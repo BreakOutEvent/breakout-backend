@@ -16,3 +16,4 @@ server.pid
 /dist/
 .cache
 .idea
+build
