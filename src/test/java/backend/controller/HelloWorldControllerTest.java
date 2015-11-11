@@ -39,6 +39,6 @@ public class HelloWorldControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("content").value("Hello, Stranger!"));
-    } 
+    }
 
 }
