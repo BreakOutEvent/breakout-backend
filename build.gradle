@@ -36,6 +36,17 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.3'
 }
 
-task stage {
-    dependsOn build
+// See: http://stackoverflow.com/questions/26389679/running-spring-app-built-with-gradle-on-heroku
+task stage(type: Copy, dependsOn: [clean, build]) {
+    from jar.archivePath
+    into project.rootDir
+    rename {
+        'app.jar'
+    }
+}
+
+stage.mustRunAfter(clean)
+
+clean << {
+    project.file('app.jar').delete()
 }
