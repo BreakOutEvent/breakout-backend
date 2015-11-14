@@ -36,7 +36,7 @@ public class HelloWorldControllerTest {
 
     @Test
     public void saysHello() throws Exception {
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/helloworld"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("content").value("Hello and welcome to BreakOut, Stranger!"));
