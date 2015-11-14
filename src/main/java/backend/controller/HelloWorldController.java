@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Controller
-@RequestMapping("/")
+@RequestMapping("/helloworld")
 public class HelloWorldController {
 
     private static final String template = "Hello and welcome to BreakOut, %s!";
