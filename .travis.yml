@@ -17,4 +17,4 @@ deploy:
 services:
 - mysql
 before_script:
-- mysql -e "create database IF NOT EXISTS test;"
+- mysql -e "DROP DATABASE IF EXISTS test; CREATE DATABASE test;"

@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -42,4 +43,12 @@ public class HelloWorldControllerTest {
                 .andExpect(jsonPath("content").value("Hello and welcome to BreakOut, Stranger!"));
     }
 
+    @Test
+    public void deleteHello() throws Exception {
+        saysHello();
+        mockMvc.perform(delete("/helloworld?id=1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("success").value("deleted"));
+    }
 }
