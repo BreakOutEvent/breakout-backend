@@ -17,4 +17,4 @@ deploy:
 services:
 - mysql
 before_script:
-  - if [[ "$DB" == "mysql" ]]; then mysql -e "create database IF NOT EXISTS test; CREATE TABLE `greeting` ( `id` BIGINT(20) NOT NULL AUTO_INCREMENT, `content` VARCHAR(255) NOT NULL, PRIMARY KEY (`id`) )" -uroot; fi
+- mysql -e "create database IF NOT EXISTS test; CREATE TABLE test.greeting ( id BIGINT(20) NOT NULL AUTO_INCREMENT, content VARCHAR(255) NOT NULL, PRIMARY KEY (id));"
