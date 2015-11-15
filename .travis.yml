@@ -14,3 +14,5 @@ deploy:
   on:
     repo: BreakOutEvent/breakout-backend
     branch: develop
+services:
+- mysql
