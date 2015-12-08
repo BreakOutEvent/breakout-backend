@@ -8,6 +8,73 @@ public class UserCore implements User {
     private Map<Class, UserRole> userRoles = new HashMap<>();
 
     @Override
+    public String getFirstname() {
+        return firstname;
+    }
+
+    @Override
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    @Override
+    public String getLastname() {
+        return lastname;
+    }
+
+    @Override
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    @Override
+    public String getEmail() {
+        return email;
+    }
+
+    @Override
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    @Override
+    public boolean isBlocked() {
+        return isBlocked;
+    }
+
+    @Override
+    public void setIsBlocked(boolean isBlocked) {
+        this.isBlocked = isBlocked;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Override
+    public String getGender() {
+        return gender;
+    }
+
+    @Override
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    private String firstname;
+    private String lastname;
+    private String email;
+    private boolean isBlocked = false;
+    private String password;
+    private String gender;
+
+    @Override
     public UserRole addRole(Class clazz) throws Exception {
 
         UserRole role;
