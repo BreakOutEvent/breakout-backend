@@ -1,6 +1,7 @@
 package backend.controller;
 
 import backend.BackendConfiguration;
+import backend.TestBackendConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = BackendConfiguration.class)
+@SpringApplicationConfiguration(classes = TestBackendConfiguration.class)
 @WebAppConfiguration
 @IntegrationTest("server.port:0")
 public class TestPostController {
