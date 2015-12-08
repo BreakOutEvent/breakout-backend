@@ -5,36 +5,36 @@ import java.util.Map;
 
 public class UserCore implements User {
 
-    private Map<String, UserRole> userRoles = new HashMap<>();
+    private Map<Class, UserRole> userRoles = new HashMap<>();
 
     @Override
-    public UserRole addRole(String spec) throws Exception {
+    public UserRole addRole(Class clazz) throws Exception {
 
         UserRole role;
 
-        if(userRoles.containsKey(spec)) {
-            return userRoles.get(spec);
+        if(userRoles.containsKey(clazz)) {
+            return userRoles.get(clazz);
         } else {
-            role = UserRole.createFor(spec, this);
-            userRoles.put(spec, role);
+            role = UserRole.createFor(clazz, this);
+            userRoles.put(clazz, role);
             return role;
         }
     }
 
     @Override
-    public UserRole getRole(String spec) {
-        return userRoles.get(spec);
+    public UserRole getRole(Class clazz) {
+        return userRoles.get(clazz);
     }
 
     @Override
-    public boolean hasRole(String spec) {
-        return userRoles.containsKey(spec);
+    public boolean hasRole(Class clazz) {
+        return userRoles.containsKey(clazz);
     }
 
     @Override
-    public UserRole removeRole(String spec) {
-        if(userRoles.containsKey(spec)) {
-            return userRoles.remove(spec);
+    public UserRole removeRole(Class clazz) {
+        if(userRoles.containsKey(clazz)) {
+            return userRoles.remove(clazz);
         } else {
             return null;
         }

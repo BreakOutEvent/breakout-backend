@@ -9,31 +9,30 @@ public abstract class UserRole implements User {
     }
 
     @Override
-    public UserRole addRole(String role) throws Exception{
-        return this.core.addRole(role);
+    public UserRole addRole(Class clazz) throws Exception{
+        return this.core.addRole(clazz);
     }
 
     @Override
-    public UserRole getRole(String role) {
-        return this.core.getRole(role);
+    public UserRole getRole(Class clazz) {
+        return this.core.getRole(clazz);
     }
 
     @Override
-    public boolean hasRole(String role) {
-        return this.core.hasRole(role);
+    public boolean hasRole(Class clazz) {
+        return this.core.hasRole(clazz);
     }
 
     @Override
-    public UserRole removeRole(String role) {
-        return this.core.removeRole(role);
+    public UserRole removeRole(Class clazz) {
+        return this.core.removeRole(clazz);
     }
 
-    public static UserRole createFor(String role, UserCore core) throws Exception {
-        try {
-            Class<UserRole> c = (Class<UserRole>) Class.forName(role);
-            return c.asSubclass(c).getConstructor(UserCore.class).newInstance(core);
-        } catch (Exception e) {
-            throw new Exception("Can't create object for role "+role, e);
+    public static UserRole createFor(Class clazz, UserCore core) throws Exception {
+        if(UserRole.class.isAssignableFrom(clazz)) {
+            return (UserRole) clazz.asSubclass(clazz).getConstructor(UserCore.class).newInstance(core);
+        } else {
+            throw new Exception(clazz + " must extend UserRole");
         }
     }
 }

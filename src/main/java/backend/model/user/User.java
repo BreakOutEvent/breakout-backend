@@ -1,8 +1,8 @@
 package backend.model.user;
 
 public interface User {
-    UserRole addRole(String role) throws Exception;
-    UserRole getRole(String role);
-    boolean hasRole(String role);
-    UserRole removeRole(String role);
+    UserRole addRole(Class clazz) throws Exception;
+    UserRole getRole(Class clazz);
+    boolean hasRole(Class clazz);
+    UserRole removeRole(Class clazz);
 }
