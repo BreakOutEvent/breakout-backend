@@ -1,6 +1,10 @@
 package backend.model.user;
 
 public interface User {
+
+    Integer getId();
+    void setId(Integer id);
+
     String getFirstname();
     void setFirstname(String firstname);
 
@@ -23,4 +27,6 @@ public interface User {
     UserRole getRole(Class clazz);
     boolean hasRole(Class clazz);
     UserRole removeRole(Class clazz);
+
+    UserCore getCore();
 }

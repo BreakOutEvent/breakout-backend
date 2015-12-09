@@ -1,13 +1,24 @@
 package backend.model.user;
 
+import backend.TestBackendConfiguration;
 import org.junit.Test;
-import org.junit.internal.runners.JUnit4ClassRunner;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.IntegrationTest;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import static org.junit.Assert.*;
 
-@RunWith(JUnit4ClassRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = TestBackendConfiguration.class)
+@WebAppConfiguration
+@IntegrationTest("server.port:0")
 public class UserTest {
+
+    @Autowired
+    private UserRepository userRepository;
 
     /**
      * Create new user without any roles
@@ -22,6 +33,7 @@ public class UserTest {
 
     /**
      * Create new user with role employee
+     *
      * @throws Exception
      */
     @Test
@@ -61,6 +73,7 @@ public class UserTest {
     /**
      * Create user and add some details
      * Check if role delegates calls to core
+     *
      * @throws Exception
      */
     @Test
@@ -105,5 +118,36 @@ public class UserTest {
         assertEquals(true, user.isBlocked());
         assertEquals("_Lorem ipsum", user.getPassword());
         assertEquals("_Male", user.getGender());
+    }
+
+    @Test
+    public void createAndSaveUser() throws Exception {
+
+        // Create user with role and save it
+        User user = new UserCore().addRole(Employee.class);
+        user.setFirstname("Florian");
+        user.setLastname("Schmidt");
+        user.setEmail("florian.schmidt.1994@icloud.com");
+        user.setIsBlocked(false);
+        user.setPassword("Lorem ipsum");
+        user.setGender("Male");
+        userRepository.save(user.getCore());
+
+        // Check if saved user can be found again
+        User user1 = userRepository.findByEmail("florian.schmidt.1994@icloud.com");
+        assertEquals(user.getId(), user1.getId());
+        assertTrue(user.hasRole(Employee.class));
+
+        // Add and remove roles from user and save
+        user1.addRole(Participant.class);
+        user1.removeRole(Employee.class);
+        userRepository.save(user1.getCore());
+
+        // Check if found user has correct roles
+        User user2 = userRepository.findByEmail("florian.schmidt.1994@icloud.com");
+        assertEquals(user.getId(), user2.getId());
+        assertTrue(user2.hasRole(Participant.class));
+        assertFalse(user2.hasRole(Employee.class));
+
     }
 }

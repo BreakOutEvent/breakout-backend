@@ -1,11 +1,25 @@
 package backend.model.user;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.OneToOne;
+
+@Entity
+@DiscriminatorValue("EMPLOYEE")
 public class Employee extends UserRole {
 
+    @OneToOne
     private Address address;
+
+    @Column(name = "emp_tshirtsize")
     private String tshirtSize;
     private String title;
     private String phonenumber;
+
+    public Employee() {
+        super();
+    }
 
     public Employee(UserCore core) {
         super(core);
@@ -41,5 +55,10 @@ public class Employee extends UserRole {
 
     public void setPhonenumber(String phonenumber) {
         this.phonenumber = phonenumber;
+    }
+
+    @Override
+    public String getAuthority() {
+        return "EMPLOYEE";
     }
 }

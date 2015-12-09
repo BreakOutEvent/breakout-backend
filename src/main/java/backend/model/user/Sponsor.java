@@ -1,16 +1,21 @@
 package backend.model.user;
 
-public class Sponsor extends UserRole {
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
-    public Sponsor(UserCore core) {
-        super(core);
-    }
+@Entity
+@DiscriminatorValue("S")
+public class Sponsor extends UserRole {
 
     private String company;
     private String logo;
     private String url;
     private String address;
     private String isHidden;
+
+    public Sponsor(UserCore core) {
+        super(core);
+    }
 
     public Sponsor(UserCore core, String company, String logo, String url, String address, String isHidden) {
         super(core);
@@ -59,5 +64,10 @@ public class Sponsor extends UserRole {
 
     public void setIsHidden(String isHidden) {
         this.isHidden = isHidden;
+    }
+
+    @Override
+    public String getAuthority() {
+        return "SPONSOR";
     }
 }

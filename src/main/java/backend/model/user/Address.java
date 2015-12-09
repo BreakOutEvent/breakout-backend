@@ -1,7 +1,15 @@
 package backend.model.user;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity
 public class Address {
 
+    @Id
+    @GeneratedValue
+    private Integer id;
     private String street;
     private String housenumber;
     private String city;
@@ -12,6 +20,18 @@ public class Address {
         this.housenumber = housenumber;
         this.city = city;
         this.country = country;
+    }
+
+    public Address() {
+
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getStreet() {

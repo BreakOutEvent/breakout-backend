@@ -1,10 +1,39 @@
 package backend.model.user;
 
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.persistence.*;
 import java.util.HashMap;
 import java.util.Map;
 
+@Entity
 public class UserCore implements User {
 
+    @Id
+    @GeneratedValue
+    private Integer id;
+
+    @NotEmpty
+    private String firstname;
+
+    @NotEmpty
+    private String lastname;
+
+    @Email
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    // TODO: Not sure how to annotate this one
+    private boolean isBlocked = false;
+
+    @NotEmpty
+    private String password;
+
+    @NotEmpty
+    private String gender;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Map<Class, UserRole> userRoles = new HashMap<>();
 
     @Override
@@ -42,6 +71,10 @@ public class UserCore implements User {
         return isBlocked;
     }
 
+    public void setBlocked(boolean blocked) {
+        isBlocked = blocked;
+    }
+
     @Override
     public void setIsBlocked(boolean isBlocked) {
         this.isBlocked = isBlocked;
@@ -67,19 +100,28 @@ public class UserCore implements User {
         this.gender = gender;
     }
 
-    private String firstname;
-    private String lastname;
-    private String email;
-    private boolean isBlocked = false;
-    private String password;
-    private String gender;
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Map<Class, UserRole> getUserRoles() {
+        return userRoles;
+    }
+
+    public void setUserRoles(Map<Class, UserRole> userRoles) {
+        this.userRoles = userRoles;
+    }
 
     @Override
     public UserRole addRole(Class clazz) throws Exception {
 
         UserRole role;
 
-        if(userRoles.containsKey(clazz)) {
+        if (userRoles.containsKey(clazz)) {
             return userRoles.get(clazz);
         } else {
             role = UserRole.createFor(clazz, this);
@@ -100,10 +142,15 @@ public class UserCore implements User {
 
     @Override
     public UserRole removeRole(Class clazz) {
-        if(userRoles.containsKey(clazz)) {
+        if (userRoles.containsKey(clazz)) {
             return userRoles.remove(clazz);
         } else {
             return null;
         }
+    }
+
+    @Override
+    public UserCore getCore() {
+        return this;
     }
 }

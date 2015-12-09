@@ -1,11 +1,51 @@
 package backend.model.user;
 
-public abstract class UserRole implements User {
+import org.springframework.security.core.GrantedAuthority;
 
+import javax.persistence.*;
+
+@Entity
+@Inheritance
+@DiscriminatorColumn(name = "ROLE_NAME")
+public abstract class UserRole implements User, GrantedAuthority {
+
+    @Id
+    @GeneratedValue()
+    private Integer id;
+    @ManyToOne
     private UserCore core;
+
+    public UserRole() {
+
+    }
 
     public UserRole(UserCore core) {
         this.core = core;
+    }
+
+    public static UserRole createFor(Class clazz, UserCore core) throws Exception {
+        if (UserRole.class.isAssignableFrom(clazz)) {
+            return (UserRole) clazz.asSubclass(clazz).getConstructor(UserCore.class).newInstance(core);
+        } else {
+            throw new Exception(clazz + " must extend UserRole");
+        }
+    }
+
+    @Override
+    public UserCore getCore() {
+        return this.core;
+    }
+
+    public void setCore(UserCore core) {
+        this.core = core;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     @Override
@@ -69,7 +109,7 @@ public abstract class UserRole implements User {
     }
 
     @Override
-    public UserRole addRole(Class clazz) throws Exception{
+    public UserRole addRole(Class clazz) throws Exception {
         return this.core.addRole(clazz);
     }
 
@@ -86,13 +126,5 @@ public abstract class UserRole implements User {
     @Override
     public UserRole removeRole(Class clazz) {
         return this.core.removeRole(clazz);
-    }
-
-    public static UserRole createFor(Class clazz, UserCore core) throws Exception {
-        if(UserRole.class.isAssignableFrom(clazz)) {
-            return (UserRole) clazz.asSubclass(clazz).getConstructor(UserCore.class).newInstance(core);
-        } else {
-            throw new Exception(clazz + " must extend UserRole");
-        }
     }
 }

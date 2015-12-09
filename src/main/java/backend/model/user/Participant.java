@@ -1,15 +1,23 @@
 package backend.model.user;
 
-public class Participant extends UserRole {
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
-    public Participant(UserCore core) {
-        super(core);
-    }
+@Entity
+@DiscriminatorValue("PARTICIPANT")
+public class Participant extends UserRole {
 
     private String emergencynumber;
     private String tshirtsize;
     private String hometown;
     private String phonenumber;
+
+    public Participant() {
+        super();
+    }
+    public Participant(UserCore core) {
+        super(core);
+    }
 
     public String getEmergencynumber() {
         return emergencynumber;
@@ -41,5 +49,10 @@ public class Participant extends UserRole {
 
     public void setPhonenumber(String phonenumber) {
         this.phonenumber = phonenumber;
+    }
+
+    @Override
+    public String getAuthority() {
+        return "PARTICIPANT";
     }
 }
