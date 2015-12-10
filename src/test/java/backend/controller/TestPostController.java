@@ -1,40 +1,11 @@
 package backend.controller;
 
-import backend.BackendConfiguration;
-import backend.TestBackendConfiguration;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = TestBackendConfiguration.class)
-@WebAppConfiguration
-@IntegrationTest("server.port:0")
-public class TestPostController {
-
-    @Autowired
-    private WebApplicationContext context;
-    private MockMvc mockMvc;
-
-    @Before
-    public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-    }
+public class TestPostController extends backend.controller.IntegrationTest {
 
     @Test
     public void createNewPost() throws Exception {
@@ -76,11 +47,5 @@ public class TestPostController {
 
         mockMvc.perform(post("/test/post/", missingNestedField))
                 .andExpect(status().isBadRequest());
-    }
-
-    private MockHttpServletRequestBuilder post(String path, String json) {
-        return MockMvcRequestBuilders.post(path)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(json);
     }
 }
