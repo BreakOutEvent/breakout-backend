@@ -1,15 +1,12 @@
 package backend.model.user;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 @Entity
 @DiscriminatorValue("EMPLOYEE")
 public class Employee extends UserRole {
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Address address;
 
     @Column(name = "emp_tshirtsize")

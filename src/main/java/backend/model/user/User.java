@@ -2,9 +2,6 @@ package backend.model.user;
 
 public interface User {
 
-    Integer getId();
-    void setId(Integer id);
-
     String getFirstname();
     void setFirstname(String firstname);
 

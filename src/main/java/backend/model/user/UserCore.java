@@ -33,7 +33,13 @@ public class UserCore implements User {
     @NotEmpty
     private String gender;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    /*
+     * cascade all operations to children
+     * orphanRemoval = true allows removing a role from the database
+     * if it gets removed from Map userRoles and the core is saved!
+     * See: http://stackoverflow.com/a/2011546
+     */
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private Map<Class, UserRole> userRoles = new HashMap<>();
 
     @Override

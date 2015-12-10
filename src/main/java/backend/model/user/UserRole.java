@@ -11,7 +11,8 @@ public abstract class UserRole implements User, GrantedAuthority {
 
     @Id
     @GeneratedValue()
-    private Integer id;
+    private Integer roleID;
+
     @ManyToOne
     private UserCore core;
 
@@ -40,12 +41,12 @@ public abstract class UserRole implements User, GrantedAuthority {
         this.core = core;
     }
 
-    public Integer getId() {
-        return id;
+    public Integer getRoleID() {
+        return roleID;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setRoleID(Integer id) {
+        this.roleID = id;
     }
 
     @Override

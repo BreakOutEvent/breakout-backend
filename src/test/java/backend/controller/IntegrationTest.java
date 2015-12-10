@@ -1,6 +1,7 @@
 package backend.controller;
 
 import backend.TestBackendConfiguration;
+import backend.model.user.UserRepository;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,14 @@ import org.springframework.web.context.WebApplicationContext;
 @org.springframework.boot.test.IntegrationTest("server.port:0")
 public abstract class IntegrationTest {
 
-    @Autowired
-    private WebApplicationContext context;
+
+    @Autowired private WebApplicationContext context;
+    @Autowired protected UserRepository userRepository;
     protected MockMvc mockMvc;
 
     @Before
     public void setUp() {
+        userRepository.deleteAll();
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
     }
 

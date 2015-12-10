@@ -1,6 +1,7 @@
 package backend.model.user;
 
 import backend.TestBackendConfiguration;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,9 @@ import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -19,6 +23,12 @@ public class UserTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Before
+    public void setUp() {
+        Iterable<UserCore> users = userRepository.findAll();
+        userRepository.deleteAll();
+    }
 
     /**
      * Create new user without any roles
@@ -127,15 +137,15 @@ public class UserTest {
         User user = new UserCore().addRole(Employee.class);
         user.setFirstname("Florian");
         user.setLastname("Schmidt");
-        user.setEmail("florian.schmidt.1994@icloud.com");
+        user.setEmail("florian.schmidt.1995@icloud.com");
         user.setIsBlocked(false);
         user.setPassword("Lorem ipsum");
         user.setGender("Male");
         userRepository.save(user.getCore());
 
         // Check if saved user can be found again
-        User user1 = userRepository.findByEmail("florian.schmidt.1994@icloud.com");
-        assertEquals(user.getId(), user1.getId());
+        User user1 = userRepository.findByEmail("florian.schmidt.1995@icloud.com");
+        assertEquals(user.getCore().getId(), user1.getCore().getId());
         assertTrue(user.hasRole(Employee.class));
 
         // Add and remove roles from user and save
@@ -144,8 +154,8 @@ public class UserTest {
         userRepository.save(user1.getCore());
 
         // Check if found user has correct roles
-        User user2 = userRepository.findByEmail("florian.schmidt.1994@icloud.com");
-        assertEquals(user.getId(), user2.getId());
+        User user2 = userRepository.findByEmail("florian.schmidt.1995@icloud.com");
+        assertEquals(user.getCore().getId(), user2.getCore().getId());
         assertTrue(user2.hasRole(Participant.class));
         assertFalse(user2.hasRole(Employee.class));
 
