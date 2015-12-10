@@ -29,6 +29,19 @@ public class UserController {
         user.setPassword(body.getPassword());
         userRepository.save(user.getCore());
 
+        // TODO: Discuss what shall be returned here!
         return "{\"id\":\"1\"}";
     }
+
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping(value = "/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Iterable<UserCore> showUsers() {
+        return userRepository.findAll();
+    }
+
+//    @ExceptionHandler(Exception.class)
+//    public void handle(Exception e) {
+//        e.printStackTrace();
+//    }
+
 }

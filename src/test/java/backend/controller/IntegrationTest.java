@@ -44,10 +44,8 @@ public abstract class IntegrationTest {
                 .content(json);
     }
 
-    public MockHttpServletRequestBuilder get(String path, String json) {
-        return MockMvcRequestBuilders.get(path)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(json);
+    public MockHttpServletRequestBuilder get(String path) {
+        return MockMvcRequestBuilders.get(path);
     }
 }
 
