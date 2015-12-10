@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 @SpringApplicationConfiguration(classes = TestBackendConfiguration.class)
 @WebAppConfiguration
 @IntegrationTest("server.port:0")
-public class UserTest {
+public class TestUser {
 
     @Autowired
     private UserRepository userRepository;
