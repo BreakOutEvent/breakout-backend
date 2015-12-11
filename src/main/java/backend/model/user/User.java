@@ -20,10 +20,10 @@ public interface User {
     String getGender();
     void setGender(String gender);
 
-    UserRole addRole(Class clazz) throws Exception;
-    UserRole getRole(Class clazz);
-    boolean hasRole(Class clazz);
-    UserRole removeRole(Class clazz);
+    UserRole addRole(Class<? extends UserRole> clazz) throws Exception;
+    UserRole getRole(Class<? extends UserRole> clazz);
+    boolean hasRole(Class<? extends UserRole> clazz);
+    UserRole removeRole(Class<? extends UserRole> clazz);
 
     UserCore getCore();
 }

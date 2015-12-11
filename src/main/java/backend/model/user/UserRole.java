@@ -24,12 +24,8 @@ public abstract class UserRole implements User, GrantedAuthority {
         this.core = core;
     }
 
-    public static UserRole createFor(Class clazz, UserCore core) throws Exception {
-        if (UserRole.class.isAssignableFrom(clazz)) {
-            return (UserRole) clazz.asSubclass(clazz).getConstructor(UserCore.class).newInstance(core);
-        } else {
-            throw new Exception(clazz + " must extend UserRole");
-        }
+    public static UserRole createFor(Class<? extends UserRole> clazz, UserCore core) throws Exception {
+        return clazz.asSubclass(clazz).getConstructor(UserCore.class).newInstance(core);
     }
 
     @Override
@@ -110,22 +106,22 @@ public abstract class UserRole implements User, GrantedAuthority {
     }
 
     @Override
-    public UserRole addRole(Class clazz) throws Exception {
+    public UserRole addRole(Class<? extends UserRole> clazz) throws Exception {
         return this.core.addRole(clazz);
     }
 
     @Override
-    public UserRole getRole(Class clazz) {
+    public UserRole getRole(Class<? extends UserRole> clazz) {
         return this.core.getRole(clazz);
     }
 
     @Override
-    public boolean hasRole(Class clazz) {
+    public boolean hasRole(Class<? extends UserRole> clazz) {
         return this.core.hasRole(clazz);
     }
 
     @Override
-    public UserRole removeRole(Class clazz) {
+    public UserRole removeRole(Class<? extends UserRole> clazz) {
         return this.core.removeRole(clazz);
     }
 }

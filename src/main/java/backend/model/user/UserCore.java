@@ -41,7 +41,7 @@ public class UserCore implements User {
      * See: http://stackoverflow.com/a/2011546
      */
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    private Map<Class, UserRole> userRoles = new HashMap<>();
+    private Map<Class<? extends UserRole>, UserRole> userRoles = new HashMap<>();
 
     @Override
     public String getFirstname() {
@@ -115,16 +115,16 @@ public class UserCore implements User {
         this.id = id;
     }
 
-    public Map<Class, UserRole> getUserRoles() {
+    public Map<Class<? extends UserRole>, UserRole> getUserRoles() {
         return userRoles;
     }
 
-    public void setUserRoles(Map<Class, UserRole> userRoles) {
+    public void setUserRoles(Map<Class<? extends UserRole>, UserRole> userRoles) {
         this.userRoles = userRoles;
     }
 
     @Override
-    public UserRole addRole(Class clazz) throws Exception {
+    public UserRole addRole(Class<? extends UserRole> clazz) throws Exception {
 
         UserRole role;
 
@@ -138,17 +138,17 @@ public class UserCore implements User {
     }
 
     @Override
-    public UserRole getRole(Class clazz) {
+    public UserRole getRole(Class<? extends UserRole> clazz) {
         return userRoles.get(clazz);
     }
 
     @Override
-    public boolean hasRole(Class clazz) {
+    public boolean hasRole(Class<? extends UserRole> clazz) {
         return userRoles.containsKey(clazz);
     }
 
     @Override
-    public UserRole removeRole(Class clazz) {
+    public UserRole removeRole(Class<? extends UserRole> clazz) {
         if (userRoles.containsKey(clazz)) {
             return userRoles.remove(clazz);
         } else {

@@ -57,26 +57,7 @@ public class TestUser {
         assertEquals(emp, user.removeRole(Employee.class));
         assertNull(user.removeRole(Employee.class));
     }
-
-    /**
-     * Fail to create user with invalid role
-     */
-    @Test
-    public void failToCreateUser() {
-
-        User user = new UserCore();
-        try {
-            user.addRole(UserCore.class);
-            fail();
-        } catch (Exception e) {
-            assertEquals("class backend.model.user.UserCore must extend UserRole", e.getMessage());
-        }
-
-        assertFalse(user.hasRole(UserCore.class));
-        assertNull(user.getRole(Employee.class));
-        assertNull(user.removeRole(Employee.class));
-    }
-
+    
     /**
      * Create user and add some details
      * Check if role delegates calls to core
