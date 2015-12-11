@@ -146,7 +146,5 @@ public class TestUserController extends backend.controller.IntegrationTest {
                 .andExpect(jsonPath("$[1].gender").exists())
                 .andExpect(jsonPath("$[1].userRoles").exists())
                 .andReturn();
-
-        System.out.println(result.getResponse().getContentAsString());
     }
 }
