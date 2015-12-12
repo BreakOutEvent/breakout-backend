@@ -10,15 +10,31 @@ import java.util.HashMap
 @Entity
 class UserCore : User {
 
-    @Id @GeneratedValue var id: Int? = null
-    @NotEmpty override lateinit var firstname: String
-    @NotEmpty override lateinit var lastname: String
-    @Email @Column(unique = true, nullable = false) override lateinit var email: String
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false, updatable = false)
+    var id: Long? = null
+
+    @NotEmpty
+    override lateinit var passwordHash: String
+
+    @NotEmpty
+    override lateinit var firstname: String
+
+    @NotEmpty
+    override lateinit var lastname: String
+
+    @Email
+    @Column(unique = true, nullable = false)
+    override lateinit var email: String
 
     // TODO: Not sure how to annotate this one
     override var isBlocked = false
-    @NotEmpty override lateinit var password: String
-    @NotEmpty override lateinit var gender: String
+
+
+
+    @NotEmpty
+    override lateinit var gender: String
 
     /*
      * cascade all operations to children

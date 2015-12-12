@@ -7,7 +7,7 @@ interface User {
     var lastname: String
     var email: String
     var isBlocked: Boolean
-    var password: String
+    var passwordHash: String
     var gender: String
 
     fun addRole(clazz: Class<out UserRole>): UserRole

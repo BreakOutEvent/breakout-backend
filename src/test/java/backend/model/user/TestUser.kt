@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 import org.springframework.test.context.web.WebAppConfiguration
 
 import org.junit.Assert.*
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
 @RunWith(SpringJUnit4ClassRunner::class)
 @SpringApplicationConfiguration(classes = arrayOf(TestBackendConfiguration::class))
@@ -73,7 +74,7 @@ class TestUser {
         user.lastname = "Schmidt"
         user.email = "florian.schmidt.1994@icloud.com"
         user.isBlocked = false
-        user.password = "Lorem ipsum"
+        user.passwordHash = "Lorem ipsum"
         user.gender = "Male"
 
         val emp = user.addRole(Employee::class.java) as Employee
@@ -83,7 +84,7 @@ class TestUser {
         assertEquals("Schmidt", user.lastname)
         assertEquals("florian.schmidt.1994@icloud.com", user.email)
         assertEquals(false, user.isBlocked)
-        assertEquals("Lorem ipsum", user.password)
+        assertEquals("Lorem ipsum", user.passwordHash)
         assertEquals("Male", user.gender)
 
         // Check it's roles getter
@@ -91,7 +92,7 @@ class TestUser {
         assertEquals("Schmidt", emp.lastname)
         assertEquals("florian.schmidt.1994@icloud.com", emp.email)
         assertEquals(false, emp.isBlocked)
-        assertEquals("Lorem ipsum", emp.password)
+        assertEquals("Lorem ipsum", user.passwordHash)
         assertEquals("Male", emp.gender)
 
         // Check it's roles setter
@@ -99,14 +100,14 @@ class TestUser {
         emp.lastname = "_Schmidt"
         emp.email = "_florian.schmidt.1994@icloud.com"
         emp.isBlocked = true
-        emp.password = "_Lorem ipsum"
+        emp.passwordHash = "_Lorem ipsum"
         emp.gender = "_Male"
 
         assertEquals("_Florian", user.firstname)
         assertEquals("_Schmidt", user.lastname)
         assertEquals("_florian.schmidt.1994@icloud.com", user.email)
         assertEquals(true, user.isBlocked)
-        assertEquals("_Lorem ipsum", user.password)
+        assertEquals("_Lorem ipsum", user.passwordHash)
         assertEquals("_Male", user.gender)
     }
 
@@ -120,7 +121,7 @@ class TestUser {
         user.lastname = "Schmidt"
         user.email = "florian.schmidt.1995@icloud.com"
         user.isBlocked = false
-        user.password = "Lorem ipsum"
+        user.passwordHash = "Lorem ipsum"
         user.gender = "Male"
         userRepository!!.save(user.core)
 
@@ -141,5 +142,9 @@ class TestUser {
         assertTrue(user2.hasRole(Participant::class.java))
         assertFalse(user2.hasRole(Employee::class.java))
 
+    }
+
+    private fun hashed(string: String): String {
+        return BCryptPasswordEncoder().encode(string);
     }
 }

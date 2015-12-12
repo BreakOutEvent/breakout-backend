@@ -43,10 +43,10 @@ abstract class UserRole() : User, GrantedAuthority {
             this.core!!.isBlocked = true
         }
 
-    override var password: String
-        get() = this.core!!.password
+    override var passwordHash: String
+        get() = this.core!!.passwordHash
         set(password) {
-            this.core!!.password = password
+            this.core!!.passwordHash = password
         }
 
     override var gender: String

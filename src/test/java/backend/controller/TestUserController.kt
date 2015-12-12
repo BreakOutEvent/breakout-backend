@@ -71,7 +71,7 @@ class TestUserController : IntegrationTest() {
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("id").exists())
                 .andReturn()
-        
+
         val user = userRepository.findByEmail("florianschmidt.1994@icloud.com")
         assertNotNull(user)
         assertEquals(user.email, jsonMap["email"])
@@ -79,6 +79,31 @@ class TestUserController : IntegrationTest() {
     }
 
     //TODO: Testcases where email already exists in database!
+
+    @Test
+    fun cantAddExistingUser() {
+        this.mockMvc.perform(post("/test/user/", body()))
+                .andExpect(status().isCreated)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("id").exists())
+                .andReturn()
+
+        val res = this.mockMvc.perform(post("/test/user/", body()))
+            .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.error").value("user already exists"))
+    }
+
+    private fun body(): String {
+        // Insert dummy users in database
+        var jsonMap: MutableMap<String, String> = HashMap()
+        jsonMap.put("firstname", "Florian")
+        jsonMap.put("lastname", "Schmidt")
+        jsonMap.put("email", "florian.schmidt.1994@icloud.com")
+        jsonMap.put("password", "mypassword")
+        jsonMap.put("gender", "Male")
+        return ObjectMapper().writeValueAsString(jsonMap)
+    }
 
     @Test
     @Throws(Exception::class)
@@ -125,7 +150,7 @@ class TestUserController : IntegrationTest() {
                 .andExpect(jsonPath("$[0].blocked").exists())
                 .andExpect(jsonPath("$[0].firstname").exists())
                 .andExpect(jsonPath("$[0].lastname").exists())
-                .andExpect(jsonPath("$[0].password").exists())
+                .andExpect(jsonPath("$[0].passwordHash").exists())
                 .andExpect(jsonPath("$[0].gender").exists())
                 .andExpect(jsonPath("$[0].userRoles").exists())
                 .andExpect(jsonPath("$[1].email").exists())
@@ -133,7 +158,7 @@ class TestUserController : IntegrationTest() {
                 .andExpect(jsonPath("$[1].blocked").exists())
                 .andExpect(jsonPath("$[1].firstname").exists())
                 .andExpect(jsonPath("$[1].lastname").exists())
-                .andExpect(jsonPath("$[1].password").exists())
+                .andExpect(jsonPath("$[1].passwordHash").exists())
                 .andExpect(jsonPath("$[1].gender").exists())
                 .andExpect(jsonPath("$[1].userRoles").exists())
                 .andReturn()
