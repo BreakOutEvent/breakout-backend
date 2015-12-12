@@ -71,9 +71,7 @@ class TestUserController : IntegrationTest() {
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("id").exists())
                 .andReturn()
-
-        val content = result.response.contentAsString
-
+        
         val user = userRepository.findByEmail("florianschmidt.1994@icloud.com")
         assertNotNull(user)
         assertEquals(user.email, jsonMap["email"])
