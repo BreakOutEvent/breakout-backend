@@ -1,11 +1,12 @@
-@file:JvmName("IntegrationTest")
-package backend.controller
+package backend.Integration
 
 import backend.TestBackendConfiguration
 import backend.model.user.UserRepository
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.Before
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.IntegrationTest
 import org.springframework.boot.test.SpringApplicationConfiguration
 import org.springframework.http.MediaType
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
@@ -19,7 +20,7 @@ import org.springframework.web.context.WebApplicationContext
 @RunWith(SpringJUnit4ClassRunner::class)
 @SpringApplicationConfiguration(classes = arrayOf(TestBackendConfiguration::class))
 @WebAppConfiguration
-@org.springframework.boot.test.IntegrationTest("server.port:0")
+@IntegrationTest("server.port:0")
 abstract class IntegrationTest {
 
 
@@ -45,4 +46,7 @@ abstract class IntegrationTest {
         return MockMvcRequestBuilders.get(path)
     }
 }
+
+// Add .toJsonString() to class map
+fun Map<String, String>.toJsonString() = ObjectMapper().writeValueAsString(this)
 

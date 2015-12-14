@@ -1,12 +1,13 @@
 @file:JvmName("TestPostController")
 package backend.controller
 
+import backend.Integration.IntegrationTest
 import org.junit.Test
 import org.springframework.http.MediaType
 
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
-class TestPostController : backend.controller.IntegrationTest() {
+class TestPostController : IntegrationTest() {
 
     @Test
     @Throws(Exception::class)

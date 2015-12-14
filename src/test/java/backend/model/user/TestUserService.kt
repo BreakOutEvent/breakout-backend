@@ -1,6 +1,6 @@
 package backend.model.user
 
-import backend.controller.IntegrationTest
+import backend.Integration.IntegrationTest
 import backend.controller.RequestBodies.PostUserBody
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -11,7 +11,7 @@ class TestUserService : IntegrationTest() {
 
     @Autowired
     private lateinit var userService: UserService
-    
+
     @Test
     fun create() {
         val body = PostUserBody()
