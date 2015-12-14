@@ -14,14 +14,14 @@ class TestUserService : IntegrationTest() {
 
     @Test
     fun create() {
-        val body = getDummyBody()
+        val body = getDummyPostUserBody()
         assertNotNull(userService.create(body))
         assertFailsWith(Exception::class.java, { userService.create(body)})
     }
 
     @Test
     fun getUserById() {
-        val body = getDummyBody()
+        val body = getDummyPostUserBody()
         val user = userService.create(body)
         val user2 = userService.getUserById(user!!.core!!.id!!)
         assertEquals(user.core!!.id, user2!!.core!!.id)
@@ -31,7 +31,7 @@ class TestUserService : IntegrationTest() {
 
     @Test
     fun getUserByEmail() {
-        val body = getDummyBody()
+        val body = getDummyPostUserBody()
         val user = userService.create(body)
         val user2 = userService.getUserByEmail(user!!.email)
         assertEquals(user.core!!.email, user2!!.core!!.email)
@@ -39,7 +39,7 @@ class TestUserService : IntegrationTest() {
 
     @Test
     fun getAllUsers() {
-        val body = getDummyBody()
+        val body = getDummyPostUserBody()
         userService.create(body)
 
         body.email = "florian@mail.de"
@@ -51,7 +51,7 @@ class TestUserService : IntegrationTest() {
 
     @Test
     fun existsEmail() {
-        val body = getDummyBody()
+        val body = getDummyPostUserBody()
         userService.create(body)
 
         body.email = "florian@mail.de"
@@ -59,16 +59,6 @@ class TestUserService : IntegrationTest() {
 
         assertTrue(userService.exists(body.email!!))
         assertFalse(userService.exists("f@s.com"))
-    }
-
-    private fun getDummyBody(): PostUserBody {
-        val body = PostUserBody()
-        body.email = "florian.schmidt.1994@icloud.com"
-        body.firstname = "Florian"
-        body.lastname = "Schmidt"
-        body.gender = "Male"
-        body.password = "Awesome password"
-        return body
     }
 
 }

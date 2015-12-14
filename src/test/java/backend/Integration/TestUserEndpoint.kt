@@ -24,10 +24,35 @@ class TestUserEndpoint : IntegrationTest() {
 
     @Before
     override fun setUp() {
+        // this will delete all users from the test database
         super.setUp()
     }
 
     // TODO: Restricted Access based on roles
+
+    /**
+     * GET /user/
+     */
+    @Test
+    fun getUser() {
+        userService.create(getDummyPostUserBody())
+        userService.create(getDummyPostUserBody())
+        mockMvc.perform(get("/user/"))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$[0].firstname").exists())
+                .andExpect(jsonPath("$[0].lastname").exists())
+                .andExpect(jsonPath("$[0].email").exists())
+                .andExpect(jsonPath("$[0].gender").exists())
+                .andExpect(jsonPath("$[0].userRoles").exists())
+                .andExpect(jsonPath("$[0].passwordHash").exists()) // TODO: Change this!!
+                .andExpect(jsonPath("$[1].firstname").exists())
+                .andExpect(jsonPath("$[1].lastname").exists())
+                .andExpect(jsonPath("$[1].email").exists())
+                .andExpect(jsonPath("$[1].gender").exists())
+                .andExpect(jsonPath("$[1].userRoles").exists())
+                .andExpect(jsonPath("$[1].passwordHash").exists())
+    }
 
     /**
      * POST /user/

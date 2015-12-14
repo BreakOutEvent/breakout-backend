@@ -1,6 +1,7 @@
 package backend.Integration
 
 import backend.TestBackendConfiguration
+import backend.controller.RequestBodies.PostUserBody
 import backend.model.user.UserRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.Before
@@ -28,6 +29,22 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var userRepository: UserRepository
     lateinit protected var mockMvc: MockMvc
 
+    companion object {
+
+        var counter = 0;
+
+        fun getDummyPostUserBody(): PostUserBody {
+            val body = PostUserBody()
+            body.email = "nr$counter@icloud.com"
+            body.firstname = "Florian"
+            body.lastname = "Schmidt"
+            body.gender = "Male"
+            body.password = "Awesome password"
+            counter++
+            return body
+        }
+    }
+
     @Before
     open fun setUp() {
         userRepository.deleteAll()
@@ -45,6 +62,8 @@ abstract class IntegrationTest {
     operator fun get(path: String): MockHttpServletRequestBuilder {
         return MockMvcRequestBuilders.get(path)
     }
+
+
 }
 
 // Add .toJsonString() to class map
