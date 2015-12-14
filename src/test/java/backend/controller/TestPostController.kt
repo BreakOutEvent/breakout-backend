@@ -2,6 +2,7 @@
 package backend.controller
 
 import backend.Integration.IntegrationTest
+import backend.Integration.toJsonString
 import org.junit.Test
 import org.springframework.http.MediaType
 
@@ -14,21 +15,14 @@ class TestPostController : IntegrationTest() {
     fun createNewPost() {
         //TODO: Check whether Post was really created and saved to database
 
+        val json = mapOf(
+                "created" to 1388530800000,
+                "sent" to 1388617200000,
+                "text" to "String",
+                "location" to mapOf("lat" to 51.3, "lon" to "17.2"),
+                "challenge_id" to "rand_id"
+        ).toJsonString()
 
-        //  {
-        //      "created": 1388530800000,  // UNIX Timestamp: Wed Jan 01 2014 00:00:00 GMT+0100 (CET)
-        //                                 // Date of creation in App, time when user hits "POST" button
-        //
-        //      "sent": 1388617200000,     // Unix Timestamp: Thu Jan 02 2014 00:00:00 GMT+0100 (CET)
-        //                                 // Time when post leaves queue of app, in case app was offline, may be in HTTP post??
-        //      "text": "String",          // Content of post
-        //      "location" : {
-        //          "lat": 51.3,
-        //          "lon": 17.2,
-        //      },
-        //      "challenge_id" : "rand_id" // ID of a challenge that thereby get's fulfilled by the users team!
-        //  }
-        val json = "{\"created\": 1388530800000,\"sent\": 1388617200000,\"text\": \"String\",\"location\" : {\"lat\": 51.3,\"lon\": 17.2},\"challenge_id\" : \"rand_id\"}"
         mockMvc.perform(post("/test/post/", json))
                 .andExpect(status().isCreated)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -39,17 +33,28 @@ class TestPostController : IntegrationTest() {
     @Test
     @Throws(Exception::class)
     fun dontCreatePostForInvalidJSON() {
-        val missingField = "{\"sent\": 1388617200000,\"text\": \"String\",\"location\" : {\"lat\": 51.3,\"lon\": 17.2},\"challenge_id\" : \"rand_id\"}"
-        val missingNestedField = "{\"created\":123456,\"sent\": 1388617200000,\"text\": \"String\",\"location\" : {\"lon\": 17.2},\"challenge_id\" : \"rand_id\"}"
-        val invalidJSON = "{#;}\"created\": 1388530800000,\"sent\": 1388617200000,\"text\": \"String\",\"location\" : {\"lat\": 51.3,\"lon\": 17.2},\"challenge_id\" : \"rand_id\"}"
 
-        mockMvc.perform(post("/test/post/", missingField))
-                .andExpect(status().isBadRequest)
+        val missingField = mapOf(
+                "sent" to 1388617200000,
+                "text" to "String",
+                "location" to mapOf("lat" to 51.3, "lon" to 17.2),
+                "challenge_id" to "rand_id"
+        ).toJsonString()
 
-        mockMvc.perform(post("/test/post/", invalidJSON))
-                .andExpect(status().isBadRequest)
+        val missingNestedField = mapOf(
+                "created" to 123456,
+                "sent" to  1388617200000,
+                "text" to  "String",
+                "location"  to  mapOf("lon" to  17.2),
+                "challenge_id"  to  "rand_id"
+        ).toJsonString()
 
-        mockMvc.perform(post("/test/post/", missingNestedField))
-                .andExpect(status().isBadRequest)
+        val invalidJSON = "{#;}}"
+
+        arrayOf(missingField, missingNestedField, invalidJSON).forEach {
+            mockMvc.perform(post("/test/post/", it))
+                    .andExpect(status().isBadRequest)
+        }
+
     }
 }

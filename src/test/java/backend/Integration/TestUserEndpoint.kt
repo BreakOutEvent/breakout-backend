@@ -129,6 +129,7 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.blocked").value(true))
                 .andReturn()
         // TODO: Check if user is persistent in database!
+        // TODO: Check that some values such as passwordHash aren't shown!
         println(res.response.contentAsString)
     }
     // TODO: Test response if user does not exist

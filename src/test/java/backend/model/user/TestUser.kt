@@ -24,8 +24,7 @@ class TestUser {
 
     @Before
     fun setUp() {
-        val users = userRepository!!.findAll()
-        userRepository.deleteAll()
+        userRepository!!.deleteAll()
     }
 
     /**
