@@ -19,13 +19,13 @@ abstract class UserRole() : User, GrantedAuthority {
         this.core = core
     }
 
-    override var firstname: String
+    override var firstname: String?
         get() = this.core!!.firstname
         set(firstname) {
             this.core!!.firstname = firstname
         }
 
-    override var lastname: String
+    override var lastname: String?
         get() = this.core!!.lastname
         set(lastname) {
             this.core!!.lastname = lastname
@@ -49,7 +49,7 @@ abstract class UserRole() : User, GrantedAuthority {
             this.core!!.passwordHash = password
         }
 
-    override var gender: String
+    override var gender: String?
         get() = this.core!!.gender
         set(gender) {
             this.core!!.gender = gender

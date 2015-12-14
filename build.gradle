@@ -37,6 +37,9 @@ dependencies {
     compile("org.springframework.security.oauth:spring-security-oauth2:2.0.8.RELEASE")
     compile("org.hsqldb:hsqldb")
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+
+
 
 
     testCompile("com.jayway.jsonpath:json-path:2.0.0")

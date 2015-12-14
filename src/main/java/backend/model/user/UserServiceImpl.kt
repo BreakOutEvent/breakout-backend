@@ -24,9 +24,9 @@ class UserServiceImpl: UserService {
     override fun create(body: PostUserBody): User? {
         val user = UserCore()
         user.email = body.email!!
-        user.firstname = body.firstname!!
-        user.lastname = body.lastname!!
-        user.gender = body.gender!!
+        user.firstname = body.firstname
+        user.lastname = body.lastname
+        user.gender = body.gender
         user.isBlocked = false;
         user.passwordHash = BCryptPasswordEncoder().encode(body.password);
         return userRepository.save(user);
