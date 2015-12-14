@@ -1,6 +1,7 @@
 package backend.model.user
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.hibernate.validator.constraints.Email
 import org.hibernate.validator.constraints.NotEmpty
 
@@ -28,6 +29,7 @@ class UserCore : User {
 
 
     // TODO: Not sure how to annotate this one
+    @JsonProperty("isBlocked")
     override var isBlocked = false
 
     override var gender: String? = null

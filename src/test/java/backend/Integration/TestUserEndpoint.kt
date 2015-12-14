@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.fail
 
 class TestUserEndpoint : IntegrationTest() {
 
@@ -88,4 +87,50 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.error").value("user with email a@x.de already exists"))
     }
 
+    /**
+     * PUT /user/:id/
+     * Modify the data of a user
+     */
+    @Test
+    fun putUserId() {
+
+        // Create user
+        var json = mapOf(
+                "email" to "a@x.de",
+                "password" to "password"
+        ).toJsonString()
+
+        val result = mockMvc.perform(post(url(), json))
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.id").exists())
+                .andReturn()
+
+        val response: Map<String, kotlin.Any> = ObjectMapper()
+                .reader(Map::class.java)
+                .readValue(result.response.contentAsString)
+
+        val id = response["id"] as Int
+
+        // Update user
+        json = mapOf(
+                "firstname" to "Florian",
+                "lastname" to "Schmidt",
+                "gender" to "Male",
+                "blocked" to true
+        ).toJsonString()
+
+        val res = mockMvc.perform(put(url(id), json))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.email").value("a@x.de"))
+                .andExpect(jsonPath("$.firstname").value("Florian"))
+                .andExpect(jsonPath("$.lastname").value("Schmidt"))
+                .andExpect(jsonPath("$.gender").value("Male"))
+                .andExpect(jsonPath("$.blocked").value(true))
+                .andReturn()
+        // TODO: Check if user is persistent in database!
+        println(res.response.contentAsString)
+    }
+    // TODO: Test response if user does not exist
+    // TODO: Can't override existing properties with null!
 }

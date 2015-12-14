@@ -48,5 +48,5 @@ abstract class IntegrationTest {
 }
 
 // Add .toJsonString() to class map
-fun Map<String, String>.toJsonString() = ObjectMapper().writeValueAsString(this)
+fun Map<String, kotlin.Any>.toJsonString() = ObjectMapper().writeValueAsString(this)
 

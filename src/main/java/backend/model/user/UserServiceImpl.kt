@@ -31,5 +31,7 @@ class UserServiceImpl: UserService {
         user.passwordHash = BCryptPasswordEncoder().encode(body.password);
         return userRepository.save(user);
     }
+
+    override fun save(user: User): User? = userRepository.save(user.core)
 }
 

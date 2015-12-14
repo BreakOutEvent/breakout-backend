@@ -7,4 +7,5 @@ interface UserService {
     fun getUserByEmail(email: String): User?
     fun getAllUsers(): MutableIterable<UserCore>?;
     fun create(body: PostUserBody): User?
+    fun save(user: User): User?
 }
