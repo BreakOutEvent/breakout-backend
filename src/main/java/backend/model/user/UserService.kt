@@ -8,4 +8,6 @@ interface UserService {
     fun getAllUsers(): MutableIterable<UserCore>?;
     fun create(body: PostUserBody): User?
     fun save(user: User): User?
+    fun exists(id: Long): Boolean
+    fun exists(email: String): Boolean
 }

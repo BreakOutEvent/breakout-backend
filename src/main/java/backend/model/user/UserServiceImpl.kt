@@ -6,7 +6,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 
 @Service
-class UserServiceImpl: UserService {
+class UserServiceImpl : UserService {
 
     private val userRepository: UserRepository
 
@@ -20,6 +20,10 @@ class UserServiceImpl: UserService {
     override fun getUserByEmail(email: String): User? = userRepository.findByEmail(email);
 
     override fun getAllUsers(): MutableIterable<UserCore>? = userRepository.findAll()
+
+    override fun exists(id: Long) = userRepository.exists(id)
+
+    override fun exists(email: String) = userRepository.existsByEmail(email)
 
     override fun create(body: PostUserBody): User? {
         val user = UserCore()

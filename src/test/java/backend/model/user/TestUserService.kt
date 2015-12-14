@@ -69,5 +69,22 @@ class TestUserService : IntegrationTest() {
         assertEquals(userService.getAllUsers()!!.count(), 2)
     }
 
+    @Test
+    fun existsEmail() {
+        val body = PostUserBody()
+        body.email = "florian.schmidt.1994@icloud.com"
+        body.firstname = "Florian"
+        body.lastname = "Schmidt"
+        body.gender = "Male"
+        body.password = "Awesome password"
+        val user1 = userService.create(body)
+
+        body.email = "florian@mail.de"
+        val user2 = userService.create(body)
+
+        assertTrue(userService.exists(body.email!!))
+        assertFalse(userService.exists("f@s.com"))
+    }
+
 }
 
