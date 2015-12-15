@@ -22,7 +22,5 @@ class Employee : UserRole {
     constructor(core: UserCore) : super(core) {
     }
 
-    override fun getAuthority(): String {
-        return "EMPLOYEE"
-    }
+    override fun getAuthority(): String = "EMPLOYEE"
 }

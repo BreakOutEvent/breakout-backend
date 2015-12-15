@@ -1,6 +1,7 @@
 package backend.model.user
 
 import backend.TestBackendConfiguration
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -9,9 +10,6 @@ import org.springframework.boot.test.IntegrationTest
 import org.springframework.boot.test.SpringApplicationConfiguration
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 import org.springframework.test.context.web.WebAppConfiguration
-
-import org.junit.Assert.*
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
 @RunWith(SpringJUnit4ClassRunner::class)
 @SpringApplicationConfiguration(classes = arrayOf(TestBackendConfiguration::class))
@@ -115,13 +113,15 @@ class TestUser {
     fun createAndSaveUser() {
 
         // Create user with role and save it
-        val user = UserCore().addRole(Employee::class.java)
-        user.firstname = "Florian"
-        user.lastname = "Schmidt"
-        user.email = "florian.schmidt.1995@icloud.com"
-        user.isBlocked = false
-        user.passwordHash = "Lorem ipsum"
-        user.gender = "Male"
+        val user = UserCore().addRole(Employee::class.java).apply {
+            firstname = "Florian"
+            lastname = "Schmidt"
+            email = "florian.schmidt.1995@icloud.com"
+            isBlocked = false
+            passwordHash = "Lorem ipsum"
+            gender = "Male"
+        }
+
         userRepository!!.save(user.core)
 
         // Check if saved user can be found again
@@ -141,9 +141,5 @@ class TestUser {
         assertTrue(user2.hasRole(Participant::class.java))
         assertFalse(user2.hasRole(Employee::class.java))
 
-    }
-
-    private fun hashed(string: String): String {
-        return BCryptPasswordEncoder().encode(string);
     }
 }

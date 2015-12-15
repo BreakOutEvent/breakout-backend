@@ -26,13 +26,17 @@ class UserServiceImpl : UserService {
     override fun exists(email: String) = userRepository.existsByEmail(email)
 
     override fun create(body: PostUserBody): User? {
+
         val user = UserCore()
-        user.email = body.email!!
-        user.firstname = body.firstname
-        user.lastname = body.lastname
-        user.gender = body.gender
-        user.isBlocked = false;
-        user.passwordHash = BCryptPasswordEncoder().encode(body.password);
+        user.apply {
+            email = body.email!!
+            firstname = body.firstname
+            lastname = body.lastname
+            gender = body.gender
+            isBlocked = false
+            passwordHash = BCryptPasswordEncoder().encode(body.password)
+        }
+
         return userRepository.save(user);
     }
 

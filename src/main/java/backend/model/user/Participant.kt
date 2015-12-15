@@ -20,7 +20,5 @@ class Participant : UserRole {
     constructor(core: UserCore) : super(core) {
     }
 
-    override fun getAuthority(): String {
-        return "PARTICIPANT"
-    }
+    override fun getAuthority(): String = "PARTICIPANT"
 }

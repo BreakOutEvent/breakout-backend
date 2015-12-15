@@ -34,12 +34,13 @@ abstract class IntegrationTest {
         var counter = 0;
 
         fun getDummyPostUserBody(): PostUserBody {
-            val body = PostUserBody()
-            body.email = "nr$counter@icloud.com"
-            body.firstname = "Florian"
-            body.lastname = "Schmidt"
-            body.gender = "Male"
-            body.password = "Awesome password"
+            val body = PostUserBody().apply {
+                email = "nr$counter@icloud.com"
+                firstname = "Florian"
+                lastname = "Schmidt"
+                gender = "Male"
+                password = "Awesome password"
+            }
             counter++
             return body
         }

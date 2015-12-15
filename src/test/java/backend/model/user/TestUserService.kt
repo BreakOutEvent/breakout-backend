@@ -1,7 +1,6 @@
 package backend.model.user
 
 import backend.Integration.IntegrationTest
-import backend.controller.RequestBodies.PostUserBody
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -16,7 +15,7 @@ class TestUserService : IntegrationTest() {
     fun create() {
         val body = getDummyPostUserBody()
         assertNotNull(userService.create(body))
-        assertFailsWith(Exception::class.java, { userService.create(body)})
+        assertFailsWith(Exception::class.java, { userService.create(body) })
     }
 
     @Test
