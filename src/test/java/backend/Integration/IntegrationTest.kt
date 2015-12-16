@@ -1,6 +1,7 @@
 package backend.Integration
 
 import backend.TestBackendConfiguration
+import backend.WebSecurityConfiguration
 import backend.controller.RequestBodies.PostUserBody
 import backend.model.user.UserRepository
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -19,7 +20,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
 @RunWith(SpringJUnit4ClassRunner::class)
-@SpringApplicationConfiguration(classes = arrayOf(TestBackendConfiguration::class))
+@SpringApplicationConfiguration(classes = arrayOf(TestBackendConfiguration::class, WebSecurityConfiguration::class))
 @WebAppConfiguration
 @IntegrationTest("server.port:0")
 abstract class IntegrationTest {
