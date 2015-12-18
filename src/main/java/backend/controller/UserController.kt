@@ -2,6 +2,7 @@ package backend.controller
 
 import backend.controller.RequestBodies.PostUserBody
 import backend.controller.RequestBodies.PutUserBody
+import backend.model.user.User
 import backend.model.user.UserCore
 import backend.model.user.UserService
 import org.springframework.beans.factory.annotation.Autowired
@@ -47,7 +48,7 @@ class UserController {
      */
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping("/{id}/", method = arrayOf(RequestMethod.PUT), produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun updateUser(@PathVariable("id") id: String, @Valid @RequestBody body: PutUserBody): ResponseEntity<kotlin.Any>? {
+    fun updateUser(@PathVariable("id") id: String, @Valid @RequestBody body: PutUserBody): ResponseEntity<kotlin.Any> {
 
         val user = userService.getUserById(id.toLong())
 
@@ -66,6 +67,21 @@ class UserController {
 
         return ResponseEntity(user, HttpStatus.OK)
     }
+
+    /**
+     * GET /user/id/
+     */
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping("/{id}/", method = arrayOf(RequestMethod.GET), produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
+    fun showUser(@PathVariable("id") id: Long) : ResponseEntity<kotlin.Any> {
+
+        userService.getUserById(id)?.let {
+            return ResponseEntity(it, HttpStatus.OK)
+        }
+
+        return ResponseEntity(error("user with id $id does not exist"), HttpStatus.NOT_FOUND)
+    }
+
 
     //    @ExceptionHandler(Exception::class)
     //    fun handle(e: Exception) {

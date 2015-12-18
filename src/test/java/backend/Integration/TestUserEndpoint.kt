@@ -157,8 +157,45 @@ class TestUserEndpoint : IntegrationTest() {
 
         // TODO: Check if user is persistent in database!
         // TODO: Check that some values such as passwordHash aren't shown!
+        // TODO: Test response if user does not exist
+        // TODO: Can't override existing properties with null!
         println(res.response.contentAsString)
     }
-    // TODO: Test response if user does not exist
-    // TODO: Can't override existing properties with null!
+
+    @Test
+    fun getUserId() {
+
+        // Create user
+        var json = mapOf(
+                "email" to "a@x.de",
+                "password" to "password",
+                "firstname" to "Florian",
+                "lastname" to "Schmidt"
+        ).toJsonString()
+
+        val resultPut = mockMvc.perform(post(url(), json)).andExpect {
+            status().isCreated
+            jsonPath("$.id").exists()
+        }.andReturn()
+
+        val response: Map<String, kotlin.Any> = ObjectMapper()
+            .reader(Map::class.java)
+            .readValue(resultPut.response.contentAsString)
+
+        val id = response["id"] as Int
+
+        val responseGet = mockMvc.perform(get(url(id))).andExpect {
+            status().isOk
+            jsonPath("$.id").exists()
+            jsonPath("$.email").exists()
+            jsonPath("$.passwordHash").exists()
+            jsonPath("$.firstname").exists()
+            jsonPath("$.lastname").exists()
+            jsonPath("$.id").value(id)
+            jsonPath("$.email").value("a@x.de")
+            jsonPath("$.firstname").value("Florian")
+            jsonPath("$.lastname").value("Schmidt")
+        }
+    }
+
 }
