@@ -1,3 +1,4 @@
+![BreakOut-Logo](/header.jpg?raw=true "BreakOut")
 [![Stories in Ready](https://badge.waffle.io/BreakOutEvent/breakout-backend.png?label=ready&title=Ready)](https://waffle.io/BreakOutEvent/breakout-backend)
 [![Build Status](https://travis-ci.org/BreakOutEvent/breakout-backend.svg?branch=develop)](https://travis-ci.org/BreakOutEvent/breakout-backend)
 # breakout-backend
