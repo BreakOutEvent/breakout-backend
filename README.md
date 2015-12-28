@@ -2,6 +2,14 @@
 # breakout-backend
 The RESTful Backend for BreakOut
 
+# Test the backend
+A current dev version of the API can be found at http://breakout-development.herokuapp.com
+
+In the future a stable master version will be deployed on Heroku as well.
+
+# API
+The API documentation is done automatically using [swagger](http://swagger.io) and [springfox](https://github.com/springfox/springfox) and is shown under ["/swagger-ui.html"](http://breakout-development.herokuapp.com) of the corresponding deployed version
+
 ## License
 breakout-backend. The backend application for BreakOut
 
