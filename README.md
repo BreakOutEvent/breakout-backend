@@ -3,7 +3,11 @@
 ![BreakOut-Logo](/header.jpg?raw=true "BreakOut")
 # breakout-backend
 
-This is the backend application for BreakOut. Informations about what BreakOut is can be found at http://break-out.org
+This is the backend application for BreakOut. 
+
+# What is BreakOut?
+With BreakOut we challenge you to travel as far away as possible in 36 hours without spending any money, starting from Munich. During this time each team collects money for the DAFI-program to give refugees the opportunity of higher education.
+More information at http://www.break-out.org
 
 # Test the backend
 The newest dev build of this application is always deployed to http://breakout-development.herokuapp.com
@@ -13,7 +17,14 @@ In the future a stable master version will be deployed on Heroku as well.
 # API
 The API documentation is done automatically using [swagger](http://swagger.io) and [springfox](https://github.com/springfox/springfox) and is shown under ["/swagger-ui.html"](http://breakout-development.herokuapp.com) of the corresponding deployed version
 
-## License
+# What about Apps
+If you are interested in the other stuff we're building, feel free to visit:
+* Android: https://github.com/BreakOutEvent/breakout-android
+* iOS: https://github.com/BreakOutEvent/breakout-ios
+* Web: https://github.com/BreakOutEvent/breakout-frontend
+* More: https://github.com/BreakOutEvent/
+
+# License
 breakout-backend. The backend application for BreakOut
 
 Copyright (C) 2015 Florian Schmidt
