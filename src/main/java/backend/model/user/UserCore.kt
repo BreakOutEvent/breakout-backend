@@ -9,7 +9,7 @@ import javax.persistence.*
 import java.util.HashMap
 
 @Entity
-class UserCore : User {
+open class UserCore : User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

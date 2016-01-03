@@ -1,5 +1,7 @@
 package backend.Integration
 
+import backend.AuthorizationServerConfiguration
+import backend.ResourceServerConfiguration
 import backend.TestBackendConfiguration
 import backend.WebSecurityConfiguration
 import backend.controller.RequestBodies.PostUserBody
@@ -20,7 +22,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
 @RunWith(SpringJUnit4ClassRunner::class)
-@SpringApplicationConfiguration(classes = arrayOf(TestBackendConfiguration::class, WebSecurityConfiguration::class))
+@SpringApplicationConfiguration(classes = arrayOf(TestBackendConfiguration::class, WebSecurityConfiguration::class, ResourceServerConfiguration::class, AuthorizationServerConfiguration::class ))
 @WebAppConfiguration
 @IntegrationTest("server.port:0")
 abstract class IntegrationTest {
