@@ -7,6 +7,8 @@ import org.junit.Test
 import org.springframework.http.MediaType
 
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import kotlin.collections.forEach
+import kotlin.collections.mapOf
 
 class TestPostController : IntegrationTest() {
 

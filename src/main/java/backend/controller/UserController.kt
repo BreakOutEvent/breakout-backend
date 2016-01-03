@@ -2,7 +2,6 @@ package backend.controller
 
 import backend.controller.RequestBodies.PostUserBody
 import backend.controller.RequestBodies.PutUserBody
-import backend.model.user.User
 import backend.model.user.UserCore
 import backend.model.user.UserService
 import org.springframework.beans.factory.annotation.Autowired
@@ -11,6 +10,8 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
+import kotlin.collections.mapOf
+import kotlin.text.toLong
 
 @RestController
 @RequestMapping("/user")
@@ -73,7 +74,7 @@ class UserController {
      */
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping("/{id}/", method = arrayOf(RequestMethod.GET), produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun showUser(@PathVariable("id") id: Long) : ResponseEntity<kotlin.Any> {
+    fun showUser(@PathVariable("id") id: Long): ResponseEntity<kotlin.Any> {
 
         userService.getUserById(id)?.let {
             return ResponseEntity(it, HttpStatus.OK)

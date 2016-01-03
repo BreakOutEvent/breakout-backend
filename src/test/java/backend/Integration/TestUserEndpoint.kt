@@ -6,6 +6,7 @@ import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import kotlin.collections.mapOf
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -179,8 +180,8 @@ class TestUserEndpoint : IntegrationTest() {
         }.andReturn()
 
         val response: Map<String, kotlin.Any> = ObjectMapper()
-            .reader(Map::class.java)
-            .readValue(resultPut.response.contentAsString)
+                .reader(Map::class.java)
+                .readValue(resultPut.response.contentAsString)
 
         val id = response["id"] as Int
 
