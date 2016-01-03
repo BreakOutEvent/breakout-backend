@@ -1,6 +1,6 @@
 buildscript {
 
-    ext.kotlin_version = '1.0.0-beta-3595'
+    ext.kotlin_version = '1.0.0-beta-4584'
 
     repositories {
         mavenCentral()
@@ -39,9 +39,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
-
-
-
+    testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
     testCompile("com.jayway.jsonpath:json-path:2.0.0")
     testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompile("junit:junit")
