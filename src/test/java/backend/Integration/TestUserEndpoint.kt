@@ -121,25 +121,10 @@ class TestUserEndpoint : IntegrationTest() {
     @Test
     fun putUserId() {
 
-        // Create user
-        var json = mapOf(
-                "email" to "a@x.de",
-                "password" to "password"
-        ).toJsonString()
-
-        val result = mockMvc.perform(post(url(), json)).andExpect {
-            status().isCreated
-            jsonPath("$.id").exists()
-        }.andReturn()
-
-        val response: Map<String, kotlin.Any> = ObjectMapper()
-                .reader(Map::class.java)
-                .readValue(result.response.contentAsString)
-
-        val id = response["id"] as Int
+        val id = createUser()
 
         // Update user
-        json = mapOf(
+        val json = mapOf(
                 "firstname" to "Florian",
                 "lastname" to "Schmidt",
                 "gender" to "Male",
@@ -161,6 +146,45 @@ class TestUserEndpoint : IntegrationTest() {
         // TODO: Test response if user does not exist
         // TODO: Can't override existing properties with null!
         println(res.response.contentAsString)
+    }
+
+    @Test
+    fun makeUserParticipant() {
+
+        val id = createUser()
+
+        // Update user with role participant
+        val json = mapOf(
+                "firstname" to "Florian",
+                "lastname" to "Schmidt",
+                "gender" to "Male",
+                "blocked" to false,
+                "participant" to mapOf(
+                        "tshirtsize" to "XL",
+                        "hometown" to "Dresden",
+                        "phonenumber" to "01234567890",
+                        "emergencynumber" to "0987654321"
+                )
+        ).toJsonString()
+
+        val content = mockMvc.perform(put(url(id), json))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("id").value(id))
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.email").value("a@x.de"))
+                .andExpect(jsonPath("$.firstname").value("Florian"))
+                .andExpect(jsonPath("$.lastname").value("Schmidt"))
+                .andExpect(jsonPath("$.gender").value("Male"))
+                .andExpect(jsonPath("$.blocked").value(false))
+                .andExpect(jsonPath("$.participant").exists())
+                .andExpect(jsonPath("$.participant.tshirtsize").value("XL"))
+                .andExpect(jsonPath("$.participant.hometown").value("Dresden"))
+                .andExpect(jsonPath("$.participant.phonenumber").value("01234567890"))
+                .andExpect(jsonPath("$.participant.emergencynumber").value("0987654321"))
+                .andReturn().response.contentAsString
+
+        println(content)
+        // TODO: Check that this can only be done when the authorized user matches the user of the request
     }
 
     @Test
@@ -197,6 +221,25 @@ class TestUserEndpoint : IntegrationTest() {
             jsonPath("$.firstname").value("Florian")
             jsonPath("$.lastname").value("Schmidt")
         }
+    }
+
+    private fun createUser(): Int {
+        // Create user
+        var json = mapOf(
+                "email" to "a@x.de",
+                "password" to "password"
+        ).toJsonString()
+
+        val result = mockMvc.perform(post(url(), json)).andExpect {
+            status().isCreated
+            jsonPath("$.id").exists()
+        }.andReturn()
+
+        val response: Map<String, kotlin.Any> = ObjectMapper()
+                .reader(Map::class.java)
+                .readValue(result.response.contentAsString)
+
+        return response["id"] as Int
     }
 
 }

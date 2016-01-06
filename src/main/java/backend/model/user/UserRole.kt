@@ -1,5 +1,6 @@
 package backend.model.user
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.security.core.GrantedAuthority
 
 import javax.persistence.*
@@ -13,7 +14,9 @@ abstract class UserRole() : User, GrantedAuthority {
     @GeneratedValue
     var roleID: Int? = null
 
-    @ManyToOne override var core: UserCore? = null
+    @ManyToOne
+    @JsonIgnore
+    override var core: UserCore? = null
 
     constructor(core: UserCore) : this() {
         this.core = core
