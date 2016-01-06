@@ -127,10 +127,11 @@ class TestUserEndpoint : IntegrationTest() {
                 "password" to "password"
         ).toJsonString()
 
-        val result = mockMvc.perform(post(url(), json)).andExpect {
-            status().isCreated
-            jsonPath("$.id").exists()
-        }.andReturn()
+        val result = mockMvc.perform(post(url(), json))
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.id").exists())
+                .andReturn()
+
 
         val response: Map<String, kotlin.Any> = ObjectMapper()
                 .reader(Map::class.java)
@@ -146,21 +147,19 @@ class TestUserEndpoint : IntegrationTest() {
                 "blocked" to true
         ).toJsonString()
 
-        val res = mockMvc.perform(put(url(id), json)).andExpect {
-            status().isOk
-            jsonPath("$.id").value(id)
-            jsonPath("$.email").value("a@x.de")
-            jsonPath("$.firstname").value("Florian")
-            jsonPath("$.lastname").value("Schmidt")
-            jsonPath("$.gender").value("Male")
-            jsonPath("$.blocked").value(true)
-        }.andReturn()
-
+        mockMvc.perform(put(url(id), json))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.email").value("a@x.de"))
+                .andExpect(jsonPath("$.firstname").value("Florian"))
+                .andExpect(jsonPath("$.lastname").value("Schmidt"))
+                .andExpect(jsonPath("$.gender").value("Male"))
+                .andExpect(jsonPath("$.blocked").value(true))
+        
         // TODO: Check if user is persistent in database!
         // TODO: Check that some values such as passwordHash aren't shown!
         // TODO: Test response if user does not exist
         // TODO: Can't override existing properties with null!
-        println(res.response.contentAsString)
     }
 
     @Test
