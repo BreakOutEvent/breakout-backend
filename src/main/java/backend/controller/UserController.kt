@@ -1,7 +1,7 @@
 package backend.controller
 
 import backend.controller.RequestBodies.PostUserBody
-import backend.controller.RequestBodies.User
+import backend.controller.ResponseBodies.UserViewModel
 import backend.model.user.UserCore
 import backend.model.user.UserService
 import org.springframework.beans.factory.annotation.Autowired
@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.util.*
 import javax.validation.Valid
 import kotlin.collections.mapOf
 import kotlin.text.toLong
@@ -50,7 +49,7 @@ class UserController {
      */
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping("/{id}/", method = arrayOf(RequestMethod.PUT), produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun updateUser(@PathVariable("id") id: String, @Valid @RequestBody body: User): ResponseEntity<kotlin.Any> {
+    fun updateUser(@PathVariable("id") id: String, @Valid @RequestBody body: UserViewModel): ResponseEntity<kotlin.Any> {
 
         val user = userService.getUserById(id.toLong())
 
@@ -63,7 +62,7 @@ class UserController {
             firstname = body.firstname ?: user.firstname
             lastname = body.lastname ?: user.lastname
             gender = body.gender ?: user.gender
-            isBlocked = body.isBlocked
+            isBlocked = body.isBlocked ?: user.isBlocked
         }
 
         // Check for roles and add or modify those
@@ -84,25 +83,7 @@ class UserController {
 
         userService.save(user)
 
-        var userPart: MutableMap<String, Any?> = HashMap()
-        userPart.put("firstname", user.firstname)
-        userPart.put("lastname", user.lastname)
-        userPart.put("email", user.email)
-        userPart.put("id", user.core?.id)
-        userPart.put("gender", user.gender)
-        userPart.put("blocked", user.isBlocked)
-
-        if (user.hasRole(backend.model.user.Participant::class.java)) {
-            val p = user.getRole(backend.model.user.Participant::class.java) as backend.model.user.Participant
-            userPart.put("participant", mapOf(
-                    "tshirtsize" to p.tshirtsize,
-                    "hometown" to p.hometown,
-                    "phonenumber" to p.phonenumber,
-                    "emergencynumber" to p.emergencynumber
-            ))
-        }
-
-        return ResponseEntity(userPart, HttpStatus.OK)
+        return ResponseEntity(UserViewModel(user), HttpStatus.OK)
     }
 
     /**
