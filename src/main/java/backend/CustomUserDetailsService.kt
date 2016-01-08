@@ -29,7 +29,7 @@ class CustomUserDetailsService : UserDetailsService {
 
 }
 
-private class CustomUserDetails(val user: User) : UserCore(), UserDetails {
+private class CustomUserDetails(val user: User) : User by user, UserDetails {
     override fun getUsername() = user.email
 
     override fun isCredentialsNonExpired() = true

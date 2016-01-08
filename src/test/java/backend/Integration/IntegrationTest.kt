@@ -1,5 +1,6 @@
 package backend.Integration
 
+
 import backend.AuthorizationServerConfiguration
 import backend.ResourceServerConfiguration
 import backend.TestBackendConfiguration
@@ -18,11 +19,13 @@ import org.springframework.test.context.web.WebAppConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
+import javax.servlet.Filter
 
 @RunWith(SpringJUnit4ClassRunner::class)
-@SpringApplicationConfiguration(classes = arrayOf(TestBackendConfiguration::class, WebSecurityConfiguration::class, ResourceServerConfiguration::class, AuthorizationServerConfiguration::class ))
+@SpringApplicationConfiguration(classes = arrayOf(TestBackendConfiguration::class, WebSecurityConfiguration::class, ResourceServerConfiguration::class, AuthorizationServerConfiguration::class))
 @WebAppConfiguration
 @IntegrationTest("server.port:0")
 abstract class IntegrationTest {
@@ -30,6 +33,8 @@ abstract class IntegrationTest {
 
     @Autowired lateinit private var context: WebApplicationContext
     @Autowired lateinit protected var userRepository: UserRepository
+    @Autowired lateinit protected var springSecurityFilterChain: Filter
+
     lateinit protected var mockMvc: MockMvc
 
     companion object {
@@ -52,7 +57,10 @@ abstract class IntegrationTest {
     @Before
     open fun setUp() {
         userRepository.deleteAll()
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).build()
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .addFilters<DefaultMockMvcBuilder>(springSecurityFilterChain)
+                .build()
     }
 
     fun post(path: String, json: String): MockHttpServletRequestBuilder {

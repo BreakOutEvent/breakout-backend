@@ -9,10 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 import kotlin.collections.mapOf
-import kotlin.text.toLong
 
 @RestController
 @RequestMapping("/user")
@@ -50,20 +51,26 @@ class UserController {
      */
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping("/{id}/", method = arrayOf(RequestMethod.PUT), produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun updateUser(@PathVariable("id") id: String, @Valid @RequestBody body: UserViewModel): ResponseEntity<kotlin.Any> {
+    fun updateUser(@PathVariable("id") id: Long,
+                   @Valid @RequestBody body: UserViewModel,
+                   @AuthenticationPrincipal user: UserDetails): ResponseEntity<kotlin.Any> {
 
-        val user = userService.getUserById(id.toLong())
+        val realUser = userService.getUserByEmail(user.username)
 
-        if (user == null) {
+        if (realUser == null) {
             return ResponseEntity(error("user with id $id does not exist"), HttpStatus.BAD_REQUEST)
         }
 
-        user.apply(body)
-        userService.save(user)
+        if (realUser.core!!.id != id) {
+            return ResponseEntity(error("authenticated user and requested resource mismatch"), HttpStatus.UNAUTHORIZED)
+        }
 
-        return ResponseEntity(UserViewModel(user), HttpStatus.OK)
+        realUser.apply(body)
+        userService.save(realUser)
+
+        return ResponseEntity(UserViewModel(realUser), HttpStatus.OK)
     }
-    
+
 
     /**
      * GET /user/id/
@@ -87,7 +94,7 @@ class UserController {
 
     private data class error(var error: String)
 
-    private fun User.apply(userViewModel: UserViewModel) : User {
+    private fun User.apply(userViewModel: UserViewModel): User {
 
         this.firstname = userViewModel.firstname ?: this.firstname
         this.firstname = userViewModel.firstname ?: this.firstname

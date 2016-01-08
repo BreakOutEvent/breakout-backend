@@ -5,10 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.MediaType
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import java.util.*
 import kotlin.collections.mapOf
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.text.toByteArray
 
 class TestUserEndpoint : IntegrationTest() {
 
@@ -131,9 +135,9 @@ class TestUserEndpoint : IntegrationTest() {
                 "blocked" to true
         ).toJsonString()
 
-        val res = mockMvc.perform(put(url(id), json)).andExpect {
+        val res = mockMvc.perform(put(url(id.id), json)).andExpect {
             status().isOk
-            jsonPath("$.id").value(id)
+            jsonPath("$.id").value(id.id)
             jsonPath("$.email").value("a@x.de")
             jsonPath("$.firstname").value("Florian")
             jsonPath("$.lastname").value("Schmidt")
@@ -151,7 +155,7 @@ class TestUserEndpoint : IntegrationTest() {
     @Test
     fun makeUserParticipant() {
 
-        val id = createUser()
+        val credentials = createUser()
 
         // Update user with role participant
         val json = mapOf(
@@ -167,10 +171,16 @@ class TestUserEndpoint : IntegrationTest() {
                 )
         ).toJsonString()
 
-        val content = mockMvc.perform(put(url(id), json))
+        val request = MockMvcRequestBuilders
+                .put("/user/${credentials.id}/")
+                .header("Authorization", "Bearer ${credentials.accessToken}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+
+        val content = mockMvc.perform(request)
                 .andExpect(status().isOk)
-                .andExpect(jsonPath("id").value(id))
-                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("id").value(credentials.id))
+                .andExpect(jsonPath("$.id").value(credentials.id))
                 .andExpect(jsonPath("$.email").value("a@x.de"))
                 .andExpect(jsonPath("$.firstname").value("Florian"))
                 .andExpect(jsonPath("$.lastname").value("Schmidt"))
@@ -182,9 +192,33 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.participant.phonenumber").value("01234567890"))
                 .andExpect(jsonPath("$.participant.emergencynumber").value("0987654321"))
                 .andReturn().response.contentAsString
+    }
 
-        println(content)
-        // TODO: Check that this can only be done when the authorized user matches the user of the request
+    @Test
+    fun failToMakeUserParticipantIfUnauthorized() {
+
+        val credentials = createUser()
+        val json = mapOf(
+                "firstname" to "Florian",
+                "lastname" to "Schmidt",
+                "gender" to "Male",
+                "blocked" to false,
+                "participant" to mapOf(
+                        "tshirtsize" to "XL",
+                        "hometown" to "Dresden",
+                        "phonenumber" to "01234567890",
+                        "emergencynumber" to "0987654321"
+                )
+        ).toJsonString()
+
+        val request = MockMvcRequestBuilders
+                .put("/user/${credentials.id}/")
+                .header("Authorization", "Bearer thisIsAnInvalidAccessToken")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+
+        val content = mockMvc.perform(request)
+                .andExpect(status().isUnauthorized)
     }
 
     @Test
@@ -209,7 +243,7 @@ class TestUserEndpoint : IntegrationTest() {
 
         val id = response["id"] as Int
 
-        val responseGet = mockMvc.perform(get(url(id))).andExpect {
+        mockMvc.perform(get(url(id))).andExpect {
             status().isOk
             jsonPath("$.id").exists()
             jsonPath("$.email").exists()
@@ -223,23 +257,49 @@ class TestUserEndpoint : IntegrationTest() {
         }
     }
 
-    private fun createUser(): Int {
+    private fun createUser(): Credentials {
         // Create user
-        var json = mapOf(
+        val json = mapOf(
                 "email" to "a@x.de",
                 "password" to "password"
         ).toJsonString()
 
-        val result = mockMvc.perform(post(url(), json)).andExpect {
-            status().isCreated
-            jsonPath("$.id").exists()
-        }.andReturn()
+        val createResponseString = mockMvc.perform(post(url(), json))
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.id").exists())
+                .andReturn().response.contentAsString
 
-        val response: Map<String, kotlin.Any> = ObjectMapper()
+        val createResponse: Map<String, kotlin.Any> = ObjectMapper()
                 .reader(Map::class.java)
-                .readValue(result.response.contentAsString)
+                .readValue(createResponseString)
 
-        return response["id"] as Int
+        val id = createResponse["id"] as Int
+
+        val credentials = Base64.getEncoder().encodeToString("breakout_app:123456789".toByteArray())
+
+        val request = MockMvcRequestBuilders
+                .post("/oauth/token")
+                .param("password", "password")
+                .param("username", "a@x.de")
+                .param("scope", "read write")
+                .param("grant_type", "password")
+                .param("client_secret", "123456789")
+                .param("client_id", "breakout_app")
+                .header("Authorization", "Basic $credentials")
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+
+        val oauthResponseString = mockMvc.perform(request).andReturn().response.contentAsString
+        val oauthResponse: Map<String, kotlin.Any> = ObjectMapper()
+                .reader(Map::class.java)
+                .readValue(oauthResponseString)
+
+        val accessToken = oauthResponse["access_token"] as String
+        val refreshToken = oauthResponse["refresh_token"] as String
+
+        return Credentials(id, accessToken, refreshToken)
+
     }
+
+    class Credentials(val id: Int, val accessToken: String, val refreshToken: String)
 
 }

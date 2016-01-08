@@ -26,6 +26,8 @@ open class ResourceServerConfiguration : ResourceServerConfigurerAdapter() {
 
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity?) {
-        http!!.authorizeRequests().antMatchers("*").permitAll()
+        http!!.authorizeRequests()
+                .antMatchers("/oauth/*").permitAll()
+                .antMatchers("/user/{id}/*").authenticated()
     }
 }
