@@ -2,6 +2,7 @@ package backend.controller
 
 import backend.controller.RequestBodies.PostUserBody
 import backend.controller.ResponseBodies.UserViewModel
+import backend.model.user.User
 import backend.model.user.UserCore
 import backend.model.user.UserService
 import org.springframework.beans.factory.annotation.Autowired
@@ -57,34 +58,12 @@ class UserController {
             return ResponseEntity(error("user with id $id does not exist"), HttpStatus.BAD_REQUEST)
         }
 
-        // Apply changes from body to actual user
-        user.apply {
-            firstname = body.firstname ?: user.firstname
-            lastname = body.lastname ?: user.lastname
-            gender = body.gender ?: user.gender
-            isBlocked = body.isBlocked ?: user.isBlocked
-        }
-
-        // Check for roles and add or modify those
-        if (body.participant != null) {
-
-            if (!user.hasRole(backend.model.user.Participant::class.java)) {
-                user.addRole(backend.model.user.Participant::class.java)
-            }
-
-            val p = user.getRole(backend.model.user.Participant::class.java) as backend.model.user.Participant
-            p.apply {
-                tshirtsize = body.participant?.tshirtsize ?: tshirtsize
-                emergencynumber = body.participant?.emergencynumber ?: emergencynumber
-                hometown = body.participant?.hometown ?: hometown
-                phonenumber = body.participant?.phonenumber ?: phonenumber
-            }
-        }
-
+        user.apply(body)
         userService.save(user)
 
         return ResponseEntity(UserViewModel(user), HttpStatus.OK)
     }
+    
 
     /**
      * GET /user/id/
@@ -107,5 +86,31 @@ class UserController {
     //    }
 
     private data class error(var error: String)
+
+    private fun User.apply(userViewModel: UserViewModel) : User {
+
+        this.firstname = userViewModel.firstname ?: this.firstname
+        this.firstname = userViewModel.firstname ?: this.firstname
+        this.lastname = userViewModel.lastname ?: this.lastname
+        this.gender = userViewModel.gender ?: this.gender
+        this.isBlocked = userViewModel.isBlocked ?: this.isBlocked
+
+        if (userViewModel.participant != null) {
+
+            if (!this.hasRole(backend.model.user.Participant::class.java)) {
+                this.addRole(backend.model.user.Participant::class.java)
+            }
+
+            val p = this.getRole(backend.model.user.Participant::class.java) as backend.model.user.Participant
+            p.apply {
+                tshirtsize = userViewModel.participant?.tshirtsize ?: tshirtsize
+                emergencynumber = userViewModel.participant?.emergencynumber ?: emergencynumber
+                hometown = userViewModel.participant?.hometown ?: hometown
+                phonenumber = userViewModel.participant?.phonenumber ?: phonenumber
+            }
+        }
+
+        return this
+    }
 
 }
