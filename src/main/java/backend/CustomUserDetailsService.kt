@@ -1,7 +1,5 @@
 package backend
 
-import backend.model.user.User
-import backend.model.user.UserCore
 import backend.model.user.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.UserDetails
@@ -27,20 +25,4 @@ class CustomUserDetailsService : UserDetailsService {
         throw UsernameNotFoundException("User $username does not exist")
     }
 
-}
-
-private class CustomUserDetails(val user: User) : User by user, UserDetails {
-    override fun getUsername() = user.email
-
-    override fun isCredentialsNonExpired() = true
-
-    override fun isAccountNonExpired() = true
-
-    override fun isAccountNonLocked() = true
-
-    override fun getAuthorities() = user.core!!.userRoles.values
-
-    override fun isEnabled() = !user.isBlocked
-
-    override fun getPassword(): String? = user.passwordHash
 }

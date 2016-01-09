@@ -1,18 +1,18 @@
 package backend.controller
 
+import backend.CustomUserDetails
 import backend.controller.RequestBodies.PostUserBody
-import backend.controller.ResponseBodies.UserViewModel
+import backend.controller.ViewModels.UserViewModel
 import backend.model.user.User
-import backend.model.user.UserCore
 import backend.model.user.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
+import kotlin.collections.map
 import kotlin.collections.mapOf
 
 @RestController
@@ -25,8 +25,10 @@ class UserController {
     /**
      * POST /user/
      */
-    @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping("/", method = arrayOf(RequestMethod.POST), produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
+    @RequestMapping(
+            value = "/",
+            method = arrayOf(RequestMethod.POST),
+            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
     fun addUser(@Valid @RequestBody body: PostUserBody): ResponseEntity<kotlin.Any> {
 
         if (userService.exists(body.email!!)) {
@@ -41,34 +43,33 @@ class UserController {
      * GET /user/
      */
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping("/", method = arrayOf(RequestMethod.GET), produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun showUsers(): MutableIterable<UserCore>? {
-        return userService.getAllUsers();
+    @RequestMapping(
+            value = "/",
+            method = arrayOf(RequestMethod.GET),
+            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
+    fun showUsers(): Iterable<UserViewModel> {
+        return userService.getAllUsers()!!.map { UserViewModel(it) };
     }
 
     /**
      * PUT /user/id/
      */
-    @ResponseStatus(HttpStatus.OK)
-    @RequestMapping("/{id}/", method = arrayOf(RequestMethod.PUT), produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
+    @RequestMapping(
+            value = "/{id}/",
+            method = arrayOf(RequestMethod.PUT),
+            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
     fun updateUser(@PathVariable("id") id: Long,
                    @Valid @RequestBody body: UserViewModel,
-                   @AuthenticationPrincipal user: UserDetails): ResponseEntity<kotlin.Any> {
+                   @AuthenticationPrincipal user: CustomUserDetails): ResponseEntity<kotlin.Any> {
 
-        val realUser = userService.getUserByEmail(user.username)
-
-        if (realUser == null) {
-            return ResponseEntity(error("user with id $id does not exist"), HttpStatus.BAD_REQUEST)
-        }
-
-        if (realUser.core!!.id != id) {
+        if (user.core!!.id != id) {
             return ResponseEntity(error("authenticated user and requested resource mismatch"), HttpStatus.UNAUTHORIZED)
         }
 
-        realUser.apply(body)
-        userService.save(realUser)
+        user.apply(body)
+        userService.save(user)
 
-        return ResponseEntity(UserViewModel(realUser), HttpStatus.OK)
+        return ResponseEntity(UserViewModel(user), HttpStatus.OK)
     }
 
 
@@ -76,7 +77,10 @@ class UserController {
      * GET /user/id/
      */
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping("/{id}/", method = arrayOf(RequestMethod.GET), produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
+    @RequestMapping(
+            value = "/{id}/",
+            method = arrayOf(RequestMethod.GET),
+            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
     fun showUser(@PathVariable("id") id: Long): ResponseEntity<kotlin.Any> {
 
         userService.getUserById(id)?.let {
