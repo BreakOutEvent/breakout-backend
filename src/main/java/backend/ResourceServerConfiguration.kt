@@ -1,6 +1,7 @@
 package backend
 
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter
@@ -28,6 +29,7 @@ open class ResourceServerConfiguration : ResourceServerConfigurerAdapter() {
     override fun configure(http: HttpSecurity?) {
         http!!.authorizeRequests()
                 .antMatchers("/oauth/*").permitAll()
-                .antMatchers("/user/{id}/*").authenticated()
+                .antMatchers(HttpMethod.POST, "/user/{id}/*").authenticated()
+                .antMatchers(HttpMethod.GET, "/user/{id}/*").permitAll()
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
@@ -76,18 +77,16 @@ class UserController {
     /**
      * GET /user/id/
      */
-    @ResponseStatus(HttpStatus.OK)
     @RequestMapping(
             value = "/{id}/",
             method = arrayOf(RequestMethod.GET),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
     fun showUser(@PathVariable("id") id: Long): ResponseEntity<kotlin.Any> {
 
-        userService.getUserById(id)?.let {
-            return ResponseEntity(it, HttpStatus.OK)
-        }
+        val user = userService.getUserById(id)
 
-        return ResponseEntity(error("user with id $id does not exist"), HttpStatus.NOT_FOUND)
+        if(user == null) return ResponseEntity(error("user with id $id does not exist"), HttpStatus.NOT_FOUND)
+        else return ResponseEntity.ok(UserViewModel(user))
     }
 
 

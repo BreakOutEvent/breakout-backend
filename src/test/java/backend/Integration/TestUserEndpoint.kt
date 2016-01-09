@@ -35,22 +35,19 @@ class TestUserEndpoint : IntegrationTest() {
     fun getUser() {
         userService.create(getDummyPostUserBody())
         userService.create(getDummyPostUserBody())
-        mockMvc.perform(get("/user/")).andExpect {
-            status().isOk
-            jsonPath("$").isArray
-            jsonPath("$[0].firstname").exists()
-            jsonPath("$[0].lastname").exists()
-            jsonPath("$[0].email").exists()
-            jsonPath("$[0].gender").exists()
-            jsonPath("$[0].userRoles").exists()
-            jsonPath("$[0].passwordHash").exists() // TODO: Change this!!
-            jsonPath("$[1].firstname").exists()
-            jsonPath("$[1].lastname").exists()
-            jsonPath("$[1].email").exists()
-            jsonPath("$[1].gender").exists()
-            jsonPath("$[1].userRoles").exists()
-            jsonPath("$[1].passwordHash").exists()
-        }
+        mockMvc.perform(get("/user/"))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$[0].firstname").exists())
+                .andExpect(jsonPath("$[0].lastname").exists())
+                .andExpect(jsonPath("$[0].email").exists())
+                .andExpect(jsonPath("$[0].gender").exists())
+                .andExpect(jsonPath("$[0].passwordHash").doesNotExist())
+                .andExpect(jsonPath("$[1].firstname").exists())
+                .andExpect(jsonPath("$[1].lastname").exists())
+                .andExpect(jsonPath("$[1].email").exists())
+                .andExpect(jsonPath("$[1].gender").exists())
+                .andExpect(jsonPath("$[1].passwordHash").doesNotExist())
     }
 
     /**
@@ -65,10 +62,9 @@ class TestUserEndpoint : IntegrationTest() {
                 "password" to "password"
         ).toJsonString()
 
-        mockMvc.perform(post(url(), json)).andExpect {
-            status().isCreated
-            jsonPath("$.id").exists()
-        }
+        mockMvc.perform(post(url(), json))
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.id").exists())
 
         val user = userRepository.findByEmail("a@x.de")
         assertNotNull(user)
@@ -87,10 +83,9 @@ class TestUserEndpoint : IntegrationTest() {
                 "password" to "password"
         ).toJsonString()
 
-        mockMvc.perform(post(url(), json)).andExpect {
-            status().isBadRequest
-            content().string("")
-        }
+        mockMvc.perform(post(url(), json))
+                .andExpect(status().isBadRequest)
+                .andExpect(content().string(""))
     }
 
     /**
@@ -104,18 +99,15 @@ class TestUserEndpoint : IntegrationTest() {
                 "password" to "password"
         ).toJsonString()
 
-        mockMvc.perform(post(url(), json)).andExpect {
-            status().isCreated
-            jsonPath("$.id").exists()
-        }
+        mockMvc.perform(post(url(), json))
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.id").exists())
 
 
-        mockMvc.perform(post(url(), json)).andExpect {
-            status().isBadRequest
-            jsonPath("$.error").exists()
-            jsonPath("$.error").value("user with email a@x.de already exists")
-        }
-
+        mockMvc.perform(post(url(), json))
+                .andExpect(status().isBadRequest)
+                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.error").value("user with email a@x.de already exists"))
     }
 
     /**
@@ -125,7 +117,7 @@ class TestUserEndpoint : IntegrationTest() {
     @Test
     fun putUserId() {
 
-        val id = createUser()
+        val credentials = createUser()
 
         // Update user
         val json = mapOf(
@@ -135,21 +127,25 @@ class TestUserEndpoint : IntegrationTest() {
                 "blocked" to true
         ).toJsonString()
 
-        val res = mockMvc.perform(put(url(id.id), json)).andExpect {
-            status().isOk
-            jsonPath("$.id").value(id.id)
-            jsonPath("$.email").value("a@x.de")
-            jsonPath("$.firstname").value("Florian")
-            jsonPath("$.lastname").value("Schmidt")
-            jsonPath("$.gender").value("Male")
-            jsonPath("$.blocked").value(true)
-        }.andReturn()
+        val request = MockMvcRequestBuilders
+                .put("/user/${credentials.id}/")
+                .header("Authorization", "Bearer ${credentials.accessToken}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
 
-        // TODO: Check if user is persistent in database!
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.id").value(credentials.id))
+                .andExpect(jsonPath("$.email").value("a@x.de"))
+                .andExpect(jsonPath("$.firstname").value("Florian"))
+                .andExpect(jsonPath("$.lastname").value("Schmidt"))
+                .andExpect(jsonPath("$.gender").value("Male"))
+                .andExpect(jsonPath("$.blocked").value(true))
+
         // TODO: Check that some values such as passwordHash aren't shown!
         // TODO: Test response if user does not exist
         // TODO: Can't override existing properties with null!
-        println(res.response.contentAsString)
+        // TODO: Check that a user can't block / unblock itself
     }
 
     @Test
@@ -177,7 +173,7 @@ class TestUserEndpoint : IntegrationTest() {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
 
-        val content = mockMvc.perform(request)
+        mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("id").value(credentials.id))
                 .andExpect(jsonPath("$.id").value(credentials.id))
@@ -217,7 +213,7 @@ class TestUserEndpoint : IntegrationTest() {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
 
-        val content = mockMvc.perform(request)
+        mockMvc.perform(request)
                 .andExpect(status().isUnauthorized)
     }
 
@@ -232,10 +228,10 @@ class TestUserEndpoint : IntegrationTest() {
                 "lastname" to "Schmidt"
         ).toJsonString()
 
-        val resultPut = mockMvc.perform(post(url(), json)).andExpect {
-            status().isCreated
-            jsonPath("$.id").exists()
-        }.andReturn()
+        val resultPut = mockMvc.perform(post(url(), json))
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.id").exists())
+                .andReturn()
 
         val response: Map<String, kotlin.Any> = ObjectMapper()
                 .reader(Map::class.java)
@@ -243,18 +239,13 @@ class TestUserEndpoint : IntegrationTest() {
 
         val id = response["id"] as Int
 
-        mockMvc.perform(get(url(id))).andExpect {
-            status().isOk
-            jsonPath("$.id").exists()
-            jsonPath("$.email").exists()
-            jsonPath("$.passwordHash").exists()
-            jsonPath("$.firstname").exists()
-            jsonPath("$.lastname").exists()
-            jsonPath("$.id").value(id)
-            jsonPath("$.email").value("a@x.de")
-            jsonPath("$.firstname").value("Florian")
-            jsonPath("$.lastname").value("Schmidt")
-        }
+        mockMvc.perform(get(url(id)))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.email").exists())
+                .andExpect(jsonPath("$.firstname").exists())
+                .andExpect(jsonPath("$.lastname").exists())
+                .andExpect(jsonPath("$.passwordHash").doesNotExist())
     }
 
     private fun createUser(): Credentials {
