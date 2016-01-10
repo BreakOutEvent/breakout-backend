@@ -21,36 +21,34 @@ class TestAuthorization : IntegrationTest() {
         // Register user by sending data to POST /user/
         val json = mapOf("email" to "a@b.c", "password" to "random").toJsonString()
         mockMvc.perform(post("/user/", json))
-                .andExpect {
-                    status().isOk
-                    jsonPath("$.id").exists()
-                }
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.id").exists())
+
 
         // Authorize and get access and refresh token at /oauth/token
         val credentials = Base64.getEncoder().encodeToString("breakout_app:123456789".toByteArray())
         val request = MockMvcRequestBuilders
                 .post("/oauth/token")
-                .param("password", "fdsa")
+                .param("password", "random")
                 .param("username", "a@b.c")
                 .param("scope", "read write")
                 .param("client_secret", "123456789")
                 .param("client_id", "breakout_app")
+                .param("grant_type", "password")
                 .header("Authorization", "Basic $credentials")
                 .accept(MediaType.APPLICATION_JSON_VALUE)
 
         mockMvc.perform(request)
-                .andExpect {
-                    status().isOk
-                    jsonPath("$.access_token").exists()
-                    jsonPath("$.token_type").value("bearer")
-                    jsonPath("$.refresh_token").exists()
-                    jsonPath("$.expires_in").exists()
-                    jsonPath("$.scope").value("read write")
-                }
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.access_token").exists())
+                .andExpect(jsonPath("$.token_type").value("bearer"))
+                .andExpect(jsonPath("$.refresh_token").exists())
+                .andExpect(jsonPath("$.expires_in").exists())
+                .andExpect(jsonPath("$.scope").value("read write"))
 
-        mockMvc.perform(get("/user/")).andExpect {
-            status().isOk
-        }
+        mockMvc.perform(get("/user/"))
+                .andExpect(status().isOk)
+
 
         val unauthRequest = MockMvcRequestBuilders
                 .post("/oauth/token")
@@ -62,9 +60,7 @@ class TestAuthorization : IntegrationTest() {
                 .header("Authorization", "Basic $credentials")
                 .accept(MediaType.APPLICATION_JSON_VALUE)
 
-        mockMvc.perform(unauthRequest).andExpect {
-            status().is4xxClientError
-        }
-
+        mockMvc.perform(unauthRequest)
+                .andExpect(status().is4xxClientError)
     }
 }
