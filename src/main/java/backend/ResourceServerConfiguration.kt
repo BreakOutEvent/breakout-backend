@@ -30,6 +30,7 @@ open class ResourceServerConfiguration : ResourceServerConfigurerAdapter() {
         http!!.authorizeRequests()
                 .antMatchers("/oauth/*").permitAll()
                 .antMatchers(HttpMethod.POST, "/user/{id}/*").authenticated()
+                .antMatchers(HttpMethod.PUT, "/user/{id}/*").authenticated()
                 .antMatchers(HttpMethod.GET, "/user/{id}/*").permitAll()
     }
 }
