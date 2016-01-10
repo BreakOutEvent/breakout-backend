@@ -41,7 +41,7 @@ class UserServiceImpl : UserService {
         return userRepository.save(user);
     }
 
-    override fun create(email: String, password: String): User? {
+    override fun create(email: String, password: String): User {
         if(this.exists(email)) throw Exception("user with email $email already exists")
         val user = UserCore()
         user.email = email
@@ -50,6 +50,6 @@ class UserServiceImpl : UserService {
         return userRepository.save(user);
     }
 
-    override fun save(user: User): User? = userRepository.save(user.core)
+    override fun save(user: User): User = userRepository.save(user.core)!!
 }
 

@@ -1,10 +1,13 @@
 package backend.controller
 
 import backend.CustomUserDetails
-import backend.controller.RequestBodies.PostUserBody
 import backend.controller.ViewModels.UserViewModel
 import backend.model.user.User
 import backend.model.user.UserService
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiResponse
+import io.swagger.annotations.ApiResponses
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -15,6 +18,7 @@ import javax.validation.Valid
 import kotlin.collections.map
 import kotlin.collections.mapOf
 
+@Api
 @RestController
 @RequestMapping("/user")
 class UserController {
@@ -25,20 +29,21 @@ class UserController {
     /**
      * POST /user/
      */
+
     @RequestMapping(
             value = "/",
             method = arrayOf(RequestMethod.POST),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
+    @ApiOperation(value = "Create a new user", response = UserViewModel::class)
     fun addUser(@Valid @RequestBody body: UserViewModel): ResponseEntity<kotlin.Any> {
 
         if (userService.exists(body.email!!)) {
-            return ResponseEntity(error("user with email ${body.email!!} already exists"), HttpStatus.BAD_REQUEST)
+            return ResponseEntity(error("user with email ${body.email!!} already exists"), HttpStatus.CONFLICT)
         }
 
-        var user = userService.create(body.email!!, body.password!!)?.apply(body)
-        if(user != null) userService.save(user)
-        
-        return ResponseEntity(mapOf("id" to user!!.core!!.id!!), HttpStatus.CREATED)
+        var user = userService.create(body.email!!, body.password!!).apply(body)
+        userService.save(user)
+        return ResponseEntity(mapOf("id" to user.core!!.id!!), HttpStatus.CREATED)
     }
 
     /**
@@ -119,5 +124,4 @@ class UserController {
 
         return this
     }
-
 }

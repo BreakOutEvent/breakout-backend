@@ -105,7 +105,7 @@ class TestUserEndpoint : IntegrationTest() {
 
 
         mockMvc.perform(post(url(), json))
-                .andExpect(status().isBadRequest)
+                .andExpect(status().isConflict)
                 .andExpect(jsonPath("$.error").exists())
                 .andExpect(jsonPath("$.error").value("user with email a@x.de already exists"))
     }
