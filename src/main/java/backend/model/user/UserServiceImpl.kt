@@ -25,6 +25,7 @@ class UserServiceImpl : UserService {
 
     override fun exists(email: String) = userRepository.existsByEmail(email)
 
+    @Deprecated("Remains for testing purposes")
     override fun create(body: PostUserBody): User? {
 
         val user = UserCore()
@@ -37,6 +38,15 @@ class UserServiceImpl : UserService {
             passwordHash = BCryptPasswordEncoder().encode(body.password)
         }
 
+        return userRepository.save(user);
+    }
+
+    override fun create(email: String, password: String): User? {
+        if(this.exists(email)) throw Exception("user with email $email already exists")
+        val user = UserCore()
+        user.email = email
+        user.passwordHash = BCryptPasswordEncoder().encode(password)
+        user.isBlocked = false
         return userRepository.save(user);
     }
 

@@ -29,13 +29,15 @@ class UserController {
             value = "/",
             method = arrayOf(RequestMethod.POST),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun addUser(@Valid @RequestBody body: PostUserBody): ResponseEntity<kotlin.Any> {
+    fun addUser(@Valid @RequestBody body: UserViewModel): ResponseEntity<kotlin.Any> {
 
         if (userService.exists(body.email!!)) {
             return ResponseEntity(error("user with email ${body.email!!} already exists"), HttpStatus.BAD_REQUEST)
         }
 
-        var user = userService.create(body);
+        var user = userService.create(body.email!!, body.password!!)?.apply(body)
+        if(user != null) userService.save(user)
+        
         return ResponseEntity(mapOf("id" to user!!.core!!.id!!), HttpStatus.CREATED)
     }
 
