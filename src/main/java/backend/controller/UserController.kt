@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
@@ -85,7 +84,7 @@ class UserController {
 
         val user = userService.getUserById(id)
 
-        if(user == null) return ResponseEntity(error("user with id $id does not exist"), HttpStatus.NOT_FOUND)
+        if (user == null) return ResponseEntity(error("user with id $id does not exist"), HttpStatus.NOT_FOUND)
         else return ResponseEntity.ok(UserViewModel(user))
     }
 
@@ -112,12 +111,10 @@ class UserController {
             }
 
             val p = this.getRole(backend.model.user.Participant::class.java) as backend.model.user.Participant
-            p.apply {
-                tshirtsize = userViewModel.participant?.tshirtsize ?: tshirtsize
-                emergencynumber = userViewModel.participant?.emergencynumber ?: emergencynumber
-                hometown = userViewModel.participant?.hometown ?: hometown
-                phonenumber = userViewModel.participant?.phonenumber ?: phonenumber
-            }
+            p.tshirtsize = userViewModel.participant?.tshirtsize ?: p.tshirtsize
+            p.emergencynumber = userViewModel.participant?.emergencynumber ?: p.emergencynumber
+            p.hometown = userViewModel.participant?.hometown ?: p.hometown
+            p.phonenumber = userViewModel.participant?.phonenumber ?: p.phonenumber
         }
 
         return this

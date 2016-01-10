@@ -9,16 +9,13 @@ import javax.persistence.Entity
 @DiscriminatorValue("PARTICIPANT")
 class Participant : UserRole {
 
-    var emergencynumber: String? = null
+    var emergencynumber: String = ""
     var tshirtsize: String? = null
     var hometown: String? = null
     var phonenumber: String? = null
 
-    constructor() : super() {
-    }
-
-    constructor(core: UserCore) : super(core) {
-    }
+    constructor() : super()
+    constructor(core: UserCore) : super(core)
 
     override fun getAuthority(): String = "PARTICIPANT"
 }
