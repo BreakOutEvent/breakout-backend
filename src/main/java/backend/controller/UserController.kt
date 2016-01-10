@@ -101,10 +101,8 @@ class UserController {
     private fun User.apply(userViewModel: UserViewModel): User {
 
         this.firstname = userViewModel.firstname ?: this.firstname
-        this.firstname = userViewModel.firstname ?: this.firstname
         this.lastname = userViewModel.lastname ?: this.lastname
         this.gender = userViewModel.gender ?: this.gender
-        this.isBlocked = userViewModel.isBlocked ?: this.isBlocked
 
         if (userViewModel.participant != null) {
 

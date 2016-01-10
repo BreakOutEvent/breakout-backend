@@ -140,12 +140,11 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.firstname").value("Florian"))
                 .andExpect(jsonPath("$.lastname").value("Schmidt"))
                 .andExpect(jsonPath("$.gender").value("Male"))
-                .andExpect(jsonPath("$.blocked").value(true))
+                .andExpect(jsonPath("$.blocked").value(false)) // Expect that a user can't block itself!
 
         // TODO: Check that some values such as passwordHash aren't shown!
         // TODO: Test response if user does not exist
         // TODO: Can't override existing properties with null!
-        // TODO: Check that a user can't block / unblock itself
     }
 
     @Test
