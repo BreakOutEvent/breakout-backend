@@ -5,4 +5,5 @@ import java.time.LocalDateTime
 
 interface EventService {
     fun createEvent(title: String, date: LocalDateTime, city: String, startingLocation: Coords, duration: Int): Event
+    fun findAll(): Iterable<Event>
 }

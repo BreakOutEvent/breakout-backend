@@ -7,6 +7,9 @@ import java.time.LocalDateTime
 
 @Service
 class EventServiceImpl @Autowired constructor(val repository: EventRepository) : EventService {
+
+    override fun findAll(): Iterable<Event> = repository.findAll()
+
     override fun createEvent(title: String, date: LocalDateTime, city: String, startingLocation: Coords, duration: Int): Event {
         val event = Event(title, date, city, startingLocation, duration)
         return repository.save(event)

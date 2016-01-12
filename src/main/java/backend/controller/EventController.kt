@@ -1,17 +1,15 @@
 package backend.controller
 
-import backend.model.event.Event
 import backend.model.event.EventService
 import backend.model.misc.Coords
+import backend.view.EventView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import javax.validation.Valid
-import javax.validation.constraints.NotNull
+import kotlin.collections.map
 
 @RestController
 @RequestMapping("/event")
@@ -41,46 +39,11 @@ class EventController {
         return EventView(event)
     }
 
-    @ExceptionHandler(Exception::class)
-    fun handle(e: Exception) {
-        e.printStackTrace()
-    }
-}
-
-class EventView() {
-
-    var id: Long? = null
-
-    @NotNull
-    var title: String? = null
-
-    var date: Long? = null
-
-    @NotNull
-    var city: String? = null
-
-    @Valid
-    var startingLocation: Coords? = null
-
-    var duration: Int = 36
-
-    constructor(event: Event) : this() {
-        this.id = event.id
-        this.title = event.title
-        this.date = event.date.toEpochSecond(ZoneOffset.UTC)
-        this.city = event.city
-        this.startingLocation = Coords()
-        this.startingLocation!!.latitude = event.startingLocation.latitude
-        this.startingLocation!!.longitude = event.startingLocation.longitude
-        this.duration = event.duration
-    }
-
-    class Coords() {
-
-        @NotNull
-        var latitude: Double? = null
-
-        @NotNull
-        var longitude: Double? = null
+    @RequestMapping(
+            value = "/",
+            method = arrayOf(RequestMethod.GET),
+            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
+    fun getAllEvents(): Iterable<EventView> {
+        return eventService.findAll().map { EventView(it) }
     }
 }
