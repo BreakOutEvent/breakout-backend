@@ -1,13 +1,11 @@
 package backend.controller
 
 import backend.CustomUserDetails
-import backend.controller.ViewModels.UserViewModel
+import backend.view.UserView
 import backend.model.user.User
 import backend.model.user.UserService
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
-import io.swagger.annotations.ApiResponse
-import io.swagger.annotations.ApiResponses
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -34,8 +32,8 @@ class UserController {
             value = "/",
             method = arrayOf(RequestMethod.POST),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    @ApiOperation(value = "Create a new user", response = UserViewModel::class)
-    fun addUser(@Valid @RequestBody body: UserViewModel): ResponseEntity<kotlin.Any> {
+    @ApiOperation(value = "Create a new user", response = UserView::class)
+    fun addUser(@Valid @RequestBody body: UserView): ResponseEntity<kotlin.Any> {
 
         if (userService.exists(body.email!!)) {
             return ResponseEntity(error("user with email ${body.email!!} already exists"), HttpStatus.CONFLICT)
@@ -54,8 +52,8 @@ class UserController {
             value = "/",
             method = arrayOf(RequestMethod.GET),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun showUsers(): Iterable<UserViewModel> {
-        return userService.getAllUsers()!!.map { UserViewModel(it) };
+    fun showUsers(): Iterable<UserView> {
+        return userService.getAllUsers()!!.map { UserView(it) };
     }
 
     /**
@@ -66,7 +64,7 @@ class UserController {
             method = arrayOf(RequestMethod.PUT),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
     fun updateUser(@PathVariable("id") id: Long,
-                   @Valid @RequestBody body: UserViewModel,
+                   @Valid @RequestBody body: UserView,
                    @AuthenticationPrincipal user: CustomUserDetails): ResponseEntity<kotlin.Any> {
 
         if (user.core!!.id != id) {
@@ -76,7 +74,7 @@ class UserController {
         user.apply(body)
         userService.save(user)
 
-        return ResponseEntity(UserViewModel(user), HttpStatus.OK)
+        return ResponseEntity(UserView(user), HttpStatus.OK)
     }
 
 
@@ -92,7 +90,7 @@ class UserController {
         val user = userService.getUserById(id)
 
         if (user == null) return ResponseEntity(error("user with id $id does not exist"), HttpStatus.NOT_FOUND)
-        else return ResponseEntity.ok(UserViewModel(user))
+        else return ResponseEntity.ok(UserView(user))
     }
 
 
@@ -103,23 +101,23 @@ class UserController {
 
     private data class error(var error: String)
 
-    private fun User.apply(userViewModel: UserViewModel): User {
+    private fun User.apply(userView: UserView): User {
 
-        this.firstname = userViewModel.firstname ?: this.firstname
-        this.lastname = userViewModel.lastname ?: this.lastname
-        this.gender = userViewModel.gender ?: this.gender
+        this.firstname = userView.firstname ?: this.firstname
+        this.lastname = userView.lastname ?: this.lastname
+        this.gender = userView.gender ?: this.gender
 
-        if (userViewModel.participant != null) {
+        if (userView.participant != null) {
 
             if (!this.hasRole(backend.model.user.Participant::class.java)) {
                 this.addRole(backend.model.user.Participant::class.java)
             }
 
             val p = this.getRole(backend.model.user.Participant::class.java) as backend.model.user.Participant
-            p.tshirtsize = userViewModel.participant?.tshirtsize ?: p.tshirtsize
-            p.emergencynumber = userViewModel.participant?.emergencynumber ?: p.emergencynumber
-            p.hometown = userViewModel.participant?.hometown ?: p.hometown
-            p.phonenumber = userViewModel.participant?.phonenumber ?: p.phonenumber
+            p.tshirtsize = userView.participant?.tshirtsize ?: p.tshirtsize
+            p.emergencynumber = userView.participant?.emergencynumber ?: p.emergencynumber
+            p.hometown = userView.participant?.hometown ?: p.hometown
+            p.phonenumber = userView.participant?.phonenumber ?: p.phonenumber
         }
 
         return this

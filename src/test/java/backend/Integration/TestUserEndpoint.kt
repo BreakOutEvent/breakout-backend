@@ -117,7 +117,7 @@ class TestUserEndpoint : IntegrationTest() {
     @Test
     fun putUserId() {
 
-        val credentials = createUser()
+        val credentials = createUser(this.mockMvc)
 
         // Update user
         val json = mapOf(
@@ -150,7 +150,7 @@ class TestUserEndpoint : IntegrationTest() {
     @Test
     fun makeUserParticipant() {
 
-        val credentials = createUser()
+        val credentials = createUser(this.mockMvc)
 
         // Update user with role participant
         val json = mapOf(
@@ -192,7 +192,7 @@ class TestUserEndpoint : IntegrationTest() {
     @Test
     fun failToMakeUserParticipantIfUnauthorized() {
 
-        val credentials = createUser()
+        val credentials = createUser(mockMvc)
         val json = mapOf(
                 "firstname" to "Florian",
                 "lastname" to "Schmidt",
@@ -246,50 +246,4 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.lastname").exists())
                 .andExpect(jsonPath("$.passwordHash").doesNotExist())
     }
-
-    private fun createUser(): Credentials {
-        // Create user
-        val json = mapOf(
-                "email" to "a@x.de",
-                "password" to "password"
-        ).toJsonString()
-
-        val createResponseString = mockMvc.perform(post(url(), json))
-                .andExpect(status().isCreated)
-                .andExpect(jsonPath("$.id").exists())
-                .andReturn().response.contentAsString
-
-        val createResponse: Map<String, kotlin.Any> = ObjectMapper()
-                .reader(Map::class.java)
-                .readValue(createResponseString)
-
-        val id = createResponse["id"] as Int
-
-        val credentials = Base64.getEncoder().encodeToString("breakout_app:123456789".toByteArray())
-
-        val request = MockMvcRequestBuilders
-                .post("/oauth/token")
-                .param("password", "password")
-                .param("username", "a@x.de")
-                .param("scope", "read write")
-                .param("grant_type", "password")
-                .param("client_secret", "123456789")
-                .param("client_id", "breakout_app")
-                .header("Authorization", "Basic $credentials")
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-
-        val oauthResponseString = mockMvc.perform(request).andReturn().response.contentAsString
-        val oauthResponse: Map<String, kotlin.Any> = ObjectMapper()
-                .reader(Map::class.java)
-                .readValue(oauthResponseString)
-
-        val accessToken = oauthResponse["access_token"] as String
-        val refreshToken = oauthResponse["refresh_token"] as String
-
-        return Credentials(id, accessToken, refreshToken)
-
-    }
-
-    class Credentials(val id: Int, val accessToken: String, val refreshToken: String)
-
 }
