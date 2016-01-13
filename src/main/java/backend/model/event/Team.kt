@@ -7,6 +7,14 @@ import javax.persistence.*
 @Entity
 class Team() {
 
+    constructor(creator: Participant, name: String, description: String, status: String = "", number: String = "") : this() {
+        this.addMember(creator)
+        this.number = number
+        this.name = name
+        this.description = description
+        this.status = status
+    }
+
     @Id
     @GeneratedValue
     @Column(nullable = false, updatable = false)
@@ -19,16 +27,17 @@ class Team() {
 
     lateinit var description: String
 
-    val picture: String? = null
+    var picture: String? = null
 
-    val status: String? = null
+    var status: String? = null
 
     @OneToMany
     val members: MutableSet<Participant> = HashSet()
 
-    fun addMembers(participant: Participant) {
+    fun addMember(participant: Participant) {
         if (members.size < 2) {
             members.add(participant)
+            participant.currentTeam = this
         } else throw Exception("This team already has two members")
     }
 }
