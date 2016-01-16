@@ -3,6 +3,7 @@ package backend.controller
 
 import backend.Integration.IntegrationTest
 import backend.Integration.toJsonString
+import org.junit.Ignore
 import org.junit.Test
 import org.springframework.http.MediaType
 
@@ -12,6 +13,7 @@ import kotlin.collections.mapOf
 
 class TestPostController : IntegrationTest() {
 
+    @Ignore("Old Code version")
     @Test
     @Throws(Exception::class)
     fun createNewPost() {
@@ -32,6 +34,7 @@ class TestPostController : IntegrationTest() {
 
     }
 
+    @Ignore("Old Code version")
     @Test
     @Throws(Exception::class)
     fun dontCreatePostForInvalidJSON() {
