@@ -12,9 +12,11 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import java.util.*
 import javax.validation.Valid
 import kotlin.collections.map
 import kotlin.collections.mapOf
+import kotlin.text.toByteArray
 
 @Api
 @RestController
@@ -36,7 +38,7 @@ class UserController {
     fun addUser(@Valid @RequestBody body: UserView): ResponseEntity<kotlin.Any> {
 
         if (userService.exists(body.email!!)) {
-            return ResponseEntity(error("user with email ${body.email!!} already exists"), HttpStatus.CONFLICT)
+            return ResponseEntity(GeneralController.error("user with email ${body.email!!} already exists"), HttpStatus.CONFLICT)
         }
 
         var user = userService.create(body.email!!, body.password!!).apply(body)
@@ -68,7 +70,7 @@ class UserController {
                    @AuthenticationPrincipal user: CustomUserDetails): ResponseEntity<kotlin.Any> {
 
         if (user.core!!.id != id) {
-            return ResponseEntity(error("authenticated user and requested resource mismatch"), HttpStatus.UNAUTHORIZED)
+            return ResponseEntity(GeneralController.error("authenticated user and requested resource mismatch"), HttpStatus.UNAUTHORIZED)
         }
 
         user.apply(body)
@@ -89,7 +91,7 @@ class UserController {
 
         val user = userService.getUserById(id)
 
-        if (user == null) return ResponseEntity(error("user with id $id does not exist"), HttpStatus.NOT_FOUND)
+        if (user == null) return ResponseEntity(GeneralController.error("user with id $id does not exist"), HttpStatus.NOT_FOUND)
         else return ResponseEntity.ok(UserView(user))
     }
 
@@ -99,7 +101,6 @@ class UserController {
     //        e.printStackTrace()
     //    }
 
-    private data class error(var error: String)
 
     private fun User.apply(userView: UserView): User {
 
