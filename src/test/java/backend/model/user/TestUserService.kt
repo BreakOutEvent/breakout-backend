@@ -5,6 +5,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import kotlin.collections.count
+import kotlin.collections.first
 import kotlin.test.*
 
 class TestUserService : IntegrationTest() {
@@ -59,6 +60,19 @@ class TestUserService : IntegrationTest() {
 
         assertTrue(userService.exists(body.email!!))
         assertFalse(userService.exists("f@s.com"))
+    }
+
+    @Test
+    fun saveWithRoles() {
+        val user = userService.create("a@b.c", "pw")
+        user.addRole(Participant::class.java)
+        userService.save(user)
+
+        val foundUser = userService.getAllUsers()!!.first()
+        val foundParticipant = foundUser.getRole(Participant::class.java) as Participant
+
+        assertTrue(foundUser.hasRole(Participant::class.java))
+        assertNotNull(foundParticipant.roleID)
     }
 
 }
