@@ -31,6 +31,9 @@ class Team() {
 
     var status: String? = null
 
+    @OneToOne
+    var invitation: Invitation? = null
+
     @OneToMany
     val members: MutableSet<Participant> = HashSet()
 

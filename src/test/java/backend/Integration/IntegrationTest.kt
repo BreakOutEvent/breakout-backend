@@ -7,6 +7,7 @@ import backend.TestBackendConfiguration
 import backend.WebSecurityConfiguration
 import backend.controller.RequestBodies.PostUserBody
 import backend.model.event.EventRepository
+import backend.model.event.TeamRepository
 import backend.model.user.UserRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.Before
@@ -41,6 +42,7 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var userRepository: UserRepository
     @Autowired lateinit protected var eventRepository: EventRepository
     @Autowired lateinit protected var springSecurityFilterChain: Filter
+    @Autowired lateinit protected var teamRepository: TeamRepository
 
     lateinit protected var mockMvc: MockMvc
 
@@ -63,6 +65,7 @@ abstract class IntegrationTest {
 
     @Before
     open fun setUp() {
+        teamRepository.deleteAll()
         userRepository.deleteAll()
         eventRepository.deleteAll()
         mockMvc = MockMvcBuilders
