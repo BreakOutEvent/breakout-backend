@@ -5,16 +5,16 @@ import javax.persistence.GeneratedValue
 import javax.persistence.Id
 
 @Entity
-class Invitation {
+class Invitation() {
 
     @Id
     @GeneratedValue
     var id: Long? = null
 
-    var status: InvitationStatus
-    var invitee: String
+    lateinit var status: InvitationStatus
+    lateinit var invitee: String
 
-    constructor(email: String) {
+    constructor(email: String): this() {
         this.status = InvitationStatus.OPEN
         this.invitee = email
     }

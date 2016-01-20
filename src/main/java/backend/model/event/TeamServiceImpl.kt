@@ -22,6 +22,7 @@ class TeamServiceImpl : TeamService {
 
     override fun invite(email: String, team: Team) {
         // TODO: Send Email to the person to be invited
+        // TODO: What if user already exists?
         team.invitation = Invitation(email)
         this.save(team)
     }

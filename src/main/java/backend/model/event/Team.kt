@@ -3,6 +3,7 @@ package backend.model.event
 import backend.model.user.Participant
 import java.util.*
 import javax.persistence.*
+import javax.persistence.CascadeType.*
 
 @Entity
 class Team() {
@@ -31,7 +32,7 @@ class Team() {
 
     var status: String? = null
 
-    @OneToOne
+    @OneToOne(cascade = arrayOf(ALL))
     var invitation: Invitation? = null
 
     @OneToMany
