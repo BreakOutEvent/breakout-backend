@@ -1,11 +1,10 @@
 package backend.model.user
 
+import backend.model.BasicEntity
 import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
 
 @Entity
-public class Address() {
+public class Address() : BasicEntity() {
 
     constructor(street: String, housenumber: String, city: String, country: String) : this() {
         this.street = street
@@ -14,9 +13,6 @@ public class Address() {
         this.country = country
     }
 
-    @Id
-    @GeneratedValue
-    var id: Int? = null
     lateinit var street: String
     lateinit var housenumber: String
     lateinit var city: String
