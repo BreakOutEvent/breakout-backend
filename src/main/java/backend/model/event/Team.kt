@@ -1,16 +1,12 @@
 package backend.model.event
 
+import backend.model.BasicEntity
 import backend.model.user.Participant
 import java.util.*
 import javax.persistence.*
 
 @Entity
-class Team() {
-
-    @Id
-    @GeneratedValue
-    @Column(nullable = false, updatable = false)
-    val id: Long? = null
+class Team() : BasicEntity() {
 
     @Column(unique = true)
     lateinit var number: String
