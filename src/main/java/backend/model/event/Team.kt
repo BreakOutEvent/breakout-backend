@@ -1,12 +1,13 @@
 package backend.model.event
 
+import backend.model.BasicEntity
 import backend.model.user.Participant
 import java.util.*
 import javax.persistence.*
 import javax.persistence.CascadeType.*
 
 @Entity
-class Team() {
+class Team() : BasicEntity() {
 
     constructor(creator: Participant, name: String, description: String, status: String = "", number: String = "") : this() {
         this.addMember(creator)
@@ -15,11 +16,6 @@ class Team() {
         this.description = description
         this.status = status
     }
-
-    @Id
-    @GeneratedValue
-    @Column(nullable = false, updatable = false)
-    val id: Long? = null
 
     @Column(unique = true)
     lateinit var number: String

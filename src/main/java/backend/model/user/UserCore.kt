@@ -1,5 +1,6 @@
 package backend.model.user
 
+import backend.model.BasicEntity
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.hibernate.validator.constraints.Email
@@ -9,12 +10,7 @@ import javax.persistence.*
 import java.util.HashMap
 
 @Entity
-open class UserCore : User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, updatable = false)
-    var id: Long? = null
+open class UserCore : BasicEntity(), User {
 
     @Email
     @Column(unique = true, nullable = false)
