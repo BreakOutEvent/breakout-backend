@@ -1,43 +1,60 @@
 package backend.model.event
 
 import backend.model.BasicEntity
+import backend.model.event.Invitation.InvitationStatus
+import backend.model.misc.EmailAddress
 import backend.model.user.Participant
 import java.util.*
 import javax.persistence.*
-import javax.persistence.CascadeType.*
+import javax.persistence.CascadeType.ALL
 
 @Entity
 class Team() : BasicEntity() {
 
-    constructor(creator: Participant, name: String, description: String, status: String = "", number: String = "") : this() {
+    constructor(creator: Participant, name: String, description: String, event: Event) : this() {
         this.addMember(creator)
-        this.number = number
         this.name = name
         this.description = description
-        this.status = status
+        this.event = event
     }
-
-    @Column(unique = true)
-    lateinit var number: String
 
     lateinit var name: String
 
+    @ManyToOne
+    lateinit var event: Event
+
     lateinit var description: String
 
-    var picture: String? = null
-
-    var status: String? = null
-
     @OneToOne(cascade = arrayOf(ALL))
-    var invitation: Invitation? = null
+    private var invitation: Invitation? = null
 
     @OneToMany
     val members: MutableSet<Participant> = HashSet()
 
-    fun addMember(participant: Participant) {
-        if (members.size < 2) {
-            members.add(participant)
-            participant.currentTeam = this
-        } else throw Exception("This team already has two members")
+    private fun addMember(participant: Participant) {
+        if(participant.currentTeam != null) throw Exception("Participant ${participant.email} already is part of a team")
+        if (members.size >= 2) throw Exception("This team already has two members")
+
+        members.add(participant)
+        participant.currentTeam = this
+    }
+
+    @Throws
+    fun join(participant: Participant) {
+
+        if(invitation == null) {
+            throw Exception("${participant.email} can't join team $id because there are no invitations")
+        } else if (invitation!!.invitee.toString() != participant.email) {
+            throw Exception("${participant.email} is not invited to join this team")
+        }
+
+        addMember(participant)
+        invitation!!.status = InvitationStatus.ACCEPTED
+    }
+
+    @Throws
+    fun invite(email: EmailAddress) {
+        if (this.invitation != null) throw Exception("Someone else has already been invited to this team")
+        this.invitation = Invitation(email)
     }
 }

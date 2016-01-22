@@ -1,5 +1,6 @@
 package backend.model.event
 
+import backend.model.misc.EmailAddress
 import backend.model.user.Participant
 
 interface TeamService {
@@ -10,11 +11,12 @@ interface TeamService {
      * @param creator: The creator and first of the two members of the team
      * @param name: The name of the team
      * @param description: The description of the team
+     * @param event: The event a team belongs to
      *
      * @return The newly created Team
      */
     @Throws
-    fun create(creator: Participant, name: String, description: String): Team
+    fun create(creator: Participant, name: String, description: String, event: Event): Team
 
     /**
      * Invite a participant to a team
@@ -23,7 +25,7 @@ interface TeamService {
      * @param team: The team to invite the participant to
      */
     @Throws
-    open fun invite(email: String, team: Team)
+    open fun invite(email: EmailAddress, team: Team)
 
     /**
      * Persist a team to the database

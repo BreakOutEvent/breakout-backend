@@ -1,20 +1,16 @@
 package backend.model.event
 
+import backend.model.BasicEntity
+import backend.model.misc.EmailAddress
 import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
 
 @Entity
-class Invitation() {
-
-    @Id
-    @GeneratedValue
-    var id: Long? = null
+class Invitation() : BasicEntity() {
 
     lateinit var status: InvitationStatus
-    lateinit var invitee: String
+    lateinit var invitee: EmailAddress
 
-    constructor(email: String): this() {
+    constructor(email: EmailAddress) : this() {
         this.status = InvitationStatus.OPEN
         this.invitee = email
     }
