@@ -3,7 +3,7 @@ package backend.model
 import java.time.LocalDateTime
 import javax.persistence.*
 
-@Entity
+@MappedSuperclass
 abstract class BasicEntity {
 
     @Id

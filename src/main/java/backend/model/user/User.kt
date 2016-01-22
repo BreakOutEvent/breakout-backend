@@ -1,5 +1,7 @@
 package backend.model.user
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+
 interface User {
 
     var email: String
@@ -16,4 +18,12 @@ interface User {
     fun hasRole(clazz: Class<out UserRole>): Boolean
     fun removeRole(clazz: Class<out UserRole>): UserRole?
 
+    companion object {
+        fun create(email: String, password: String): User {
+            val user = UserCore()
+            user.email = email
+            user.passwordHash = BCryptPasswordEncoder().encode(password)
+            return user
+        }
+    }
 }

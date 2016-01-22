@@ -72,7 +72,7 @@ class TestUserService : IntegrationTest() {
         val foundParticipant = foundUser.getRole(Participant::class.java) as Participant
 
         assertTrue(foundUser.hasRole(Participant::class.java))
-        assertNotNull(foundParticipant.roleID)
+        assertNotNull(foundParticipant.id)
     }
 
 }
