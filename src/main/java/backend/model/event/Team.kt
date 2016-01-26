@@ -28,7 +28,7 @@ class Team() : BasicEntity() {
     @OneToOne(cascade = arrayOf(ALL))
     private var invitation: Invitation? = null
 
-    @OneToMany
+    @OneToMany(cascade = arrayOf(CascadeType.PERSIST))
     val members: MutableSet<Participant> = HashSet()
 
     private fun addMember(participant: Participant) {

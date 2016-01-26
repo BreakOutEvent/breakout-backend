@@ -2,12 +2,10 @@ package backend.view
 
 import backend.model.event.Team
 import org.hibernate.validator.constraints.NotEmpty
-import org.springframework.hateoas.ResourceSupport
 import java.util.*
 import javax.validation.constraints.NotNull
-import kotlin.collections.forEach
 
-class TeamView : ResourceSupport {
+class TeamView() {
 
     var id: Long? = null
 
@@ -22,7 +20,7 @@ class TeamView : ResourceSupport {
 
     var members: MutableList<String>? = null
 
-    constructor(team: Team) : super() {
+    constructor(team: Team) : this() {
         this.id = team.id
         this.name = team.name
         this.event = team.event.id
