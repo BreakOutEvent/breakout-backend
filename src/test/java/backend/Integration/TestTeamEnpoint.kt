@@ -57,7 +57,17 @@ class TestTeamEnpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.description").value("Our team is awesome"))
                 .andExpect(jsonPath("$.members").isArray)
                 .andExpect(jsonPath<MutableCollection<out Any>>("$.members", hasSize(1)))
+    }
 
+    fun failToCreateTeamIfUserIsNoParticipant() {
+        val body = mapOf("name" to "Team awesome", "description" to "This team is awesome").toJsonString()
+
+        val request = MockMvcRequestBuilders
+                .post("event/${event.id}/team")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body)
+
+        mockMvc.perform(request).andExpect(status().isUnauthorized)
     }
 
     @Test
