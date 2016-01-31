@@ -2,7 +2,11 @@ package backend.Integration
 
 import backend.model.event.Event
 import backend.model.event.EventService
+import backend.model.event.Team
+import backend.model.event.TeamService
 import backend.model.misc.Coords
+import backend.model.user.Participant
+import backend.model.user.User
 import backend.model.user.UserService
 import org.hamcrest.Matchers.hasSize
 import org.junit.Before
@@ -17,7 +21,9 @@ import java.time.LocalDateTime
 class TestTeamEnpoint : IntegrationTest() {
 
     lateinit var event: Event
+    lateinit var team: Team
     lateinit var credentials: Credentials
+    lateinit var creator: User
 
     @Autowired
     lateinit var userService: UserService
@@ -25,17 +31,26 @@ class TestTeamEnpoint : IntegrationTest() {
     @Autowired
     lateinit var eventService: EventService
 
+    @Autowired
+    lateinit var teamService: TeamService
+
     @Before
     override fun setUp() {
         super.setUp()
+
         event = eventService.createEvent(
                 title = "Breakout München",
                 date = LocalDateTime.now(),
                 city = "Munich",
                 startingLocation = Coords(0.0, 0.0),
                 duration = 36)
+
         credentials = createUser(this.mockMvc)
         makeUserParticipant(credentials)
+        creator = userRepository.findOne(credentials.id.toLong()).getRole(Participant::class.java) as Participant
+        team = teamService.create(creator as Participant, "name", "description", event)
+
+
     }
 
     @Test
@@ -77,7 +92,16 @@ class TestTeamEnpoint : IntegrationTest() {
 
     @Test
     fun testInviteUser() {
+        val body = mapOf("email" to "florian@schmidt.de").toJsonString()
 
+        val request = MockMvcRequestBuilders
+                .post("/event/${event.id}/team/${team.id}/invitation/")
+                .header("Authorization", "Bearer ${credentials.accessToken}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body)
+
+        mockMvc.perform(request)
+                .andExpect(status().isCreated)
     }
 
     private fun makeUserParticipant(credentials: Credentials) {
