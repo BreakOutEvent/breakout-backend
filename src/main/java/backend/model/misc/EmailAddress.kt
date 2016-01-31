@@ -5,12 +5,12 @@ import org.hibernate.validator.constraints.Email
 import javax.persistence.Embeddable
 
 @Embeddable
-class EmailAddress {
+class EmailAddress() {
 
     @Email
-    private val value: String
+    private lateinit var value: String
 
-    constructor(email: String) {
+    constructor(email: String) : this() {
         val validator = EmailValidator.getInstance()
         if (!validator.isValid(email)) throw Exception("Invalid email $email")
         this.value = email
