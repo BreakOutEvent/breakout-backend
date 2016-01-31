@@ -1,6 +1,6 @@
 package backend.model.misc
 
-import org.apache.commons.validator.EmailValidator
+import org.apache.commons.validator.routines.EmailValidator
 import org.hibernate.validator.constraints.Email
 import javax.persistence.Embeddable
 
