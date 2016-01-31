@@ -56,7 +56,7 @@ class TeamController {
 
         val emailString = body.get("email") as? String ?: throw Exception("body is missing field email")
         val email = EmailAddress(emailString)
-        team.invite(email)
+        teamService.invite(email, team)
     }
 
 
