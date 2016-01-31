@@ -13,17 +13,22 @@ import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
+import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 
 class TestTeamEnpoint : IntegrationTest() {
 
     lateinit var event: Event
     lateinit var team: Team
-    lateinit var credentials: Credentials
+    lateinit var creatorCredentials: Credentials
     lateinit var creator: User
+    lateinit var inviteeCredentials: Credentials
+    lateinit var invitee: User
 
     @Autowired
     lateinit var userService: UserService
@@ -45,9 +50,12 @@ class TestTeamEnpoint : IntegrationTest() {
                 startingLocation = Coords(0.0, 0.0),
                 duration = 36)
 
-        credentials = createUser(this.mockMvc)
-        makeUserParticipant(credentials)
-        creator = userRepository.findOne(credentials.id.toLong()).getRole(Participant::class.java) as Participant
+        creatorCredentials = createUser(this.mockMvc)
+        inviteeCredentials = createUser(this.mockMvc, email = "invitee@mail.com")
+        makeUserParticipant(creatorCredentials)
+        makeUserParticipant(inviteeCredentials)
+        creator = userRepository.findOne(creatorCredentials.id.toLong()).getRole(Participant::class.java) as Participant
+        invitee = userRepository.findOne(inviteeCredentials.id.toLong())
         team = teamService.create(creator as Participant, "name", "description", event)
 
 
@@ -58,9 +66,8 @@ class TestTeamEnpoint : IntegrationTest() {
 
         val body = mapOf("name" to "Team awesome", "description" to "Our team is awesome").toJsonString()
 
-        val request = MockMvcRequestBuilders
-                .post("/event/${event.id}/team/")
-                .header("Authorization", "Bearer ${credentials.accessToken}")
+        val request = post("/event/${event.id}/team/")
+                .header("Authorization", "Bearer ${creatorCredentials.accessToken}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body)
 
@@ -77,8 +84,7 @@ class TestTeamEnpoint : IntegrationTest() {
     fun failToCreateTeamIfUserIsNoParticipant() {
         val body = mapOf("name" to "Team awesome", "description" to "This team is awesome").toJsonString()
 
-        val request = MockMvcRequestBuilders
-                .post("event/${event.id}/team")
+        val request = post("event/${event.id}/team")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body)
 
@@ -92,16 +98,31 @@ class TestTeamEnpoint : IntegrationTest() {
 
     @Test
     fun testInviteUser() {
-        val body = mapOf("email" to "florian@schmidt.de").toJsonString()
+        val body = mapOf("email" to invitee.email).toJsonString()
 
-        val request = MockMvcRequestBuilders
-                .post("/event/${event.id}/team/${team.id}/invitation/")
-                .header("Authorization", "Bearer ${credentials.accessToken}")
+        val request = post("/event/${event.id}/team/${team.id}/invitation/")
+                .header("Authorization", "Bearer ${creatorCredentials.accessToken}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body)
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated)
+    }
+
+    @Test
+    fun joinTeam() {
+
+        // TODO: Is this a good practice? How to do integration tests...
+        testInviteUser()
+
+        val body = mapOf("email" to invitee.email).toJsonString()
+        val joinRequest = post("/event/${event.id}/team/${team.id}/member/")
+                .header("Authorization", "Bearer ${inviteeCredentials.accessToken}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body)
+
+        // Join team
+        mockMvc.perform(joinRequest).andExpect(status().isCreated)
     }
 
     private fun makeUserParticipant(credentials: Credentials) {
@@ -120,8 +141,7 @@ class TestTeamEnpoint : IntegrationTest() {
                 )
         ).toJsonString()
 
-        val request = MockMvcRequestBuilders
-                .put("/user/${credentials.id}/")
+        val request = put("/user/${credentials.id}/")
                 .header("Authorization", "Bearer ${credentials.accessToken}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)

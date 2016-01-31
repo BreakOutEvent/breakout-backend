@@ -59,5 +59,24 @@ class TeamController {
         teamService.invite(email, team)
     }
 
+    @ResponseStatus(CREATED)
+    @RequestMapping("/{teamId}/member/", method = arrayOf(POST))
+    fun joinTeam(@PathVariable eventId: Long,
+                 @PathVariable teamId: Long,
+                 @AuthenticationPrincipal user: CustomUserDetails,
+                 @Valid @RequestBody body: Map<String, String>) {
 
+        val event = eventRepository.findOne(eventId) ?: throw ResourceNotFoundException("No event with id $eventId")
+        val team = teamRepository.findOne(teamId) ?: throw ResourceNotFoundException("No team with id $teamId")
+        val emailString = body.get("email") ?: throw Exception("body is missing field email")
+        val email = EmailAddress(emailString)
+
+        if (user.email != email.toString()) throw Exception("Authorized user and email from request body don't match")
+
+        val participant = user.getRole(Participant::class.java) as? Participant ?:
+                throw RuntimeException("User is no participant")
+
+        // TODO: Handle Exceptions which may occur when user is not invited to team, etc.
+        team.join(participant)
+    }
 }
