@@ -126,8 +126,8 @@ class TestUser {
 
         // Check if saved user can be found again
         val user1 = userRepository.findByEmail("florian.schmidt.1995@icloud.com")
-        assertNotNull(user.core!!)
-        assertEquals(user.core!!.id, user1.core!!.id)
+        assertNotNull(user.core)
+        assertEquals(user.core.id, user1.core!!.id)
         assertTrue(user.hasRole(Employee::class.java))
 
         // Add and remove roles from user and save
@@ -137,7 +137,7 @@ class TestUser {
 
         // Check if found user has correct roles
         val user2 = userRepository.findByEmail("florian.schmidt.1995@icloud.com")
-        assertEquals(user.core!!.id, user2.core!!.id)
+        assertEquals(user.core.id, user2.core!!.id)
         assertTrue(user2.hasRole(Participant::class.java))
         assertFalse(user2.hasRole(Employee::class.java))
 

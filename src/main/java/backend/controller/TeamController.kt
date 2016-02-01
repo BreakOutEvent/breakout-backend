@@ -11,6 +11,7 @@ import backend.model.user.Participant
 import backend.view.TeamView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.POST
@@ -18,11 +19,11 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/event/{eventId}/team")
-class TeamController {
+open class TeamController {
 
-    lateinit var teamService: TeamService
-    lateinit var eventRepository: EventRepository
-    lateinit var teamRepository: TeamRepository
+    open var teamService: TeamService
+    open var eventRepository: EventRepository
+    open var teamRepository: TeamRepository
 
     @Autowired
     constructor(teamService: TeamService, eventRepository: EventRepository, teamRepository: TeamRepository) {
@@ -46,14 +47,14 @@ class TeamController {
 
     @ResponseStatus(CREATED)
     @RequestMapping("/{teamId}/invitation/", method = arrayOf(POST))
+    @PreAuthorize("isAuthenticated()")
     fun inviteUser(@PathVariable eventId: Long,
                    @PathVariable teamId: Long,
-                   @AuthenticationPrincipal user: CustomUserDetails,
                    @Valid @RequestBody body: Map<String, Any>) {
 
-        val event = eventRepository.findById(eventId) ?: throw ResourceNotFoundException("No event with id $eventId")
-        val team = teamRepository.findOne(teamId) ?: throw ResourceNotFoundException("No team with id $teamId")
+        if (eventRepository.exists(eventId) == false) throw ResourceNotFoundException("No event with id $eventId")
 
+        val team = teamRepository.findOne(teamId) ?: throw ResourceNotFoundException("No team with id $teamId")
         val emailString = body.get("email") as? String ?: throw Exception("body is missing field email")
         val email = EmailAddress(emailString)
         teamService.invite(email, team)
@@ -66,7 +67,8 @@ class TeamController {
                  @AuthenticationPrincipal user: CustomUserDetails,
                  @Valid @RequestBody body: Map<String, String>) {
 
-        val event = eventRepository.findOne(eventId) ?: throw ResourceNotFoundException("No event with id $eventId")
+        if (eventRepository.exists(eventId) == false) throw ResourceNotFoundException("No event with id $eventId")
+
         val team = teamRepository.findOne(teamId) ?: throw ResourceNotFoundException("No team with id $teamId")
         val emailString = body.get("email") ?: throw Exception("body is missing field email")
         val email = EmailAddress(emailString)
