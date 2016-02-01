@@ -93,12 +93,12 @@ abstract class IntegrationTest {
 fun Map<String, kotlin.Any>.toJsonString() = ObjectMapper().writeValueAsString(this)
 
 // Create a user via the API and return it's credentials
-fun createUser(mockMvc: MockMvc): Credentials {
+fun createUser(mockMvc: MockMvc, email: String = "a@x.de", password: String = "password"): Credentials {
 
     // Create user
     val userdata = mapOf(
-            "email" to "a@x.de",
-            "password" to "password"
+            "email" to email,
+            "password" to password
     ).toJsonString()
 
     val createRequest = MockMvcRequestBuilders
@@ -122,8 +122,8 @@ fun createUser(mockMvc: MockMvc): Credentials {
 
     val request = MockMvcRequestBuilders
             .post("/oauth/token")
-            .param("password", "password")
-            .param("username", "a@x.de")
+            .param("password", password)
+            .param("username", email)
             .param("scope", "read write")
             .param("grant_type", "password")
             .param("client_secret", "123456789")
