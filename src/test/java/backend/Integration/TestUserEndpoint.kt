@@ -8,11 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
-import java.util.*
-import kotlin.collections.mapOf
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.text.toByteArray
 
 class TestUserEndpoint : IntegrationTest() {
 
@@ -48,6 +45,19 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$[1].email").exists())
                 .andExpect(jsonPath("$[1].gender").exists())
                 .andExpect(jsonPath("$[1].passwordHash").doesNotExist())
+    }
+
+    @Test
+    fun getAuthenticatedUser() {
+        val credentials = createUser(this.mockMvc)
+
+        val request = MockMvcRequestBuilders.get("/me/")
+                .header("Authorization", "Bearer ${credentials.accessToken}")
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.email").exists())
     }
 
     /**
