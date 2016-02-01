@@ -28,7 +28,7 @@ class Team() : BasicEntity() {
     @OneToOne(cascade = arrayOf(ALL))
     private var invitation: Invitation? = null
 
-    @OneToMany(mappedBy = "currentTeam")
+    @OneToMany(mappedBy = "currentTeam", fetch = FetchType.EAGER)
     val members: MutableSet<Participant> = HashSet()
 
     private fun addMember(participant: Participant) {
@@ -56,5 +56,10 @@ class Team() : BasicEntity() {
     fun invite(email: EmailAddress) {
         if (this.invitation != null) throw Exception("Someone else has already been invited to this team")
         this.invitation = Invitation(email)
+    }
+    @PreRemove
+    fun preRemove() {
+        this.members.forEach { it.currentTeam = null }
+        this.members.clear()
     }
 }

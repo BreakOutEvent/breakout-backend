@@ -17,8 +17,6 @@ import kotlin.test.assertNotNull
 
 class TeamServiceImplTest : IntegrationTest() {
 
-    @Autowired
-    private lateinit var repository: TeamRepository
 
     @Autowired
     private lateinit var userService: UserService
@@ -29,6 +27,8 @@ class TeamServiceImplTest : IntegrationTest() {
     @Autowired
     private lateinit var teamService: TeamService
 
+    @Autowired
+    private lateinit var repository: TeamRepository
     private lateinit var event: Event
 
     @Before
@@ -47,7 +47,7 @@ class TeamServiceImplTest : IntegrationTest() {
 
         assertNotNull(savedTeam)
         assertEquals(team.id, savedTeam.id)
-        assertEquals(participant, team.members.first())
+        assertEquals(participant.core.id, savedTeam.members.first().core.id)
     }
 
     @Test
