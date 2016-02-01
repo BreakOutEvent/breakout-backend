@@ -2,6 +2,7 @@ package backend.model.event
 
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
+import org.springframework.security.access.prepost.PreAuthorize
 
 interface TeamService {
 
@@ -25,6 +26,7 @@ interface TeamService {
      * @param team: The team to invite the participant to
      */
     @Throws
+    @PreAuthorize("#team.isMember(authentication.name)")
     open fun invite(email: EmailAddress, team: Team)
 
     /**

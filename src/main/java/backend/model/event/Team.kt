@@ -57,6 +57,11 @@ class Team() : BasicEntity() {
         if (this.invitation != null) throw Exception("Someone else has already been invited to this team")
         this.invitation = Invitation(email)
     }
+
+    fun isMember(username: String): Boolean {
+        return this.members.map { participant -> participant.email }.contains(username)
+    }
+
     @PreRemove
     fun preRemove() {
         this.members.forEach { it.currentTeam = null }
