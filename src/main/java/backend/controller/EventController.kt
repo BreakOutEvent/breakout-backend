@@ -9,6 +9,7 @@ import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import javax.validation.Valid
 import kotlin.collections.map
 
 @RestController
@@ -27,7 +28,7 @@ class EventController {
             value = "/",
             method = arrayOf(RequestMethod.POST),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun createEvent(@RequestBody body: EventView): EventView {
+    fun createEvent(@Valid @RequestBody body: EventView): EventView {
 
         val event = eventService.createEvent(
                 title = body.title!!,
