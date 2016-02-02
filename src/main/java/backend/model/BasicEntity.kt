@@ -14,9 +14,13 @@ abstract class BasicEntity {
     @Column
     var createdAt: LocalDateTime? = null
 
+    @Column
+    var updatedAt: LocalDateTime? = null
+
     @PreUpdate
     @PrePersist
     fun setTimestamps() {
+        updatedAt = LocalDateTime.now()
         if (createdAt == null) {
             createdAt = LocalDateTime.now()
         }

@@ -73,15 +73,14 @@ class TeamServiceImplTest : IntegrationTest() {
 
     @Test
     fun failToInvite() {
-        val authenticatedUser = setAuthenticatedUser("user@mail.com", Participant::class.java)
-                .getRole(Participant::class.java)as Participant
+        setAuthenticatedUser("user@mail.com", Participant::class.java).getRole(Participant::class.java)as Participant
         val creator = userService.create("not@mail.com", "password").addRole(Participant::class.java) as Participant
         val team = teamService.create(creator, "name", "description", event)
 
         assertFails { teamService.invite(EmailAddress("test@mail.com"), team) }
     }
 
-    private fun setAuthenticatedUser(email: String, role: Class<out UserRole>) : User {
+    private fun setAuthenticatedUser(email: String, role: Class<out UserRole>): User {
         val user = userService.create(email, "password").addRole(role)
         val details = userDetailsService.loadUserByUsername(email)!! // Not null because otherwise exception is thrown
         val token = UsernamePasswordAuthenticationToken(details.username, details.password, details.authorities)
