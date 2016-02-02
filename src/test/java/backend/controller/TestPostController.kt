@@ -6,9 +6,16 @@ import backend.Integration.Credentials
 import backend.Integration.IntegrationTest
 import backend.Integration.createUser
 import backend.Integration.toJsonString
+import backend.model.event.Post
+import backend.model.event.PostService
+import backend.model.misc.Coords
+import backend.model.user.User
+import backend.model.user.UserService
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
@@ -16,12 +23,17 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import kotlin.collections.forEach
 import kotlin.collections.mapOf
 
 class TestPostController : IntegrationTest() {
 
     lateinit var userCredentials: Credentials
+
+    @Autowired
+    lateinit var userService: UserService
+
+    @Autowired
+    lateinit var postService: PostService
 
     @Before
     override fun setUp() {
@@ -30,7 +42,6 @@ class TestPostController : IntegrationTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun createNewPost() {
         val postData = mapOf(
                 "text" to "TestPost",
@@ -62,7 +73,6 @@ class TestPostController : IntegrationTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun dontCreatePostForInvalidJSON() {
         val postData = mapOf(
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
@@ -87,7 +97,6 @@ class TestPostController : IntegrationTest() {
 
 
     @Test
-    @Throws(Exception::class)
     fun dontCreatePostWithoutValidAuth() {
         val postData = mapOf(
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
@@ -108,5 +117,29 @@ class TestPostController : IntegrationTest() {
                 .andReturn().response.contentAsString
 
         println(response)
+    }
+
+    @Ignore("Not Working")
+    @Test
+    fun getPostById() {
+        val user = userService.create(getDummyPostUserBody())
+        val post = postService.createPost("Test", Coords(0.0, 0.0), user as User)
+
+        val getRequest = MockMvcRequestBuilders
+                .request(HttpMethod.GET, "/post/" + post.id + "/")
+                .contentType(MediaType.APPLICATION_JSON)
+
+        val getResponse = mockMvc.perform (getRequest)
+                .andExpect (status().isOk)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.text").exists())
+                .andExpect(jsonPath("$.date").exists())
+                .andExpect(jsonPath("$.user").exists())
+                .andExpect(jsonPath("$.postLocation.latitude").exists())
+                .andExpect(jsonPath("$.postLocation.longitude").exists())
+                .andReturn().response.contentAsString
+
+        println(getResponse)
     }
 }

@@ -6,6 +6,7 @@ import backend.model.user.User
 interface PostService {
     fun createPost(text: String, postLocation: Coords, user: User): Post
     fun findAll(): Iterable<Post>
+    fun getByID(id: Long): Post?
     fun save(post: Post): Post?
 
 }

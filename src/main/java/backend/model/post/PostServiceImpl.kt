@@ -18,4 +18,8 @@ class PostServiceImpl @Autowired constructor(val repository: PostRepository) : P
         val post = Post(text, postLocation, user)
         return repository.save(post)
     }
+
+    override fun getByID(id: Long): Post? {
+        return repository.findById(id)
+    }
 }

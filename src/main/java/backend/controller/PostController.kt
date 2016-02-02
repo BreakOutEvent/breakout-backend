@@ -12,7 +12,6 @@ import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 import javax.validation.Valid
-import kotlin.collections.mapOf
 
 @RestController
 @RequestMapping("/post")
@@ -39,6 +38,25 @@ class PostController {
         postService.save(post)
         return ResponseEntity(PostView(post), HttpStatus.CREATED)
 
+    }
+
+
+    /**
+     * GET /post/id/
+     */
+    @RequestMapping(
+            value = "/{id}/",
+            method = arrayOf(RequestMethod.GET),
+            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
+    fun showPost(@PathVariable("id") id: Long): ResponseEntity<kotlin.Any> {
+
+        val post = postService.getByID(id)
+
+        if (post == null) {
+            return ResponseEntity(GeneralController.error("post with id $id does not exist"), HttpStatus.NOT_FOUND)
+        } else {
+            return ResponseEntity.ok(PostView(post))
+        }
     }
 
 }
