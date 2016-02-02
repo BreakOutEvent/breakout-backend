@@ -1,6 +1,6 @@
 package backend.model.event
 
-import backend.CustomUserDetailsService
+import backend.configuration.CustomUserDetailsService
 import backend.Integration.IntegrationTest
 import backend.model.misc.Coords
 import backend.model.misc.EmailAddress

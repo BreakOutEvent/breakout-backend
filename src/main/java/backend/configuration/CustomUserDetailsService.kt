@@ -1,4 +1,4 @@
-package backend
+package backend.configuration
 
 import backend.model.user.UserService
 import org.springframework.beans.factory.annotation.Autowired

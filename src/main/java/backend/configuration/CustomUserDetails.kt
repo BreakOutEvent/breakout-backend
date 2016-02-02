@@ -1,4 +1,4 @@
-package backend
+package backend.configuration
 
 import backend.model.user.User
 import org.springframework.security.core.userdetails.UserDetails

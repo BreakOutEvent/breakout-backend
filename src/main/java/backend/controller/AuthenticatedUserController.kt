@@ -1,6 +1,6 @@
 package backend.controller
 
-import backend.CustomUserDetails
+import backend.configuration.CustomUserDetails
 import backend.view.UserView
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.RequestMapping

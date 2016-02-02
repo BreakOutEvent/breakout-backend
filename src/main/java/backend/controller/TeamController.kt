@@ -1,6 +1,6 @@
 package backend.controller
 
-import backend.CustomUserDetails
+import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.ResourceNotFoundException
 import backend.controller.exceptions.UnauthorizedException
 import backend.model.event.EventRepository
