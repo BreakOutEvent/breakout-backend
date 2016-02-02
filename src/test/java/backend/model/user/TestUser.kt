@@ -1,6 +1,9 @@
 package backend.model.user
 
 import backend.TestBackendConfiguration
+import backend.configuration.AuthorizationServerConfiguration
+import backend.configuration.ResourceServerConfiguration
+import backend.configuration.WebSecurityConfiguration
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -12,17 +15,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 import org.springframework.test.context.web.WebAppConfiguration
 
 @RunWith(SpringJUnit4ClassRunner::class)
-@SpringApplicationConfiguration(classes = arrayOf(TestBackendConfiguration::class))
+@SpringApplicationConfiguration(classes = arrayOf(TestBackendConfiguration::class, WebSecurityConfiguration::class, ResourceServerConfiguration::class, AuthorizationServerConfiguration::class))
 @WebAppConfiguration
 @IntegrationTest("server.port:0")
 class TestUser {
 
-    @Autowired
-    private val userRepository: UserRepository? = null
+    @Autowired lateinit protected var userRepository: UserRepository
 
     @Before
     fun setUp() {
-        userRepository!!.deleteAll()
+        userRepository.deleteAll()
     }
 
     /**
@@ -122,7 +124,7 @@ class TestUser {
             gender = "Male"
         }
 
-        userRepository!!.save(user.core)
+        userRepository.save(user.core)
 
         // Check if saved user can be found again
         val user1 = userRepository.findByEmail("florian.schmidt.1995@icloud.com")
