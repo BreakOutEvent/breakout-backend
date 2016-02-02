@@ -1,65 +1,112 @@
 @file:JvmName("TestPostController")
+
 package backend.controller
 
+import backend.Integration.Credentials
 import backend.Integration.IntegrationTest
+import backend.Integration.createUser
 import backend.Integration.toJsonString
+import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
+import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import kotlin.collections.forEach
 import kotlin.collections.mapOf
 
 class TestPostController : IntegrationTest() {
 
-    @Ignore("Old Code version")
+    lateinit var userCredentials: Credentials
+
+    @Before
+    override fun setUp() {
+        super.setUp()
+        userCredentials = createUser(this.mockMvc)
+    }
+
     @Test
     @Throws(Exception::class)
     fun createNewPost() {
-        //TODO: Check whether Post was really created and saved to database
-
-        val json = mapOf(
-                "created" to 1388530800000,
-                "sent" to 1388617200000,
-                "text" to "String",
-                "location" to mapOf("lat" to 51.3, "lon" to "17.2"),
-                "challenge_id" to "rand_id"
+        val postData = mapOf(
+                "text" to "TestPost",
+                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
+                "postLocation" to mapOf(
+                        "latitude" to 0.0,
+                        "longitude" to 0.0
+                )
         ).toJsonString()
 
-        mockMvc.perform(post("/test/post/", json))
+        val request = MockMvcRequestBuilders
+                .request(HttpMethod.POST, "/post/")
+                .header("Authorization", "Bearer ${userCredentials.accessToken}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(postData)
+
+        val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.text").exists())
+                .andExpect(jsonPath("$.date").exists())
+                .andExpect(jsonPath("$.user").exists())
+                .andExpect(jsonPath("$.postLocation.latitude").exists())
+                .andExpect(jsonPath("$.postLocation.longitude").exists())
+                .andReturn().response.contentAsString
 
+        println(response)
     }
 
-    @Ignore("Old Code version")
     @Test
     @Throws(Exception::class)
     fun dontCreatePostForInvalidJSON() {
-
-        val missingField = mapOf(
-                "sent" to 1388617200000,
-                "text" to "String",
-                "location" to mapOf("lat" to 51.3, "lon" to 17.2),
-                "challenge_id" to "rand_id"
+        val postData = mapOf(
+                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
+                "postLocation" to mapOf(
+                        "latitude" to 0.0,
+                        "longitude" to 0.0
+                )
         ).toJsonString()
 
-        val missingNestedField = mapOf(
-                "created" to 123456,
-                "sent" to  1388617200000,
-                "text" to  "String",
-                "location"  to  mapOf("lon" to  17.2),
-                "challenge_id"  to  "rand_id"
+        val request = MockMvcRequestBuilders
+                .request(HttpMethod.POST, "/post/")
+                .header("Authorization", "Bearer ${userCredentials.accessToken}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(postData)
+
+        val response = mockMvc.perform(request)
+                .andExpect(status().isBadRequest)
+                .andReturn().response.contentAsString
+
+        println(response)
+    }
+
+
+    @Test
+    @Throws(Exception::class)
+    fun dontCreatePostWithoutValidAuth() {
+        val postData = mapOf(
+                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
+                "postLocation" to mapOf(
+                        "latitude" to 0.0,
+                        "longitude" to 0.0
+                )
         ).toJsonString()
 
-        val invalidJSON = "{#;}}"
+        val request = MockMvcRequestBuilders
+                .request(HttpMethod.POST, "/post/")
+                .header("Authorization", "Bearer invalidToken")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(postData)
 
-        arrayOf(missingField, missingNestedField, invalidJSON).forEach {
-            mockMvc.perform(post("/test/post/", it))
-                    .andExpect(status().isBadRequest)
-        }
+        val response = mockMvc.perform(request)
+                .andExpect(status().isUnauthorized)
+                .andReturn().response.contentAsString
 
+        println(response)
     }
 }

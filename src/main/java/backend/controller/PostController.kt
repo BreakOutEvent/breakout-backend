@@ -15,14 +15,14 @@ import javax.validation.Valid
 import kotlin.collections.mapOf
 
 @RestController
-@RequestMapping("/posting")
+@RequestMapping("/post")
 class PostController {
 
     @Autowired
     private lateinit var postService: PostService
 
     /**
-     * Post /posting/
+     * Post /post/
      */
     @RequestMapping(
             value = "/",
@@ -37,7 +37,7 @@ class PostController {
 
         var post = postService.createPost(text = body.text!!, postLocation = Coords(body.postLocation!!.latitude!!, body.postLocation!!.longitude!!), user = user)
         postService.save(post)
-        return ResponseEntity(mapOf("id" to post.id!!), HttpStatus.CREATED)
+        return ResponseEntity(PostView(post), HttpStatus.CREATED)
 
     }
 
