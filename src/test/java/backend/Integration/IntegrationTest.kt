@@ -8,6 +8,7 @@ import backend.configuration.WebSecurityConfiguration
 import backend.controller.RequestBodies.PostUserBody
 import backend.model.event.EventRepository
 import backend.model.event.TeamRepository
+import backend.model.event.PostRepository
 import backend.model.user.UserRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.Before
@@ -28,8 +29,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import java.util.*
 import javax.servlet.Filter
-import kotlin.collections.mapOf
-import kotlin.text.toByteArray
 
 @RunWith(SpringJUnit4ClassRunner::class)
 @SpringApplicationConfiguration(classes = arrayOf(TestBackendConfiguration::class, WebSecurityConfiguration::class, ResourceServerConfiguration::class, AuthorizationServerConfiguration::class))
@@ -41,6 +40,7 @@ abstract class IntegrationTest {
     @Autowired lateinit private var context: WebApplicationContext
     @Autowired lateinit protected var userRepository: UserRepository
     @Autowired lateinit protected var eventRepository: EventRepository
+    @Autowired lateinit protected var postRepository: PostRepository
     @Autowired lateinit protected var springSecurityFilterChain: Filter
     @Autowired lateinit protected var teamRepository: TeamRepository
 
@@ -66,6 +66,7 @@ abstract class IntegrationTest {
     @Before
     open fun setUp() {
         teamRepository.deleteAll()
+        postRepository.deleteAll()
         userRepository.deleteAll()
         eventRepository.deleteAll()
         mockMvc = MockMvcBuilders
