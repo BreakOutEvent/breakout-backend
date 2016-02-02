@@ -34,7 +34,7 @@ class PostController {
             return ResponseEntity(GeneralController.error("authenticated user and requested resource mismatch"), HttpStatus.UNAUTHORIZED)
         }
 
-        var post = postService.createPost(text = body.text!!, postLocation = Coords(body.postLocation!!.latitude!!, body.postLocation!!.longitude!!), user = user)
+        var post = postService.createPost(text = body.text!!, postLocation = Coords(body.postLocation!!.latitude!!, body.postLocation!!.longitude!!), user = user.core!!)
         postService.save(post)
         return ResponseEntity(PostView(post), HttpStatus.CREATED)
 

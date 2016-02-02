@@ -1,6 +1,6 @@
 @file:JvmName("TestPostController")
 
-package backend.controller
+package backend.Integration
 
 import backend.Integration.Credentials
 import backend.Integration.IntegrationTest
@@ -25,7 +25,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlin.collections.mapOf
 
-class TestPostController : IntegrationTest() {
+class TestPostEndpoint : IntegrationTest() {
 
     lateinit var userCredentials: Credentials
 
@@ -119,11 +119,10 @@ class TestPostController : IntegrationTest() {
         println(response)
     }
 
-    @Ignore("Not Working")
     @Test
     fun getPostById() {
         val user = userService.create(getDummyPostUserBody())
-        val post = postService.createPost("Test", Coords(0.0, 0.0), user as User)
+        val post = postService.createPost("Test", Coords(0.0, 0.0), user!!.core!!)
 
         val getRequest = MockMvcRequestBuilders
                 .request(HttpMethod.GET, "/post/" + post.id + "/")

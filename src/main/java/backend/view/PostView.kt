@@ -18,7 +18,7 @@ class PostView() {
     var postLocation: PostView.Coords? = null
 
     @Valid
-    var user: PostView.User? = null
+    var user: UserView? = null
 
     constructor(post: Post) : this() {
         this.id = post.id
@@ -27,8 +27,7 @@ class PostView() {
         this.postLocation = PostView.Coords()
         this.postLocation!!.latitude = post.postLocation.latitude
         this.postLocation!!.longitude = post.postLocation.longitude
-        this.user = PostView.User()
-        this.user!!.id = post.user.core!!.id
+        this.user = UserView(post.user!!.core)
     }
 
     class Coords() {
@@ -40,9 +39,4 @@ class PostView() {
         var longitude: Double? = null
     }
 
-    class User() {
-
-        @NotNull
-        var id: Long? = null
-    }
 }

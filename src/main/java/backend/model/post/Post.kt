@@ -2,6 +2,7 @@ package backend.model.event
 
 import backend.model.misc.Coords
 import backend.model.user.User
+import backend.model.user.UserCore
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -19,10 +20,10 @@ class Post() {
     @Embedded
     lateinit var postLocation: Coords
 
-    @Embedded
-    lateinit var user: User
+    @ManyToOne
+    var user: UserCore? = null
 
-    constructor(text: String, postLocation: Coords, user: User) : this() {
+    constructor(text: String, postLocation: Coords, user: UserCore) : this() {
         this.text = text
         this.date = LocalDateTime.now()
         this.postLocation = postLocation

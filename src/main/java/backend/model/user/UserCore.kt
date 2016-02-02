@@ -1,12 +1,13 @@
 package backend.model.user
 
+import backend.model.event.Post
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.hibernate.validator.constraints.Email
 import org.hibernate.validator.constraints.NotEmpty
+import java.util.*
 
 import javax.persistence.*
-import java.util.HashMap
 
 @Entity
 open class UserCore : User {
@@ -34,6 +35,9 @@ open class UserCore : User {
 
     override var gender: String? = null
 
+    @OrderColumn
+    @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+    val posts: MutableList<Post>? = ArrayList()
     /*
      * cascade all operations to children
      * orphanRemoval = true allows removing a role from the database
