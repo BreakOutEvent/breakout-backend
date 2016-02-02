@@ -1,6 +1,6 @@
 package backend.controller
 
-import backend.CustomUserDetails
+import backend.configuration.CustomUserDetails
 import backend.model.user.User
 import backend.model.user.UserService
 import backend.view.UserView

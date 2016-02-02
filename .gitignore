@@ -15,6 +15,6 @@ server.pid
 *.eml
 /dist/
 .cache
-.idea
+.idea/
 build
 .gradle

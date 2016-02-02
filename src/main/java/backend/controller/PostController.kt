@@ -1,6 +1,6 @@
 package backend.controller
 
-import backend.CustomUserDetails
+import backend.configuration.CustomUserDetails
 import backend.model.event.PostService
 import backend.model.misc.Coords
 import backend.view.PostView

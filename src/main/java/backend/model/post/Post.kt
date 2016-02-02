@@ -1,17 +1,13 @@
 package backend.model.event
 
+import backend.model.BasicEntity
 import backend.model.misc.Coords
 import backend.model.user.UserCore
 import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
-class Post() {
-
-    @Id
-    @GeneratedValue
-    @Column(nullable = false, updatable = false)
-    var id: Long? = null
+class Post() : BasicEntity() {
 
     lateinit var text: String
     lateinit var date: LocalDateTime
