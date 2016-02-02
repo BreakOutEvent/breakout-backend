@@ -1,29 +1,19 @@
-@file:JvmName("TestPostController")
+@file:JvmName("TestPostEndpoint")
 
 package backend.Integration
 
-import backend.Integration.Credentials
-import backend.Integration.IntegrationTest
-import backend.Integration.createUser
-import backend.Integration.toJsonString
-import backend.model.event.Post
 import backend.model.event.PostService
 import backend.model.misc.Coords
-import backend.model.user.User
 import backend.model.user.UserService
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import kotlin.collections.mapOf
 
 class TestPostEndpoint : IntegrationTest() {
 

@@ -1,12 +1,9 @@
 package backend.model.event
 
 import backend.model.misc.Coords
-import backend.model.user.User
 import backend.model.user.UserCore
-import backend.model.user.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 @Service
 class PostServiceImpl @Autowired constructor(val repository: PostRepository) : PostService {

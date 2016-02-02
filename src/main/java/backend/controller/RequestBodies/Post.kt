@@ -2,9 +2,9 @@
 package backend.controller.RequestBodies
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import java.util.*
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
-import java.util.Date
 
 class Post {
     @NotNull var created: Date? = null

@@ -7,8 +7,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.util.*
-import kotlin.collections.mapOf
-import kotlin.text.toByteArray
 
 class TestAuthorization : IntegrationTest() {
 

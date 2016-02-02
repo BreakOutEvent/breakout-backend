@@ -1,7 +1,6 @@
 package backend.model.event
 
 import backend.model.misc.Coords
-import backend.model.user.User
 import backend.model.user.UserCore
 import java.time.LocalDateTime
 import javax.persistence.*

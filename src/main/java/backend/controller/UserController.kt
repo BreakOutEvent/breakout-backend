@@ -1,9 +1,9 @@
 package backend.controller
 
 import backend.CustomUserDetails
-import backend.view.UserView
 import backend.model.user.User
 import backend.model.user.UserService
+import backend.view.UserView
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,11 +12,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import java.util.*
 import javax.validation.Valid
-import kotlin.collections.map
-import kotlin.collections.mapOf
-import kotlin.text.toByteArray
 
 @Api
 @RestController
