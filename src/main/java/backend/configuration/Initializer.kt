@@ -25,6 +25,8 @@ class Initializer {
 
     @PostConstruct
     fun initialize() {
-        userService.create(ADMIN_EMAIL, ADMIN_PASSWORD).addRole(Admin::class.java)
+        val admin = userService.create(ADMIN_EMAIL, ADMIN_PASSWORD)
+        admin.addRole(Admin::class.java)
+        userService.save(admin)
     }
 }
