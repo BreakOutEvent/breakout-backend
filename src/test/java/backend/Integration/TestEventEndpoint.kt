@@ -1,7 +1,10 @@
 package backend.Integration
 
+import backend.model.user.Admin
+import backend.model.user.UserService
 import org.junit.Before
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
@@ -14,11 +17,17 @@ import kotlin.collections.mapOf
 class TestEventEndpoint : IntegrationTest() {
 
     lateinit var userCredentials: Credentials
+    lateinit var adminAccessToken: String
+
+    @Autowired lateinit var userService: UserService
 
     @Before
     override fun setUp() {
         super.setUp()
         userCredentials = createUser(this.mockMvc)
+        val admin = userService.create("test_admin@break-out.org", "password").addRole(Admin::class.java)
+        userService.save(admin)
+        adminAccessToken = getTokens(this.mockMvc, "test_admin@break-out.org", "password").first
     }
 
     @Test
@@ -37,7 +46,7 @@ class TestEventEndpoint : IntegrationTest() {
 
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.POST, "/event/")
-                .header("Authorization", "Bearer ${userCredentials.accessToken}")
+                .header("Authorization", "Bearer ${adminAccessToken}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(eventData)
 
