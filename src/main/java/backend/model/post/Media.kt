@@ -10,6 +10,7 @@ class Media() : BasicEntity() {
     @ManyToOne
     var post: Post? = null
 
+    @Enumerated(EnumType.STRING)
     var mediaType: MediaType? = null
 
     @OrderColumn

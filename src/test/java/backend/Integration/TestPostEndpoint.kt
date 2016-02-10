@@ -240,7 +240,7 @@ class TestPostEndpoint : IntegrationTest() {
         val post = postService.createPost("Test", Coords(0.0, 0.0), user!!.core!!, null);
         val media = mediaService.createMedia(post, "image")
         post.media = listOf(media) as MutableList<Media>
-        val savedpost = postService.save(post)!!
+        val savedpost = postService.save(post)
 
         val postData = mapOf(
                 "url" to "https://aws.amazon.com/bla.jpg",
@@ -250,10 +250,9 @@ class TestPostEndpoint : IntegrationTest() {
         ).toJsonString()
 
         val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/post/media/${savedpost.media!!.first().id}/")
+                .request(HttpMethod.POST, "/post/media/${savedpost!!.media!!.first().id}/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(postData)
-
 
         val response = mockMvc.perform (request)
                 .andExpect (status().isCreated)

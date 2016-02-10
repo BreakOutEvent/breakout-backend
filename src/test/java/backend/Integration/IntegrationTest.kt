@@ -8,6 +8,8 @@ import backend.configuration.WebSecurityConfiguration
 import backend.controller.RequestBodies.PostUserBody
 import backend.model.event.EventRepository
 import backend.model.event.TeamRepository
+import backend.model.post.MediaRepository
+import backend.model.post.MediaSizeRepository
 import backend.model.post.PostRepository
 import backend.model.user.UserRepository
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -43,6 +45,8 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var postRepository: PostRepository
     @Autowired lateinit protected var springSecurityFilterChain: Filter
     @Autowired lateinit protected var teamRepository: TeamRepository
+    @Autowired lateinit protected var mediaRepository: MediaRepository
+    @Autowired lateinit protected var mediaSizeRepository: MediaSizeRepository
 
     lateinit protected var mockMvc: MockMvc
 
@@ -66,9 +70,11 @@ abstract class IntegrationTest {
     @Before
     open fun setUp() {
         teamRepository.deleteAll()
+        mediaSizeRepository.deleteAll()
         postRepository.deleteAll()
-        userRepository.deleteAll()
+        mediaRepository.deleteAll()
         eventRepository.deleteAll()
+        userRepository.deleteAll()
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .addFilters<DefaultMockMvcBuilder>(springSecurityFilterChain)
