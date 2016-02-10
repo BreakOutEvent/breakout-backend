@@ -3,7 +3,8 @@ package backend.model.event
 import backend.model.BasicEntity
 import backend.model.misc.Coords
 import java.time.LocalDateTime
-import javax.persistence.*
+import javax.persistence.Embedded
+import javax.persistence.Entity
 
 @Entity
 class Event() : BasicEntity() {

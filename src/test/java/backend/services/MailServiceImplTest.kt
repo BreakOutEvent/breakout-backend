@@ -4,7 +4,6 @@ import backend.Integration.toJsonString
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.misc.URL
-import org.hamcrest.Matchers.any
 import org.junit.Before
 import org.junit.Test
 import org.springframework.http.HttpMethod

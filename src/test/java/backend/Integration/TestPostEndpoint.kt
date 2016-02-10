@@ -2,8 +2,8 @@
 
 package backend.Integration
 
-import backend.model.post.PostService
 import backend.model.misc.Coords
+import backend.model.post.PostService
 import backend.model.user.UserService
 import org.junit.Before
 import org.junit.Test

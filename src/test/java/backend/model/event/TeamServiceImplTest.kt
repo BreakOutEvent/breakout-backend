@@ -1,21 +1,19 @@
 package backend.model.event
 
-import backend.configuration.CustomUserDetailsService
 import backend.Integration.IntegrationTest
+import backend.configuration.CustomUserDetailsService
 import backend.model.misc.Coords
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserRole
 import backend.model.user.UserService
-import org.hibernate.validator.constraints.Email
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import java.time.LocalDateTime
-import javax.transaction.Transactional
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
 import kotlin.test.assertNotNull

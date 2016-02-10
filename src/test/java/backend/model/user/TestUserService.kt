@@ -4,8 +4,6 @@ import backend.Integration.IntegrationTest
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import kotlin.collections.count
-import kotlin.collections.first
 import kotlin.test.*
 
 class TestUserService : IntegrationTest() {

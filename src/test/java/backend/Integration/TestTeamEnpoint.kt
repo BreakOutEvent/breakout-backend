@@ -18,8 +18,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
-import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
 
 class TestTeamEnpoint : IntegrationTest() {
 

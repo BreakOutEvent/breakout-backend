@@ -3,7 +3,6 @@ package backend.controller
 import backend.configuration.CustomUserDetails
 import backend.model.misc.Coords
 import backend.model.post.Media
-import backend.model.post.MediaService
 import backend.model.post.PostService
 import backend.view.PostRequestView
 import backend.view.PostResponseView
@@ -13,7 +12,6 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-
 import javax.validation.Valid
 
 @RestController

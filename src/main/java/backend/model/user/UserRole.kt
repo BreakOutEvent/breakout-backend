@@ -3,8 +3,10 @@ package backend.model.user
 import backend.model.BasicEntity
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.security.core.GrantedAuthority
-
-import javax.persistence.*
+import javax.persistence.DiscriminatorColumn
+import javax.persistence.Entity
+import javax.persistence.Inheritance
+import javax.persistence.ManyToOne
 
 @Entity
 @Inheritance

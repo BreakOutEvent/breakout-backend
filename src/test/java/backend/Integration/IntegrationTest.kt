@@ -1,10 +1,9 @@
 package backend.Integration
 
 
+import backend.TestBackendConfiguration
 import backend.configuration.AuthorizationServerConfiguration
 import backend.configuration.ResourceServerConfiguration
-import backend.TestBackendConfiguration
-import backend.configuration.Initializer
 import backend.configuration.WebSecurityConfiguration
 import backend.controller.RequestBodies.PostUserBody
 import backend.model.event.EventRepository
