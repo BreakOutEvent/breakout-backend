@@ -1,31 +1,14 @@
 package backend.model.user
 
-import backend.TestBackendConfiguration
-import backend.configuration.AuthorizationServerConfiguration
-import backend.configuration.ResourceServerConfiguration
-import backend.configuration.WebSecurityConfiguration
+import backend.Integration.IntegrationTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.IntegrationTest
-import org.springframework.boot.test.SpringApplicationConfiguration
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
-import org.springframework.test.context.web.WebAppConfiguration
 
-@RunWith(SpringJUnit4ClassRunner::class)
-@SpringApplicationConfiguration(classes = arrayOf(TestBackendConfiguration::class, WebSecurityConfiguration::class, ResourceServerConfiguration::class, AuthorizationServerConfiguration::class))
-@WebAppConfiguration
-@IntegrationTest("server.port:0")
-class TestUser {
-
-    @Autowired lateinit protected var userRepository: UserRepository
+class TestUser : IntegrationTest() {
 
     @Before
-    fun setUp() {
-        userRepository.deleteAll()
-    }
+    override fun setUp() = super.setUp()
 
     /**
      * Create new user without any roles
