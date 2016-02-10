@@ -4,6 +4,7 @@ package backend.Integration
 import backend.configuration.AuthorizationServerConfiguration
 import backend.configuration.ResourceServerConfiguration
 import backend.TestBackendConfiguration
+import backend.configuration.Initializer
 import backend.configuration.WebSecurityConfiguration
 import backend.controller.RequestBodies.PostUserBody
 import backend.model.event.EventRepository
@@ -31,7 +32,8 @@ import java.util.*
 import javax.servlet.Filter
 
 @RunWith(SpringJUnit4ClassRunner::class)
-@SpringApplicationConfiguration(classes = arrayOf(TestBackendConfiguration::class, WebSecurityConfiguration::class, ResourceServerConfiguration::class, AuthorizationServerConfiguration::class))
+@SpringApplicationConfiguration(classes = arrayOf(TestBackendConfiguration::class, WebSecurityConfiguration::class,
+        ResourceServerConfiguration::class, AuthorizationServerConfiguration::class, Initializer::class))
 @WebAppConfiguration
 @IntegrationTest("server.port:0")
 abstract class IntegrationTest {
@@ -118,6 +120,13 @@ fun createUser(mockMvc: MockMvc, email: String = "a@x.de", password: String = "p
 
     val id = createResponse["id"] as Int
 
+    val accessToken = getTokens(mockMvc, email, password).first
+    val refreshToken = getTokens(mockMvc, email, password).second
+
+    return Credentials(id, accessToken, refreshToken)
+}
+
+fun getTokens(mockMvc: MockMvc, email: String, password: String): Pair<String, String> {
     // Get credentials for created user
     val clientCredentials = Base64.getEncoder().encodeToString("breakout_app:123456789".toByteArray())
 
@@ -133,14 +142,13 @@ fun createUser(mockMvc: MockMvc, email: String = "a@x.de", password: String = "p
             .accept(MediaType.APPLICATION_JSON_VALUE)
 
     val oauthResponseString = mockMvc.perform(request).andReturn().response.contentAsString
-    val oauthResponse: Map<String, kotlin.Any> = ObjectMapper()
+    val oauthResponse: Map<String, Any> = ObjectMapper()
             .reader(Map::class.java)
             .readValue(oauthResponseString)
 
     val accessToken = oauthResponse["access_token"] as String
     val refreshToken = oauthResponse["refresh_token"] as String
-
-    return Credentials(id, accessToken, refreshToken)
+    return Pair(accessToken, refreshToken)
 }
 
 class Credentials(val id: Int, val accessToken: String, val refreshToken: String)

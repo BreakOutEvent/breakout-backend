@@ -4,31 +4,35 @@ import backend.model.event.EventService
 import backend.model.misc.Coords
 import backend.view.EventView
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.MediaType
-import org.springframework.web.bind.annotation.*
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestMethod.GET
+import org.springframework.web.bind.annotation.RequestMethod.POST
+import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import javax.annotation.PostConstruct
 import javax.validation.Valid
-import kotlin.collections.map
 
 @RestController
 @RequestMapping("/event")
-class EventController {
+open class EventController {
 
-    val eventService: EventService
+    private var eventService: EventService
 
     @Autowired
     constructor(eventService: EventService) {
         this.eventService = eventService
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping(
-            value = "/",
-            method = arrayOf(RequestMethod.POST),
-            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun createEvent(@Valid @RequestBody body: EventView): EventView {
+    @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(CREATED)
+    @RequestMapping(value = "/", method = arrayOf(POST))
+    open fun createEvent(@Valid @RequestBody body: EventView): EventView {
 
         val event = eventService.createEvent(
                 title = body.title!!,
@@ -42,9 +46,9 @@ class EventController {
 
     @RequestMapping(
             value = "/",
-            method = arrayOf(RequestMethod.GET),
+            method = arrayOf(GET),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun getAllEvents(): Iterable<EventView> {
+    open fun getAllEvents(): Iterable<EventView> {
         return eventService.findAll().map { EventView(it) }
     }
 }

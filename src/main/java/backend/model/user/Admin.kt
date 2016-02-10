@@ -8,5 +8,5 @@ import javax.persistence.Entity
 class Admin : UserRole {
     constructor() : super()
     constructor(core: UserCore) : super(core)
-    override fun getAuthority(): String? = "ROLE_ADMIN"
+    override fun getAuthority(): String? = "ADMIN"
 }
