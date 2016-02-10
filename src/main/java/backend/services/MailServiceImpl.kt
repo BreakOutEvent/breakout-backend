@@ -24,12 +24,8 @@ class MailServiceImpl() : MailService {
     @Value("\${org.breakout.mailer.xauthtoken}")
     private lateinit var token: String
 
+    // TODO: How to autowire this, failed on normal approach
     var restTemplate: RestOperations = RestTemplate()
-
-//    @Autowired
-    constructor(restOperations: RestTemplate) : this() {
-        this.restTemplate = restOperations
-    }
 
     override fun send(email: Email) {
         val headers = HttpHeaders().apply {
@@ -37,7 +33,6 @@ class MailServiceImpl() : MailService {
             set("X-AUTH-TOKEN", "$token")
         }
         val body = ObjectMapper().writeValueAsString(email)
-        println(body)
         val request = HttpEntity<String>(body, headers)
         restTemplate.exchange(getSendUrl(url, port), HttpMethod.POST, request, String::class.java)
     }

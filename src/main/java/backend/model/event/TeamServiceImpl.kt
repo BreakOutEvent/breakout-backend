@@ -1,8 +1,10 @@
 package backend.model.event
 
+import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
 import backend.model.user.UserService
+import backend.services.MailService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -10,13 +12,14 @@ import org.springframework.stereotype.Service
 class TeamServiceImpl : TeamService {
 
     private val repository: TeamRepository
-    private val event: Event = Event()
-
-    @Autowired lateinit var userService: UserService
+    private val userService: UserService
+    private val mailService: MailService
 
     @Autowired
-    constructor(repository: TeamRepository) {
-        this.repository = repository
+    constructor(teamRepository: TeamRepository, userService: UserService, mailService: MailService) {
+        this.repository = teamRepository
+        this.userService = userService
+        this.mailService = mailService
     }
 
     override fun create(creator: Participant, name: String, description: String, event: Event): Team {
@@ -27,10 +30,21 @@ class TeamServiceImpl : TeamService {
         return savedTeam
     }
 
-    override fun invite(email: EmailAddress, team: Team) {
+    override fun invite(emailAddress: EmailAddress, team: Team) {
+
+
         // TODO: Send Email to the person to be invited
         // TODO: What if user already exists?
-        team.invite(email)
+
+        // TODO: Should the creation of emails be moved to a seperate entity?
+        val email = Email(
+                to = listOf(emailAddress),
+                subject = "${team.members.first().email} hat dich eingeladen, ein Teil seines Breakout-Teams zu werden",
+                body = "Melde dich jetzt an auf www.break-out.org"
+        )
+
+        mailService.send(email)
+        team.invite(emailAddress)
         this.save(team)
     }
 

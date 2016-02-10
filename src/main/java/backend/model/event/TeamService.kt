@@ -22,12 +22,12 @@ interface TeamService {
     /**
      * Invite a participant to a team
      *
-     * @param email: The email of participant to be invited
+     * @param emailAddress: The email of participant to be invited
      * @param team: The team to invite the participant to
      */
     @Throws
     @PreAuthorize("#team.isMember(authentication.name)")
-    open fun invite(email: EmailAddress, team: Team)
+    open fun invite(emailAddress: EmailAddress, team: Team)
 
     /**
      * Persist a team to the database

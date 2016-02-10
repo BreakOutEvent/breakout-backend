@@ -4,7 +4,6 @@ import backend.Integration.toJsonString
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.misc.URL
-import org.hamcrest.Matchers.any
 import org.junit.Before
 import org.junit.Test
 import org.springframework.http.HttpMethod
@@ -29,11 +28,12 @@ class MailServiceImplTest {
     @Before
     fun setUp() {
         restTemplate = RestTemplate()
-        mailService = MailServiceImpl(restTemplate)
+        mailService = MailServiceImpl()
         mockServer = MockRestServiceServer.createServer(restTemplate)
         ReflectionTestUtils.setField(mailService, "token", "randomtoken")
         ReflectionTestUtils.setField(mailService, "url", BASE_URL)
         ReflectionTestUtils.setField(mailService, "port", PORT)
+        ReflectionTestUtils.setField(mailService, "restTemplate", restTemplate)
     }
 
     @Test
