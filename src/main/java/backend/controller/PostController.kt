@@ -3,7 +3,10 @@ package backend.controller
 import backend.configuration.CustomUserDetails
 import backend.model.misc.Coords
 import backend.model.post.Media
+import backend.model.post.MediaService
+import backend.model.post.MediaSizeService
 import backend.model.post.PostService
+import backend.view.MediaSizeView
 import backend.view.PostRequestView
 import backend.view.PostResponseView
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,6 +23,12 @@ class PostController {
 
     @Autowired
     private lateinit var postService: PostService
+
+    @Autowired
+    private lateinit var mediaSizeService: MediaSizeService
+
+    @Autowired
+    private lateinit var mediaService: MediaService
 
     /**
      * Post /post/
@@ -60,6 +69,27 @@ class PostController {
         return ResponseEntity(PostResponseView(post), HttpStatus.CREATED)
     }
 
+
+    /**
+     * POST /post/media/id
+     */
+    @RequestMapping(
+            value = "/media/{id}",
+            method = arrayOf(RequestMethod.POST),
+            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
+    fun createPost(@PathVariable("id") id: Long,
+                   @Valid @RequestBody body: MediaSizeView,
+                   @AuthenticationPrincipal user: CustomUserDetails): ResponseEntity<Any> {
+
+
+        val media = mediaService.getByID(id);
+
+        var mediaSize = mediaSizeService.createMediaSize(media!!, body.url!!, body.width!!, body.height!!, body.length!!)
+
+        mediaSizeService.save(mediaSize)
+        return ResponseEntity(MediaSizeView(mediaSize), HttpStatus.CREATED)
+
+    }
 
     /**
      * GET /post/id/
