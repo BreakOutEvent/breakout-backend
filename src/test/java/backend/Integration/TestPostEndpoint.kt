@@ -3,6 +3,8 @@
 package backend.Integration
 
 import backend.model.misc.Coords
+import backend.model.post.Media
+import backend.model.post.MediaService
 import backend.model.post.PostService
 import backend.model.user.UserService
 import org.junit.Before
@@ -24,6 +26,9 @@ class TestPostEndpoint : IntegrationTest() {
 
     @Autowired
     lateinit var postService: PostService
+
+    @Autowired
+    lateinit var mediaService: MediaService
 
     @Before
     override fun setUp() {
@@ -209,11 +214,11 @@ class TestPostEndpoint : IntegrationTest() {
         val user = userService.create(getDummyPostUserBody())
         val post = postService.createPost("Test", Coords(0.0, 0.0), user!!.core!!, null)
 
-        val getRequest = MockMvcRequestBuilders
+        val request = MockMvcRequestBuilders
                 .request(HttpMethod.GET, "/post/" + post.id + "/")
                 .contentType(MediaType.APPLICATION_JSON)
 
-        val getResponse = mockMvc.perform (getRequest)
+        val response = mockMvc.perform (request)
                 .andExpect (status().isOk)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.id").exists())
@@ -224,6 +229,43 @@ class TestPostEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.postLocation.longitude").exists())
                 .andReturn().response.contentAsString
 
-        println(getResponse)
+        println(response)
     }
+
+
+    @Test
+    fun createNewPostWithMediaAndAddMediaSizes() {
+
+        val user = userService.create(getDummyPostUserBody())
+        val post = postService.createPost("Test", Coords(0.0, 0.0), user!!.core!!, null);
+        val media = mediaService.createMedia(post, "image")
+        post.media = listOf(media) as MutableList<Media>
+        val savedpost = postService.save(post)!!
+
+        val postData = mapOf(
+                "url" to "https://aws.amazon.com/bla.jpg",
+                "width" to 400,
+                "height" to 200,
+                "length" to 0.0
+        ).toJsonString()
+
+        val request = MockMvcRequestBuilders
+                .request(HttpMethod.POST, "/post/media/${savedpost.media!!.first().id}/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(postData)
+
+
+        val response = mockMvc.perform (request)
+                .andExpect (status().isCreated)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.url").exists())
+                .andExpect(jsonPath("$.width").exists())
+                .andExpect(jsonPath("$.height").exists())
+                .andExpect(jsonPath("$.length").exists())
+                .andReturn().response.contentAsString
+
+        println(response)
+    }
+
 }
