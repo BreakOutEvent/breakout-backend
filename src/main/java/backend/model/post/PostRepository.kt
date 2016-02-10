@@ -1,4 +1,4 @@
-package backend.model.event
+package backend.model.post
 
 import org.springframework.data.repository.CrudRepository
 

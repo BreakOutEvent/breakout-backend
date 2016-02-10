@@ -1,9 +1,12 @@
 package backend.controller
 
 import backend.configuration.CustomUserDetails
-import backend.model.event.PostService
 import backend.model.misc.Coords
-import backend.view.PostView
+import backend.model.post.Media
+import backend.model.post.MediaService
+import backend.model.post.PostService
+import backend.view.PostRequestView
+import backend.view.PostResponseView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -27,17 +30,36 @@ class PostController {
             value = "/",
             method = arrayOf(RequestMethod.POST),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun createPost(@Valid @RequestBody body: PostView,
+    fun createPost(@Valid @RequestBody body: PostRequestView,
                    @AuthenticationPrincipal user: CustomUserDetails): ResponseEntity<Any> {
 
         if (user.core!!.id == null) {
             return ResponseEntity(GeneralController.error("authenticated user and requested resource mismatch"), HttpStatus.UNAUTHORIZED)
         }
 
-        var post = postService.createPost(text = body.text!!, postLocation = Coords(body.postLocation!!.latitude!!, body.postLocation!!.longitude!!), user = user.core)
-        postService.save(post)
-        return ResponseEntity(PostView(post), HttpStatus.CREATED)
+        if (body.media == null && body.text == null && body.postLocation == null) {
+            return ResponseEntity(GeneralController.error("empty posts not allowed"), HttpStatus.BAD_REQUEST)
+        }
 
+        var location: Coords? = null
+        if (body.postLocation != null && body.postLocation!!.latitude != null && body.postLocation!!.longitude != null)
+            location = Coords(body.postLocation!!.latitude!!, body.postLocation!!.longitude!!)
+
+
+        var post = postService.createPost(text = body.text, postLocation = location, user = user.core, media = null)
+
+        var media: MutableList<Media>? = null
+        if (body.media != null && body.media!! is List<*>) {
+            media = arrayListOf()
+            body.media!!.forEach {
+                media!!.add(Media(post, it))
+            }
+        }
+
+        post.media = media
+
+        postService.save(post)
+        return ResponseEntity(PostResponseView(post), HttpStatus.CREATED)
     }
 
 
@@ -55,7 +77,7 @@ class PostController {
         if (post == null) {
             return ResponseEntity(GeneralController.error("post with id $id does not exist"), HttpStatus.NOT_FOUND)
         } else {
-            return ResponseEntity.ok(PostView(post))
+            return ResponseEntity.ok(PostResponseView(post))
         }
     }
 

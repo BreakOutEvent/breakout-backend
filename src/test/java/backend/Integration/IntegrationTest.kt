@@ -9,7 +9,7 @@ import backend.configuration.WebSecurityConfiguration
 import backend.controller.RequestBodies.PostUserBody
 import backend.model.event.EventRepository
 import backend.model.event.TeamRepository
-import backend.model.event.PostRepository
+import backend.model.post.PostRepository
 import backend.model.user.UserRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.Before
@@ -32,8 +32,7 @@ import java.util.*
 import javax.servlet.Filter
 
 @RunWith(SpringJUnit4ClassRunner::class)
-@SpringApplicationConfiguration(classes = arrayOf(TestBackendConfiguration::class, WebSecurityConfiguration::class,
-        ResourceServerConfiguration::class, AuthorizationServerConfiguration::class, Initializer::class))
+@SpringApplicationConfiguration(classes = arrayOf(TestBackendConfiguration::class, WebSecurityConfiguration::class, ResourceServerConfiguration::class, AuthorizationServerConfiguration::class))
 @WebAppConfiguration
 @IntegrationTest("server.port:0")
 abstract class IntegrationTest {

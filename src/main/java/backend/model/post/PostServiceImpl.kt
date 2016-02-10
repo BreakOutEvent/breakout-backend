@@ -1,4 +1,4 @@
-package backend.model.event
+package backend.model.post
 
 import backend.model.misc.Coords
 import backend.model.user.UserCore
@@ -12,8 +12,8 @@ class PostServiceImpl @Autowired constructor(val repository: PostRepository) : P
 
     override fun findAll(): Iterable<Post> = repository.findAll()
 
-    override fun createPost(text: String, postLocation: Coords, user: UserCore): Post {
-        val post = Post(text, postLocation, user)
+    override fun createPost(text: String?, postLocation: Coords?, user: UserCore, media: MutableList<Media>?): Post {
+        val post = Post(text, postLocation, user, media)
         return repository.save(post)
     }
 

@@ -1,7 +1,7 @@
 package backend.model.user
 
 import backend.model.BasicEntity
-import backend.model.event.Post
+import backend.model.post.Post
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.hibernate.validator.constraints.Email
