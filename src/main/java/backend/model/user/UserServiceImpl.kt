@@ -1,6 +1,9 @@
 package backend.model.user
 
 import backend.controller.RequestBodies.PostUserBody
+import backend.model.misc.Email
+import backend.model.misc.EmailAddress
+import backend.services.MailService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -8,10 +11,12 @@ import org.springframework.stereotype.Service
 class UserServiceImpl : UserService {
 
     private val userRepository: UserRepository
+    private val mailService: MailService
 
     @Autowired
-    constructor(userRepository: UserRepository) {
+    constructor(userRepository: UserRepository, mailService: MailService) {
         this.userRepository = userRepository
+        this.mailService = mailService
     }
 
     override fun getUserById(id: Long): User? = userRepository.findOne(id)
@@ -39,8 +44,21 @@ class UserServiceImpl : UserService {
     override fun create(email: String, password: String): User {
         if (this.exists(email)) throw Exception("user with email $email already exists")
         val user = User.create(email, password)
-        user.isBlocked = false
+        val token = user.createActivationToken()
+
+        sendActivationEmail(token, user)
+
         return userRepository.save(user.core!!);
+    }
+
+    private fun sendActivationEmail(token: String, user: User) {
+        val email = Email(
+                to = listOf(EmailAddress(user.email)),
+                subject = "Please activate your BreakOut Account",
+                body = "Your token is $token"
+        )
+
+        mailService.send(email)
     }
 
     override fun save(user: User): User = userRepository.save(user.core!!)
