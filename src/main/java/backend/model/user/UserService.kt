@@ -11,4 +11,6 @@ interface UserService {
     fun save(user: User): User?
     fun exists(id: Long): Boolean
     fun exists(email: String): Boolean
+
+    fun activate(user: User, token: String)
 }

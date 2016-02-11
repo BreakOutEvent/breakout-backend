@@ -5,6 +5,8 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.*
+import org.springframework.cglib.core.ReflectUtils
+import org.springframework.test.util.ReflectionTestUtils
 
 class UserServiceImplTest {
 
@@ -17,6 +19,8 @@ class UserServiceImplTest {
         mailService = mock(MailService::class.java)
         userRepository = mock(UserRepository::class.java)
         userServiceImpl = UserServiceImpl(userRepository, mailService)
+        ReflectionTestUtils.setField(userServiceImpl, "BASEURL", "localhost")
+        ReflectionTestUtils.setField(userServiceImpl, "PORT", "8083")
     }
 
     @Test

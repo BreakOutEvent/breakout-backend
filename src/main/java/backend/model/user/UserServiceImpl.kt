@@ -5,6 +5,7 @@ import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.services.MailService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
@@ -12,6 +13,12 @@ class UserServiceImpl : UserService {
 
     private val userRepository: UserRepository
     private val mailService: MailService
+
+    @Value("\${org.breakout.api.host}")
+    private lateinit var BASEURL: String
+
+    @Value("\${org.breakout.api.port}")
+    private lateinit var PORT: String
 
     @Autowired
     constructor(userRepository: UserRepository, mailService: MailService) {
@@ -51,14 +58,25 @@ class UserServiceImpl : UserService {
         return userRepository.save(user.core!!);
     }
 
+    override fun activate(user: User, token: String) {
+        if(user.isActivated()) throw Exception("User already is activated")
+        else if (!user.isActivationTokenCorrect(token)) throw Exception("Incorrect activation token")
+        else user.activate(token)
+        this.save(user)
+    }
+
     private fun sendActivationEmail(token: String, user: User) {
+        val activationUrl = createActivationUrl(token, user)
         val email = Email(
                 to = listOf(EmailAddress(user.email)),
                 subject = "Please activate your BreakOut Account",
-                body = "Your token is $token"
+                body = "Your token is $token<br/>Please click the following link: $activationUrl"
         )
-
         mailService.send(email)
+    }
+
+    private fun createActivationUrl(token: String, user: User): String {
+        return "http://$BASEURL:$PORT/activation?token=$token&email=${user.email}"
     }
 
     override fun save(user: User): User = userRepository.save(user.core!!)
