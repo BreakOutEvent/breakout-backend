@@ -12,7 +12,11 @@ import javax.persistence.*
 import java.util.HashMap
 
 @Entity
-open class UserCore : BasicEntity(), User {
+open class UserCore : BasicEntity, User {
+
+    constructor() : super() {
+        this.isBlocked = true
+    }
 
     @Email
     @Column(unique = true, nullable = false)
@@ -44,6 +48,33 @@ open class UserCore : BasicEntity(), User {
     @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.EAGER, orphanRemoval = true)
     var userRoles: MutableMap<Class<out UserRole>, UserRole> = HashMap()
 
+    private lateinit var activationToken: String
+
+    override fun activate(token: String) {
+        if(isActivationTokenCorrect(token)) this.isBlocked = false
+        else throw Exception("Provided token $token does not match the activation token")
+    }
+
+    override fun isActivationTokenCorrect(token: String): Boolean {
+        return this.activationToken == token
+    }
+
+    override fun createActivationToken(): String {
+        this.activationToken = UUID.randomUUID().toString()
+        return this.activationToken
+    }
+
+    fun getActivationToken(): String {
+        return this.activationToken
+    }
+
+    fun setActivationToken(token: String) {
+        this.activationToken = token
+    }
+
+    override fun isActivated(): Boolean {
+        return !isBlocked;
+    }
 
     @Throws(Exception::class)
     override fun addRole(clazz: Class<out UserRole>): UserRole {
