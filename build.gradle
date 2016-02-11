@@ -4,10 +4,12 @@ buildscript {
 
     repositories {
         mavenCentral()
+        jcenter() // required for mockito
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.7.RELEASE")
+
     }
 }
 
@@ -50,6 +52,7 @@ dependencies {
     testCompile("com.jayway.jsonpath:json-path:2.0.0")
     testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompile("junit:junit")
+    testCompile "org.mockito:mockito-core:1.+"
 }
 
 task wrapper(type: Wrapper) {
