@@ -12,7 +12,11 @@ class MediaSizeView() {
 
     var height: Int? = null
 
-    var length: Float? = null
+    var length: Int? = null
+
+    var size: Long? = null
+
+    var type: String? = null
 
     constructor(mediaSize: MediaSize) : this() {
         this.id = mediaSize.id
@@ -20,5 +24,7 @@ class MediaSizeView() {
         this.width = mediaSize.width
         this.height = mediaSize.height
         this.length = mediaSize.length
+        this.size = mediaSize.size
+        this.type = mediaSize.mediaType.toString()
     }
 }

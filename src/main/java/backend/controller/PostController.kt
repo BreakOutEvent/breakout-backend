@@ -77,11 +77,11 @@ class PostController {
             value = "/media/{id}/",
             method = arrayOf(RequestMethod.POST),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun createPost(@PathVariable("id") id: Long,
-                   @Valid @RequestBody body: MediaSizeView): ResponseEntity<Any> {
+    fun createMediaSize(@PathVariable("id") id: Long,
+                        @Valid @RequestBody body: MediaSizeView): ResponseEntity<Any> {
 
         val media = mediaService.getByID(id);
-        var mediaSize = mediaSizeService.createMediaSize(media!!, body.url!!, body.width!!, body.height!!, body.length!!)
+        var mediaSize = mediaSizeService.createMediaSize(media!!, body.url!!, body.width!!, body.height!!, body.length!!, body.size!!, body.type!!)
 
         mediaSizeService.save(mediaSize)
         return ResponseEntity(MediaSizeView(mediaSize), HttpStatus.CREATED)

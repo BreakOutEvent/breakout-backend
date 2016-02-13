@@ -246,7 +246,9 @@ class TestPostEndpoint : IntegrationTest() {
                 "url" to "https://aws.amazon.com/bla.jpg",
                 "width" to 400,
                 "height" to 200,
-                "length" to 0.0
+                "length" to 0.0,
+                "size" to 0.0,
+                "type" to "image"
         ).toJsonString()
 
         val request = MockMvcRequestBuilders
@@ -262,6 +264,8 @@ class TestPostEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.width").exists())
                 .andExpect(jsonPath("$.height").exists())
                 .andExpect(jsonPath("$.length").exists())
+                .andExpect(jsonPath("$.size").exists())
+                .andExpect(jsonPath("$.type").exists())
                 .andReturn().response.contentAsString
 
         println(response)
