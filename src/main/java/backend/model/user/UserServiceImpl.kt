@@ -80,5 +80,11 @@ class UserServiceImpl : UserService {
     }
 
     override fun save(user: User): User = userRepository.save(user.core!!)
+
+    override fun create(email: String, password: String, f: User.() -> Unit) {
+        val user = this.create(email, password)
+        f.invoke(user)
+        this.save(user)
+    }
 }
 

@@ -17,9 +17,6 @@ class TestUserEndpoint : IntegrationTest() {
 
     private fun url(id: Int): String = "/user/${id.toString()}/"
 
-    @Autowired
-    lateinit var userService: UserService
-
     @Before
     override fun setUp() = super.setUp() // this will delete all users from the test database
 
@@ -30,8 +27,19 @@ class TestUserEndpoint : IntegrationTest() {
      */
     @Test
     fun getUser() {
-        userService.create(getDummyPostUserBody())
-        userService.create(getDummyPostUserBody())
+
+        userService.create("test@mail.com", "password", {
+            firstname = "Florian"
+            lastname = "Schmidt"
+            gender = "Male"
+        })
+
+        userService.create("secondTest@mail.com", "password", {
+            firstname = "Leo"
+            lastname = "Theo"
+            gender = "Male"
+        })
+
         mockMvc.perform(get("/user/"))
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$").isArray)
