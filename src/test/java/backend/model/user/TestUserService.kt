@@ -64,7 +64,7 @@ class TestUserService : IntegrationTest() {
 
     @Test
     fun saveWithRoles() {
-        val user = userService.create("a@b.c", "pw")
+        val user = userService.create("user@mail.com", "pw")
         user.addRole(Participant::class.java)
         userService.save(user)
 
