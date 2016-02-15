@@ -3,9 +3,7 @@ package backend.model.user
 import org.junit.Before
 import org.junit.Test
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class UserCoreTest {
 
@@ -39,5 +37,38 @@ class UserCoreTest {
     @Test
     fun testIsActivated() {
         assertFalse(userCore.isActivated())
+    }
+
+    @Test
+    fun testAddRole() {
+        userCore.addRole(Participant::class.java)
+        assertFails { userCore.addRole(Participant::class.java) }
+    }
+
+    @Test
+    fun testGetRole() {
+        userCore.addRole(Participant::class.java)
+        val role = userCore.getRole(Participant::class.java)
+        assertNotNull(role)
+    }
+
+    @Test
+    fun testHasRole() {
+        userCore.addRole(Participant::class.java)
+        assertTrue { userCore.hasRole(Participant::class.java) }
+    }
+
+    @Test
+    fun testRemoveRole() {
+        userCore.addRole(Participant::class.java)
+        userCore.removeRole(Participant::class.java)
+        assertFalse { userCore.hasRole(Participant::class.java) }
+        assertNull(userCore.getRole(Participant::class.java))
+    }
+
+    @Test
+    fun testGetCore() {
+        val core = userCore.core
+        assertEquals(userCore.core, core)
     }
 }

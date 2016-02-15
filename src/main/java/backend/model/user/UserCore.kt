@@ -79,7 +79,7 @@ open class UserCore : BasicEntity, User {
         val role: UserRole
 
         if (userRoles.containsKey(clazz)) {
-            return userRoles[clazz]!!
+            throw Exception("User already has role $clazz")
         } else {
             role = UserRole.createFor(clazz, this)
             userRoles.put(clazz, role)
