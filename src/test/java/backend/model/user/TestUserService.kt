@@ -17,7 +17,7 @@ class TestUserService : IntegrationTest() {
     fun create() {
         val body = getDummyPostUserBody()
         assertNotNull(userService.create(body))
-        assertFailsWith(Exception::class.java, { userService.create(body) })
+        assertFailsWith(Exception::class, { userService.create(body) })
     }
 
     @Test
