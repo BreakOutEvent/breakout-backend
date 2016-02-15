@@ -1,39 +1,23 @@
 package backend.model.event
 
-import backend.configuration.CustomUserDetailsService
 import backend.Integration.IntegrationTest
+import backend.configuration.CustomUserDetailsService
 import backend.model.misc.Coords
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserRole
-import backend.model.user.UserService
-import org.hibernate.validator.constraints.Email
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import java.time.LocalDateTime
-import javax.transaction.Transactional
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
 import kotlin.test.assertNotNull
 
 class TeamServiceImplTest : IntegrationTest() {
-
-
-    @Autowired
-    private lateinit var userService: UserService
-
-    @Autowired
-    private lateinit var eventService: EventService
-
-    @Autowired
-    private lateinit var teamService: TeamService
-
-    @Autowired
-    private lateinit var repository: TeamRepository
 
     @Autowired
     private lateinit var userDetailsService: CustomUserDetailsService
@@ -52,7 +36,7 @@ class TeamServiceImplTest : IntegrationTest() {
         userService.save(participant)
 
         val team = teamService.create(participant, "Team Awesome", "Das beste Team aus Dresden", event)
-        val savedTeam = repository.findAll().first()
+        val savedTeam = teamRepository.findAll().first()
 
         assertNotNull(savedTeam)
         assertEquals(team.id, savedTeam.id)

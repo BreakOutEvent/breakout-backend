@@ -12,7 +12,7 @@ class CustomUserDetails(val user: User) : User by user, UserDetails {
 
     override fun isAccountNonLocked() = true
 
-    override fun getAuthorities() = user.core!!.userRoles.values
+    override fun getAuthorities() = user.core!!.getAuthorities()
 
     override fun isEnabled() = !user.isBlocked
 

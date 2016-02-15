@@ -19,6 +19,8 @@ abstract class UserRole() : BasicEntity(), User, GrantedAuthority {
         this.core = core
     }
 
+    // From here on: delegation of methods to core
+
     override var firstname: String?
         get() = this.core.firstname
         set(firstname) {
@@ -40,7 +42,7 @@ abstract class UserRole() : BasicEntity(), User, GrantedAuthority {
     override var isBlocked: Boolean
         get() = this.core.isBlocked
         set(isBlocked) {
-            this.core.isBlocked = true
+            this.core.isBlocked = isBlocked
         }
 
     override var passwordHash: String
@@ -59,6 +61,11 @@ abstract class UserRole() : BasicEntity(), User, GrantedAuthority {
     override fun getRole(clazz: Class<out UserRole>): UserRole? = this.core.getRole(clazz)
     override fun hasRole(clazz: Class<out UserRole>): Boolean = this.core.hasRole(clazz)
     override fun removeRole(clazz: Class<out UserRole>): UserRole? = this.core.removeRole(clazz)
+
+    override fun activate(token: String) = this.core.activate(token)
+    override fun isActivationTokenCorrect(token: String): Boolean = this.core.isActivationTokenCorrect(token)
+    override fun createActivationToken(): String = this.core.createActivationToken()
+    override fun isActivated(): Boolean = this.core.isActivated()
 
     companion object {
 

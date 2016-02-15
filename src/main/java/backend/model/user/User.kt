@@ -26,4 +26,9 @@ interface User {
             return user
         }
     }
+
+    fun activate(token: String)
+    fun isActivationTokenCorrect(token: String): Boolean
+    fun createActivationToken(): String
+    fun isActivated(): Boolean
 }

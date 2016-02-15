@@ -1,16 +1,19 @@
 package backend.Integration
 
 
+import backend.TestBackendConfiguration
 import backend.configuration.AuthorizationServerConfiguration
 import backend.configuration.ResourceServerConfiguration
-import backend.TestBackendConfiguration
-import backend.configuration.Initializer
 import backend.configuration.WebSecurityConfiguration
 import backend.controller.RequestBodies.PostUserBody
 import backend.model.event.EventRepository
+import backend.model.event.EventService
 import backend.model.event.TeamRepository
+import backend.model.event.TeamService
 import backend.model.post.PostRepository
+import backend.model.post.PostService
 import backend.model.user.UserRepository
+import backend.model.user.UserService
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.Before
 import org.junit.runner.RunWith
@@ -40,31 +43,23 @@ import javax.servlet.Filter
 abstract class IntegrationTest {
 
 
+    // Spring stuff
     @Autowired lateinit private var context: WebApplicationContext
+    @Autowired lateinit protected var springSecurityFilterChain: Filter
+
+    // Repositories
     @Autowired lateinit protected var userRepository: UserRepository
     @Autowired lateinit protected var eventRepository: EventRepository
-    @Autowired lateinit protected var postRepository: PostRepository
-    @Autowired lateinit protected var springSecurityFilterChain: Filter
     @Autowired lateinit protected var teamRepository: TeamRepository
+    @Autowired lateinit protected var postRepository: PostRepository
+
+    // Services
+    @Autowired lateinit protected var userService: UserService
+    @Autowired lateinit protected var teamService: TeamService
+    @Autowired lateinit protected var postService: PostService
+    @Autowired lateinit protected var eventService: EventService
 
     lateinit protected var mockMvc: MockMvc
-
-    companion object {
-
-        var counter = 0;
-
-        fun getDummyPostUserBody(): PostUserBody {
-            val body = PostUserBody().apply {
-                email = "nr$counter@icloud.com"
-                firstname = "Florian"
-                lastname = "Schmidt"
-                gender = "Male"
-                password = "Awesome password"
-            }
-            counter++
-            return body
-        }
-    }
 
     @Before
     open fun setUp() {
@@ -97,7 +92,7 @@ abstract class IntegrationTest {
 fun Map<String, kotlin.Any>.toJsonString() = ObjectMapper().writeValueAsString(this)
 
 // Create a user via the API and return it's credentials
-fun createUser(mockMvc: MockMvc, email: String = "a@x.de", password: String = "password"): Credentials {
+fun createUser(mockMvc: MockMvc, email: String = "a@x.de", password: String = "password", userService: UserService): Credentials {
 
     // Create user
     val userdata = mapOf(
@@ -120,6 +115,10 @@ fun createUser(mockMvc: MockMvc, email: String = "a@x.de", password: String = "p
             .readValue(createResponseString)
 
     val id = createResponse["id"] as Int
+
+    val user = userService.getUserByEmail(email)!!
+    user.isBlocked = false
+    userService.save(user)
 
     val accessToken = getTokens(mockMvc, email, password).first
     val refreshToken = getTokens(mockMvc, email, password).second

@@ -6,13 +6,18 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.hibernate.validator.constraints.Email
 import org.hibernate.validator.constraints.NotEmpty
+import org.springframework.security.core.GrantedAuthority
 import java.util.*
 
 import javax.persistence.*
 import java.util.HashMap
 
 @Entity
-open class UserCore : BasicEntity(), User {
+open class UserCore : BasicEntity, User {
+
+    constructor() : super() {
+        this.isBlocked = true
+    }
 
     @Email
     @Column(unique = true, nullable = false)
@@ -42,8 +47,31 @@ open class UserCore : BasicEntity(), User {
      * See: http://stackoverflow.com/a/2011546
      */
     @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.EAGER, orphanRemoval = true)
-    var userRoles: MutableMap<Class<out UserRole>, UserRole> = HashMap()
+    private var userRoles: MutableMap<Class<out UserRole>, UserRole> = HashMap()
 
+    private lateinit var activationToken: String
+
+    fun getAuthorities() : Collection<GrantedAuthority> {
+        return this.userRoles.values
+    }
+
+    override fun activate(token: String) {
+        if(isActivationTokenCorrect(token)) this.isBlocked = false
+        else throw Exception("Provided token $token does not match the activation token")
+    }
+
+    override fun isActivationTokenCorrect(token: String): Boolean {
+        return this.activationToken == token
+    }
+
+    override fun createActivationToken(): String {
+        this.activationToken = UUID.randomUUID().toString()
+        return this.activationToken
+    }
+
+    override fun isActivated(): Boolean {
+        return !isBlocked;
+    }
 
     @Throws(Exception::class)
     override fun addRole(clazz: Class<out UserRole>): UserRole {

@@ -2,29 +2,22 @@ package backend.model.user
 
 import backend.Integration.IntegrationTest
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import kotlin.collections.count
-import kotlin.collections.first
 import kotlin.test.*
 
 class TestUserService : IntegrationTest() {
 
-    @Autowired
-    private lateinit var userService: UserService
-
     @Test
     fun create() {
-        val body = getDummyPostUserBody()
-        assertNotNull(userService.create(body))
-        assertFailsWith(Exception::class, { userService.create(body) })
+        assertNotNull(userService.create("test@mail.com", "password"))
+        assertFailsWith(Exception::class, { userService.create("test@mail.com", "password") })
     }
 
     @Test
     fun getUserById() {
-        val body = getDummyPostUserBody()
-        val user = userService.create(body)
-        val user2 = userService.getUserById(user!!.core!!.id!!)
+        val user = userService.create("test@mail.de", "Awesome password")
+        val user2 = userService.getUserById(user.core!!.id!!)
+
         assertEquals(user.core!!.id, user2!!.core!!.id)
         assertTrue(BCryptPasswordEncoder().matches("Awesome password", user.passwordHash))
         assertFalse(BCryptPasswordEncoder().matches("Not Awesome password", user.passwordHash))
@@ -32,19 +25,16 @@ class TestUserService : IntegrationTest() {
 
     @Test
     fun getUserByEmail() {
-        val body = getDummyPostUserBody()
-        val user = userService.create(body)
-        val user2 = userService.getUserByEmail(user!!.email)
+        val user = userService.create("test@mail.de", "password")
+        val user2 = userService.getUserByEmail(user.email)
+
         assertEquals(user.core!!.email, user2!!.core!!.email)
     }
 
     @Test
     fun getAllUsers() {
-        val body = getDummyPostUserBody()
-        userService.create(body)
-
-        body.email = "florian@mail.de"
-        userService.create(body)
+        userService.create("test@mail.com", "password")
+        userService.create("second_test@mail.com", "password")
 
         assertNotNull(userService.getAllUsers())
         assertEquals(userService.getAllUsers()!!.count(), 2)
@@ -52,19 +42,14 @@ class TestUserService : IntegrationTest() {
 
     @Test
     fun existsEmail() {
-        val body = getDummyPostUserBody()
-        userService.create(body)
-
-        body.email = "florian@mail.de"
-        userService.create(body)
-
-        assertTrue(userService.exists(body.email!!))
+        userService.create("test@mail.com", "password")
+        assertTrue(userService.exists("test@mail.com"))
         assertFalse(userService.exists("f@s.com"))
     }
 
     @Test
     fun saveWithRoles() {
-        val user = userService.create("a@b.c", "pw")
+        val user = userService.create("user@mail.com", "pw")
         user.addRole(Participant::class.java)
         userService.save(user)
 

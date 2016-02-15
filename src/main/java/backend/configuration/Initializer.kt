@@ -1,6 +1,7 @@
 package backend.configuration
 
 import backend.model.user.Admin
+import backend.model.user.User
 import backend.model.user.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -25,8 +26,9 @@ class Initializer {
 
     @PostConstruct
     fun initialize() {
-        val admin = userService.create(ADMIN_EMAIL, ADMIN_PASSWORD)
+        val admin = User.create(ADMIN_EMAIL, ADMIN_PASSWORD)
         admin.addRole(Admin::class.java)
+        admin.isBlocked = false
         userService.save(admin)
     }
 }

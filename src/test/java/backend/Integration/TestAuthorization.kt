@@ -17,18 +17,21 @@ class TestAuthorization : IntegrationTest() {
     fun registerUserAndAuthorize() {
 
         // Register user by sending data to POST /user/
-        val json = mapOf("email" to "a@b.c", "password" to "random").toJsonString()
+        val json = mapOf("email" to "test@mail.com", "password" to "random").toJsonString()
         mockMvc.perform(post("/user/", json))
                 .andExpect(status().isCreated)
                 .andExpect(jsonPath("$.id").exists())
 
+        val user = userService.getUserByEmail("test@mail.com")!!
+        user.isBlocked = false
+        userService.save(user)
 
         // Authorize and get access and refresh token at /oauth/token
         val credentials = Base64.getEncoder().encodeToString("breakout_app:123456789".toByteArray())
         val request = MockMvcRequestBuilders
                 .post("/oauth/token")
                 .param("password", "random")
-                .param("username", "a@b.c")
+                .param("username", "test@mail.com")
                 .param("scope", "read write")
                 .param("client_secret", "123456789")
                 .param("client_id", "breakout_app")
@@ -51,7 +54,7 @@ class TestAuthorization : IntegrationTest() {
         val unauthRequest = MockMvcRequestBuilders
                 .post("/oauth/token")
                 .param("password", "invalid_password")
-                .param("username", "a@b.c")
+                .param("username", "test@mail.com")
                 .param("scope", "read write")
                 .param("client_secret", "123456789")
                 .param("client_id", "breakout_app")

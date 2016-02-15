@@ -1,27 +1,21 @@
 package backend.Integration
 
 import backend.model.event.Event
-import backend.model.event.EventService
 import backend.model.event.Team
-import backend.model.event.TeamService
 import backend.model.misc.Coords
 import backend.model.user.Participant
 import backend.model.user.User
-import backend.model.user.UserService
 import org.hamcrest.Matchers.hasSize
 import org.junit.Before
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
-import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
 
-class TestTeamEnpoint : IntegrationTest() {
+class TestTeamEndpoint : IntegrationTest() {
 
     lateinit var event: Event
     lateinit var team: Team
@@ -29,15 +23,6 @@ class TestTeamEnpoint : IntegrationTest() {
     lateinit var creator: User
     lateinit var inviteeCredentials: Credentials
     lateinit var invitee: User
-
-    @Autowired
-    lateinit var userService: UserService
-
-    @Autowired
-    lateinit var eventService: EventService
-
-    @Autowired
-    lateinit var teamService: TeamService
 
     @Before
     override fun setUp() {
@@ -50,8 +35,8 @@ class TestTeamEnpoint : IntegrationTest() {
                 startingLocation = Coords(0.0, 0.0),
                 duration = 36)
 
-        creatorCredentials = createUser(this.mockMvc)
-        inviteeCredentials = createUser(this.mockMvc, email = "invitee@mail.com")
+        creatorCredentials = createUser(this.mockMvc, userService = userService)
+        inviteeCredentials = createUser(this.mockMvc, email = "invitee@mail.com", userService = userService)
         makeUserParticipant(creatorCredentials)
         makeUserParticipant(inviteeCredentials)
         creator = userRepository.findOne(creatorCredentials.id.toLong()).getRole(Participant::class.java) as Participant

@@ -17,9 +17,6 @@ class TestUserEndpoint : IntegrationTest() {
 
     private fun url(id: Int): String = "/user/${id.toString()}/"
 
-    @Autowired
-    lateinit var userService: UserService
-
     @Before
     override fun setUp() = super.setUp() // this will delete all users from the test database
 
@@ -30,8 +27,19 @@ class TestUserEndpoint : IntegrationTest() {
      */
     @Test
     fun getUser() {
-        userService.create(getDummyPostUserBody())
-        userService.create(getDummyPostUserBody())
+
+        userService.create("test@mail.com", "password", {
+            firstname = "Florian"
+            lastname = "Schmidt"
+            gender = "Male"
+        })
+
+        userService.create("secondTest@mail.com", "password", {
+            firstname = "Leo"
+            lastname = "Theo"
+            gender = "Male"
+        })
+
         mockMvc.perform(get("/user/"))
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$").isArray)
@@ -49,7 +57,7 @@ class TestUserEndpoint : IntegrationTest() {
 
     @Test
     fun getAuthenticatedUser() {
-        val credentials = createUser(this.mockMvc)
+        val credentials = createUser(this.mockMvc, userService = userService)
 
         val request = MockMvcRequestBuilders.get("/me/")
                 .header("Authorization", "Bearer ${credentials.accessToken}")
@@ -127,7 +135,7 @@ class TestUserEndpoint : IntegrationTest() {
     @Test
     fun putUserId() {
 
-        val credentials = createUser(this.mockMvc)
+        val credentials = createUser(this.mockMvc, userService = userService)
 
         // Update user
         val json = mapOf(
@@ -160,7 +168,7 @@ class TestUserEndpoint : IntegrationTest() {
     @Test
     fun makeUserParticipant() {
 
-        val credentials = createUser(this.mockMvc)
+        val credentials = createUser(this.mockMvc, userService = userService)
 
         // Update user with role participant
         val json = mapOf(
@@ -202,7 +210,7 @@ class TestUserEndpoint : IntegrationTest() {
     @Test
     fun failToMakeUserParticipantIfUnauthorized() {
 
-        val credentials = createUser(mockMvc)
+        val credentials = createUser(mockMvc, userService = userService)
         val json = mapOf(
                 "firstname" to "Florian",
                 "lastname" to "Schmidt",

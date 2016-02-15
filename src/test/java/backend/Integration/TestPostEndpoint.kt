@@ -2,12 +2,9 @@
 
 package backend.Integration
 
-import backend.model.post.PostService
 import backend.model.misc.Coords
-import backend.model.user.UserService
 import org.junit.Before
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
@@ -19,16 +16,10 @@ class TestPostEndpoint : IntegrationTest() {
 
     lateinit var userCredentials: Credentials
 
-    @Autowired
-    lateinit var userService: UserService
-
-    @Autowired
-    lateinit var postService: PostService
-
     @Before
     override fun setUp() {
         super.setUp()
-        userCredentials = createUser(this.mockMvc)
+        userCredentials = createUser(this.mockMvc, userService = userService)
     }
 
     @Test
@@ -206,8 +197,8 @@ class TestPostEndpoint : IntegrationTest() {
 
     @Test
     fun getPostById() {
-        val user = userService.create(getDummyPostUserBody())
-        val post = postService.createPost("Test", Coords(0.0, 0.0), user!!.core!!, null)
+        val user = userService.create("test@mail.com", "password")
+        val post = postService.createPost("Test", Coords(0.0, 0.0), user.core!!, null)
 
         val getRequest = MockMvcRequestBuilders
                 .request(HttpMethod.GET, "/post/" + post.id + "/")
