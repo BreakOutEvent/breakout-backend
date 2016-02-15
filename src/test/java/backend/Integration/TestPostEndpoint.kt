@@ -28,7 +28,7 @@ class TestPostEndpoint : IntegrationTest() {
     @Before
     override fun setUp() {
         super.setUp()
-        userCredentials = createUser(this.mockMvc)
+        userCredentials = createUser(this.mockMvc, userService = userService)
     }
 
     @Test

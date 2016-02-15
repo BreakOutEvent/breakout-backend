@@ -50,8 +50,8 @@ class TestTeamEnpoint : IntegrationTest() {
                 startingLocation = Coords(0.0, 0.0),
                 duration = 36)
 
-        creatorCredentials = createUser(this.mockMvc)
-        inviteeCredentials = createUser(this.mockMvc, email = "invitee@mail.com")
+        creatorCredentials = createUser(this.mockMvc, userService = userService)
+        inviteeCredentials = createUser(this.mockMvc, email = "invitee@mail.com", userService = userService)
         makeUserParticipant(creatorCredentials)
         makeUserParticipant(inviteeCredentials)
         creator = userRepository.findOne(creatorCredentials.id.toLong()).getRole(Participant::class.java) as Participant

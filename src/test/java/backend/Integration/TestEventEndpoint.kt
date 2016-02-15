@@ -23,8 +23,9 @@ class TestEventEndpoint : IntegrationTest() {
     @Before
     override fun setUp() {
         super.setUp()
-        userCredentials = createUser(this.mockMvc)
+        userCredentials = createUser(this.mockMvc, userService = userService)
         val admin = userService.create("test_admin@break-out.org", "password").addRole(Admin::class.java)
+        admin.isBlocked = false
         userService.save(admin)
         adminAccessToken = getTokens(this.mockMvc, "test_admin@break-out.org", "password").first
     }

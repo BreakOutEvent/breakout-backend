@@ -11,6 +11,7 @@ import backend.model.event.EventRepository
 import backend.model.event.TeamRepository
 import backend.model.post.PostRepository
 import backend.model.user.UserRepository
+import backend.model.user.UserService
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.Before
 import org.junit.runner.RunWith
@@ -97,7 +98,7 @@ abstract class IntegrationTest {
 fun Map<String, kotlin.Any>.toJsonString() = ObjectMapper().writeValueAsString(this)
 
 // Create a user via the API and return it's credentials
-fun createUser(mockMvc: MockMvc, email: String = "a@x.de", password: String = "password"): Credentials {
+fun createUser(mockMvc: MockMvc, email: String = "a@x.de", password: String = "password", userService: UserService): Credentials {
 
     // Create user
     val userdata = mapOf(
@@ -120,6 +121,10 @@ fun createUser(mockMvc: MockMvc, email: String = "a@x.de", password: String = "p
             .readValue(createResponseString)
 
     val id = createResponse["id"] as Int
+
+    val user = userService.getUserByEmail(email)!!
+    user.isBlocked = false
+    userService.save(user)
 
     val accessToken = getTokens(mockMvc, email, password).first
     val refreshToken = getTokens(mockMvc, email, password).second

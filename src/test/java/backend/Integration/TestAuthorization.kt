@@ -1,7 +1,9 @@
 package backend.Integration
 
+import backend.model.user.UserService
 import org.junit.Before
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -13,6 +15,8 @@ class TestAuthorization : IntegrationTest() {
     @Before
     override fun setUp() = super.setUp()
 
+    @Autowired lateinit var userService: UserService
+
     @Test
     fun registerUserAndAuthorize() {
 
@@ -22,6 +26,9 @@ class TestAuthorization : IntegrationTest() {
                 .andExpect(status().isCreated)
                 .andExpect(jsonPath("$.id").exists())
 
+        val user = userService.getUserByEmail("test@mail.com")!!
+        user.isBlocked = false
+        userService.save(user)
 
         // Authorize and get access and refresh token at /oauth/token
         val credentials = Base64.getEncoder().encodeToString("breakout_app:123456789".toByteArray())

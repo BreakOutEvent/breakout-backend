@@ -49,7 +49,7 @@ class TestUserEndpoint : IntegrationTest() {
 
     @Test
     fun getAuthenticatedUser() {
-        val credentials = createUser(this.mockMvc)
+        val credentials = createUser(this.mockMvc, userService = userService)
 
         val request = MockMvcRequestBuilders.get("/me/")
                 .header("Authorization", "Bearer ${credentials.accessToken}")
@@ -127,7 +127,7 @@ class TestUserEndpoint : IntegrationTest() {
     @Test
     fun putUserId() {
 
-        val credentials = createUser(this.mockMvc)
+        val credentials = createUser(this.mockMvc, userService = userService)
 
         // Update user
         val json = mapOf(
@@ -160,7 +160,7 @@ class TestUserEndpoint : IntegrationTest() {
     @Test
     fun makeUserParticipant() {
 
-        val credentials = createUser(this.mockMvc)
+        val credentials = createUser(this.mockMvc, userService = userService)
 
         // Update user with role participant
         val json = mapOf(
@@ -202,7 +202,7 @@ class TestUserEndpoint : IntegrationTest() {
     @Test
     fun failToMakeUserParticipantIfUnauthorized() {
 
-        val credentials = createUser(mockMvc)
+        val credentials = createUser(mockMvc, userService = userService)
         val json = mapOf(
                 "firstname" to "Florian",
                 "lastname" to "Schmidt",
