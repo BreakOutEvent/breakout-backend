@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.hibernate.validator.constraints.Email
 import org.hibernate.validator.constraints.NotEmpty
+import org.springframework.security.core.GrantedAuthority
 import java.util.*
 
 import javax.persistence.*
@@ -46,9 +47,13 @@ open class UserCore : BasicEntity, User {
      * See: http://stackoverflow.com/a/2011546
      */
     @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.EAGER, orphanRemoval = true)
-    var userRoles: MutableMap<Class<out UserRole>, UserRole> = HashMap()
+    private var userRoles: MutableMap<Class<out UserRole>, UserRole> = HashMap()
 
     private lateinit var activationToken: String
+
+    fun getAuthorities() : Collection<GrantedAuthority> {
+        return this.userRoles.values
+    }
 
     override fun activate(token: String) {
         if(isActivationTokenCorrect(token)) this.isBlocked = false
@@ -62,14 +67,6 @@ open class UserCore : BasicEntity, User {
     override fun createActivationToken(): String {
         this.activationToken = UUID.randomUUID().toString()
         return this.activationToken
-    }
-
-    fun getActivationToken(): String {
-        return this.activationToken
-    }
-
-    fun setActivationToken(token: String) {
-        this.activationToken = token
     }
 
     override fun isActivated(): Boolean {
