@@ -42,7 +42,7 @@ abstract class UserRole() : BasicEntity(), User, GrantedAuthority {
     override var isBlocked: Boolean
         get() = this.core.isBlocked
         set(isBlocked) {
-            this.core.isBlocked = true
+            this.core.isBlocked = isBlocked
         }
 
     override var passwordHash: String
