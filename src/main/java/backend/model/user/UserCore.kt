@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.NotEmpty
 import org.springframework.security.core.GrantedAuthority
 import java.util.*
 import javax.persistence.*
+import kotlin.reflect.KClass
 
 @Entity
 open class UserCore : BasicEntity, User {
@@ -45,12 +46,12 @@ open class UserCore : BasicEntity, User {
 
     private lateinit var activationToken: String
 
-    fun getAuthorities() : Collection<GrantedAuthority> {
+    fun getAuthorities(): Collection<GrantedAuthority> {
         return this.userRoles.values
     }
 
     override fun activate(token: String) {
-        if(isActivationTokenCorrect(token)) this.isBlocked = false
+        if (isActivationTokenCorrect(token)) this.isBlocked = false
         else throw Exception("Provided token $token does not match the activation token")
     }
 
@@ -67,34 +68,24 @@ open class UserCore : BasicEntity, User {
         return !isBlocked;
     }
 
+    override fun <T : UserRole> addRole(clazz: KClass<T>): T = this.addRole(clazz.java) as T
+    override fun <T : UserRole> getRole(clazz: KClass<T>): T? = this.getRole(clazz.java) as? T?
+    override fun <T : UserRole> hasRole(clazz: KClass<T>): Boolean = this.hasRole(clazz.java)
+    override fun <T : UserRole> removeRole(clazz: KClass<T>): T? = this.removeRole(clazz.java) as? T?
+
+    override fun getRole(clazz: Class<out UserRole>): UserRole? = userRoles[clazz]
+    override fun hasRole(clazz: Class<out UserRole>): Boolean = userRoles.containsKey(clazz)
+    override fun removeRole(clazz: Class<out UserRole>): UserRole? = userRoles.remove(clazz)
+
     @Throws(Exception::class)
     override fun addRole(clazz: Class<out UserRole>): UserRole {
 
         val role: UserRole
 
-        if (userRoles.containsKey(clazz)) {
-            throw Exception("User already has role $clazz")
-        } else {
-            role = UserRole.createFor(clazz, this)
-            userRoles.put(clazz, role)
-            return role
-        }
-    }
-
-    override fun getRole(clazz: Class<out UserRole>): UserRole? {
-        return userRoles[clazz]
-    }
-
-    override fun hasRole(clazz: Class<out UserRole>): Boolean {
-        return userRoles.containsKey(clazz)
-    }
-
-    override fun removeRole(clazz: Class<out UserRole>): UserRole? {
-        if (userRoles.containsKey(clazz)) {
-            return userRoles.remove(clazz)
-        } else {
-            return null
-        }
+        if (userRoles.containsKey(clazz)) throw Exception("User already has role $clazz")
+        role = UserRole.createFor(clazz, this)
+        userRoles.put(clazz, role)
+        return role
     }
 
     override val core: UserCore

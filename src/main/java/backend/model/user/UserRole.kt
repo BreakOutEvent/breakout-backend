@@ -7,6 +7,7 @@ import javax.persistence.DiscriminatorColumn
 import javax.persistence.Entity
 import javax.persistence.Inheritance
 import javax.persistence.ManyToOne
+import kotlin.reflect.KClass
 
 @Entity
 @Inheritance
@@ -63,6 +64,11 @@ abstract class UserRole() : BasicEntity(), User, GrantedAuthority {
     override fun getRole(clazz: Class<out UserRole>): UserRole? = this.core.getRole(clazz)
     override fun hasRole(clazz: Class<out UserRole>): Boolean = this.core.hasRole(clazz)
     override fun removeRole(clazz: Class<out UserRole>): UserRole? = this.core.removeRole(clazz)
+
+    override fun <T : UserRole> addRole(clazz: KClass<T>): T = this.core.addRole(clazz)
+    override fun <T : UserRole> getRole(clazz: KClass<T>): T? = this.core.getRole(clazz)
+    override fun <T : UserRole> hasRole(clazz: KClass<T>): Boolean = this.core.hasRole(clazz)
+    override fun <T : UserRole> removeRole(clazz: KClass<T>): T? = this.core.removeRole(clazz)
 
     override fun activate(token: String) = this.core.activate(token)
     override fun isActivationTokenCorrect(token: String): Boolean = this.core.isActivationTokenCorrect(token)
