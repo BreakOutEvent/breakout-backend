@@ -9,7 +9,10 @@ import backend.model.post.PostService
 import backend.view.MediaSizeView
 import backend.view.PostRequestView
 import backend.view.PostResponseView
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -29,6 +32,9 @@ class PostController {
 
     @Autowired
     private lateinit var mediaService: MediaService
+
+    @Value("\${org.breakout.api.jwt_secret}")
+    private lateinit var JWT_SECRET: String
 
     /**
      * Post /post/
@@ -66,6 +72,13 @@ class PostController {
         post.media = media
 
         postService.save(post)
+
+        if (post.media != null) {
+            post.media!!.forEach {
+                it.uploadToken = Jwts.builder().setSubject(it.id.toString()).signWith(SignatureAlgorithm.HS512, JWT_SECRET).compact();
+            }
+        }
+
         return ResponseEntity(PostResponseView(post), HttpStatus.CREATED)
     }
 

@@ -69,10 +69,13 @@ class TestPostEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.postLocation.longitude").exists())
                 .andExpect(jsonPath("$.media[0].type").exists())
                 .andExpect(jsonPath("$.media[0].id").exists())
+                .andExpect(jsonPath("$.media[0].uploadToken").exists())
                 .andExpect(jsonPath("$.media[1].type").exists())
                 .andExpect(jsonPath("$.media[1].id").exists())
+                .andExpect(jsonPath("$.media[1].uploadToken").exists())
                 .andExpect(jsonPath("$.media[2].type").exists())
                 .andExpect(jsonPath("$.media[2].id").exists())
+                .andExpect(jsonPath("$.media[2].uploadToken").exists())
                 .andReturn().response.contentAsString
 
         println(response)
@@ -126,10 +129,13 @@ class TestPostEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.media[0].type").exists())
                 .andExpect(jsonPath("$.media[0].id").exists())
+                .andExpect(jsonPath("$.media[0].uploadToken").exists())
                 .andExpect(jsonPath("$.media[1].type").exists())
                 .andExpect(jsonPath("$.media[1].id").exists())
+                .andExpect(jsonPath("$.media[1].uploadToken").exists())
                 .andExpect(jsonPath("$.media[2].type").exists())
                 .andExpect(jsonPath("$.media[2].id").exists())
+                .andExpect(jsonPath("$.media[2].uploadToken").exists())
                 .andExpect(jsonPath("$.date").exists())
                 .andExpect(jsonPath("$.user").exists())
                 .andReturn().response.contentAsString
