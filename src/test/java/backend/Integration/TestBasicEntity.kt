@@ -4,7 +4,6 @@ import backend.model.event.Event
 import backend.model.misc.Coords
 import org.junit.Test
 import java.time.LocalDateTime
-import kotlin.collections.first
 import kotlin.test.assertNotNull
 
 

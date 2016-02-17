@@ -9,6 +9,8 @@ import backend.model.event.EventRepository
 import backend.model.event.EventService
 import backend.model.event.TeamRepository
 import backend.model.event.TeamService
+import backend.model.post.MediaRepository
+import backend.model.post.MediaSizeRepository
 import backend.model.post.PostRepository
 import backend.model.post.PostService
 import backend.model.user.UserRepository
@@ -57,15 +59,19 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var teamService: TeamService
     @Autowired lateinit protected var postService: PostService
     @Autowired lateinit protected var eventService: EventService
+    @Autowired lateinit protected var mediaRepository: MediaRepository
+    @Autowired lateinit protected var mediaSizeRepository: MediaSizeRepository
 
     lateinit protected var mockMvc: MockMvc
 
     @Before
     open fun setUp() {
         teamRepository.deleteAll()
+        mediaSizeRepository.deleteAll()
         postRepository.deleteAll()
-        userRepository.deleteAll()
+        mediaRepository.deleteAll()
         eventRepository.deleteAll()
+        userRepository.deleteAll()
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .addFilters<DefaultMockMvcBuilder>(springSecurityFilterChain)

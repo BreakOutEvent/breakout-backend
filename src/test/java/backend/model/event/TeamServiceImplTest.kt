@@ -7,6 +7,7 @@ import backend.model.misc.EmailAddress
 import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserRole
+import backend.model.user.UserService
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired

@@ -3,7 +3,6 @@ package backend.model.post
 import backend.model.BasicEntity
 import backend.model.misc.Coords
 import backend.model.user.UserCore
-import org.jetbrains.annotations.Nullable
 import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
