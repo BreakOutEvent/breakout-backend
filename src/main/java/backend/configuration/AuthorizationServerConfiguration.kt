@@ -2,6 +2,7 @@ package backend.configuration
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
@@ -36,6 +37,12 @@ open class AuthorizationServerConfiguration : AuthorizationServerConfigurerAdapt
     @Autowired
     lateinit private var userDetailsService: CustomUserDetailsService
 
+    @Value("\${org.breakout.api.client.name}")
+    private lateinit var CLIENT_NAME: String
+
+    @Value("\${org.breakout.api.client.secret}")
+    private lateinit var CLIENT_SECRET: String
+
     @Bean
     @Primary
     open fun tokenServices(): DefaultTokenServices {
@@ -54,12 +61,12 @@ open class AuthorizationServerConfiguration : AuthorizationServerConfigurerAdapt
     @Throws(Exception::class)
     override fun configure(clients: ClientDetailsServiceConfigurer) {
         clients.inMemory()
-                .withClient("breakout_app")
+                .withClient(CLIENT_NAME)
                 .authorizedGrantTypes("password", "refresh_token")
                 .authorities("USER") // Authorities that are granted to the client (regular Spring Security authorities)
                 .scopes("read", "write") // Set scope "read" and "write" for breakout_app, can be checked with @PreAuthorize
                 .resourceIds("BREAKOUT_BACKEND") // Allow breakout_app to access all resources with id BREAKOUT_BACKEND
-                .secret("123456789") // TODO: Change me
+                .secret(CLIENT_SECRET)
     }
 
     /*
