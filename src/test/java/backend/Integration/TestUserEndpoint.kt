@@ -153,11 +153,54 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.firstname").value("Florian"))
                 .andExpect(jsonPath("$.lastname").value("Schmidt"))
                 .andExpect(jsonPath("$.gender").value("Male"))
-                .andExpect(jsonPath("$.blocked").value(false)) // Expect that a user can't block itself!
+                .andExpect(jsonPath("$.blocked").value(false)) // A user can't block itself
+                .andExpect(jsonPath("$.passwordHash").doesNotExist())
 
-        // TODO: Check that some values such as passwordHash aren't shown!
-        // TODO: Test response if user does not exist
         // TODO: Can't override existing properties with null!
+    }
+
+    @Test
+    fun putUserDoesNotOverrideExistingPropertiesWithNull() {
+        val credentials = createUser(this.mockMvc, userService = this.userService)
+
+
+        val initJson = mapOf(
+                "firstname" to "Florian",
+                "lastname" to "Schmidt",
+                "gender" to "Male",
+                "blocked" to true
+        ).toJsonString()
+
+        val initRequest = MockMvcRequestBuilders
+                .put("/user/${credentials.id}/")
+                .header("Authorization", "Bearer ${credentials.accessToken}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(initJson)
+
+        mockMvc.perform(initRequest).andExpect(status().isOk)
+
+        val json = mapOf(
+                "firstname" to "Florian",
+                "lastname" to "Schmidt",
+                "gender" to "Male",
+                "blocked" to true
+        ).toJsonString()
+
+        val request = MockMvcRequestBuilders
+                .put("/user/${credentials.id}/")
+                .header("Authorization", "Bearer ${credentials.accessToken}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.id").value(credentials.id))
+                .andExpect(jsonPath("$.email").value("a@x.de"))
+                .andExpect(jsonPath("$.firstname").value("Florian"))
+                .andExpect(jsonPath("$.lastname").value("Schmidt"))
+                .andExpect(jsonPath("$.gender").value("Male"))
+                .andExpect(jsonPath("$.blocked").value(false)) // A user can't block itself
+                .andExpect(jsonPath("$.passwordHash").doesNotExist())
     }
 
     @Test
