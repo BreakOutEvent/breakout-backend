@@ -32,10 +32,7 @@ class TeamServiceImpl : TeamService {
 
     override fun invite(emailAddress: EmailAddress, team: Team) {
 
-
-        // TODO: Send Email to the person to be invited
         // TODO: What if user already exists?
-
         // TODO: Should the creation of emails be moved to a seperate entity?
         val email = Email(
                 to = listOf(emailAddress),

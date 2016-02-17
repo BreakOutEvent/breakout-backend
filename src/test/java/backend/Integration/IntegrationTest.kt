@@ -5,7 +5,6 @@ import backend.TestBackendConfiguration
 import backend.configuration.AuthorizationServerConfiguration
 import backend.configuration.ResourceServerConfiguration
 import backend.configuration.WebSecurityConfiguration
-import backend.controller.RequestBodies.PostUserBody
 import backend.model.event.EventRepository
 import backend.model.event.EventService
 import backend.model.event.TeamRepository

@@ -30,9 +30,6 @@ open class UserCore : BasicEntity, User {
 
     override var lastname: String? = null
 
-
-    // TODO: Not sure how to annotate this one
-    @JsonProperty("isBlocked")
     override var isBlocked = false
 
     override var gender: String? = null

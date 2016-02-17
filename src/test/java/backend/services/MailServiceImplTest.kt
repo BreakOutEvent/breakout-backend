@@ -28,12 +28,11 @@ class MailServiceImplTest {
     @Before
     fun setUp() {
         restTemplate = RestTemplate()
-        mailService = MailServiceImpl()
+        mailService = MailServiceImpl(restTemplate)
         mockServer = MockRestServiceServer.createServer(restTemplate)
         ReflectionTestUtils.setField(mailService, "token", "randomtoken")
         ReflectionTestUtils.setField(mailService, "url", BASE_URL)
         ReflectionTestUtils.setField(mailService, "port", PORT)
-        ReflectionTestUtils.setField(mailService, "restTemplate", restTemplate)
     }
 
     @Test
