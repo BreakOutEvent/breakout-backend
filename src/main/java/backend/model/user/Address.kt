@@ -4,7 +4,7 @@ import backend.model.BasicEntity
 import javax.persistence.Entity
 
 @Entity
-public class Address() : BasicEntity() {
+class Address() : BasicEntity() {
 
     constructor(street: String, housenumber: String, city: String, country: String) : this() {
         this.street = street

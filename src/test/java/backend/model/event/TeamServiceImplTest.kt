@@ -68,7 +68,7 @@ class TeamServiceImplTest : IntegrationTest() {
         val user = userService.create(email, "password").addRole(role)
         val details = userDetailsService.loadUserByUsername(email)!! // Not null because otherwise exception is thrown
         val token = UsernamePasswordAuthenticationToken(details.username, details.password, details.authorities)
-        SecurityContextHolder.getContext().setAuthentication(token)
+        SecurityContextHolder.getContext().authentication = token
         return user
     }
 }

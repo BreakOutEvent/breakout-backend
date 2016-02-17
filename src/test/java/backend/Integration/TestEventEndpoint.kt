@@ -45,7 +45,7 @@ class TestEventEndpoint : IntegrationTest() {
 
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.POST, "/event/")
-                .header("Authorization", "Bearer ${adminAccessToken}")
+                .header("Authorization", "Bearer $adminAccessToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(eventData)
 

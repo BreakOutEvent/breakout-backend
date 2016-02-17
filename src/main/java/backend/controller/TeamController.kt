@@ -55,7 +55,7 @@ open class TeamController {
         if (eventRepository.exists(eventId) == false) throw ResourceNotFoundException("No event with id $eventId")
 
         val team = teamRepository.findOne(teamId) ?: throw ResourceNotFoundException("No team with id $teamId")
-        val emailString = body.get("email") as? String ?: throw Exception("body is missing field email")
+        val emailString = body["email"] as? String ?: throw Exception("body is missing field email")
         val email = EmailAddress(emailString)
         teamService.invite(email, team)
     }
@@ -70,7 +70,7 @@ open class TeamController {
         if (eventRepository.exists(eventId) == false) throw ResourceNotFoundException("No event with id $eventId")
 
         val team = teamRepository.findOne(teamId) ?: throw ResourceNotFoundException("No team with id $teamId")
-        val emailString = body.get("email") ?: throw Exception("body is missing field email")
+        val emailString = body["email"] ?: throw Exception("body is missing field email")
         val email = EmailAddress(emailString)
 
         if (user.email != email.toString()) throw Exception("Authorized user and email from request body don't match")
