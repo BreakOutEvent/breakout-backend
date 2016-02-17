@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import javax.annotation.PostConstruct
 import javax.validation.Valid
 
 @RestController

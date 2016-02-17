@@ -3,14 +3,11 @@ package backend.model.user
 import backend.model.BasicEntity
 import backend.model.post.Post
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonProperty
 import org.hibernate.validator.constraints.Email
 import org.hibernate.validator.constraints.NotEmpty
 import org.springframework.security.core.GrantedAuthority
 import java.util.*
-
 import javax.persistence.*
-import java.util.HashMap
 
 @Entity
 open class UserCore : BasicEntity, User {

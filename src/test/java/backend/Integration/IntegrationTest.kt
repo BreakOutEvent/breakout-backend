@@ -9,8 +9,7 @@ import backend.model.event.EventRepository
 import backend.model.event.EventService
 import backend.model.event.TeamRepository
 import backend.model.event.TeamService
-import backend.model.post.PostRepository
-import backend.model.post.PostService
+import backend.model.post.*
 import backend.model.user.UserRepository
 import backend.model.user.UserService
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -51,21 +50,27 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var eventRepository: EventRepository
     @Autowired lateinit protected var teamRepository: TeamRepository
     @Autowired lateinit protected var postRepository: PostRepository
+    @Autowired lateinit protected var mediaRepository: MediaRepository
+    @Autowired lateinit protected var mediaSizeRepository: MediaSizeRepository
 
     // Services
     @Autowired lateinit protected var userService: UserService
     @Autowired lateinit protected var teamService: TeamService
     @Autowired lateinit protected var postService: PostService
     @Autowired lateinit protected var eventService: EventService
+    @Autowired lateinit protected var mediaService: MediaService
+    @Autowired lateinit protected var mediaSizeService: MediaSizeService
 
     lateinit protected var mockMvc: MockMvc
 
     @Before
     open fun setUp() {
         teamRepository.deleteAll()
+        mediaSizeRepository.deleteAll()
         postRepository.deleteAll()
-        userRepository.deleteAll()
+        mediaRepository.deleteAll()
         eventRepository.deleteAll()
+        userRepository.deleteAll()
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .addFilters<DefaultMockMvcBuilder>(springSecurityFilterChain)

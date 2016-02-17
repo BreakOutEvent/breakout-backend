@@ -1,10 +1,8 @@
 package backend.Integration
 
 import backend.model.user.Admin
-import backend.model.user.UserService
 import org.junit.Before
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
