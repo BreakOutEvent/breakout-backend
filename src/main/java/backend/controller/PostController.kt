@@ -11,6 +11,7 @@ import backend.view.PostRequestView
 import backend.view.PostResponseView
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.SignatureException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
@@ -91,14 +92,24 @@ class PostController {
             method = arrayOf(RequestMethod.POST),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
     fun createMediaSize(@PathVariable("id") id: Long,
+                        @RequestHeader("X-UPLOAD-TOKEN") uploadToken: String,
                         @Valid @RequestBody body: MediaSizeView): ResponseEntity<Any> {
 
-        val media = mediaService.getByID(id);
-        var mediaSize = mediaSizeService.createMediaSize(media!!, body.url!!, body.width!!, body.height!!, body.length!!, body.size!!, body.type!!)
+        try {
+            var isTokenValid = Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(uploadToken).body.subject.equals(id.toString());
+            if (isTokenValid) {
 
-        mediaSizeService.save(mediaSize)
-        return ResponseEntity(MediaSizeView(mediaSize), HttpStatus.CREATED)
+                val media = mediaService.getByID(id);
+                var mediaSize = mediaSizeService.createMediaSize(media!!, body.url!!, body.width!!, body.height!!, body.length!!, body.size!!, body.type!!)
 
+                mediaSizeService.save(mediaSize)
+                return ResponseEntity(MediaSizeView(mediaSize), HttpStatus.CREATED)
+            } else {
+                return ResponseEntity(GeneralController.error("authenticated user and requested resource mismatch"), HttpStatus.UNAUTHORIZED)
+            }
+        } catch (e: Exception) {
+            return ResponseEntity(GeneralController.error("authenticated user and requested resource mismatch"), HttpStatus.UNAUTHORIZED)
+        }
     }
 
     /**
