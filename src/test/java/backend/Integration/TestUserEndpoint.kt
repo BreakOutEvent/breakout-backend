@@ -1,10 +1,8 @@
 package backend.Integration
 
-import backend.model.user.UserService
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.Before
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
@@ -18,9 +16,7 @@ class TestUserEndpoint : IntegrationTest() {
     private fun url(id: Int): String = "/user/${id.toString()}/"
 
     @Before
-    override fun setUp() = super.setUp() // this will delete all users from the test database
-
-    // TODO: Restricted Access based on roles
+    override fun setUp() = super.setUp()
 
     /**
      * GET /user/
@@ -121,7 +117,6 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(status().isCreated)
                 .andExpect(jsonPath("$.id").exists())
 
-
         mockMvc.perform(post(url(), json))
                 .andExpect(status().isConflict)
                 .andExpect(jsonPath("$.error").exists())
@@ -163,6 +158,29 @@ class TestUserEndpoint : IntegrationTest() {
         // TODO: Check that some values such as passwordHash aren't shown!
         // TODO: Test response if user does not exist
         // TODO: Can't override existing properties with null!
+    }
+
+    @Test
+    fun putUserCanOnlyModifyItsOwnData() {
+        val firstUserCredentials = createUser(this.mockMvc, "first@email.com", "pwd", this.userService)
+        val secondUserCredentials = createUser(this.mockMvc, "second@email.com", "pwd", this.userService)
+
+        val json = mapOf("firstname" to "ChangeMe").toJsonString()
+        val request = MockMvcRequestBuilders
+                .put("/user/${firstUserCredentials.id}/")
+                .header("Authorization", "Bearer ${secondUserCredentials.accessToken}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+        mockMvc.perform(request).andExpect(status().isUnauthorized)
+    }
+
+    @Test
+    fun putUserUnauthorizedUserCantModifyUserData() {
+        val json = mapOf("firstname" to "ChangeMe").toJsonString()
+        val request = MockMvcRequestBuilders.put("/user/1/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+        mockMvc.perform(request).andExpect(status().isUnauthorized)
     }
 
     @Test
