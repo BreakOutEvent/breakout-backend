@@ -27,7 +27,7 @@ class Initializer {
     @PostConstruct
     fun initialize() {
         val admin = User.create(ADMIN_EMAIL, ADMIN_PASSWORD)
-        admin.addRole(Admin::class.java)
+        admin.addRole(Admin::class)
         admin.isBlocked = false
         userService.save(admin)
     }

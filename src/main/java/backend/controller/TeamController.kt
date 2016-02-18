@@ -39,8 +39,7 @@ open class TeamController {
                    @RequestBody body: TeamView): TeamView {
 
         val event = eventRepository.findById(eventId) ?: throw ResourceNotFoundException("No event with id $eventId")
-        val creator = user.getRole(Participant::class.java) as? Participant ?:
-                throw UnauthorizedException("User is no participant")
+        val creator = user.getRole(Participant::class) ?: throw UnauthorizedException("User is no participant")
 
         return TeamView(teamService.create(creator, body.name!!, body.description!!, event))
     }
@@ -74,9 +73,7 @@ open class TeamController {
         val email = EmailAddress(emailString)
 
         if (user.email != email.toString()) throw Exception("Authorized user and email from request body don't match")
-
-        val participant = user.getRole(Participant::class.java) as? Participant ?:
-                throw RuntimeException("User is no participant")
+        val participant = user.getRole(Participant::class) ?: throw RuntimeException("User is no participant")
 
         // TODO: Handle Exceptions which may occur when user is not invited to team, etc.
         team.join(participant)

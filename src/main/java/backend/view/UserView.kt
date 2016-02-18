@@ -32,7 +32,7 @@ class UserView() {
         this.gender = user.gender
         this.id = user.core!!.id
         this.isBlocked = user.isBlocked
-        this.participant = if (user.hasRole(Participant::class.java)) ParticipantViewModel(user) else null
+        this.participant = if (user.hasRole(Participant::class)) ParticipantViewModel(user) else null
     }
 
     class ParticipantViewModel() {
@@ -45,7 +45,7 @@ class UserView() {
         var tshirtsize: String? = null
 
         constructor(user: User) : this() {
-            this.participant = user.getRole(Participant::class.java) as Participant
+            this.participant = user.getRole(Participant::class)
             this.emergencynumber = participant!!.emergencynumber
             this.hometown = participant!!.hometown
             this.phonenumber = participant!!.phonenumber

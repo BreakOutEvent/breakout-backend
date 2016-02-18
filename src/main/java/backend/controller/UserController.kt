@@ -1,6 +1,7 @@
 package backend.controller
 
 import backend.configuration.CustomUserDetails
+import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserService
 import backend.view.UserView
@@ -104,18 +105,14 @@ class UserController {
         this.lastname = userView.lastname ?: this.lastname
         this.gender = userView.gender ?: this.gender
 
-        if (userView.participant != null) {
+        if (userView.participant == null) return this;
 
-            if (!this.hasRole(backend.model.user.Participant::class.java)) {
-                this.addRole(backend.model.user.Participant::class.java)
-            }
-
-            val p = this.getRole(backend.model.user.Participant::class.java) as backend.model.user.Participant
-            p.tshirtsize = userView.participant?.tshirtsize ?: p.tshirtsize
-            p.emergencynumber = userView.participant?.emergencynumber ?: p.emergencynumber
-            p.hometown = userView.participant?.hometown ?: p.hometown
-            p.phonenumber = userView.participant?.phonenumber ?: p.phonenumber
-        }
+        if (!this.hasRole(Participant::class)) this.addRole(Participant::class)
+        val p = this.getRole(Participant::class)!!
+        p.tshirtsize = userView.participant?.tshirtsize ?: p.tshirtsize
+        p.emergencynumber = userView.participant?.emergencynumber ?: p.emergencynumber
+        p.hometown = userView.participant?.hometown ?: p.hometown
+        p.phonenumber = userView.participant?.phonenumber ?: p.phonenumber
 
         return this
     }
