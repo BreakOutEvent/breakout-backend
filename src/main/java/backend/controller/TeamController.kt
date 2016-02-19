@@ -8,9 +8,14 @@ import backend.model.event.TeamRepository
 import backend.model.event.TeamService
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
+import backend.view.EventView
+import backend.view.PostResponseView
 import backend.view.TeamView
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.CREATED
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
@@ -77,5 +82,20 @@ open class TeamController {
 
         // TODO: Handle Exceptions which may occur when user is not invited to team, etc.
         team.join(participant)
+    }
+
+    @RequestMapping(
+            value = "/{id}/",
+            method = arrayOf(RequestMethod.GET),
+            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
+    fun showPost(@PathVariable("id") id: Long): ResponseEntity<Any> {
+
+        val team = teamService.getByID(id)
+
+        if (team == null) {
+            return ResponseEntity(GeneralController.error("team with id $id does not exist"), HttpStatus.NOT_FOUND)
+        } else {
+            return ResponseEntity.ok(TeamView(team))
+        }
     }
 }

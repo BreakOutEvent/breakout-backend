@@ -8,9 +8,12 @@ import backend.model.user.User
 import org.hamcrest.Matchers.hasSize
 import org.junit.Before
 import org.junit.Test
+import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
@@ -77,8 +80,22 @@ class TestTeamEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun testGetTeams() {
+    fun testGetTeamById() {
+        val request = MockMvcRequestBuilders
+                .request(HttpMethod.GET, "/event/${event.id}/team/${team.id}/")
+                .contentType(MediaType.APPLICATION_JSON)
 
+        val response = mockMvc.perform (request)
+                .andExpect(status().isOk)
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.name").exists())
+                .andExpect(jsonPath("$.event").exists())
+                .andExpect(jsonPath("$.description").exists())
+                .andExpect(jsonPath("$.members").exists())
+                .andReturn().response.contentAsString
+
+        println(response)
     }
 
     @Test

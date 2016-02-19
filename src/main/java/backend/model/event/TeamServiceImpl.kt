@@ -2,6 +2,7 @@ package backend.model.event
 
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
+import backend.model.post.Media
 import backend.model.user.Participant
 import backend.model.user.UserService
 import backend.services.MailService
@@ -47,4 +48,7 @@ class TeamServiceImpl : TeamService {
 
     override fun save(team: Team) = repository.save(team)
 
+    override fun getByID(id: Long): Team? {
+        return repository.findById(id)
+    }
 }
