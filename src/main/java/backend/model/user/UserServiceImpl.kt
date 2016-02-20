@@ -1,6 +1,5 @@
 package backend.model.user
 
-import backend.controller.RequestBodies.PostUserBody
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.services.MailService
@@ -35,18 +34,6 @@ class UserServiceImpl : UserService {
     override fun exists(id: Long) = userRepository.exists(id)
 
     override fun exists(email: String) = userRepository.existsByEmail(email)
-
-    @Deprecated("Remains for testing purposes")
-    override fun create(body: PostUserBody): User? {
-
-        val user = User.create(body.email!!, body.password!!)
-        user.firstname = body.firstname
-        user.lastname = body.lastname
-        user.gender = body.gender
-        user.isBlocked = false
-
-        return userRepository.save(user.core);
-    }
 
     override fun create(email: String, password: String): User {
         if (this.exists(email)) throw Exception("user with email $email already exists")
