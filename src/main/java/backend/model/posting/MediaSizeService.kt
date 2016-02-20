@@ -1,4 +1,4 @@
-package backend.model.post
+package backend.model.posting
 
 interface MediaSizeService {
     fun createMediaSize(media: Media, url: String, width: Int, height: Int, length: Int, size: Long, type: String): MediaSize

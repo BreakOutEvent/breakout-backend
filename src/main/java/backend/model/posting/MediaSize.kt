@@ -1,4 +1,4 @@
-package backend.model.post
+package backend.model.posting
 
 import backend.model.BasicEntity
 import javax.persistence.Entity
@@ -12,7 +12,7 @@ class MediaSize() : BasicEntity() {
     @ManyToOne
     var media: Media? = null
 
-    var url: String? = null
+    lateinit var  url: String
 
     var width: Int? = null
 

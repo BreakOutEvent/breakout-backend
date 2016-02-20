@@ -1,4 +1,4 @@
-package backend.model.post
+package backend.model.posting
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service

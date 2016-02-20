@@ -2,13 +2,13 @@ package backend.controller
 
 import backend.configuration.CustomUserDetails
 import backend.model.misc.Coords
-import backend.model.post.Media
-import backend.model.post.MediaService
-import backend.model.post.MediaSizeService
-import backend.model.post.PostService
+import backend.model.posting.Media
+import backend.model.posting.MediaService
+import backend.model.posting.MediaSizeService
+import backend.model.posting.PostingService
 import backend.view.MediaSizeView
-import backend.view.PostRequestView
-import backend.view.PostResponseView
+import backend.view.PostingRequestView
+import backend.view.PostingResponseView
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,11 +22,11 @@ import org.springframework.web.bind.annotation.RequestMethod.GET
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/post")
-class PostController {
+@RequestMapping("/posting")
+class PostingController {
 
     @Autowired
-    private lateinit var postService: PostService
+    private lateinit var postingService: PostingService
 
     @Autowired
     private lateinit var mediaSizeService: MediaSizeService
@@ -38,51 +38,51 @@ class PostController {
     private lateinit var JWT_SECRET: String
 
     /**
-     * Post /post/
+     * Post /posting/
      */
     @RequestMapping("/",method = arrayOf(RequestMethod.POST))
-    fun createPost(@Valid @RequestBody body: PostRequestView,
+    fun createPost(@Valid @RequestBody body: PostingRequestView,
                    @AuthenticationPrincipal user: CustomUserDetails): ResponseEntity<Any> {
 
         if (user.core!!.id == null) {
             return ResponseEntity(GeneralController.error("authenticated user and requested resource mismatch"), HttpStatus.UNAUTHORIZED)
         }
 
-        if (body.media == null && body.text == null && body.postLocation == null) {
-            return ResponseEntity(GeneralController.error("empty posts not allowed"), HttpStatus.BAD_REQUEST)
+        if (body.media == null && body.text == null && body.postingLocation == null) {
+            return ResponseEntity(GeneralController.error("empty postings not allowed"), HttpStatus.BAD_REQUEST)
         }
 
         var location: Coords? = null
-        if (body.postLocation != null && body.postLocation!!.latitude != null && body.postLocation!!.longitude != null)
-            location = Coords(body.postLocation!!.latitude!!, body.postLocation!!.longitude!!)
+        if (body.postingLocation != null && body.postingLocation!!.latitude != null && body.postingLocation!!.longitude != null)
+            location = Coords(body.postingLocation!!.latitude!!, body.postingLocation!!.longitude!!)
 
 
-        var post = postService.createPost(text = body.text, postLocation = location, user = user.core, media = null)
+        var posting = postingService.createPosting(text = body.text, postingLocation = location, user = user.core, media = null)
 
         var media: MutableList<Media>? = null
         if (body.media != null && body.media!! is List<*>) {
             media = arrayListOf()
             body.media!!.forEach {
-                media!!.add(Media(post, it))
+                media!!.add(Media(posting, it))
             }
         }
 
-        post.media = media
+        posting.media = media
 
-        postService.save(post)
+        postingService.save(posting)
 
-        if (post.media != null) {
-            post.media!!.forEach {
+        if (posting.media != null) {
+            posting.media!!.forEach {
                 it.uploadToken = Jwts.builder().setSubject(it.id.toString()).signWith(SignatureAlgorithm.HS512, JWT_SECRET).compact();
             }
         }
 
-        return ResponseEntity(PostResponseView(post), HttpStatus.CREATED)
+        return ResponseEntity(PostingResponseView(posting), HttpStatus.CREATED)
     }
 
 
     /**
-     * POST /post/media/id/
+     * POST /posting/media/id/
      */
     @RequestMapping("/media/{id}/",method = arrayOf(RequestMethod.POST))
     fun createMediaSize(@PathVariable("id") id: Long,
@@ -107,23 +107,23 @@ class PostController {
     }
 
     /**
-     * GET /post/id/
+     * GET /posting/id/
      */
     @RequestMapping("/{id}/",method = arrayOf(GET))
-    fun showPost(@PathVariable("id") id: Long): ResponseEntity<kotlin.Any> {
+    fun getPosting(@PathVariable("id") id: Long): ResponseEntity<kotlin.Any> {
 
-        val post = postService.getByID(id)
+        val posting = postingService.getByID(id)
 
-        if (post == null) {
-            return ResponseEntity(GeneralController.error("post with id $id does not exist"), HttpStatus.NOT_FOUND)
+        if (posting == null) {
+            return ResponseEntity(GeneralController.error("posting with id $id does not exist"), HttpStatus.NOT_FOUND)
         } else {
-            return ResponseEntity.ok(PostResponseView(post))
+            return ResponseEntity.ok(PostingResponseView(posting))
         }
     }
 
     @RequestMapping("/", method = arrayOf(GET))
-    fun getAllPosts(): Iterable<PostResponseView> {
-        return postService.findAll().map { PostResponseView(it) }
+    fun getAllPosts(): Iterable<PostingResponseView> {
+        return postingService.findAll().map { PostingResponseView(it) }
     }
 
 }

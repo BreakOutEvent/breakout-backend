@@ -1,6 +1,6 @@
 package backend.view
 
-import backend.model.post.MediaSize
+import backend.model.posting.MediaSize
 
 class MediaSizeView() {
 

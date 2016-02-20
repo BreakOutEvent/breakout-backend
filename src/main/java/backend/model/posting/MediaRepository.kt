@@ -1,4 +1,4 @@
-package backend.model.post
+package backend.model.posting
 
 import org.springframework.data.repository.CrudRepository
 

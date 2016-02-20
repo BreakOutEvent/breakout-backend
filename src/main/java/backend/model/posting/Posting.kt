@@ -1,4 +1,4 @@
-package backend.model.post
+package backend.model.posting
 
 import backend.model.BasicEntity
 import backend.model.misc.Coords
@@ -8,7 +8,7 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
-class Post() : BasicEntity() {
+class Posting() : BasicEntity() {
 
     var text: String? = null
 

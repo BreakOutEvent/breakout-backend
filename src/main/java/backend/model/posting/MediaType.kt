@@ -1,4 +1,4 @@
-package backend.model.post
+package backend.model.posting
 
 enum class MediaType {
     IMAGE,

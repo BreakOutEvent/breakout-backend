@@ -1,7 +1,7 @@
 package backend.model.user
 
 import backend.model.BasicEntity
-import backend.model.post.Post
+import backend.model.posting.Posting
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.validator.constraints.Email
 import org.hibernate.validator.constraints.NotEmpty
@@ -34,7 +34,7 @@ open class UserCore : BasicEntity, User {
 
     @OrderColumn
     @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
-    val posts: MutableList<Post>? = ArrayList()
+    val postings: MutableList<Posting>? = ArrayList()
     /*
      * cascade all operations to children
      * orphanRemoval = true allows removing a role from the database

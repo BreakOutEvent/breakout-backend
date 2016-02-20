@@ -1,4 +1,4 @@
-package backend.model.post
+package backend.model.posting
 
 import backend.model.BasicEntity
 import java.util.*
@@ -8,7 +8,7 @@ import javax.persistence.*
 class Media() : BasicEntity() {
 
     @ManyToOne
-    var post: Post? = null
+    var posting: Posting? = null
 
     @Enumerated(EnumType.STRING)
     var mediaType: MediaType? = null
@@ -20,9 +20,9 @@ class Media() : BasicEntity() {
     @Transient
     var uploadToken: String? = null
 
-    constructor(post: Post, type: String) : this() {
+    constructor(posting: Posting, type: String) : this() {
         this.mediaType = MediaType.valueOf(type.toUpperCase())
-        this.post = post
+        this.posting = posting
     }
 
 }
