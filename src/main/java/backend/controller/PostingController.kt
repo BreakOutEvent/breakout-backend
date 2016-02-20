@@ -34,8 +34,9 @@ class PostingController {
     @Autowired
     private lateinit var mediaService: MediaService
 
-    @Value("\${org.breakout.api.jwt_secret}")
-    private lateinit var JWT_SECRET: String
+//    @Value("\${org.breakout.api.jwt_secret}")
+    // TODO: Workaround for testing purposes
+    private var JWT_SECRET: String = System.getenv("RECODER_JWT_SECRET") ?: ""
 
     /**
      * Post /posting/
