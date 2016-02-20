@@ -12,6 +12,7 @@ class EventView() {
     @NotNull
     var title: String? = null
 
+    @NotNull
     var date: Long? = null
 
     @NotNull

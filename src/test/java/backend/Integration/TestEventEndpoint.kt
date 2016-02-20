@@ -1,10 +1,12 @@
 package backend.Integration
 
 import backend.model.user.Admin
+import javassist.tools.web.BadHttpRequest
 import org.junit.Before
 import org.junit.Test
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -30,6 +32,21 @@ class TestEventEndpoint : IntegrationTest() {
     }
 
     @Test
+    fun dontCreateEventIfPropertyMissing() {
+        val eventData = mapOf(
+                "title" to "BreakOut",
+                "city" to "München").toJsonString()
+
+        val request = MockMvcRequestBuilders
+                .post("/event/")
+                .header("Authorization", "Bearer $adminAccessToken")
+                .contentType(APPLICATION_JSON)
+                .content(eventData)
+
+        mockMvc.perform(request).andExpect(status().isBadRequest)
+    }
+
+    @Test
     fun createNewEvent() {
 
         val eventData = mapOf(
@@ -46,7 +63,7 @@ class TestEventEndpoint : IntegrationTest() {
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.POST, "/event/")
                 .header("Authorization", "Bearer $adminAccessToken")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(eventData)
 
         val response = mockMvc.perform(request)
