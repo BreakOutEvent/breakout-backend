@@ -8,5 +8,5 @@ interface PostingService {
     fun findAll(): Iterable<Posting>
     fun getByID(id: Long): Posting?
     fun save(posting: Posting): Posting?
-
+    fun findAllByIds(body: List<Long>): Iterable<Posting>
 }

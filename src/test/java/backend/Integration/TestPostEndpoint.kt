@@ -241,6 +241,34 @@ class TestPostEndpoint : IntegrationTest() {
 
 
     @Test
+    fun getPostingsByIds() {
+        val user = userService.create("test@mail.com", "password")
+        val postingZero = postingService.createPosting("Test0", Coords(0.0, 0.0), user.core!!, null)
+        val postingOne = postingService.createPosting("Test1", Coords(0.0, 0.0), user.core!!, null)
+        val postingTwo = postingService.createPosting("Test2", Coords(0.0, 0.0), user.core!!, null)
+
+        val postingsIds: List<Long> = listOf(postingZero.id!!, postingTwo.id!!)
+
+        val request = MockMvcRequestBuilders
+                .request(HttpMethod.POST, "/posting/get/ids")
+                .content(postingsIds.toJsonString())
+                .contentType(MediaType.APPLICATION_JSON)
+
+        val response = mockMvc.perform (request)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$.[0]").exists())
+                .andExpect(jsonPath("$.[0].text").value("Test0"))
+                .andExpect(jsonPath("$.[1]").exists())
+                .andExpect(jsonPath("$.[1].text").value("Test2"))
+                .andReturn().response.contentAsString
+
+        println(response)
+    }
+
+
+    @Test
     fun createNewPostingWithMediaAndAddMediaSizesWithoutToken() {
 
         val user = userService.create("test@mail.com", "password")

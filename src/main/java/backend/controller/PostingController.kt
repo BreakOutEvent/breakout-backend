@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.GET
+import org.springframework.web.bind.annotation.RequestMethod.POST
 import javax.validation.Valid
 
 @RestController
@@ -40,9 +41,9 @@ class PostingController {
     /**
      * Post /posting/
      */
-    @RequestMapping("/",method = arrayOf(RequestMethod.POST))
-    fun createPost(@Valid @RequestBody body: PostingRequestView,
-                   @AuthenticationPrincipal user: CustomUserDetails): ResponseEntity<Any> {
+    @RequestMapping("/", method = arrayOf(RequestMethod.POST))
+    fun createPosting(@Valid @RequestBody body: PostingRequestView,
+                      @AuthenticationPrincipal user: CustomUserDetails): ResponseEntity<Any> {
 
         if (user.core!!.id == null) {
             return ResponseEntity(GeneralController.error("authenticated user and requested resource mismatch"), HttpStatus.UNAUTHORIZED)
@@ -84,7 +85,7 @@ class PostingController {
     /**
      * POST /posting/media/id/
      */
-    @RequestMapping("/media/{id}/",method = arrayOf(RequestMethod.POST))
+    @RequestMapping("/media/{id}/", method = arrayOf(RequestMethod.POST))
     fun createMediaSize(@PathVariable("id") id: Long,
                         @RequestHeader("X-UPLOAD-TOKEN") uploadToken: String,
                         @Valid @RequestBody body: MediaSizeView): ResponseEntity<Any> {
@@ -109,7 +110,7 @@ class PostingController {
     /**
      * GET /posting/id/
      */
-    @RequestMapping("/{id}/",method = arrayOf(GET))
+    @RequestMapping("/{id}/", method = arrayOf(GET))
     fun getPosting(@PathVariable("id") id: Long): ResponseEntity<kotlin.Any> {
 
         val posting = postingService.getByID(id)
@@ -121,9 +122,20 @@ class PostingController {
         }
     }
 
+    /**
+     * GET /posting/
+     */
     @RequestMapping("/", method = arrayOf(GET))
-    fun getAllPosts(): Iterable<PostingResponseView> {
+    fun getAllPostings(): Iterable<PostingResponseView> {
         return postingService.findAll().map { PostingResponseView(it) }
+    }
+
+    /**
+     * POST /posting/get/ids/
+     */
+    @RequestMapping("/get/ids", method = arrayOf(POST))
+    fun getPostingsById(@Valid @RequestBody body: List<Long>): Iterable<PostingResponseView> {
+        return postingService.findAllByIds(body).map { PostingResponseView(it) }
     }
 
 }
