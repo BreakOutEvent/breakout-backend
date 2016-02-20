@@ -24,6 +24,8 @@ class TestPostEndpoint : IntegrationTest() {
 
     lateinit var userCredentials: Credentials
 
+    val APPLICATION_JSON_UTF_8 = "application/json;charset=UTF-8"
+
     @Before
     override fun setUp() {
         super.setUp()
@@ -59,7 +61,7 @@ class TestPostEndpoint : IntegrationTest() {
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.text").exists())
                 .andExpect(jsonPath("$.date").exists())
@@ -95,7 +97,7 @@ class TestPostEndpoint : IntegrationTest() {
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.text").exists())
                 .andExpect(jsonPath("$.date").exists())
@@ -124,7 +126,7 @@ class TestPostEndpoint : IntegrationTest() {
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.media[0].type").exists())
                 .andExpect(jsonPath("$.media[0].id").exists())
@@ -160,7 +162,7 @@ class TestPostEndpoint : IntegrationTest() {
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.postLocation.latitude").exists())
                 .andExpect(jsonPath("$.postLocation.longitude").exists())
@@ -225,7 +227,7 @@ class TestPostEndpoint : IntegrationTest() {
 
         val response = mockMvc.perform (request)
                 .andExpect(status().isOk)
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.text").exists())
                 .andExpect(jsonPath("$.date").exists())
@@ -327,7 +329,7 @@ class TestPostEndpoint : IntegrationTest() {
 
         val response = mockMvc.perform (request)
                 .andExpect(status().isCreated)
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.url").exists())
                 .andExpect(jsonPath("$.width").exists())
@@ -338,6 +340,25 @@ class TestPostEndpoint : IntegrationTest() {
                 .andReturn().response.contentAsString
 
         println(response)
+    }
+
+    @Test
+    fun getAllPosts() {
+        val user = userService.create("test@mail.com", "password")
+        val post = postService.createPost("Test", Coords(0.0, 0.0), user.core!!, null)
+        val secondPost = postService.createPost("Test 2", Coords(0.0, 0.0), user.core!!, null)
+
+        val request = MockMvcRequestBuilders
+                .request(HttpMethod.GET, "/post/")
+                .contentType(MediaType.APPLICATION_JSON)
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$[0]").exists())
+                .andExpect(jsonPath("$[1]").exists())
+                .andReturn().response.contentAsString
     }
 
 }

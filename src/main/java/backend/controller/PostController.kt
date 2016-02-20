@@ -18,6 +18,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.RequestMethod.GET
 import javax.validation.Valid
 
 @RestController
@@ -39,10 +40,7 @@ class PostController {
     /**
      * Post /post/
      */
-    @RequestMapping(
-            value = "/",
-            method = arrayOf(RequestMethod.POST),
-            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
+    @RequestMapping("/",method = arrayOf(RequestMethod.POST))
     fun createPost(@Valid @RequestBody body: PostRequestView,
                    @AuthenticationPrincipal user: CustomUserDetails): ResponseEntity<Any> {
 
@@ -86,10 +84,7 @@ class PostController {
     /**
      * POST /post/media/id/
      */
-    @RequestMapping(
-            value = "/media/{id}/",
-            method = arrayOf(RequestMethod.POST),
-            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
+    @RequestMapping("/media/{id}/",method = arrayOf(RequestMethod.POST))
     fun createMediaSize(@PathVariable("id") id: Long,
                         @RequestHeader("X-UPLOAD-TOKEN") uploadToken: String,
                         @Valid @RequestBody body: MediaSizeView): ResponseEntity<Any> {
@@ -114,10 +109,7 @@ class PostController {
     /**
      * GET /post/id/
      */
-    @RequestMapping(
-            value = "/{id}/",
-            method = arrayOf(RequestMethod.GET),
-            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
+    @RequestMapping("/{id}/",method = arrayOf(GET))
     fun showPost(@PathVariable("id") id: Long): ResponseEntity<kotlin.Any> {
 
         val post = postService.getByID(id)
@@ -127,6 +119,11 @@ class PostController {
         } else {
             return ResponseEntity.ok(PostResponseView(post))
         }
+    }
+
+    @RequestMapping("/", method = arrayOf(GET))
+    fun getAllPosts(): Iterable<PostResponseView> {
+        return postService.findAll().map { PostResponseView(it) }
     }
 
 }
