@@ -2,6 +2,7 @@ package backend.services
 
 import backend.model.misc.Email
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
@@ -27,6 +28,8 @@ class MailServiceImpl : MailService {
 
     private lateinit var restTemplate: RestOperations
 
+    private val logger = Logger.getLogger(MailServiceImpl::class.java)
+
     @Autowired
     constructor(restTemplate: RestOperations) {
         this.restTemplate = restTemplate
@@ -39,7 +42,12 @@ class MailServiceImpl : MailService {
         }
         val body = ObjectMapper().writeValueAsString(email)
         val request = HttpEntity<String>(body, headers)
-        restTemplate.exchange(getSendUrl(url, port), HttpMethod.POST, request, String::class.java)
+        try {
+            restTemplate.exchange(getSendUrl(url, port), HttpMethod.POST, request, String::class.java)
+        } catch (e: Exception) {
+            logger.error("Mailer not available at this time")
+        }
+
     }
 
     private fun getSendUrl(baseUrl: String, port: String) = UriComponentsBuilder
