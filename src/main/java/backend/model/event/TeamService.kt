@@ -1,7 +1,6 @@
 package backend.model.event
 
 import backend.model.misc.EmailAddress
-import backend.model.post.Media
 import backend.model.user.Participant
 import org.springframework.security.access.prepost.PreAuthorize
 

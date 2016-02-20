@@ -8,8 +8,6 @@ import backend.model.event.TeamRepository
 import backend.model.event.TeamService
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
-import backend.view.EventView
-import backend.view.PostResponseView
 import backend.view.TeamView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -88,7 +86,7 @@ open class TeamController {
             value = "/{id}/",
             method = arrayOf(RequestMethod.GET),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun showPost(@PathVariable("id") id: Long): ResponseEntity<Any> {
+    fun showTeam(@PathVariable("id") id: Long): ResponseEntity<Any> {
 
         val team = teamService.getByID(id)
 
