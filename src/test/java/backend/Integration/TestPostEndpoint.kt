@@ -16,6 +16,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import org.hamcrest.Matchers.hasSize
+
 
 class TestPostEndpoint : IntegrationTest() {
 
@@ -258,10 +260,34 @@ class TestPostEndpoint : IntegrationTest() {
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$").isArray)
-                .andExpect(jsonPath("$.[0]").exists())
-                .andExpect(jsonPath("$.[0].text").value("Test0"))
-                .andExpect(jsonPath("$.[1]").exists())
-                .andExpect(jsonPath("$.[1].text").value("Test2"))
+                .andExpect(jsonPath<MutableCollection<out Any>>("$", hasSize(2)))
+                .andExpect(jsonPath("$[0]").exists())
+                .andExpect(jsonPath("$[0].text").value("Test0"))
+                .andExpect(jsonPath("$[1]").exists())
+                .andExpect(jsonPath("$[1].text").value("Test2"))
+                .andReturn().response.contentAsString
+
+        println(response)
+    }
+
+    @Test
+    fun getPostingIdsSince() {
+        val user = userService.create("test@mail.com", "password")
+        val postingZero = postingService.createPosting("Test0", Coords(0.0, 0.0), user.core!!, null)
+        postingService.createPosting("Test1", Coords(0.0, 0.0), user.core!!, null)
+        postingService.createPosting("Test2", Coords(0.0, 0.0), user.core!!, null)
+
+        val request = MockMvcRequestBuilders
+                .request(HttpMethod.GET, "/posting/get/since/${postingZero.id}/")
+                .contentType(MediaType.APPLICATION_JSON)
+
+        val response = mockMvc.perform (request)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath<MutableCollection<out Any>>("$", hasSize(2)))
+                .andExpect(jsonPath("$[0]").exists())
+                .andExpect(jsonPath("$[1]").exists())
                 .andReturn().response.contentAsString
 
         println(response)

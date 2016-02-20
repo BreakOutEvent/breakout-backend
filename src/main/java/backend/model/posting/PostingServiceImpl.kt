@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class PostingServiceImpl @Autowired constructor(val repository: PostingRepository) : PostingService {
+    override fun findAllSince(id: Long): Iterable<Posting> = repository.findAllSince(id)
+
     override fun findAllByIds(body: List<Long>): Iterable<Posting> = repository.findAll(body)
 
     override fun save(posting: Posting): Posting = repository.save(posting)!!

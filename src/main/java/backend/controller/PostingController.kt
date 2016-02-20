@@ -14,7 +14,6 @@ import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
@@ -138,4 +137,11 @@ class PostingController {
         return postingService.findAllByIds(body).map { PostingResponseView(it) }
     }
 
+    /**
+     * GET /posting/get/since/id/
+     */
+    @RequestMapping("/get/since/{id}/")
+    fun getPostingIdsSince(@PathVariable("id") id: Long): Iterable<Long> {
+        return postingService.findAllSince(id).map { it.id!! }
+    }
 }
