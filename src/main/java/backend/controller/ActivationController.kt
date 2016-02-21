@@ -1,6 +1,6 @@
 package backend.controller
 
-import backend.controller.exceptions.ResourceNotFoundException
+import backend.controller.exceptions.NotFoundException
 import backend.model.misc.EmailAddress
 import backend.model.user.UserService
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,12 +19,13 @@ class ActivationController {
     constructor(userService: UserService) {
         this.userService = userService
     }
+
     @RequestMapping(method = arrayOf(GET))
     fun activateAccount(@RequestParam token: String,
                         @RequestParam email: EmailAddress) {
 
         val user = userService.getUserByEmail(email.toString()) ?:
-                throw ResourceNotFoundException("No user with email $email")
+                throw NotFoundException("No user with email $email")
 
         userService.activate(user, token)
 

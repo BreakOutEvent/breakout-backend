@@ -109,7 +109,7 @@ class TestUserEndpoint : IntegrationTest() {
     @Test
     fun postUserRejectExistingEmail() {
         val json = mapOf(
-                "email" to "a@x.de",
+                "email" to "test@mail.de",
                 "password" to "password"
         ).toJsonString()
 
@@ -119,8 +119,6 @@ class TestUserEndpoint : IntegrationTest() {
 
         mockMvc.perform(post(url(), json))
                 .andExpect(status().isConflict)
-                .andExpect(jsonPath("$.error").exists())
-                .andExpect(jsonPath("$.error").value("user with email a@x.de already exists"))
     }
 
     /**

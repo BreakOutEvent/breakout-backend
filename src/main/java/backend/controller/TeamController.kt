@@ -1,7 +1,7 @@
 package backend.controller
 
 import backend.configuration.CustomUserDetails
-import backend.controller.exceptions.ResourceNotFoundException
+import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
 import backend.model.event.EventRepository
 import backend.model.event.TeamRepository
@@ -10,10 +10,8 @@ import backend.model.misc.EmailAddress
 import backend.model.user.Participant
 import backend.view.TeamView
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
@@ -41,7 +39,7 @@ open class TeamController {
                    @AuthenticationPrincipal user: CustomUserDetails,
                    @RequestBody body: TeamView): TeamView {
 
-        val event = eventRepository.findById(eventId) ?: throw ResourceNotFoundException("No event with id $eventId")
+        val event = eventRepository.findById(eventId) ?: throw NotFoundException("No event with id $eventId")
         val creator = user.getRole(Participant::class) ?: throw UnauthorizedException("User is no participant")
 
         return TeamView(teamService.create(creator, body.name!!, body.description!!, event))
@@ -54,9 +52,9 @@ open class TeamController {
                    @PathVariable teamId: Long,
                    @Valid @RequestBody body: Map<String, Any>) {
 
-        if (eventRepository.exists(eventId) == false) throw ResourceNotFoundException("No event with id $eventId")
+        if (eventRepository.exists(eventId) == false) throw NotFoundException("No event with id $eventId")
 
-        val team = teamRepository.findOne(teamId) ?: throw ResourceNotFoundException("No team with id $teamId")
+        val team = teamRepository.findOne(teamId) ?: throw NotFoundException("No team with id $teamId")
         val emailString = body["email"] as? String ?: throw Exception("body is missing field email")
         val email = EmailAddress(emailString)
         teamService.invite(email, team)
@@ -69,9 +67,9 @@ open class TeamController {
                  @AuthenticationPrincipal user: CustomUserDetails,
                  @Valid @RequestBody body: Map<String, String>) {
 
-        if (eventRepository.exists(eventId) == false) throw ResourceNotFoundException("No event with id $eventId")
+        if (eventRepository.exists(eventId) == false) throw NotFoundException("No event with id $eventId")
 
-        val team = teamRepository.findOne(teamId) ?: throw ResourceNotFoundException("No team with id $teamId")
+        val team = teamRepository.findOne(teamId) ?: throw NotFoundException("No team with id $teamId")
         val emailString = body["email"] ?: throw Exception("body is missing field email")
         val email = EmailAddress(emailString)
 
@@ -86,14 +84,8 @@ open class TeamController {
             value = "/{id}/",
             method = arrayOf(RequestMethod.GET),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun showTeam(@PathVariable("id") id: Long): ResponseEntity<Any> {
-
-        val team = teamService.getByID(id)
-
-        if (team == null) {
-            return ResponseEntity(GeneralController.error("team with id $id does not exist"), HttpStatus.NOT_FOUND)
-        } else {
-            return ResponseEntity.ok(TeamView(team))
-        }
+    fun showTeam(@PathVariable("id") id: Long): TeamView {
+        val team = teamService.getByID(id) ?: throw NotFoundException("team with id $id does not exist")
+        return TeamView(team)
     }
 }

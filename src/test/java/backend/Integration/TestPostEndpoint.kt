@@ -7,21 +7,19 @@ import backend.model.posting.Media
 import backend.model.user.Admin
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
+import org.hamcrest.Matchers.hasSize
 import org.junit.Before
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import org.hamcrest.Matchers.hasSize
-import org.junit.Ignore
 
 class TestPostEndpoint : IntegrationTest() {
 
-//    @Value("\${org.breakout.api.jwt_secret}")
+    //    @Value("\${org.breakout.api.jwt_secret}")
     private var JWT_SECRET: String = System.getenv("RECODER_JWT_SECRET") ?: "testsecret"
 
     lateinit var userCredentials: Credentials

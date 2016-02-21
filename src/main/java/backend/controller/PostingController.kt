@@ -2,7 +2,7 @@ package backend.controller
 
 import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.BadRequestException
-import backend.controller.exceptions.ResourceNotFoundException
+import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
 import backend.model.misc.Coords
 import backend.model.posting.Media
@@ -16,9 +16,7 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.MalformedJwtException
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.CREATED
-import org.springframework.http.ResponseEntity
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.GET
@@ -107,9 +105,9 @@ class PostingController {
      * GET /posting/id/
      */
     @RequestMapping("/{id}/", method = arrayOf(GET))
-    fun getPosting(@PathVariable("id") id: Long): ResponseEntity<kotlin.Any> {
-        val posting = postingService.getByID(id) ?: throw ResourceNotFoundException("posting with id $id does not exist")
-        return ResponseEntity.ok(PostingResponseView(posting))
+    fun getPosting(@PathVariable("id") id: Long): PostingResponseView {
+        val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
+        return PostingResponseView(posting)
     }
 
     /**
