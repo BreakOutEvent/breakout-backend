@@ -15,6 +15,7 @@ import backend.view.PostingResponseView
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.MalformedJwtException
 import io.jsonwebtoken.SignatureAlgorithm
+import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
@@ -35,6 +36,8 @@ class PostingController {
 
     @Autowired
     private lateinit var mediaService: MediaService
+
+    val logger = Logger.getLogger(PostingController::class.java)
 
     //    @Value("\${org.breakout.api.jwt_secret}")
     // TODO: Workaround for testing purposes
@@ -89,7 +92,8 @@ class PostingController {
                         @Valid @RequestBody body: MediaSizeView): MediaSizeView {
 
         try {
-            Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(uploadToken).body.subject.equals(id.toString())
+            var body = Jwts.parser().setSigningKey(JWT_SECRET).parse(uploadToken).body.toString()
+            logger.info(body)
         } catch (e: MalformedJwtException) {
             throw UnauthorizedException(e.message ?: "Invalid JWT token")
         }
