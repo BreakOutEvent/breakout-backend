@@ -1,5 +1,7 @@
 package backend.model.user
 
+import backend.controller.exceptions.ConflictException
+import backend.exceptions.DomainException
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.services.MailService
@@ -36,7 +38,7 @@ class UserServiceImpl : UserService {
     override fun exists(email: String) = userRepository.existsByEmail(email)
 
     override fun create(email: String, password: String): User {
-        if (this.exists(email)) throw Exception("user with email $email already exists")
+        if (this.exists(email)) throw ConflictException("user with email $email already exists")
         val user = User.create(email, password)
         val token = user.createActivationToken()
 
@@ -46,8 +48,8 @@ class UserServiceImpl : UserService {
     }
 
     override fun activate(user: User, token: String) {
-        if(user.isActivated()) throw Exception("User already is activated")
-        else if (!user.isActivationTokenCorrect(token)) throw Exception("Incorrect activation token")
+        if(user.isActivated()) throw DomainException("User already is activated")
+        else if (!user.isActivationTokenCorrect(token)) throw DomainException("Incorrect activation token")
         else user.activate(token)
         this.save(user)
     }
