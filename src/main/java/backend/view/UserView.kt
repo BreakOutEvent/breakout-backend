@@ -12,11 +12,13 @@ class UserView() {
     var user: User? = null
 
     var password: String? = null
+
     var firstname: String? = null
     var lastname: String? = null
 
     @Email
     var email: String? = null
+
     var gender: String? = null
     var id: Long? = null
     var isBlocked: Boolean? = null
