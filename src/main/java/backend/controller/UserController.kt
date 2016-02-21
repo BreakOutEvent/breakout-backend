@@ -5,7 +5,6 @@ import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.ConflictException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
-import backend.exceptions.DomainException
 import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserService
@@ -37,9 +36,14 @@ class UserController {
     @ApiOperation(value = "Create a new user", response = UserView::class)
     fun addUser(@Valid @RequestBody body: UserView): UserView {
 
-        if (userService.exists(body.email!!)) throw ConflictException("email ${body.email!!} already exists")
+        // Validate existence of email and password by hand
+        // because UserView has those as optional because of PUT requests
+        val email = body.email ?: throw BadRequestException("missing email")
+        val password = body.password ?: throw BadRequestException("missing password")
 
-        val user = userService.create(body.email!!, body.password!!).apply(body)
+        if (userService.exists(email)) throw ConflictException("email ${body.email!!} already exists")
+
+        val user = userService.create(email, password).apply(body)
         return UserView(userService.save(user)!!)
     }
 
