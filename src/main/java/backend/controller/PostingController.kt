@@ -1,6 +1,9 @@
 package backend.controller
 
 import backend.configuration.CustomUserDetails
+import backend.controller.exceptions.BadRequestException
+import backend.controller.exceptions.ResourceNotFoundException
+import backend.controller.exceptions.UnauthorizedException
 import backend.model.misc.Coords
 import backend.model.posting.Media
 import backend.model.posting.MediaService
@@ -10,10 +13,11 @@ import backend.view.MediaSizeView
 import backend.view.PostingRequestView
 import backend.view.PostingResponseView
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.MalformedJwtException
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.ResponseEntity
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
@@ -34,31 +38,26 @@ class PostingController {
     @Autowired
     private lateinit var mediaService: MediaService
 
-//    @Value("\${org.breakout.api.jwt_secret}")
+    //    @Value("\${org.breakout.api.jwt_secret}")
     // TODO: Workaround for testing purposes
-    private var JWT_SECRET: String = System.getenv("RECODER_JWT_SECRET") ?: ""
+    private var JWT_SECRET: String = System.getenv("RECODER_JWT_SECRET") ?: "testsecret"
 
     /**
      * Post /posting/
      */
-    @RequestMapping("/", method = arrayOf(RequestMethod.POST))
+    @RequestMapping("/", method = arrayOf(POST))
+    @ResponseStatus(CREATED)
     fun createPosting(@Valid @RequestBody body: PostingRequestView,
-                      @AuthenticationPrincipal user: CustomUserDetails): ResponseEntity<Any> {
+                      @AuthenticationPrincipal user: CustomUserDetails): PostingResponseView {
 
-        if (user.core!!.id == null) {
-            return ResponseEntity(GeneralController.error("authenticated user and requested resource mismatch"), HttpStatus.UNAUTHORIZED)
-        }
-
-        if (body.media == null && body.text == null && body.postingLocation == null) {
-            return ResponseEntity(GeneralController.error("empty postings not allowed"), HttpStatus.BAD_REQUEST)
-        }
+        if (body.media == null && body.text == null && body.postingLocation == null)
+            throw BadRequestException("empty postings not allowed")
 
         var location: Coords? = null
         if (body.postingLocation != null && body.postingLocation!!.latitude != null && body.postingLocation!!.longitude != null)
             location = Coords(body.postingLocation!!.latitude!!, body.postingLocation!!.longitude!!)
 
-
-        var posting = postingService.createPosting(text = body.text, postingLocation = location, user = user.core, media = null)
+        var posting = postingService.createPosting(text = body.text, postingLocation = location, user = user.core!!, media = null)
 
         var media: MutableList<Media>? = null
         if (body.media != null && body.media!! is List<*>) {
@@ -78,7 +77,7 @@ class PostingController {
             }
         }
 
-        return ResponseEntity(PostingResponseView(posting), HttpStatus.CREATED)
+        return PostingResponseView(posting)
     }
 
 
@@ -86,25 +85,22 @@ class PostingController {
      * POST /posting/media/id/
      */
     @RequestMapping("/media/{id}/", method = arrayOf(RequestMethod.POST))
+    @ResponseStatus(CREATED)
     fun createMediaSize(@PathVariable("id") id: Long,
                         @RequestHeader("X-UPLOAD-TOKEN") uploadToken: String,
-                        @Valid @RequestBody body: MediaSizeView): ResponseEntity<Any> {
+                        @Valid @RequestBody body: MediaSizeView): MediaSizeView {
 
         try {
-            var isTokenValid = Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(uploadToken).body.subject.equals(id.toString());
-            if (isTokenValid) {
-
-                val media = mediaService.getByID(id);
-                var mediaSize = mediaSizeService.createMediaSize(media!!, body.url!!, body.width!!, body.height!!, body.length!!, body.size!!, body.type!!)
-
-                mediaSizeService.save(mediaSize)
-                return ResponseEntity(MediaSizeView(mediaSize), HttpStatus.CREATED)
-            } else {
-                return ResponseEntity(GeneralController.error("authenticated user and requested resource mismatch"), HttpStatus.UNAUTHORIZED)
-            }
-        } catch (e: Exception) {
-            return ResponseEntity(GeneralController.error("authenticated user and requested resource mismatch"), HttpStatus.UNAUTHORIZED)
+            Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(uploadToken).body.subject.equals(id.toString())
+        } catch (e: MalformedJwtException) {
+            throw UnauthorizedException(e.message ?: "Invalid JWT token")
         }
+
+        val media = mediaService.getByID(id);
+        var mediaSize = mediaSizeService.createMediaSize(media!!, body.url!!, body.width!!, body.height!!, body.length!!, body.size!!, body.type!!)
+
+        mediaSizeService.save(mediaSize)
+        return MediaSizeView(mediaSize)
     }
 
     /**
@@ -112,14 +108,8 @@ class PostingController {
      */
     @RequestMapping("/{id}/", method = arrayOf(GET))
     fun getPosting(@PathVariable("id") id: Long): ResponseEntity<kotlin.Any> {
-
-        val posting = postingService.getByID(id)
-
-        if (posting == null) {
-            return ResponseEntity(GeneralController.error("posting with id $id does not exist"), HttpStatus.NOT_FOUND)
-        } else {
-            return ResponseEntity.ok(PostingResponseView(posting))
-        }
+        val posting = postingService.getByID(id) ?: throw ResourceNotFoundException("posting with id $id does not exist")
+        return ResponseEntity.ok(PostingResponseView(posting))
     }
 
     /**

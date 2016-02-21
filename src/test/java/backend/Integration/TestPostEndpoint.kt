@@ -19,11 +19,10 @@ import java.time.ZoneOffset
 import org.hamcrest.Matchers.hasSize
 import org.junit.Ignore
 
-@Ignore
 class TestPostEndpoint : IntegrationTest() {
 
-    @Value("\${org.breakout.api.jwt_secret}")
-    private lateinit var JWT_SECRET: String
+//    @Value("\${org.breakout.api.jwt_secret}")
+    private var JWT_SECRET: String = System.getenv("RECODER_JWT_SECRET") ?: "testsecret"
 
     lateinit var userCredentials: Credentials
 
