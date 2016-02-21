@@ -5,18 +5,23 @@ import backend.model.user.User
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.validator.constraints.Email
 import javax.validation.Valid
+import javax.validation.constraints.NotNull
 
 class UserView() {
 
     @JsonIgnore
     var user: User? = null
 
+    @NotNull
     var password: String? = null
+    
     var firstname: String? = null
     var lastname: String? = null
 
     @Email
+    @NotNull
     var email: String? = null
+
     var gender: String? = null
     var id: Long? = null
     var isBlocked: Boolean? = null
