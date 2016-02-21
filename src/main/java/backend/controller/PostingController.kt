@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RequestMethod.POST
 import javax.validation.Valid
+import javax.xml.bind.DatatypeConverter
 
 @RestController
 @RequestMapping("/posting")
@@ -92,8 +93,7 @@ class PostingController {
                         @Valid @RequestBody body: MediaSizeView): MediaSizeView {
 
         try {
-            var body = Jwts.parser().setSigningKey(JWT_SECRET).parse(uploadToken).body.toString()
-            logger.info(body)
+            Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(JWT_SECRET)).parseClaimsJws(uploadToken).body.subject.equals(id.toString())
         } catch (e: MalformedJwtException) {
             throw UnauthorizedException(e.message ?: "Invalid JWT token")
         }
