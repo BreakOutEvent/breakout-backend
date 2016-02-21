@@ -1,5 +1,6 @@
 package backend.model.event
 
+import backend.exceptions.DomainException
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
@@ -23,7 +24,7 @@ class TeamServiceImpl : TeamService {
     }
 
     override fun create(creator: Participant, name: String, description: String, event: Event): Team {
-        if (creator.currentTeam != null) throw Exception("participant ${creator.core.id} already is part of a team")
+        if (creator.currentTeam != null) throw DomainException("participant ${creator.core.id} already is part of a team")
         val team = Team(creator, name, description, event)
         val savedTeam = this.save(team)
         userService.save(creator)

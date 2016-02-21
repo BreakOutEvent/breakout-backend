@@ -1,5 +1,6 @@
 package backend.model.misc
 
+import backend.exceptions.DomainException
 import org.apache.commons.validator.routines.EmailValidator
 import org.hibernate.validator.constraints.Email
 import javax.persistence.Embeddable
@@ -12,7 +13,7 @@ class EmailAddress() {
 
     constructor(email: String) : this() {
         val validator = EmailValidator.getInstance()
-        if (!validator.isValid(email)) throw Exception("Invalid email $email")
+        if (!validator.isValid(email)) throw DomainException("Invalid email $email")
         this.value = email
     }
 

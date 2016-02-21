@@ -1,6 +1,7 @@
 package backend.controller
 
 import backend.configuration.CustomUserDetails
+import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
 import backend.model.event.EventRepository
@@ -55,7 +56,7 @@ open class TeamController {
         if (eventRepository.exists(eventId) == false) throw NotFoundException("No event with id $eventId")
 
         val team = teamRepository.findOne(teamId) ?: throw NotFoundException("No team with id $teamId")
-        val emailString = body["email"] as? String ?: throw Exception("body is missing field email")
+        val emailString = body["email"] as? String ?: throw BadRequestException("body is missing field email")
         val email = EmailAddress(emailString)
         teamService.invite(email, team)
     }
@@ -70,10 +71,10 @@ open class TeamController {
         if (eventRepository.exists(eventId) == false) throw NotFoundException("No event with id $eventId")
 
         val team = teamRepository.findOne(teamId) ?: throw NotFoundException("No team with id $teamId")
-        val emailString = body["email"] ?: throw Exception("body is missing field email")
+        val emailString = body["email"] ?: throw BadRequestException("body is missing field email")
         val email = EmailAddress(emailString)
 
-        if (user.email != email.toString()) throw Exception("Authorized user and email from request body don't match")
+        if (user.email != email.toString()) throw BadRequestException("Authorized user and email from request body don't match")
         val participant = user.getRole(Participant::class) ?: throw RuntimeException("User is no participant")
 
         // TODO: Handle Exceptions which may occur when user is not invited to team, etc.

@@ -1,5 +1,6 @@
 package backend.model.user
 
+import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.posting.Posting
 import com.fasterxml.jackson.annotation.JsonIgnore
@@ -52,7 +53,7 @@ open class UserCore : BasicEntity, User {
 
     override fun activate(token: String) {
         if (isActivationTokenCorrect(token)) this.isBlocked = false
-        else throw Exception("Provided token $token does not match the activation token")
+        else throw DomainException("Provided token $token does not match the activation token")
     }
 
     override fun isActivationTokenCorrect(token: String): Boolean {
@@ -82,7 +83,7 @@ open class UserCore : BasicEntity, User {
 
         val role: UserRole
 
-        if (userRoles.containsKey(clazz)) throw Exception("User already has role $clazz")
+        if (userRoles.containsKey(clazz)) throw DomainException("User already has role $clazz")
         role = UserRole.createFor(clazz, this)
         userRoles.put(clazz, role)
         return role

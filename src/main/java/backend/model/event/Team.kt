@@ -1,5 +1,6 @@
 package backend.model.event
 
+import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.event.Invitation.InvitationStatus
 import backend.model.misc.EmailAddress
@@ -32,8 +33,8 @@ class Team() : BasicEntity() {
     val members: MutableSet<Participant> = HashSet()
 
     private fun addMember(participant: Participant) {
-        if(participant.currentTeam != null) throw Exception("Participant ${participant.email} already is part of a team")
-        if (members.size >= 2) throw Exception("This team already has two members")
+        if(participant.currentTeam != null) throw DomainException("Participant ${participant.email} already is part of a team")
+        if (members.size >= 2) throw DomainException("This team already has two members")
 
         members.add(participant)
         participant.currentTeam = this
@@ -43,9 +44,9 @@ class Team() : BasicEntity() {
     fun join(participant: Participant) {
 
         if(invitation == null) {
-            throw Exception("${participant.email} can't join team $id because there are no invitations")
+            throw DomainException("${participant.email} can't join team $id because there are no invitations")
         } else if (invitation!!.invitee.toString() != participant.email) {
-            throw Exception("${participant.email} is not invited to join this team")
+            throw DomainException("${participant.email} is not invited to join this team")
         }
 
         addMember(participant)
@@ -54,7 +55,7 @@ class Team() : BasicEntity() {
 
     @Throws
     fun invite(email: EmailAddress) {
-        if (this.invitation != null) throw Exception("Someone else has already been invited to this team")
+        if (this.invitation != null) throw DomainException("Someone else has already been invited to this team")
         this.invitation = Invitation(email)
     }
 
