@@ -5,8 +5,8 @@ package backend.Integration
 import backend.model.misc.Coords
 import backend.model.posting.Media
 import backend.model.user.Admin
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
+import com.auth0.jwt.Algorithm
+import com.auth0.jwt.JWTSigner
 import org.hamcrest.Matchers.hasSize
 import org.junit.Before
 import org.junit.Test
@@ -376,7 +376,7 @@ class TestPostEndpoint : IntegrationTest() {
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.POST, "/posting/media/${savedposting!!.media!!.first().id}/")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-UPLOAD-TOKEN", Jwts.builder().setSubject(savedposting.media!!.first().id.toString()).signWith(SignatureAlgorithm.HS512, JWT_SECRET).compact())
+                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .content(postData)
 
         val response = mockMvc.perform (request)

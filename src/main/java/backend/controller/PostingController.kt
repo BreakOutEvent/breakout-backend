@@ -12,9 +12,9 @@ import backend.model.posting.PostingService
 import backend.view.MediaSizeView
 import backend.view.PostingRequestView
 import backend.view.PostingResponseView
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.MalformedJwtException
-import io.jsonwebtoken.SignatureAlgorithm
+import com.auth0.jwt.Algorithm
+import com.auth0.jwt.JWTSigner
+import com.auth0.jwt.JWTVerifier
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
@@ -22,6 +22,7 @@ import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RequestMethod.POST
+import java.security.SignatureException
 import javax.validation.Valid
 import javax.xml.bind.DatatypeConverter
 
@@ -75,7 +76,7 @@ class PostingController {
 
         if (posting.media != null) {
             posting.media!!.forEach {
-                it.uploadToken = Jwts.builder().setSubject(it.id.toString()).signWith(SignatureAlgorithm.HS512, JWT_SECRET).compact();
+                it.uploadToken = JWTSigner(JWT_SECRET).sign(mapOf("subject" to it.id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512))
             }
         }
 
@@ -93,8 +94,12 @@ class PostingController {
                         @Valid @RequestBody body: MediaSizeView): MediaSizeView {
 
         try {
-            Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(JWT_SECRET)).parseClaimsJws(uploadToken).body.subject.equals(id.toString())
-        } catch (e: MalformedJwtException) {
+            if (!(JWTVerifier(JWT_SECRET, "audience").verify(uploadToken)["subject"] as String).equals(id.toString())) {
+                throw UnauthorizedException("Invalid JWT token")
+            }
+        } catch (e: SignatureException) {
+            throw UnauthorizedException(e.message ?: "Invalid JWT token")
+        } catch (e: IllegalStateException) {
             throw UnauthorizedException(e.message ?: "Invalid JWT token")
         }
 
