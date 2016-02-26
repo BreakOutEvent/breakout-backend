@@ -2,7 +2,7 @@ package backend.model.event
 
 import backend.Integration.IntegrationTest
 import backend.configuration.CustomUserDetailsService
-import backend.model.misc.Coords
+import backend.model.misc.Coord
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
 import backend.model.user.User
@@ -27,7 +27,7 @@ class TeamServiceImplTest : IntegrationTest() {
     @Before
     override fun setUp() {
         super.setUp()
-        event = eventService.createEvent("BreakOut München", LocalDateTime.now(), "München", Coords(0.0, 1.1), 36)
+        event = eventService.createEvent("BreakOut München", LocalDateTime.now(), "München", Coord(0.0, 1.1), 36)
     }
 
     @Test

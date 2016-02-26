@@ -1,7 +1,7 @@
 package backend.controller
 
 import backend.model.event.EventService
-import backend.model.misc.Coords
+import backend.model.misc.Coord
 import backend.model.posting.PostingService
 import backend.model.user.UserService
 import org.springframework.beans.factory.annotation.Autowired
@@ -44,7 +44,7 @@ class DummyDataController {
 
     fun createEvent(count: Int): Iterable<Long> {
         return (0..count).map {
-            eventService.createEvent("Eventtitle$it", LocalDateTime.now(), "City$count", Coords(0.0, 0.0), 36).id!!
+            eventService.createEvent("Eventtitle$it", LocalDateTime.now(), "City$count", Coord(0.0, 0.0), 36).id!!
         }
     }
 
@@ -56,7 +56,7 @@ class DummyDataController {
             if (user != null) {
                 postingService.createPosting(
                         text = "text$it",
-                        postingLocation = Coords(0.0, 0.0),
+                        postingLocation = Coord(0.0, 0.0),
                         media = null,
                         user = user).id!!
             } else 1

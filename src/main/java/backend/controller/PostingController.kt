@@ -4,7 +4,7 @@ import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
-import backend.model.misc.Coords
+import backend.model.misc.Coord
 import backend.model.posting.Media
 import backend.model.posting.MediaService
 import backend.model.posting.MediaSizeService
@@ -56,9 +56,9 @@ class PostingController {
         if (body.media == null && body.text == null && body.postingLocation == null)
             throw BadRequestException("empty postings not allowed")
 
-        var location: Coords? = null
+        var location: Coord? = null
         if (body.postingLocation != null && body.postingLocation!!.latitude != null && body.postingLocation!!.longitude != null)
-            location = Coords(body.postingLocation!!.latitude!!, body.postingLocation!!.longitude!!)
+            location = Coord(body.postingLocation!!.latitude!!, body.postingLocation!!.longitude!!)
 
         var posting = postingService.createPosting(text = body.text, postingLocation = location, user = user.core!!, media = null)
 

@@ -1,6 +1,6 @@
 package backend.utils
 
-import backend.model.misc.Coords
+import backend.model.misc.Coord
 import com.grum.geocalc.*
 import com.grum.geocalc.Point
 
@@ -13,21 +13,19 @@ import com.grum.geocalc.Point
  * Full License Text: https://github.com/grumlimited/geocalc/blob/master/LICENSE.txt
  */
 
-fun distanceCoordsKM(from: Coords, to: Coords): Double {
-    val fromPoint: Point = coordsToPoint(from)
-    val toPoint: Point = coordsToPoint(to)
+fun distanceCoordsKM(from: Coord, to: Coord): Double {
+    val fromPoint: Point = coordToPoint(from)
+    val toPoint: Point = coordToPoint(to)
 
     return EarthCalc.getVincentyDistance(fromPoint, toPoint) / 1000
 }
 
-fun distanceCoordsListKM(list: List<Coords>): Double {
-    return coordsListToPairList(list).fold(0.0) { total, next -> total + distanceCoordsKM(next.first, next.second) }
-}
+fun distanceCoordsListKM(list: List<Coord>): Double = coordsListToPairList(list).fold(0.0) { total, next -> total + distanceCoordsKM(next.first, next.second) }
 
-fun coordsListToPairList(list: List<Coords>): List<Pair<Coords, Coords>> {
-    val coordPairs: MutableList<Pair<Coords, Coords>> = arrayListOf()
+fun coordsListToPairList(list: List<Coord>): List<Pair<Coord, Coord>> {
+    val coordPairs: MutableList<Pair<Coord, Coord>> = arrayListOf()
 
-    var lastCoord: Coords? = null
+    var lastCoord: Coord? = null
     list.forEach { thisCoord ->
         if (lastCoord != null) {
             coordPairs.add(Pair(lastCoord!!, thisCoord))
@@ -38,6 +36,4 @@ fun coordsListToPairList(list: List<Coords>): List<Pair<Coords, Coords>> {
     return coordPairs
 }
 
-fun coordsToPoint(coords: Coords): Point {
-    return Point(DegreeCoordinate(coords.latitude), DegreeCoordinate(coords.longitude))
-}
+fun coordToPoint(coord: Coord): Point = Point(DegreeCoordinate(coord.latitude), DegreeCoordinate(coord.longitude))

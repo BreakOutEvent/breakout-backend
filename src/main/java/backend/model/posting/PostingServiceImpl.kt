@@ -1,6 +1,6 @@
 package backend.model.posting
 
-import backend.model.misc.Coords
+import backend.model.misc.Coord
 import backend.model.user.UserCore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -15,7 +15,7 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
 
     override fun findAll(): Iterable<Posting> = repository.findAll()
 
-    override fun createPosting(text: String?, postingLocation: Coords?, user: UserCore, media: MutableList<Media>?): Posting = repository.save(Posting(text, postingLocation, user, media))
+    override fun createPosting(text: String?, postingLocation: Coord?, user: UserCore, media: MutableList<Media>?): Posting = repository.save(Posting(text, postingLocation, user, media))
 
     override fun getByID(id: Long): Posting? = repository.findById(id)
 }

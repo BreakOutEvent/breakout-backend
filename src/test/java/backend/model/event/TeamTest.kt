@@ -1,6 +1,6 @@
 package backend.model.event
 
-import backend.model.misc.Coords
+import backend.model.misc.Coord
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
 import backend.model.user.User
@@ -21,7 +21,7 @@ class TeamTest {
     @Before
     fun setUp() {
         creator = User.create("creator@mail.de", "password").addRole(Participant::class.java) as Participant
-        event = Event("Awesome Event", LocalDateTime.now(), "Munich", Coords(0.0, 0.0), duration = 36)
+        event = Event("Awesome Event", LocalDateTime.now(), "Munich", Coord(0.0, 0.0), duration = 36)
         team = Team(creator, "Team awesome", "our team is awesome", event)
     }
 

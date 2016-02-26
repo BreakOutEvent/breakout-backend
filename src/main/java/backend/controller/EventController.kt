@@ -1,7 +1,7 @@
 package backend.controller
 
 import backend.model.event.EventService
-import backend.model.misc.Coords
+import backend.model.misc.Coord
 import backend.view.EventView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
@@ -38,7 +38,7 @@ open class EventController {
                 date = LocalDateTime.ofEpochSecond(body.date!!, 0, ZoneOffset.UTC),
                 city = body.city!!,
                 duration = body.duration,
-                startingLocation = Coords(body.startingLocation!!.latitude!!, body.startingLocation!!.longitude!!))
+                startingLocation = Coord(body.startingLocation!!.latitude!!, body.startingLocation!!.longitude!!))
 
         return EventView(event)
     }

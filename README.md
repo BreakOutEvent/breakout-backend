@@ -27,7 +27,7 @@ If you are interested in the other stuff we're building, feel free to visit:
 # License
 breakout-backend. The backend application for BreakOut
 
-Copyright (C) 2015 Florian Schmidt
+Copyright (C) 2015-2016 Florian Schmidt & Philipp Piwowarsky
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as

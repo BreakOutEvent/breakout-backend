@@ -19,7 +19,7 @@ class EventView() {
     var city: String? = null
 
     @Valid
-    var startingLocation: Coords? = null
+    var startingLocation: CoordView? = null
 
     var duration: Int = 36
 
@@ -28,18 +28,7 @@ class EventView() {
         this.title = event.title
         this.date = event.date.toEpochSecond(ZoneOffset.UTC)
         this.city = event.city
-        this.startingLocation = Coords()
-        this.startingLocation!!.latitude = event.startingLocation.latitude
-        this.startingLocation!!.longitude = event.startingLocation.longitude
+        this.startingLocation = CoordView(event.startingLocation)
         this.duration = event.duration
-    }
-
-    class Coords() {
-
-        @NotNull
-        var latitude: Double? = null
-
-        @NotNull
-        var longitude: Double? = null
     }
 }

@@ -2,7 +2,7 @@
 
 package backend.Integration
 
-import backend.model.misc.Coords
+import backend.model.misc.Coord
 import backend.model.posting.Media
 import backend.model.user.Admin
 import com.auth0.jwt.Algorithm
@@ -219,7 +219,7 @@ class TestPostEndpoint : IntegrationTest() {
     @Test
     fun getPostingById() {
         val user = userService.create("test@mail.com", "password")
-        val posting = postingService.createPosting("Test", Coords(0.0, 0.0), user.core!!, null)
+        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null)
 
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.GET, "/posting/" + posting.id + "/")
@@ -243,9 +243,9 @@ class TestPostEndpoint : IntegrationTest() {
     @Test
     fun getPostingsByIds() {
         val user = userService.create("test@mail.com", "password")
-        val postingZero = postingService.createPosting("Test0", Coords(0.0, 0.0), user.core!!, null)
-        val postingOne = postingService.createPosting("Test1", Coords(0.0, 0.0), user.core!!, null)
-        val postingTwo = postingService.createPosting("Test2", Coords(0.0, 0.0), user.core!!, null)
+        val postingZero = postingService.createPosting("Test0", Coord(0.0, 0.0), user.core!!, null)
+        val postingOne = postingService.createPosting("Test1", Coord(0.0, 0.0), user.core!!, null)
+        val postingTwo = postingService.createPosting("Test2", Coord(0.0, 0.0), user.core!!, null)
 
         val postingsIds: List<Long> = listOf(postingZero.id!!, postingTwo.id!!)
 
@@ -271,9 +271,9 @@ class TestPostEndpoint : IntegrationTest() {
     @Test
     fun getPostingIdsSince() {
         val user = userService.create("test@mail.com", "password")
-        val postingZero = postingService.createPosting("Test0", Coords(0.0, 0.0), user.core!!, null)
-        postingService.createPosting("Test1", Coords(0.0, 0.0), user.core!!, null)
-        postingService.createPosting("Test2", Coords(0.0, 0.0), user.core!!, null)
+        val postingZero = postingService.createPosting("Test0", Coord(0.0, 0.0), user.core!!, null)
+        postingService.createPosting("Test1", Coord(0.0, 0.0), user.core!!, null)
+        postingService.createPosting("Test2", Coord(0.0, 0.0), user.core!!, null)
 
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.GET, "/posting/get/since/${postingZero.id}/")
@@ -296,7 +296,7 @@ class TestPostEndpoint : IntegrationTest() {
     fun createNewPostingWithMediaAndAddMediaSizesWithoutToken() {
 
         val user = userService.create("test@mail.com", "password")
-        val posting = postingService.createPosting("Test", Coords(0.0, 0.0), user.core!!, null);
+        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null);
         val media = mediaService.createMedia(posting, "image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -326,7 +326,7 @@ class TestPostEndpoint : IntegrationTest() {
     fun createNewPostingWithMediaAndAddMediaSizesWithWrongToken() {
 
         val user = userService.create("test@mail.com", "password")
-        val posting = postingService.createPosting("Test", Coords(0.0, 0.0), user.core!!, null);
+        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null);
         val media = mediaService.createMedia(posting, "image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -357,7 +357,7 @@ class TestPostEndpoint : IntegrationTest() {
     fun createNewPostingWithMediaAndAddMediaSizesWithValidToken() {
 
         val user = userService.create("test@mail.com", "password")
-        val posting = postingService.createPosting("Test", Coords(0.0, 0.0), user.core!!, null);
+        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null);
         val media = mediaService.createMedia(posting, "image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -397,8 +397,8 @@ class TestPostEndpoint : IntegrationTest() {
     @Test
     fun getAllPostings() {
         val user = userService.create("test@mail.com", "password")
-        val posting = postingService.createPosting("Test", Coords(0.0, 0.0), user.core!!, null)
-        val secondPosting = postingService.createPosting("Test 2", Coords(0.0, 0.0), user.core!!, null)
+        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null)
+        val secondPosting = postingService.createPosting("Test 2", Coord(0.0, 0.0), user.core!!, null)
 
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.GET, "/posting/")

@@ -2,7 +2,7 @@ package backend.Integration
 
 import backend.model.event.Event
 import backend.model.event.Team
-import backend.model.misc.Coords
+import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.model.user.User
 import org.hamcrest.Matchers.hasSize
@@ -35,7 +35,7 @@ class TestTeamEndpoint : IntegrationTest() {
                 title = "Breakout München",
                 date = LocalDateTime.now(),
                 city = "Munich",
-                startingLocation = Coords(0.0, 0.0),
+                startingLocation = Coord(0.0, 0.0),
                 duration = 36)
 
         creatorCredentials = createUser(this.mockMvc, userService = userService)

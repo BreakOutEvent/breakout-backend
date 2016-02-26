@@ -1,7 +1,7 @@
 package backend.model.posting
 
 import backend.model.BasicEntity
-import backend.model.misc.Coords
+import backend.model.misc.Coord
 import backend.model.user.UserCore
 import java.time.LocalDateTime
 import java.util.*
@@ -19,7 +19,7 @@ class Posting() : BasicEntity() {
             AttributeOverride(name = "latitude", column = Column(nullable = true)),
             AttributeOverride(name = "longitude", column = Column(nullable = true))
     )
-    var postLocation: Coords? = null
+    var postLocation: Coord? = null
 
     @ManyToOne
     var user: UserCore? = null
@@ -29,7 +29,7 @@ class Posting() : BasicEntity() {
     var media: MutableList<Media>? = ArrayList()
 
 
-    constructor(text: String?, postLocation: Coords?, user: UserCore, media: MutableList<Media>?) : this() {
+    constructor(text: String?, postLocation: Coord?, user: UserCore, media: MutableList<Media>?) : this() {
         this.text = text
         this.date = LocalDateTime.now()
         this.postLocation = postLocation

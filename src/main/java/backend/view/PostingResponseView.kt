@@ -14,7 +14,7 @@ class PostingResponseView() {
     var date: Long? = null
 
     @Valid
-    var postingLocation: PostingResponseView.Coords? = null
+    var postingLocation: CoordView? = null
 
     var media: List<MediaView>? = null
 
@@ -25,20 +25,10 @@ class PostingResponseView() {
         this.id = posting.id
         this.text = posting.text
         this.date = posting.date.toEpochSecond(ZoneOffset.UTC)
-        this.postingLocation = PostingResponseView.Coords()
-        this.postingLocation?.latitude = posting.postLocation?.latitude
-        this.postingLocation?.longitude = posting.postLocation?.longitude
+        this.postingLocation = CoordView(posting.postLocation)
         this.user = UserView(posting.user!!.core)
         this.media = posting.media?.map { MediaView(it) }
     }
 
-    class Coords() {
-
-        @NotNull
-        var latitude: Double? = null
-
-        @NotNull
-        var longitude: Double? = null
-    }
 
 }
