@@ -9,6 +9,7 @@ import backend.model.event.EventRepository
 import backend.model.event.EventService
 import backend.model.event.TeamRepository
 import backend.model.event.TeamService
+import backend.model.misc.Coord
 import backend.model.posting.*
 import backend.model.user.UserRepository
 import backend.model.user.UserService

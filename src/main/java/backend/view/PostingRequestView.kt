@@ -3,7 +3,6 @@ package backend.view
 import backend.model.posting.Posting
 import java.time.ZoneOffset
 import javax.validation.Valid
-import javax.validation.constraints.NotNull
 
 class PostingRequestView() {
 

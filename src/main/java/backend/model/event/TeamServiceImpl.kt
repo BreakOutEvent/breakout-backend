@@ -3,6 +3,7 @@ package backend.model.event
 import backend.exceptions.DomainException
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
+import backend.model.posting.Posting
 import backend.model.user.Participant
 import backend.model.user.UserService
 import backend.services.MailService
@@ -48,7 +49,9 @@ class TeamServiceImpl : TeamService {
 
     override fun save(team: Team) = repository.save(team)
 
-    override fun getByID(id: Long): Team? {
-        return repository.findById(id)
-    }
+    override fun getByID(id: Long): Team? = repository.findById(id)
+
+    override fun findPostingsById(id: Long): List<Posting>? = repository.findPostingsById(id)
+
+    override fun findLocationPostingsById(id: Long): List<Posting>? = repository.findLocationPostingsById(id)
 }

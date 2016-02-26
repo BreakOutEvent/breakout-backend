@@ -3,10 +3,12 @@ package backend.Integration
 import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.misc.Coord
+import backend.model.posting.Posting
 import backend.model.user.Participant
 import backend.model.user.User
 import org.hamcrest.Matchers.hasSize
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
@@ -46,6 +48,8 @@ class TestTeamEndpoint : IntegrationTest() {
         invitee = userRepository.findOne(inviteeCredentials.id.toLong())
         team = teamService.create(creator as Participant, "name", "description", event)
 
+        postingService.save(Posting("test", Coord(1.0, 1.0), creator.core!!, null))
+        postingService.save(Posting("test", Coord(1.2, 2.0), creator.core!!, null))
 
     }
 
@@ -93,6 +97,22 @@ class TestTeamEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.event").exists())
                 .andExpect(jsonPath("$.description").exists())
                 .andExpect(jsonPath("$.members").exists())
+                .andReturn().response.contentAsString
+
+        println(response)
+    }
+
+    @Ignore
+    @Test
+    fun testGetTeamPostingsById() {
+        val request = MockMvcRequestBuilders
+                .request(HttpMethod.GET, "/event/${event.id}/team/${team.id}/posting/")
+                .contentType(MediaType.APPLICATION_JSON)
+
+        val response = mockMvc.perform (request)
+                .andExpect(status().isOk)
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$").isArray)
                 .andReturn().response.contentAsString
 
         println(response)

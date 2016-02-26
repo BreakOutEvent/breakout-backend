@@ -33,7 +33,7 @@ class Team() : BasicEntity() {
     val members: MutableSet<Participant> = HashSet()
 
     private fun addMember(participant: Participant) {
-        if(participant.currentTeam != null) throw DomainException("Participant ${participant.email} already is part of a team")
+        if (participant.currentTeam != null) throw DomainException("Participant ${participant.email} already is part of a team")
         if (members.size >= 2) throw DomainException("This team already has two members")
 
         members.add(participant)
@@ -43,7 +43,7 @@ class Team() : BasicEntity() {
     @Throws
     fun join(participant: Participant) {
 
-        if(invitation == null) {
+        if (invitation == null) {
             throw DomainException("${participant.email} can't join team $id because there are no invitations")
         } else if (invitation!!.invitee.toString() != participant.email) {
             throw DomainException("${participant.email} is not invited to join this team")

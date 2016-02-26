@@ -7,8 +7,10 @@ import backend.controller.exceptions.UnauthorizedException
 import backend.model.event.EventRepository
 import backend.model.event.TeamRepository
 import backend.model.event.TeamService
+import backend.model.misc.Coord
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
+import backend.utils.distanceCoordsListKM
 import backend.view.TeamView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
@@ -88,5 +90,24 @@ open class TeamController {
     fun showTeam(@PathVariable("id") id: Long): TeamView {
         val team = teamService.getByID(id) ?: throw NotFoundException("team with id $id does not exist")
         return TeamView(team)
+    }
+
+    @RequestMapping(
+            value = "/{id}/posting/",
+            method = arrayOf(RequestMethod.GET),
+            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
+    fun getTeamPostings(@PathVariable("id") id: Long): List<Long> {
+        val postings = teamService.findPostingsById(id) ?: throw NotFoundException("team with id $id does not exist")
+        return postings.map { it.id!! }
+    }
+
+    @RequestMapping(
+            value = "/{id}/distance/",
+            method = arrayOf(RequestMethod.GET),
+            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
+    fun getTeamDistance(@PathVariable("id") id: Long): Double {
+        val postings = teamService.findLocationPostingsById(id) ?: throw NotFoundException("team with id $id does not exist")
+        val distance = distanceCoordsListKM(postings.map { it.postLocation!! })
+        return distance
     }
 }

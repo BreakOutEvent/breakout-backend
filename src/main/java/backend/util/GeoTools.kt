@@ -1,7 +1,8 @@
 package backend.utils
 
 import backend.model.misc.Coord
-import com.grum.geocalc.*
+import com.grum.geocalc.DegreeCoordinate
+import com.grum.geocalc.EarthCalc
 import com.grum.geocalc.Point
 
 /**
@@ -12,7 +13,6 @@ import com.grum.geocalc.Point
  *
  * Full License Text: https://github.com/grumlimited/geocalc/blob/master/LICENSE.txt
  */
-
 fun distanceCoordsKM(from: Coord, to: Coord): Double {
     val fromPoint: Point = coordToPoint(from)
     val toPoint: Point = coordToPoint(to)

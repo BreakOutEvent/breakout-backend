@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RequestMethod.POST
 import java.security.SignatureException
 import javax.validation.Valid
-import javax.xml.bind.DatatypeConverter
 
 @RestController
 @RequestMapping("/posting")

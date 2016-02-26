@@ -1,6 +1,7 @@
 package backend.model.event
 
 import backend.model.misc.EmailAddress
+import backend.model.posting.Posting
 import backend.model.user.Participant
 import org.springframework.security.access.prepost.PreAuthorize
 
@@ -47,5 +48,23 @@ interface TeamService {
      * @return gotten team object
      */
     fun getByID(id: Long): Team?
+
+    /**
+     * Get Team Postings from database
+     *
+     * @param id: The id of Team to get postings for
+     *
+     * @return gotten postings list
+     */
+    fun findPostingsById(id: Long): List<Posting>?
+
+    /**
+     * Get Team Postings from database only including location
+     *
+     * @param id: The id of Team to get postings for
+     *
+     * @return gotten postings list
+     */
+    fun findLocationPostingsById(id: Long): List<Posting>?
 
 }

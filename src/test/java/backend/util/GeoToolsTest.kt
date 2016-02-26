@@ -1,8 +1,8 @@
 package backend.util
 
 import backend.model.misc.Coord
-import backend.utils.coordsListToPairList
 import backend.utils.coordToPoint
+import backend.utils.coordsListToPairList
 import backend.utils.distanceCoordsKM
 import backend.utils.distanceCoordsListKM
 import com.grum.geocalc.DegreeCoordinate
@@ -32,6 +32,20 @@ class GeoToolsTest {
         val coordList: List<Coord> = listOf(Coord(1.0, 1.0), Coord(2.0, 2.0), Coord(3.0, 3.0), Coord(4.0, 4.0))
 
         assertEquals(470, distanceCoordsListKM(coordList).toInt())
+    }
+
+    @Test
+    fun testDistanceCoordsListKMOneCoord() {
+        val coordList: List<Coord> = listOf(Coord(1.0, 1.0))
+
+        assertEquals(0, distanceCoordsListKM(coordList).toInt())
+    }
+
+    @Test
+    fun testDistanceCoordsListKMNoCoords() {
+        val coordList: List<Coord> = listOf()
+
+        assertEquals(0, distanceCoordsListKM(coordList).toInt())
     }
 
     @Test
