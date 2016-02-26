@@ -4,7 +4,8 @@ buildscript {
 
     repositories {
         mavenCentral()
-        jcenter() // required for mockito
+        jcenter()
+        maven { url "https://jitpack.io" }
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -29,6 +30,7 @@ targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
@@ -45,6 +47,7 @@ dependencies {
     compile 'commons-validator:commons-validator:1.5.0'
     compile("org.springframework:spring-web")
     compile 'com.auth0:java-jwt:2.0.1'
+    compile 'com.github.grumlimited:geocalc:v0.5.1'
 
     testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
     runtime('mysql:mysql-connector-java')
