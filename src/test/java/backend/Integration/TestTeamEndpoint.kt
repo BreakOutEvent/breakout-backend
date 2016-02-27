@@ -113,6 +113,25 @@ class TestTeamEndpoint : IntegrationTest() {
                 .andExpect(status().isOk)
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$[0]").exists())
+                .andExpect(jsonPath("$[1]").exists())
+                .andExpect(jsonPath("$[2]").doesNotExist())
+                .andReturn().response.contentAsString
+
+        println(response)
+    }
+
+    @Ignore
+    @Test
+    fun testGetTeamDistanceById() {
+        val request = MockMvcRequestBuilders
+                .request(HttpMethod.GET, "/event/${event.id}/team/${team.id}/distance/")
+                .contentType(MediaType.APPLICATION_JSON)
+
+        val response = mockMvc.perform (request)
+                .andExpect(status().isOk)
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.distance").exists())
                 .andReturn().response.contentAsString
 
         println(response)

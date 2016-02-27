@@ -105,9 +105,9 @@ open class TeamController {
             value = "/{id}/distance/",
             method = arrayOf(RequestMethod.GET),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun getTeamDistance(@PathVariable("id") id: Long): Double {
+    fun getTeamDistance(@PathVariable("id") id: Long): Map<String, Double> {
         val postings = teamService.findLocationPostingsById(id) ?: throw NotFoundException("team with id $id does not exist")
         val distance = distanceCoordsListKM(postings.map { it.postLocation!! })
-        return distance
+        return mapOf("distance" to distance)
     }
 }
