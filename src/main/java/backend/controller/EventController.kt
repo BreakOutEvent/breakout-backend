@@ -1,18 +1,17 @@
 package backend.controller
 
+import backend.controller.exceptions.NotFoundException
 import backend.model.event.EventService
 import backend.model.misc.Coord
+import backend.utils.distanceCoordsListKM
 import backend.view.EventView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RequestMethod.POST
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import javax.validation.Valid
@@ -21,7 +20,7 @@ import javax.validation.Valid
 @RequestMapping("/event")
 open class EventController {
 
-    private var eventService: EventService
+    open var eventService: EventService
 
     @Autowired
     constructor(eventService: EventService) {
@@ -49,5 +48,24 @@ open class EventController {
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
     open fun getAllEvents(): Iterable<EventView> {
         return eventService.findAll().map { EventView(it) }
+    }
+
+    @RequestMapping(
+            value = "/{id}/posting/",
+            method = arrayOf(RequestMethod.GET),
+            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
+    open fun getEventPostings(@PathVariable("id") id: Long): List<Long> {
+        val postingIds = eventService.findPostingsById(id) ?: throw NotFoundException("event with id $id does not exist")
+        return postingIds
+    }
+
+    @RequestMapping(
+            value = "/{id}/distance/",
+            method = arrayOf(RequestMethod.GET),
+            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
+    open fun getEventDistance(@PathVariable("id") id: Long): Map<String, Double> {
+        val postings = eventService.findLocationPostingsById(id) ?: throw NotFoundException("event with id $id does not exist")
+        val distance = distanceCoordsListKM(postings.map { it.postLocation!! })
+        return mapOf("distance" to distance)
     }
 }

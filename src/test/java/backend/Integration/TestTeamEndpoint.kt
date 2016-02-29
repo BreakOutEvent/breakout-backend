@@ -8,7 +8,6 @@ import backend.model.user.Participant
 import backend.model.user.User
 import org.hamcrest.Matchers.hasSize
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
@@ -73,6 +72,7 @@ class TestTeamEndpoint : IntegrationTest() {
                 .andExpect(jsonPath<MutableCollection<out Any>>("$.members", hasSize(1)))
     }
 
+    @Test
     fun failToCreateTeamIfUserIsNoParticipant() {
         val body = mapOf("name" to "Team awesome", "description" to "This team is awesome").toJsonString()
 
@@ -80,7 +80,7 @@ class TestTeamEndpoint : IntegrationTest() {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body)
 
-        mockMvc.perform(request).andExpect(status().isUnauthorized)
+        mockMvc.perform(request).andExpect(status().isNotFound)
     }
 
     @Test
