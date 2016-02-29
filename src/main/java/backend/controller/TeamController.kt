@@ -97,8 +97,8 @@ open class TeamController {
             method = arrayOf(RequestMethod.GET),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
     fun getTeamPostings(@PathVariable("id") id: Long): List<Long> {
-        val postings = teamService.findPostingsById(id) ?: throw NotFoundException("team with id $id does not exist")
-        return postings.map { it.id!! }
+        val postingIds = teamService.findPostingsById(id) ?: throw NotFoundException("team with id $id does not exist")
+        return postingIds
     }
 
     @RequestMapping(

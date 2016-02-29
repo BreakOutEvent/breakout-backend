@@ -51,7 +51,7 @@ class TeamServiceImpl : TeamService {
 
     override fun getByID(id: Long): Team? = repository.findById(id)
 
-    override fun findPostingsById(id: Long): List<Posting>? = repository.findPostingsById(id)
+    override fun findPostingsById(id: Long): List<Long>? = repository.findPostingsById(id)
 
     override fun findLocationPostingsById(id: Long): List<Posting>? = repository.findLocationPostingsById(id)
 }

@@ -56,7 +56,7 @@ interface TeamService {
      *
      * @return gotten postings list
      */
-    fun findPostingsById(id: Long): List<Posting>?
+    fun findPostingsById(id: Long): List<Long>?
 
     /**
      * Get Team Postings from database only including location
