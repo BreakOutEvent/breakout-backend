@@ -102,7 +102,6 @@ class TestTeamEndpoint : IntegrationTest() {
         println(response)
     }
 
-    @Ignore
     @Test
     fun testGetTeamPostingsById() {
         val request = MockMvcRequestBuilders
@@ -121,7 +120,6 @@ class TestTeamEndpoint : IntegrationTest() {
         println(response)
     }
 
-    @Ignore
     @Test
     fun testGetTeamDistanceById() {
         val request = MockMvcRequestBuilders
