@@ -7,11 +7,13 @@ import backend.model.misc.Coord
 import backend.model.posting.Media
 import backend.model.user.Admin
 import backend.model.user.Participant
+import backend.services.ConfigurationService
 import com.auth0.jwt.Algorithm
 import com.auth0.jwt.JWTSigner
 import org.hamcrest.Matchers.hasSize
 import org.junit.Before
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
@@ -21,26 +23,23 @@ import java.time.ZoneOffset
 
 class TestPostEndpoint : IntegrationTest() {
 
-    //@Value("\${org.breakout.api.jwt_secret}")
-    private var JWT_SECRET: String = System.getenv("RECODER_JWT_SECRET") ?: "testsecret"
-
-    lateinit var userCredentials: Credentials
-    lateinit var event: Event
-
-
-    val APPLICATION_JSON_UTF_8 = "application/json;charset=UTF-8"
+    @Autowired
+    private lateinit var configurationService: ConfigurationService
+    private lateinit var JWT_SECRET: String
+    private lateinit var userCredentials: Credentials
+    private val APPLICATION_JSON_UTF_8 = "application/json;charset=UTF-8"
 
     @Before
     override fun setUp() {
         super.setUp()
-
-        event = eventService.createEvent(
+        val event = eventService.createEvent(
                 title = "Breakout München",
                 date = LocalDateTime.now(),
                 city = "Munich",
                 startingLocation = Coord(0.0, 0.0),
                 duration = 36)
 
+        this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
         userCredentials = createUser(this.mockMvc, userService = userService)
 
         makeUserParticipant(userCredentials)

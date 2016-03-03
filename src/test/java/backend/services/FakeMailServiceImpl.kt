@@ -9,7 +9,7 @@ import org.springframework.web.client.RestOperations
 
 @Service
 @Profile("test")
-class FakeMailServiceImpl @Autowired constructor(restTemplate: RestOperations) : MailService by MailServiceImpl(restTemplate) {
+class FakeMailServiceImpl @Autowired constructor(restTemplate: RestOperations, configurationService: ConfigurationService) : MailService by MailServiceImpl(restTemplate, configurationService) {
     val logger = Logger.getLogger(FakeMailServiceImpl::class.java)
 
     override fun send(email: Email) {

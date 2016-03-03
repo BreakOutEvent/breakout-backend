@@ -4,9 +4,9 @@ import backend.controller.exceptions.ConflictException
 import backend.exceptions.DomainException
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
+import backend.services.ConfigurationService
 import backend.services.MailService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
@@ -14,17 +14,15 @@ class UserServiceImpl : UserService {
 
     private val userRepository: UserRepository
     private val mailService: MailService
-
-    @Value("\${org.breakout.api.host}")
-    private lateinit var BASEURL: String
-
-    @Value("\${org.breakout.api.port}")
-    private lateinit var PORT: String
+    private val host: String
+    private val port: String
 
     @Autowired
-    constructor(userRepository: UserRepository, mailService: MailService) {
+    constructor(userRepository: UserRepository, mailService: MailService, configurationService: ConfigurationService) {
         this.userRepository = userRepository
         this.mailService = mailService
+        this.host = configurationService.getRequired("org.breakout.api.host")
+        this.port = configurationService.getRequired("org.breakout.api.port")
     }
 
     override fun getUserById(id: Long): User? = userRepository.findOne(id)
@@ -48,7 +46,7 @@ class UserServiceImpl : UserService {
     }
 
     override fun activate(user: User, token: String) {
-        if(user.isActivated()) throw DomainException("User already is activated")
+        if (user.isActivated()) throw DomainException("User already is activated")
         else if (!user.isActivationTokenCorrect(token)) throw DomainException("Incorrect activation token")
         else user.activate(token)
         this.save(user)
@@ -65,7 +63,7 @@ class UserServiceImpl : UserService {
     }
 
     private fun createActivationUrl(token: String, user: User): String {
-        return "http://$BASEURL:$PORT/activation?token=$token&email=${user.email}"
+        return "http://$host:$port/activation?token=$token&email=${user.email}"
     }
 
     override fun save(user: User): User = userRepository.save(user.core!!)

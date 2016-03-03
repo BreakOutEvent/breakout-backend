@@ -10,6 +10,7 @@ import backend.model.posting.MediaService
 import backend.model.posting.MediaSizeService
 import backend.model.posting.PostingService
 import backend.model.user.Participant
+import backend.services.ConfigurationService
 import backend.utils.distanceCoordsKM
 import backend.view.MediaSizeView
 import backend.view.PostingRequestView
@@ -31,20 +32,27 @@ import javax.validation.Valid
 @RequestMapping("/posting")
 class PostingController {
 
-    @Autowired
-    private lateinit var postingService: PostingService
+    private val postingService: PostingService
+    private val mediaSizeService: MediaSizeService
+    private val mediaService: MediaService
+    private val configurationService: ConfigurationService
+    private val logger: Logger
+    private var JWT_SECRET: String
 
     @Autowired
-    private lateinit var mediaSizeService: MediaSizeService
+    constructor(postingService: PostingService,
+                mediaSizeService: MediaSizeService,
+                mediaService: MediaService,
+                configurationService: ConfigurationService) {
 
-    @Autowired
-    private lateinit var mediaService: MediaService
+        this.mediaService = mediaService
+        this.postingService = postingService
+        this.mediaSizeService = mediaSizeService
+        this.configurationService = configurationService
+        this.logger = Logger.getLogger(PostingController::class.java)
+        this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
+    }
 
-    val logger = Logger.getLogger(PostingController::class.java)
-
-    //    @Value("\${org.breakout.api.jwt_secret}")
-    // TODO: Workaround for testing purposes
-    private var JWT_SECRET: String = System.getenv("RECODER_JWT_SECRET") ?: "testsecret"
 
     /**
      * Post /posting/

@@ -1,11 +1,11 @@
 package backend.model.user
 
+import backend.services.ConfigurationService
 import backend.services.MailService
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.*
-import org.springframework.test.util.ReflectionTestUtils
 
 class UserServiceImplTest {
 
@@ -17,9 +17,11 @@ class UserServiceImplTest {
     fun setUp() {
         mailService = mock(MailService::class.java)
         userRepository = mock(UserRepository::class.java)
-        userServiceImpl = UserServiceImpl(userRepository, mailService)
-        ReflectionTestUtils.setField(userServiceImpl, "BASEURL", "localhost")
-        ReflectionTestUtils.setField(userServiceImpl, "PORT", "8083")
+        val configurationService = mock(ConfigurationService::class.java)
+        userServiceImpl = UserServiceImpl(userRepository, mailService, configurationService)
+
+        `when`(configurationService.getRequired("org.breakout.api.host")).thenReturn("localhost")
+        `when`(configurationService.getRequired("org.breakout.api.port")).thenReturn("8083")
     }
 
     @Test

@@ -1,8 +1,8 @@
 package backend.configuration
 
+import backend.services.ConfigurationService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices
 import org.springframework.security.oauth2.provider.token.TokenStore
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore
+import javax.annotation.PostConstruct
 
 /*
  *
@@ -27,21 +28,20 @@ import org.springframework.security.oauth2.provider.token.store.InMemoryTokenSto
 @EnableAuthorizationServer
 open class AuthorizationServerConfiguration : AuthorizationServerConfigurerAdapter() {
 
+    @Qualifier("authenticationManagerBean")
+    @Autowired lateinit private var authenticationManager: AuthenticationManager
+    @Autowired lateinit private var userDetailsService: CustomUserDetailsService
+    @Autowired lateinit private var configurationService: ConfigurationService
 
     private val tokenStore: TokenStore = InMemoryTokenStore()
+    private lateinit var clientName: String
+    private lateinit var clientSecret: String
 
-    @Autowired
-    @Qualifier("authenticationManagerBean")
-    lateinit private var authenticationManager: AuthenticationManager
-
-    @Autowired
-    lateinit private var userDetailsService: CustomUserDetailsService
-
-    @Value("\${org.breakout.api.client.name}")
-    private lateinit var CLIENT_NAME: String
-
-    @Value("\${org.breakout.api.client.secret}")
-    private lateinit var CLIENT_SECRET: String
+    @PostConstruct
+    open fun setUp() {
+        clientName = configurationService.getRequired("org.breakout.api.client.name")
+        clientSecret = configurationService.getRequired("org.breakout.api.client.secret")
+    }
 
     @Bean
     @Primary
@@ -61,12 +61,12 @@ open class AuthorizationServerConfiguration : AuthorizationServerConfigurerAdapt
     @Throws(Exception::class)
     override fun configure(clients: ClientDetailsServiceConfigurer) {
         clients.inMemory()
-                .withClient(CLIENT_NAME)
+                .withClient(clientName)
                 .authorizedGrantTypes("password", "refresh_token")
                 .authorities("USER") // Authorities that are granted to the client (regular Spring Security authorities)
                 .scopes("read", "write") // Set scope "read" and "write" for breakout_app, can be checked with @PreAuthorize
                 .resourceIds("BREAKOUT_BACKEND") // Allow breakout_app to access all resources with id BREAKOUT_BACKEND
-                .secret(CLIENT_SECRET)
+                .secret(clientSecret)
     }
 
     /*

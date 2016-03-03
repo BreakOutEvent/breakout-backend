@@ -6,6 +6,7 @@ import backend.model.misc.EmailAddress
 import backend.model.misc.URL
 import org.junit.Before
 import org.junit.Test
+import org.mockito.Mockito
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.util.ReflectionTestUtils
@@ -28,11 +29,12 @@ class MailServiceImplTest {
     @Before
     fun setUp() {
         restTemplate = RestTemplate()
-        mailService = MailServiceImpl(restTemplate)
+        val configurationService = Mockito.mock(ConfigurationService::class.java)
+        Mockito.`when`(configurationService.getRequired("org.breakout.mailer.xauthtoken")).thenReturn("randomtoken")
+        Mockito.`when`(configurationService.getRequired("org.breakout.mailer.url")).thenReturn(BASE_URL)
+        Mockito.`when`(configurationService.getRequired("org.breakout.mailer.port")).thenReturn(PORT)
+        mailService = MailServiceImpl(restTemplate, configurationService)
         mockServer = MockRestServiceServer.createServer(restTemplate)
-        ReflectionTestUtils.setField(mailService, "token", "randomtoken")
-        ReflectionTestUtils.setField(mailService, "url", BASE_URL)
-        ReflectionTestUtils.setField(mailService, "port", PORT)
     }
 
     @Test
