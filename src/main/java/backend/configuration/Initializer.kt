@@ -3,8 +3,8 @@ package backend.configuration
 import backend.model.user.Admin
 import backend.model.user.User
 import backend.model.user.UserService
+import backend.services.ConfigurationService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import javax.annotation.PostConstruct
 
@@ -12,21 +12,19 @@ import javax.annotation.PostConstruct
 class Initializer {
 
     private val userService: UserService
+    private val adminEmail: String
+    private val adminPassword: String
 
     @Autowired
-    constructor(userService: UserService) {
+    constructor(userService: UserService, configurationService: ConfigurationService) {
         this.userService = userService
+        this.adminEmail = configurationService.getRequired("org.breakout.admin_password")
+        this.adminPassword = configurationService.getRequired("org.breakout.admin_email")
     }
-
-    @Value("\${org.breakout.admin_password}")
-    private lateinit var ADMIN_PASSWORD: String
-
-    @Value("\${org.breakout.admin_email}")
-    private lateinit var ADMIN_EMAIL: String
 
     @PostConstruct
     fun initialize() {
-        val admin = User.create(ADMIN_EMAIL, ADMIN_PASSWORD)
+        val admin = User.create(adminPassword, adminEmail)
         admin.addRole(Admin::class)
         admin.isBlocked = false
         userService.save(admin)
