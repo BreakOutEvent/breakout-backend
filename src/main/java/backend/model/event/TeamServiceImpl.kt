@@ -55,5 +55,12 @@ class TeamServiceImpl : TeamService {
 
     override fun findLocationPostingsById(id: Long): List<Posting>? = repository.findLocationPostingsById(id)
 
-    override fun getPostingMaxDistanceById(id: Long): Posting? = repository.getPostingMaxDistanceById(id).first()
+    override fun getPostingMaxDistanceById(id: Long): Posting? {
+        val postingList = repository.getPostingMaxDistanceById(id)
+        if (postingList.size <= 0) {
+            return null
+        } else {
+            return postingList.first()
+        }
+    }
 }

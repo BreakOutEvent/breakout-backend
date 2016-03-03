@@ -5,7 +5,10 @@ import backend.model.posting.Posting
 import java.time.LocalDateTime
 
 interface EventService {
+    fun getById(id: Long): Event?
+
     fun createEvent(title: String, date: LocalDateTime, city: String, startingLocation: Coord, duration: Int): Event
+
     fun findAll(): Iterable<Event>
 
     /**
@@ -25,4 +28,6 @@ interface EventService {
      * @return gotten postings list
      */
     fun findLocationPostingsById(id: Long): List<Posting>?
+
+    fun getPostingMaxDistanceById(id: Long): Posting?
 }

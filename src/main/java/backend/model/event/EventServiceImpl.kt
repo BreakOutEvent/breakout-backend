@@ -8,6 +8,7 @@ import java.time.LocalDateTime
 
 @Service
 class EventServiceImpl @Autowired constructor(val repository: EventRepository) : EventService {
+    override fun getById(id: Long): Event? = repository.findById(id)
 
     override fun findAll(): Iterable<Event> = repository.findAll()
 
@@ -19,4 +20,13 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository) :
     override fun findPostingsById(id: Long): List<Long>? = repository.findPostingsById(id)
 
     override fun findLocationPostingsById(id: Long): List<Posting>? = repository.findLocationPostingsById(id)
+
+    override fun getPostingMaxDistanceById(id: Long): Posting? {
+        val postingList = repository.getPostingMaxDistanceById(id)
+        if (postingList.size <= 0) {
+            return null
+        } else {
+            return postingList.first()
+        }
+    }
 }

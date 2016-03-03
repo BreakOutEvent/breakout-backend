@@ -4,6 +4,7 @@ import backend.controller.exceptions.NotFoundException
 import backend.model.event.EventService
 import backend.model.misc.Coord
 import backend.utils.distanceCoordsListKM
+import backend.utils.distanceCoordsListKMfromStart
 import backend.view.EventView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
@@ -59,13 +60,20 @@ open class EventController {
         return postingIds
     }
 
+
     @RequestMapping(
             value = "/{id}/distance/",
             method = arrayOf(RequestMethod.GET),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    open fun getEventDistance(@PathVariable("id") id: Long): Map<String, Double> {
+    open fun getEventDistance(@PathVariable("id") id: Long): Map<String, Any> {
+        val event = eventService.getById(id) ?: throw NotFoundException("event with id $id does not exist")
         val postings = eventService.findLocationPostingsById(id) ?: throw NotFoundException("event with id $id does not exist")
-        val distance = distanceCoordsListKM(postings.map { it.postLocation!! })
-        return mapOf("distance" to distance)
+        val actualdistance = distanceCoordsListKMfromStart(event.startingLocation, postings.map { it.postLocation!! })
+        val postingDistance = eventService.getPostingMaxDistanceById(id)
+        var distance = 0.0
+        if (postingDistance != null) {
+            distance = postingDistance.distance ?: 0.0
+        }
+        return mapOf("actualdistance" to actualdistance, "distance" to distance)
     }
 }
