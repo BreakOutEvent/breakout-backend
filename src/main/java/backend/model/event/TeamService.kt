@@ -67,4 +67,13 @@ interface TeamService {
      */
     fun findLocationPostingsById(id: Long): List<Posting>?
 
+    /**
+     * Get Team Posting from database with max distance
+     *
+     * @param id: The id of Team to get postings for
+     *
+     * @return gotten postings list
+     */
+    fun getPostingMaxDistanceById(id: Long): Posting?
+
 }

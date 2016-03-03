@@ -130,6 +130,7 @@ class TestTeamEndpoint : IntegrationTest() {
                 .andExpect(status().isOk)
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.distance").exists())
+                .andExpect(jsonPath("$.actualdistance").exists())
                 .andReturn().response.contentAsString
 
         println(response)

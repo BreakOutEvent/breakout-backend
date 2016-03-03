@@ -20,6 +20,12 @@ fun distanceCoordsKM(from: Coord, to: Coord): Double {
     return EarthCalc.getVincentyDistance(fromPoint, toPoint) / 1000
 }
 
+fun distanceCoordsListKMfromStart(startingPoint: Coord, list: List<Coord>): Double {
+    var coordsList = arrayListOf(startingPoint)
+    coordsList.addAll(list)
+    return distanceCoordsListKM(coordsList)
+}
+
 fun distanceCoordsListKM(list: List<Coord>): Double = coordsListToPairList(list).fold(0.0) { total, next -> total + distanceCoordsKM(next.first, next.second) }
 
 fun coordsListToPairList(list: List<Coord>): List<Pair<Coord, Coord>> {

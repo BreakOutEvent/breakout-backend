@@ -11,6 +11,7 @@ import backend.model.misc.Coord
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
 import backend.utils.distanceCoordsListKM
+import backend.utils.distanceCoordsListKMfromStart
 import backend.view.TeamView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
@@ -105,9 +106,15 @@ open class TeamController {
             value = "/{id}/distance/",
             method = arrayOf(RequestMethod.GET),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun getTeamDistance(@PathVariable("id") id: Long): Map<String, Double> {
+    fun getTeamDistance(@PathVariable("id") id: Long): Map<String, Any> {
+        val team = teamService.getByID(id) ?: throw NotFoundException("team with id $id does not exist")
         val postings = teamService.findLocationPostingsById(id) ?: throw NotFoundException("team with id $id does not exist")
-        val distance = distanceCoordsListKM(postings.map { it.postLocation!! })
-        return mapOf("distance" to distance)
+        val actualdistance = distanceCoordsListKMfromStart(team.event.startingLocation, postings.map { it.postLocation!! })
+        val postingDistance = teamService.getPostingMaxDistanceById(id)
+        var distance = 0.0
+        if (postingDistance != null) {
+            distance = postingDistance.distance ?: 0.0
+        }
+        return mapOf("actualdistance" to actualdistance, "distance" to distance)
     }
 }
