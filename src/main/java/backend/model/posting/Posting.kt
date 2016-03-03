@@ -21,6 +21,8 @@ class Posting() : BasicEntity() {
     )
     var postLocation: Coord? = null
 
+    var distance: Double? = null
+
     @ManyToOne
     var user: UserCore? = null
 
@@ -29,12 +31,13 @@ class Posting() : BasicEntity() {
     var media: MutableList<Media>? = ArrayList()
 
 
-    constructor(text: String?, postLocation: Coord?, user: UserCore, media: MutableList<Media>?) : this() {
+    constructor(text: String?, postLocation: Coord?, user: UserCore, media: MutableList<Media>?, distance: Double?) : this() {
         this.text = text
         this.date = LocalDateTime.now()
         this.postLocation = postLocation
         this.user = user
         this.media = media
+        this.distance = distance
     }
 
 }

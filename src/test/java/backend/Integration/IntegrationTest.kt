@@ -11,6 +11,7 @@ import backend.model.event.TeamRepository
 import backend.model.event.TeamService
 import backend.model.misc.Coord
 import backend.model.posting.*
+import backend.model.user.User
 import backend.model.user.UserRepository
 import backend.model.user.UserService
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -131,7 +132,7 @@ fun createUser(mockMvc: MockMvc, email: String = "a@x.de", password: String = "p
     val accessToken = getTokens(mockMvc, email, password).first
     val refreshToken = getTokens(mockMvc, email, password).second
 
-    return Credentials(id, accessToken, refreshToken)
+    return Credentials(id, accessToken, refreshToken, user)
 }
 
 fun getTokens(mockMvc: MockMvc, email: String, password: String): Pair<String, String> {
@@ -159,6 +160,6 @@ fun getTokens(mockMvc: MockMvc, email: String, password: String): Pair<String, S
     return Pair(accessToken, refreshToken)
 }
 
-class Credentials(val id: Int, val accessToken: String, val refreshToken: String)
+class Credentials(val id: Int, val accessToken: String, val refreshToken: String, val user: User)
 
 

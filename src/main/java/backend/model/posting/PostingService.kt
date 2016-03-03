@@ -4,7 +4,7 @@ import backend.model.misc.Coord
 import backend.model.user.UserCore
 
 interface PostingService {
-    fun createPosting(text: String?, postingLocation: Coord?, user: UserCore, media: MutableList<Media>?): Posting
+    fun createPosting(text: String?, postingLocation: Coord?, user: UserCore, media: MutableList<Media>?, distance: Double?): Posting
     fun findAll(): Iterable<Posting>
     fun getByID(id: Long): Posting?
     fun save(posting: Posting): Posting?

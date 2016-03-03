@@ -58,7 +58,8 @@ class DummyDataController {
                         text = "text$it",
                         postingLocation = Coord(0.0, 0.0),
                         media = null,
-                        user = user).id!!
+                        user = user,
+                        distance = 0.0).id!!
             } else 1
         }
     }

@@ -9,6 +9,8 @@ import backend.model.posting.Media
 import backend.model.posting.MediaService
 import backend.model.posting.MediaSizeService
 import backend.model.posting.PostingService
+import backend.model.user.Participant
+import backend.utils.distanceCoordsKM
 import backend.view.MediaSizeView
 import backend.view.PostingRequestView
 import backend.view.PostingResponseView
@@ -56,11 +58,20 @@ class PostingController {
             throw BadRequestException("empty postings not allowed")
 
         var location: Coord? = null
-        if (body.postingLocation != null && body.postingLocation!!.latitude != null && body.postingLocation!!.longitude != null)
+        var distance: Double? = null
+
+        if (body.postingLocation != null && body.postingLocation!!.latitude != null && body.postingLocation!!.longitude != null) {
             location = Coord(body.postingLocation!!.latitude!!, body.postingLocation!!.longitude!!)
+            val creator = user.getRole(Participant::class) ?: throw UnauthorizedException("User is no participant")
+            val team = creator.currentTeam ?: throw UnauthorizedException("User has no team")
 
-        var posting = postingService.createPosting(text = body.text, postingLocation = location, user = user.core!!, media = null)
+            //Calculate Distance from starting point of Event to Location Position and
+            distance = distanceCoordsKM(team.event.startingLocation, location)
+        }
 
+        var posting = postingService.createPosting(text = body.text, postingLocation = location, user = user.core!!, media = null, distance = distance)
+
+        //Create Media-Objects for each media item requested to add
         var media: MutableList<Media>? = null
         if (body.media != null && body.media!! is List<*>) {
             media = arrayListOf()
@@ -68,11 +79,11 @@ class PostingController {
                 media!!.add(Media(posting, it))
             }
         }
-
         posting.media = media
 
         postingService.save(posting)
 
+        //Adds uploadingTokens to response
         if (posting.media != null) {
             posting.media!!.forEach {
                 it.uploadToken = JWTSigner(JWT_SECRET).sign(mapOf("subject" to it.id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512))

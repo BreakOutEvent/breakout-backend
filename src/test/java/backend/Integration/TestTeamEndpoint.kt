@@ -47,8 +47,8 @@ class TestTeamEndpoint : IntegrationTest() {
         invitee = userRepository.findOne(inviteeCredentials.id.toLong())
         team = teamService.create(creator as Participant, "name", "description", event)
 
-        postingService.save(Posting("test", Coord(1.0, 1.0), creator.core!!, null))
-        postingService.save(Posting("test", Coord(1.2, 2.0), creator.core!!, null))
+        postingService.save(Posting("test", Coord(1.0, 1.0), creator.core!!, null, 156.899568))
+        postingService.save(Posting("test", Coord(1.2, 2.0), creator.core!!, null, 259.16669))
 
     }
 

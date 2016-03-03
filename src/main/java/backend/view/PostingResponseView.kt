@@ -12,6 +12,8 @@ class PostingResponseView() {
 
     var date: Long? = null
 
+    var distance: Double? = null
+
     @Valid
     var postingLocation: CoordView? = null
 
@@ -27,6 +29,7 @@ class PostingResponseView() {
         this.postingLocation = CoordView(posting.postLocation)
         this.user = UserView(posting.user!!.core)
         this.media = posting.media?.map { MediaView(it) }
+        this.distance = posting.distance
     }
 
 

@@ -15,7 +15,7 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
 
     override fun findAll(): Iterable<Posting> = repository.findAll()
 
-    override fun createPosting(text: String?, postingLocation: Coord?, user: UserCore, media: MutableList<Media>?): Posting = repository.save(Posting(text, postingLocation, user, media))
+    override fun createPosting(text: String?, postingLocation: Coord?, user: UserCore, media: MutableList<Media>?, distance: Double?): Posting = repository.save(Posting(text, postingLocation, user, media, distance))
 
     override fun getByID(id: Long): Posting? = repository.findById(id)
 }
