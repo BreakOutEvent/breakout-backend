@@ -32,7 +32,7 @@ class TeamServiceImplTest : IntegrationTest() {
 
     @Test
     fun testCreate() {
-        val participant = User.create("f@x.de", "lorem").addRole(Participant::class.java) as Participant
+        val participant = User.create("f@x.de", "lorem").addRole(Participant::class)
         userService.save(participant)
 
         val team = teamService.create(participant, "Team Awesome", "Das beste Team aus Dresden", event)
@@ -45,27 +45,24 @@ class TeamServiceImplTest : IntegrationTest() {
 
     @Test
     fun testInvite() {
-        val creator = setAuthenticatedUser("user@mail.com", Participant::class.java).getRole(Participant::class.java)
-                as Participant
-
+        val creator = setAuthenticatedUser("user@mail.com", Participant::class.java).getRole(Participant::class)!!
         val team = teamService.create(creator, "name", "description", event)
 
         teamService.invite(EmailAddress("invitee@mail.de"), team)
-
         // TODO: Make sure an Email is sent!
     }
 
     @Test
     fun failToInvite() {
-        setAuthenticatedUser("user@mail.com", Participant::class.java).getRole(Participant::class.java)as Participant
-        val creator = userService.create("not@mail.com", "password").addRole(Participant::class.java) as Participant
+        setAuthenticatedUser("user@mail.com", Participant::class.java).getRole(Participant::class)
+        val creator = userService.create("not@mail.com", "password").addRole(Participant::class)
         val team = teamService.create(creator, "name", "description", event)
 
         assertFails { teamService.invite(EmailAddress("test@mail.com"), team) }
     }
 
     private fun setAuthenticatedUser(email: String, role: Class<out UserRole>): User {
-        val user = userService.create(email, "password").addRole(role)
+        val user = userService.create(email, "password").addRole(role.kotlin)
         val details = userDetailsService.loadUserByUsername(email)!! // Not null because otherwise exception is thrown
         val token = UsernamePasswordAuthenticationToken(details.username, details.password, details.authorities)
         SecurityContextHolder.getContext().authentication = token

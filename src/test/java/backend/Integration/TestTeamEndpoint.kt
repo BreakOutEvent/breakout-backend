@@ -43,7 +43,7 @@ class TestTeamEndpoint : IntegrationTest() {
         inviteeCredentials = createUser(this.mockMvc, email = "invitee@mail.com", userService = userService)
         makeUserParticipant(creatorCredentials)
         makeUserParticipant(inviteeCredentials)
-        creator = userRepository.findOne(creatorCredentials.id.toLong()).getRole(Participant::class.java) as Participant
+        creator = userRepository.findOne(creatorCredentials.id.toLong()).getRole(Participant::class)!!
         invitee = userRepository.findOne(inviteeCredentials.id.toLong())
         team = teamService.create(creator as Participant, "name", "description", event)
 

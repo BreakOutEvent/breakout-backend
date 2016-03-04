@@ -60,11 +60,6 @@ abstract class UserRole() : BasicEntity(), User, GrantedAuthority {
             this.core.gender = gender
         }
 
-    override fun addRole(clazz: Class<out UserRole>): UserRole = this.core.addRole(clazz)
-    override fun getRole(clazz: Class<out UserRole>): UserRole? = this.core.getRole(clazz)
-    override fun hasRole(clazz: Class<out UserRole>): Boolean = this.core.hasRole(clazz)
-    override fun removeRole(clazz: Class<out UserRole>): UserRole? = this.core.removeRole(clazz)
-
     override fun <T : UserRole> addRole(clazz: KClass<T>): T = this.core.addRole(clazz)
     override fun <T : UserRole> getRole(clazz: KClass<T>): T? = this.core.getRole(clazz)
     override fun <T : UserRole> hasRole(clazz: KClass<T>): Boolean = this.core.hasRole(clazz)

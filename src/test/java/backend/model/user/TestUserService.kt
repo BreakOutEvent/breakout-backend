@@ -50,14 +50,15 @@ class TestUserService : IntegrationTest() {
     @Test
     fun saveWithRoles() {
         val user = userService.create("user@mail.com", "pw")
-        user.addRole(Participant::class.java)
+        user.addRole(Participant::class)
         userService.save(user)
 
         val foundUser = userService.getAllUsers()!!.first()
-        val foundParticipant = foundUser.getRole(Participant::class.java) as Participant
+        val foundParticipant = foundUser.getRole(Participant::class)
 
-        assertTrue(foundUser.hasRole(Participant::class.java))
-        assertNotNull(foundParticipant.id)
+        assertNotNull(foundParticipant)
+        assertTrue(foundUser.hasRole(Participant::class))
+        assertNotNull(foundParticipant!!.id)
     }
 
 }

@@ -43,14 +43,14 @@ class TestPostEndpoint : IntegrationTest() {
         userCredentials = createUser(this.mockMvc, userService = userService)
 
         makeUserParticipant(userCredentials)
-        val creator = userRepository.findOne(userCredentials.id.toLong()).getRole(Participant::class.java) as Participant
+        val creator = userRepository.findOne(userCredentials.id.toLong()).getRole(Participant::class)!!
         teamService.create(creator, "name", "description", event)
 
         getTokens(mockMvc, creator.email, "password").first
         getTokens(mockMvc, creator.email, "password").second
 
         userService.create("test_admin@break-out.org", "password", {
-            addRole(Admin::class.java)
+            addRole(Admin::class)
             isBlocked = false
         })
     }
@@ -265,7 +265,7 @@ class TestPostEndpoint : IntegrationTest() {
     fun getPostingsByIds() {
         val user = userService.create("test@mail.com", "password")
         val postingZero = postingService.createPosting("Test0", Coord(0.0, 0.0), user.core!!, null, 0.0)
-        val postingOne = postingService.createPosting("Test1", Coord(0.0, 0.0), user.core!!, null, 0.0)
+        postingService.createPosting("Test1", Coord(0.0, 0.0), user.core!!, null, 0.0)
         val postingTwo = postingService.createPosting("Test2", Coord(0.0, 0.0), user.core!!, null, 0.0)
 
         val postingsIds: List<Long> = listOf(postingZero.id!!, postingTwo.id!!)
@@ -418,8 +418,8 @@ class TestPostEndpoint : IntegrationTest() {
     @Test
     fun getAllPostings() {
         val user = userService.create("test@mail.com", "password")
-        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null, 0.0)
-        val secondPosting = postingService.createPosting("Test 2", Coord(0.0, 0.0), user.core!!, null, 0.0)
+        postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null, 0.0)
+        postingService.createPosting("Test 2", Coord(0.0, 0.0), user.core!!, null, 0.0)
 
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.GET, "/posting/")
