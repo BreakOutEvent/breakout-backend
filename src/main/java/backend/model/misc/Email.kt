@@ -29,7 +29,7 @@ class Email(to: List<EmailAddress>,
 
     @JsonProperty("bccs")
     fun bccAsString(): List<String> {
-        return to.map { it.toString() }
+        return bcc.map { it.toString() }
     }
 
     @JsonProperty("files")
