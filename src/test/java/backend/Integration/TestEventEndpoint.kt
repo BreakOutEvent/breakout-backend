@@ -28,7 +28,7 @@ class TestEventEndpoint : IntegrationTest() {
         userCredentials = createUser(this.mockMvc, userService = userService)
 
         userService.create("test_admin@break-out.org", "password", {
-            addRole(Admin::class.java)
+            addRole(Admin::class)
             isBlocked = false
         })
 

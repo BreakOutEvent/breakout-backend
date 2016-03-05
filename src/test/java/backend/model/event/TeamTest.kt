@@ -20,7 +20,7 @@ class TeamTest {
 
     @Before
     fun setUp() {
-        creator = User.create("creator@mail.de", "password").addRole(Participant::class.java) as Participant
+        creator = User.create("creator@mail.de", "password").addRole(Participant::class)
         event = Event("Awesome Event", LocalDateTime.now(), "Munich", Coord(0.0, 0.0), duration = 36)
         team = Team(creator, "Team awesome", "our team is awesome", event)
     }
@@ -28,7 +28,7 @@ class TeamTest {
 
     @Test
     fun testCreateTeam() {
-        val creator = User.create("creator@mail.de", "password").addRole(Participant::class.java) as Participant
+        val creator = User.create("creator@mail.de", "password").addRole(Participant::class)
         val team = Team(creator, "Team awesome", "our team is awesome", event)
 
         assertEquals(team, creator.currentTeam)
@@ -46,7 +46,7 @@ class TeamTest {
     @Test
     fun testJoin() {
         val inviteeEmail = EmailAddress("invitee@mail.com")
-        val invitee = User.create(inviteeEmail.toString(), "password").addRole(Participant::class.java) as Participant
+        val invitee = User.create(inviteeEmail.toString(), "password").addRole(Participant::class)
 
         team.invite(inviteeEmail)
         team.join(invitee)
@@ -55,7 +55,7 @@ class TeamTest {
     @Test
     fun testFailToJoin() {
         val inviteeEmail = EmailAddress("invitee@mail.com")
-        val notInvitee = User.create("notinvitee@mail.com", "password").addRole(Participant::class.java) as Participant
+        val notInvitee = User.create("notinvitee@mail.com", "password").addRole(Participant::class)
         team.invite(inviteeEmail)
 
         assertFails({ team.join(notInvitee) })

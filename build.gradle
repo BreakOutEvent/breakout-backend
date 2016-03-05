@@ -21,7 +21,6 @@ apply plugin: 'idea'
 apply plugin: 'spring-boot'
 
 jar {
-    baseName = 'gs-actuator-service'
     version = '0.1.0'
 }
 
@@ -35,7 +34,6 @@ repositories {
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
-    compile("org.springframework.boot:spring-boot-starter-actuator")
     compile('org.springframework.boot:spring-boot-starter-security')
     compile("io.springfox:springfox-swagger2:2.2.2")
     compile("io.springfox:springfox-swagger-ui:2.2.2")

@@ -69,24 +69,25 @@ open class UserCore : BasicEntity, User {
         return !isBlocked;
     }
 
-    override fun <T : UserRole> addRole(clazz: KClass<T>): T = this.addRole(clazz.java) as T
-    override fun <T : UserRole> getRole(clazz: KClass<T>): T? = this.getRole(clazz.java) as? T?
-    override fun <T : UserRole> hasRole(clazz: KClass<T>): Boolean = this.hasRole(clazz.java)
-    override fun <T : UserRole> removeRole(clazz: KClass<T>): T? = this.removeRole(clazz.java) as? T?
+    // This cast will always succeed because the specific type of the value / object
+    // in the Map<Class<out UserRole>, UserRole> always matches the one defined with T
+    // This is guaranteed as the key of the map always expresses the exact class of
+    // the object stored as the value
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : UserRole> getRole(clazz: KClass<T>): T? = userRoles[clazz.java] as? T?
+    override fun <T : UserRole> hasRole(clazz: KClass<T>): Boolean = userRoles.containsKey(clazz.java)
 
-    override fun getRole(clazz: Class<out UserRole>): UserRole? = userRoles[clazz]
-    override fun hasRole(clazz: Class<out UserRole>): Boolean = userRoles.containsKey(clazz)
-    override fun removeRole(clazz: Class<out UserRole>): UserRole? = userRoles.remove(clazz)
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : UserRole> removeRole(clazz: KClass<T>): T? = userRoles.remove(clazz.java) as? T?
 
     @Throws(Exception::class)
-    override fun addRole(clazz: Class<out UserRole>): UserRole {
-
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : UserRole> addRole(clazz: KClass<T>): T {
         val role: UserRole
-
-        if (userRoles.containsKey(clazz)) throw DomainException("User already has role $clazz")
-        role = UserRole.createFor(clazz, this)
-        userRoles.put(clazz, role)
-        return role
+        if (userRoles.containsKey(clazz.java)) throw DomainException("User already has role $clazz")
+        role = UserRole.createFor(clazz.java, this)
+        userRoles.put(clazz.java, role)
+        return role as T
     }
 
     override val core: UserCore

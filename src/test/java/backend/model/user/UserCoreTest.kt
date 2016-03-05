@@ -41,29 +41,29 @@ class UserCoreTest {
 
     @Test
     fun testAddRole() {
-        userCore.addRole(Participant::class.java)
-        assertFails { userCore.addRole(Participant::class.java) }
+        userCore.addRole(Participant::class)
+        assertFails { userCore.addRole(Participant::class) }
     }
 
     @Test
     fun testGetRole() {
-        userCore.addRole(Participant::class.java)
-        val role = userCore.getRole(Participant::class.java)
+        userCore.addRole(Participant::class)
+        val role = userCore.getRole(Participant::class)
         assertNotNull(role)
     }
 
     @Test
     fun testHasRole() {
-        userCore.addRole(Participant::class.java)
-        assertTrue { userCore.hasRole(Participant::class.java) }
+        userCore.addRole(Participant::class)
+        assertTrue { userCore.hasRole(Participant::class) }
     }
 
     @Test
     fun testRemoveRole() {
-        userCore.addRole(Participant::class.java)
-        userCore.removeRole(Participant::class.java)
-        assertFalse { userCore.hasRole(Participant::class.java) }
-        assertNull(userCore.getRole(Participant::class.java))
+        userCore.addRole(Participant::class)
+        userCore.removeRole(Participant::class)
+        assertFalse { userCore.hasRole(Participant::class) }
+        assertNull(userCore.getRole(Participant::class))
     }
 
     @Test
