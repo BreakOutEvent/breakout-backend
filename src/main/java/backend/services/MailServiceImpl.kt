@@ -39,8 +39,11 @@ class MailServiceImpl : MailService {
         val body = ObjectMapper().writeValueAsString(email)
         val request = HttpEntity<String>(body, headers)
         try {
-            restTemplate.exchange(getSendUrl(url, port), HttpMethod.POST, request, String::class.java)
+            val sendurl = getSendUrl(url, port)
+            logger.info("sending mail via: $sendurl")
+            restTemplate.exchange(sendurl, HttpMethod.POST, request, String::class.java)
         } catch (e: Exception) {
+            logger.error(e.message)
             // TODO: Implement better fallback in this case!
             logger.error("Mailer not available at this time")
         }
