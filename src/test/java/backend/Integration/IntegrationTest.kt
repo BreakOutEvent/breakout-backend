@@ -68,9 +68,9 @@ abstract class IntegrationTest {
     @Before
     open fun setUp() {
         teamRepository.deleteAll()
-        mediaSizeRepository.deleteAll()
         postingRepository.deleteAll()
         mediaRepository.deleteAll()
+        mediaSizeRepository.deleteAll()
         eventRepository.deleteAll()
         userRepository.deleteAll()
         mockMvc = MockMvcBuilders

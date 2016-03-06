@@ -6,12 +6,10 @@ import org.springframework.stereotype.Service
 @Service
 class MediaSizeServiceImpl : MediaSizeService {
 
-
     private val repository: MediaSizeRepository
     private val mediaRepository: MediaRepository
 
     @Autowired
-
     constructor(mediaSizeRepository: MediaSizeRepository, mediaRepository: MediaRepository) {
         this.repository = mediaSizeRepository
         this.mediaRepository = mediaRepository
