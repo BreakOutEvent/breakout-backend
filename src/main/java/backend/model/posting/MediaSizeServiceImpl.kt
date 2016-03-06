@@ -4,7 +4,18 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class MediaSizeServiceImpl @Autowired constructor(val repository: MediaSizeRepository) : MediaSizeService {
+class MediaSizeServiceImpl : MediaSizeService {
+
+
+    private val repository: MediaSizeRepository
+    private val mediaRepository: MediaRepository
+
+    @Autowired
+
+    constructor(mediaSizeRepository: MediaSizeRepository, mediaRepository: MediaRepository) {
+        this.repository = mediaSizeRepository
+        this.mediaRepository = mediaRepository
+    }
 
     override fun save(mediaSize: MediaSize): MediaSize = repository.save(mediaSize)
 
@@ -12,7 +23,10 @@ class MediaSizeServiceImpl @Autowired constructor(val repository: MediaSizeRepos
 
     override fun createMediaSize(media: Media, url: String, width: Int, height: Int, length: Int, size: Long, type: String): MediaSize {
         val mediaSize = MediaSize(media, url, width, height, length, size, type)
-        return repository.save(mediaSize)
+        val mediaSizeSaved = this.save(mediaSize)
+        media.sizes!!.add(mediaSizeSaved)
+        mediaRepository.save(media)
+        return mediaSizeSaved
     }
 
     override fun getByID(id: Long): MediaSize? {

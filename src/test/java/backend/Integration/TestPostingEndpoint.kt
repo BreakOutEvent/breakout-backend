@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-class TestPostEndpoint : IntegrationTest() {
+class TestPostingEndpoint : IntegrationTest() {
 
     @Autowired
     private lateinit var configurationService: ConfigurationService
@@ -412,7 +412,34 @@ class TestPostEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.type").exists())
                 .andReturn().response.contentAsString
 
+
         println(response)
+
+        val requestMedia = MockMvcRequestBuilders
+                .request(HttpMethod.GET, "/posting/${savedposting.id}/")
+                .contentType(MediaType.APPLICATION_JSON)
+
+        val responseMedia = mockMvc.perform (requestMedia)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.media").exists())
+                .andExpect(jsonPath("$.media").isArray)
+                .andExpect(jsonPath("$.media[0]").exists())
+                .andExpect(jsonPath("$.media[0].id").exists())
+                .andExpect(jsonPath("$.media[0].type").exists())
+                .andExpect(jsonPath("$.media[0].sizes").exists())
+                .andExpect(jsonPath("$.media[0].sizes").isArray)
+                .andExpect(jsonPath("$.media[0].sizes[0]").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].id").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].url").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].width").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].height").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].length").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].size").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].type").exists())
+                .andReturn().response.contentAsString
+
+        println(responseMedia)
     }
 
     @Test
