@@ -19,7 +19,7 @@ class MediaSizeServiceImpl : MediaSizeService {
 
     override fun findAll(): Iterable<MediaSize> = repository.findAll()
 
-    override fun createMediaSize(media: Media, url: String, width: Int, height: Int, length: Int, size: Long, type: String): MediaSize {
+    override fun createAndSaveMediaSize(media: Media, url: String, width: Int, height: Int, length: Int, size: Long, type: String): MediaSize {
         val mediaSize = MediaSize(media, url, width, height, length, size, type)
         val mediaSizeSaved = this.save(mediaSize)
         media.sizes!!.add(mediaSizeSaved)

@@ -122,9 +122,8 @@ class PostingController {
         }
 
         val media = mediaService.getByID(id);
-        var mediaSize = mediaSizeService.createMediaSize(media!!, body.url!!, body.width!!, body.height!!, body.length!!, body.size!!, body.type!!)
+        var mediaSize = mediaSizeService.createAndSaveMediaSize(media!!, body.url!!, body.width!!, body.height!!, body.length!!, body.size!!, body.type!!)
 
-        mediaSizeService.save(mediaSize)
         return MediaSizeView(mediaSize)
     }
 
