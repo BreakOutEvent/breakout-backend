@@ -1,6 +1,7 @@
 buildscript {
 
     ext.kotlin_version = '1.0.0'
+    ext.powermock_version = '1.6.4'
 
     repositories {
         mavenCentral()
@@ -46,6 +47,9 @@ dependencies {
     compile("org.springframework:spring-web")
     compile 'com.auth0:java-jwt:2.0.1'
     compile 'com.github.grumlimited:geocalc:v0.5.1'
+
+    testCompile "org.powermock:powermock-module-junit4:$powermock_version"
+    testCompile "org.powermock:powermock-api-mockito:$powermock_version"
 
     testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
     runtime('mysql:mysql-connector-java')
