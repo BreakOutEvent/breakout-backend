@@ -32,4 +32,6 @@ interface User {
     fun isActivationTokenCorrect(token: String): Boolean
     fun createActivationToken(): String
     fun isActivated(): Boolean
+
+    fun isSameUserAs(user: User) = this.core!!.id == user.core!!.id
 }

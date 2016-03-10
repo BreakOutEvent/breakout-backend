@@ -63,6 +63,10 @@ class Team() : BasicEntity() {
         return this.members.map { participant -> participant.email }.contains(username)
     }
 
+    fun isMember(participant: Participant): Boolean {
+        return this.members.filter { it.isSameUserAs(participant) }.isNotEmpty()
+    }
+
     @PreRemove
     fun preRemove() {
         this.members.forEach { it.currentTeam = null }
