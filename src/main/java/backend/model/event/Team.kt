@@ -3,6 +3,7 @@ package backend.model.event
 import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.event.Invitation.InvitationStatus
+import backend.model.location.Location
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
 import java.util.*
@@ -31,6 +32,9 @@ class Team() : BasicEntity() {
 
     @OneToMany(mappedBy = "currentTeam", fetch = FetchType.EAGER)
     val members: MutableSet<Participant> = HashSet()
+
+    @OneToMany(mappedBy = "team")
+    val locations: MutableList<Location> = ArrayList()
 
     private fun addMember(participant: Participant) {
         if (participant.currentTeam != null) throw DomainException("Participant ${participant.email} already is part of a team")

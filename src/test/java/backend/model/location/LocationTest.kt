@@ -2,8 +2,6 @@ package backend.model.location
 
 import backend.model.event.Team
 import backend.model.user.Participant
-import com.grum.geocalc.DegreeCoordinate
-import com.grum.geocalc.Point
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -12,7 +10,6 @@ import org.mockito.Mockito
 import org.powermock.api.mockito.PowerMockito
 import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.PowerMockRunner
-import org.powermock.reflect.Whitebox
 
 @RunWith(PowerMockRunner::class)
 @PrepareForTest(Participant::class, Team::class)
@@ -26,9 +23,9 @@ class LocationTest {
     @Before
     fun setUp() {
         team = PowerMockito.mock(Team::class.java)
-        point = Point(DegreeCoordinate(0.0), DegreeCoordinate(1.1))
+        point = Point(0.0, 1.1)
         participant = PowerMockito.mock(Participant::class.java)
-        
+
         Mockito.`when`(participant.currentTeam).thenReturn(team)
         location = Location(point, participant)
     }
