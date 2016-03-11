@@ -4,8 +4,12 @@ import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.event.Team
 import backend.model.user.Participant
-import javax.persistence.*
+import java.time.LocalDateTime
 import javax.persistence.CascadeType.PERSIST
+import javax.persistence.Embedded
+import javax.persistence.Entity
+import javax.persistence.ManyToOne
+import javax.persistence.OneToOne
 
 @Entity
 class Location : BasicEntity {
@@ -31,19 +35,5 @@ class Location : BasicEntity {
         this.point = point
         this.team = uploader.currentTeam ?: throw DomainException("A user without a team can't upload locations")
         this.uploader = uploader
-    }
-}
-
-@Embeddable
-class Point {
-
-    var latitude: Double = 0.0
-    var longitude: Double = 0.0
-
-    private constructor() {}
-
-    constructor(latitude: Double, longitude: Double) {
-        this.latitude = latitude
-        this.longitude = longitude
     }
 }
