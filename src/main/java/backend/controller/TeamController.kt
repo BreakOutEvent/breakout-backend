@@ -7,10 +7,8 @@ import backend.controller.exceptions.UnauthorizedException
 import backend.model.event.EventRepository
 import backend.model.event.TeamRepository
 import backend.model.event.TeamService
-import backend.model.misc.Coord
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
-import backend.utils.distanceCoordsListKM
 import backend.utils.distanceCoordsListKMfromStart
 import backend.view.TeamView
 import org.springframework.beans.factory.annotation.Autowired

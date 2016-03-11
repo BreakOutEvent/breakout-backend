@@ -332,7 +332,7 @@ class TestPostingEndpoint : IntegrationTest() {
         ).toJsonString()
 
         val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/media/${savedposting!!.media!!.first().id}/")
+                .request(HttpMethod.POST, "/media/${savedposting!!.media!!.first().id}/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(postData)
 
@@ -362,7 +362,7 @@ class TestPostingEndpoint : IntegrationTest() {
         ).toJsonString()
 
         val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/media/${savedposting!!.media!!.first().id}/")
+                .request(HttpMethod.POST, "/media/${savedposting!!.media!!.first().id}/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-UPLOAD-TOKEN", "87654321")
                 .content(postData)
@@ -395,7 +395,7 @@ class TestPostingEndpoint : IntegrationTest() {
         println(posting.media)
 
         val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/media/${savedposting!!.media!!.first().id}/")
+                .request(HttpMethod.POST, "/media/${savedposting!!.media!!.first().id}/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .content(postData)
