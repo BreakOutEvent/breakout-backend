@@ -1,4 +1,4 @@
-package backend.model.posting
+package backend.model.media
 
 import backend.model.BasicEntity
 import javax.persistence.Entity

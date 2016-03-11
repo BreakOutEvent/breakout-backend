@@ -4,7 +4,7 @@ package backend.Integration
 
 import backend.model.event.Event
 import backend.model.misc.Coord
-import backend.model.posting.Media
+import backend.model.media.Media
 import backend.model.user.Admin
 import backend.model.user.Participant
 import backend.services.ConfigurationService

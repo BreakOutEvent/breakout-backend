@@ -9,6 +9,10 @@ import backend.model.event.EventRepository
 import backend.model.event.EventService
 import backend.model.event.TeamRepository
 import backend.model.event.TeamService
+import backend.model.media.MediaRepository
+import backend.model.media.MediaService
+import backend.model.media.MediaSizeRepository
+import backend.model.media.MediaSizeService
 import backend.model.misc.Coord
 import backend.model.posting.*
 import backend.model.user.User

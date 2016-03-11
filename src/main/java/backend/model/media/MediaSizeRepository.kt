@@ -1,4 +1,4 @@
-package backend.model.posting
+package backend.model.media
 
 import org.springframework.data.repository.CrudRepository
 

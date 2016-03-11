@@ -1,4 +1,6 @@
-package backend.model.posting
+package backend.model.media
+
+import backend.model.posting.Posting
 
 interface MediaService {
     fun createMedia(posting: Posting, type: String): Media

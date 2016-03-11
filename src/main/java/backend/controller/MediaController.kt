@@ -1,8 +1,8 @@
 package backend.controller
 
 import backend.controller.exceptions.UnauthorizedException
-import backend.model.posting.MediaService
-import backend.model.posting.MediaSizeService
+import backend.model.media.MediaService
+import backend.model.media.MediaSizeService
 import backend.services.ConfigurationService
 import backend.view.MediaSizeView
 import com.auth0.jwt.JWTVerifier
