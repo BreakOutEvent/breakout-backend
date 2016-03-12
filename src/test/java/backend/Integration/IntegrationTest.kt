@@ -73,10 +73,10 @@ abstract class IntegrationTest {
     open fun setUp() {
         teamRepository.deleteAll()
         postingRepository.deleteAll()
+        userRepository.deleteAll()
         mediaRepository.deleteAll()
         mediaSizeRepository.deleteAll()
         eventRepository.deleteAll()
-        userRepository.deleteAll()
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .addFilters<DefaultMockMvcBuilder>(springSecurityFilterChain)

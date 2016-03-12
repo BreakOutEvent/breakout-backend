@@ -5,10 +5,16 @@ import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.ConflictException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
+import backend.model.event.EventRepository
+import backend.model.event.TeamRepository
+import backend.model.event.TeamService
 import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserService
+import backend.services.ConfigurationService
 import backend.view.UserView
+import com.auth0.jwt.Algorithm
+import com.auth0.jwt.JWTSigner
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,8 +30,16 @@ import javax.validation.Valid
 @RequestMapping("/user")
 class UserController {
 
+    private val userService: UserService
+    private val JWT_SECRET: String
+    private val configurationService: ConfigurationService
+
     @Autowired
-    private lateinit var userService: UserService
+    constructor(userService: UserService, configurationService: ConfigurationService) {
+        this.userService = userService
+        this.configurationService = configurationService
+        this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
+    }
 
     /**
      * POST /user/
@@ -44,6 +58,9 @@ class UserController {
         if (userService.exists(email)) throw ConflictException("email ${body.email!!} already exists")
 
         val user = userService.create(email, password).apply(body)
+
+        user.profilePic.uploadToken = JWTSigner(JWT_SECRET).sign(mapOf("subject" to user.profilePic.id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512))
+
         return UserView(userService.save(user)!!)
     }
 
@@ -77,8 +94,7 @@ class UserController {
     @RequestMapping("/{id}/", method = arrayOf(GET))
     fun showUser(@PathVariable("id") id: Long): UserView {
 
-        val user = userService.getUserById(id)
-        if (user == null) throw NotFoundException("user with id $id does not exist")
+        val user = userService.getUserById(id) ?: throw NotFoundException("user with id $id does not exist")
         return (UserView(user))
     }
 

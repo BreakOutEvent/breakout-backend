@@ -26,6 +26,8 @@ class UserView() {
     @Valid
     var participant: ParticipantViewModel? = null
 
+    var profilePic: MediaView? = null
+
     constructor(user: User) : this() {
         this.user = user
         this.firstname = user.firstname
@@ -35,6 +37,7 @@ class UserView() {
         this.id = user.core!!.id
         this.isBlocked = user.isBlocked
         this.participant = if (user.hasRole(Participant::class)) ParticipantViewModel(user) else null
+        this.profilePic = MediaView(user.profilePic)
     }
 
     class ParticipantViewModel() {

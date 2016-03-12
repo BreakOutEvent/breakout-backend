@@ -1,6 +1,7 @@
 package backend.model.user
 
 import backend.model.BasicEntity
+import backend.model.media.Media
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.security.core.GrantedAuthority
 import javax.persistence.DiscriminatorColumn
@@ -58,6 +59,12 @@ abstract class UserRole() : BasicEntity(), User, GrantedAuthority {
         get() = this.core.gender
         set(gender) {
             this.core.gender = gender
+        }
+
+    override var profilePic: Media
+        get() = this.core.profilePic
+        set(profilePic) {
+            this.core.profilePic = profilePic
         }
 
     override fun <T : UserRole> addRole(clazz: KClass<T>): T = this.core.addRole(clazz)
