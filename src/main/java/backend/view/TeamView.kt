@@ -5,7 +5,7 @@ import org.hibernate.validator.constraints.NotEmpty
 import java.util.*
 import javax.validation.constraints.NotNull
 
-class TeamRequestView() {
+class TeamView() {
 
     var id: Long? = null
 
@@ -20,7 +20,7 @@ class TeamRequestView() {
 
     var members: MutableList<String>? = null
 
-    var profilePic: String? = null
+    var profilePic: MediaView? = null
 
     constructor(team: Team) : this() {
         this.id = team.id
@@ -29,6 +29,6 @@ class TeamRequestView() {
         this.description = team.description
         this.members = ArrayList<String>()
         team.members.forEach { this.members!!.add(it.email) }
-        this.profilePic = team.profilePic.mediaType.toString()
+        this.profilePic = MediaView(team.profilePic)
     }
 }

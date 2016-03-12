@@ -11,8 +11,7 @@ import backend.model.misc.EmailAddress
 import backend.model.user.Participant
 import backend.services.ConfigurationService
 import backend.utils.distanceCoordsListKMfromStart
-import backend.view.TeamRequestView
-import backend.view.TeamResponseView
+import backend.view.TeamView
 import com.auth0.jwt.Algorithm
 import com.auth0.jwt.JWTSigner
 import org.springframework.beans.factory.annotation.Autowired
@@ -48,7 +47,7 @@ open class TeamController {
     @RequestMapping("/", method = arrayOf(POST))
     fun createTeam(@PathVariable eventId: Long,
                    @AuthenticationPrincipal user: CustomUserDetails,
-                   @RequestBody body: TeamRequestView): TeamResponseView {
+                   @RequestBody body: TeamView): TeamView {
 
         val event = eventRepository.findById(eventId) ?: throw NotFoundException("No event with id $eventId")
         val creator = user.getRole(Participant::class) ?: throw UnauthorizedException("User is no participant")
@@ -56,7 +55,7 @@ open class TeamController {
 
         team.profilePic.uploadToken = JWTSigner(JWT_SECRET).sign(mapOf("subject" to team.profilePic.id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512))
 
-        return TeamResponseView(team)
+        return TeamView(team)
     }
 
     @ResponseStatus(CREATED)
@@ -98,9 +97,9 @@ open class TeamController {
             value = "/{id}/",
             method = arrayOf(RequestMethod.GET),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun showTeam(@PathVariable("id") id: Long): TeamResponseView {
+    fun showTeam(@PathVariable("id") id: Long): TeamView {
         val team = teamService.getByID(id) ?: throw NotFoundException("team with id $id does not exist")
-        return TeamResponseView(team)
+        return TeamView(team)
     }
 
     @RequestMapping(
