@@ -1,4 +1,4 @@
-package backend.model.posting
+package backend.model.media
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -10,8 +10,8 @@ class MediaServiceImpl @Autowired constructor(val repository: MediaRepository) :
 
     override fun findAll(): Iterable<Media> = repository.findAll()
 
-    override fun createMedia(posting: Posting, type: String): Media {
-        val media = Media(posting, type)
+    override fun createMedia(type: String): Media {
+        val media = Media(type)
         return repository.save(media)
     }
 

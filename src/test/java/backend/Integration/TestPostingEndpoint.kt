@@ -1,10 +1,9 @@
-@file:JvmName("TestPostEndpoint")
+@file:JvmName("TestPostingEndpoint")
 
 package backend.Integration
 
-import backend.model.event.Event
+import backend.model.media.Media
 import backend.model.misc.Coord
-import backend.model.posting.Media
 import backend.model.user.Admin
 import backend.model.user.Participant
 import backend.services.ConfigurationService
@@ -318,7 +317,7 @@ class TestPostingEndpoint : IntegrationTest() {
 
         val user = userService.create("test@mail.com", "password")
         val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null, 0.0);
-        val media = mediaService.createMedia(posting, "image")
+        val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
 
@@ -332,7 +331,7 @@ class TestPostingEndpoint : IntegrationTest() {
         ).toJsonString()
 
         val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/media/${savedposting!!.media!!.first().id}/")
+                .request(HttpMethod.POST, "/media/${savedposting!!.media!!.first().id}/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(postData)
 
@@ -348,7 +347,7 @@ class TestPostingEndpoint : IntegrationTest() {
 
         val user = userService.create("test@mail.com", "password")
         val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null, 0.0);
-        val media = mediaService.createMedia(posting, "image")
+        val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
 
@@ -362,7 +361,7 @@ class TestPostingEndpoint : IntegrationTest() {
         ).toJsonString()
 
         val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/media/${savedposting!!.media!!.first().id}/")
+                .request(HttpMethod.POST, "/media/${savedposting!!.media!!.first().id}/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-UPLOAD-TOKEN", "87654321")
                 .content(postData)
@@ -379,7 +378,7 @@ class TestPostingEndpoint : IntegrationTest() {
 
         val user = userService.create("test@mail.com", "password")
         val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null, 0.0);
-        val media = mediaService.createMedia(posting, "image")
+        val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
 
@@ -395,7 +394,7 @@ class TestPostingEndpoint : IntegrationTest() {
         println(posting.media)
 
         val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/media/${savedposting!!.media!!.first().id}/")
+                .request(HttpMethod.POST, "/media/${savedposting!!.media!!.first().id}/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .content(postData)

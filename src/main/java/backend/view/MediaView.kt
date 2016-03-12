@@ -1,6 +1,6 @@
 package backend.view
 
-import backend.model.posting.Media
+import backend.model.media.Media
 
 class MediaView() {
 
