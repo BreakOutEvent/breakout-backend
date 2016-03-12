@@ -53,7 +53,6 @@ open class TeamController {
         val event = eventRepository.findById(eventId) ?: throw NotFoundException("No event with id $eventId")
         val creator = user.getRole(Participant::class) ?: throw UnauthorizedException("User is no participant")
         var team = teamService.create(creator, body.name!!, body.description!!, event)
-        teamService.save(team)
 
         team.profilePic.uploadToken = JWTSigner(JWT_SECRET).sign(mapOf("subject" to team.profilePic.id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512))
 
