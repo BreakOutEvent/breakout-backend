@@ -13,8 +13,8 @@ import backend.model.media.MediaRepository
 import backend.model.media.MediaService
 import backend.model.media.MediaSizeRepository
 import backend.model.media.MediaSizeService
-import backend.model.misc.Coord
-import backend.model.posting.*
+import backend.model.posting.PostingRepository
+import backend.model.posting.PostingService
 import backend.model.user.User
 import backend.model.user.UserRepository
 import backend.model.user.UserService

@@ -1,7 +1,5 @@
 package backend.model.media
 
-import backend.model.posting.Posting
-
 interface MediaService {
     fun createMedia(type: String): Media
     fun findAll(): Iterable<Media>

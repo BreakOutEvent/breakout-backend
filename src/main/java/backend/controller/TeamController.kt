@@ -9,8 +9,12 @@ import backend.model.event.TeamRepository
 import backend.model.event.TeamService
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
+import backend.services.ConfigurationService
 import backend.utils.distanceCoordsListKMfromStart
-import backend.view.TeamView
+import backend.view.TeamRequestView
+import backend.view.TeamResponseView
+import com.auth0.jwt.Algorithm
+import com.auth0.jwt.JWTSigner
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.MediaType
@@ -24,27 +28,36 @@ import javax.validation.Valid
 @RequestMapping("/event/{eventId}/team")
 open class TeamController {
 
-    open var teamService: TeamService
-    open var eventRepository: EventRepository
-    open var teamRepository: TeamRepository
+    open val teamService: TeamService
+    open val eventRepository: EventRepository
+    open val teamRepository: TeamRepository
+    open val JWT_SECRET: String
+    open val configurationService: ConfigurationService
+
 
     @Autowired
-    constructor(teamService: TeamService, eventRepository: EventRepository, teamRepository: TeamRepository) {
+    constructor(teamService: TeamService, eventRepository: EventRepository, teamRepository: TeamRepository, configurationService: ConfigurationService) {
         this.teamService = teamService
         this.eventRepository = eventRepository
         this.teamRepository = teamRepository
+        this.configurationService = configurationService
+        this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
     }
 
     @ResponseStatus(CREATED)
     @RequestMapping("/", method = arrayOf(POST))
     fun createTeam(@PathVariable eventId: Long,
                    @AuthenticationPrincipal user: CustomUserDetails,
-                   @RequestBody body: TeamView): TeamView {
+                   @RequestBody body: TeamRequestView): TeamResponseView {
 
         val event = eventRepository.findById(eventId) ?: throw NotFoundException("No event with id $eventId")
         val creator = user.getRole(Participant::class) ?: throw UnauthorizedException("User is no participant")
+        var team = teamService.create(creator, body.name!!, body.description!!, event)
+        teamService.save(team)
 
-        return TeamView(teamService.create(creator, body.name!!, body.description!!, event))
+        team.profilePic.uploadToken = JWTSigner(JWT_SECRET).sign(mapOf("subject" to team.profilePic.id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512))
+
+        return TeamResponseView(team)
     }
 
     @ResponseStatus(CREATED)
@@ -86,9 +99,9 @@ open class TeamController {
             value = "/{id}/",
             method = arrayOf(RequestMethod.GET),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun showTeam(@PathVariable("id") id: Long): TeamView {
+    fun showTeam(@PathVariable("id") id: Long): TeamResponseView {
         val team = teamService.getByID(id) ?: throw NotFoundException("team with id $id does not exist")
-        return TeamView(team)
+        return TeamResponseView(team)
     }
 
     @RequestMapping(

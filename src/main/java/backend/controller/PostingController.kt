@@ -4,10 +4,9 @@ import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
-import backend.model.misc.Coord
 import backend.model.media.Media
 import backend.model.media.MediaService
-import backend.model.media.MediaSizeService
+import backend.model.misc.Coord
 import backend.model.posting.PostingService
 import backend.model.user.Participant
 import backend.services.ConfigurationService

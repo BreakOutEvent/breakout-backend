@@ -62,15 +62,22 @@ class TestTeamEndpoint : IntegrationTest() {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body)
 
-        mockMvc.perform(request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
                 .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.profilePic.type").exists())
+                .andExpect(jsonPath("$.profilePic.id").exists())
+                .andExpect(jsonPath("$.profilePic.uploadToken").exists())
                 .andExpect(jsonPath("$.event").value(event.id!!.toInt()))
                 .andExpect(jsonPath("$.name").value("Team awesome"))
                 .andExpect(jsonPath("$.description").value("Our team is awesome"))
                 .andExpect(jsonPath("$.members").isArray)
                 .andExpect(jsonPath<MutableCollection<out Any>>("$.members", hasSize(1)))
+                .andReturn().response.contentAsString
+
+        print(response)
     }
+
 
     @Test
     fun failToCreateTeamIfUserIsNoParticipant() {

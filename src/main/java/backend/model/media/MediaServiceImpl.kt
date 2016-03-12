@@ -1,6 +1,5 @@
 package backend.model.media
 
-import backend.model.posting.Posting
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 

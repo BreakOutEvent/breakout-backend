@@ -1,7 +1,6 @@
 package backend.model.media
 
 import backend.model.BasicEntity
-import backend.model.posting.Posting
 import java.util.*
 import javax.persistence.*
 

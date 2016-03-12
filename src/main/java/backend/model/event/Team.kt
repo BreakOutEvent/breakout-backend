@@ -3,6 +3,7 @@ package backend.model.event
 import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.event.Invitation.InvitationStatus
+import backend.model.media.Media
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
 import java.util.*
@@ -17,6 +18,7 @@ class Team() : BasicEntity() {
         this.name = name
         this.description = description
         this.event = event
+        this.profilePic = Media("image")
     }
 
     lateinit var name: String
@@ -28,6 +30,9 @@ class Team() : BasicEntity() {
 
     @OneToOne(cascade = arrayOf(ALL))
     private var invitation: Invitation? = null
+
+    @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true)
+    lateinit var profilePic: Media
 
     @OneToMany(mappedBy = "currentTeam", fetch = FetchType.EAGER)
     val members: MutableSet<Participant> = HashSet()
