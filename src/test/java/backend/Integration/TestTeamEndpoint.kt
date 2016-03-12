@@ -2,13 +2,18 @@ package backend.Integration
 
 import backend.model.event.Event
 import backend.model.event.Team
+import backend.model.media.Media
 import backend.model.misc.Coord
 import backend.model.posting.Posting
 import backend.model.user.Participant
 import backend.model.user.User
+import backend.services.ConfigurationService
+import com.auth0.jwt.Algorithm
+import com.auth0.jwt.JWTSigner
 import org.hamcrest.Matchers.hasSize
 import org.junit.Before
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
@@ -21,17 +26,23 @@ import java.time.LocalDateTime
 
 class TestTeamEndpoint : IntegrationTest() {
 
+    @Autowired
+    lateinit var configurationService: ConfigurationService
+    lateinit var JWT_SECRET: String
     lateinit var event: Event
     lateinit var team: Team
     lateinit var creatorCredentials: Credentials
     lateinit var creator: User
     lateinit var inviteeCredentials: Credentials
     lateinit var invitee: User
+    val APPLICATION_JSON_UTF_8 = "application/json;charset=UTF-8"
+
 
     @Before
     override fun setUp() {
         super.setUp()
 
+        this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
         event = eventService.createEvent(
                 title = "Breakout München",
                 date = LocalDateTime.now(),
@@ -76,6 +87,69 @@ class TestTeamEndpoint : IntegrationTest() {
                 .andReturn().response.contentAsString
 
         print(response)
+    }
+
+    @Test
+    fun testCreateTeamAndAddMediaSizesWithValidToken() {
+
+        val postData = mapOf(
+                "url" to "https://aws.amazon.com/bla.jpg",
+                "width" to 400,
+                "height" to 200,
+                "length" to 0.0,
+                "size" to 0.0,
+                "type" to "image"
+        ).toJsonString()
+
+        val request = MockMvcRequestBuilders
+                .request(HttpMethod.POST, "/media/${team.profilePic.id}/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to team.profilePic.id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
+                .content(postData)
+
+        val response = mockMvc.perform (request)
+                .andExpect(status().isCreated)
+                .andExpect(MockMvcResultMatchers.content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.url").exists())
+                .andExpect(jsonPath("$.width").exists())
+                .andExpect(jsonPath("$.height").exists())
+                .andExpect(jsonPath("$.length").exists())
+                .andExpect(jsonPath("$.size").exists())
+                .andExpect(jsonPath("$.type").exists())
+                .andReturn().response.contentAsString
+
+
+        println(response)
+
+        val requestMedia = MockMvcRequestBuilders
+                .request(HttpMethod.GET, "/event/${event.id}/team/${team.id}/")
+                .contentType(MediaType.APPLICATION_JSON)
+
+        val responseMedia = mockMvc.perform (requestMedia)
+                .andExpect(status().isOk)
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.name").exists())
+                .andExpect(jsonPath("$.event").exists())
+                .andExpect(jsonPath("$.description").exists())
+                .andExpect(jsonPath("$.members").exists())
+                .andExpect(jsonPath("$.profilePic").exists())
+                .andExpect(jsonPath("$.profilePic.id").exists())
+                .andExpect(jsonPath("$.profilePic.type").exists())
+                .andExpect(jsonPath("$.profilePic.sizes").exists())
+                .andExpect(jsonPath("$.profilePic.sizes").isArray)
+                .andExpect(jsonPath("$.profilePic.sizes[0]").exists())
+                .andExpect(jsonPath("$.profilePic.sizes[0].id").exists())
+                .andExpect(jsonPath("$.profilePic.sizes[0].url").exists())
+                .andExpect(jsonPath("$.profilePic.sizes[0].width").exists())
+                .andExpect(jsonPath("$.profilePic.sizes[0].height").exists())
+                .andExpect(jsonPath("$.profilePic.sizes[0].length").exists())
+                .andExpect(jsonPath("$.profilePic.sizes[0].size").exists())
+                .andExpect(jsonPath("$.profilePic.sizes[0].type").exists())
+                .andReturn().response.contentAsString
+
+        println(responseMedia)
     }
 
 

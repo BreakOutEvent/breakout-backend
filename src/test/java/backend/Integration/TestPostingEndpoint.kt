@@ -1,4 +1,4 @@
-@file:JvmName("TestPostEndpoint")
+@file:JvmName("TestPostingEndpoint")
 
 package backend.Integration
 
