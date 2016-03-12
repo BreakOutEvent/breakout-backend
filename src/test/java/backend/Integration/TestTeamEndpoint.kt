@@ -69,7 +69,9 @@ class TestTeamEndpoint : IntegrationTest() {
         val body = mapOf("name" to "Team awesome", "description" to "Our team is awesome").toJsonString()
 
         val request = post("/event/${event.id}/team/")
-                .header("Authorization", "Bearer ${creatorCredentials.accessToken}")
+                // TODO: Stop using inviteeCredentials just because creator already is part of a team because of setUp()
+                // TODO: This is just a workaround and the tests should be refactored to be structured properly
+                .header("Authorization", "Bearer ${inviteeCredentials.accessToken}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body)
 

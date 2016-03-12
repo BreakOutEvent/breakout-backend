@@ -1,5 +1,6 @@
 package backend.model.user
 
+import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.ConflictException
 import backend.exceptions.DomainException
 import backend.model.misc.Email
@@ -23,6 +24,11 @@ class UserServiceImpl : UserService {
         this.mailService = mailService
         this.host = configurationService.getRequired("org.breakout.api.host")
         this.port = configurationService.getRequired("org.breakout.api.port")
+    }
+
+    override fun getUserFromCustomUserDetails(customUserDetails: CustomUserDetails): User {
+        val user = userRepository.findOne(customUserDetails.id) ?: throw Exception("User could be authenticated but data was not found")
+        return user
     }
 
     override fun getUserById(id: Long): User? = userRepository.findOne(id)

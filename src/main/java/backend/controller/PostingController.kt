@@ -9,6 +9,7 @@ import backend.model.media.MediaService
 import backend.model.misc.Coord
 import backend.model.posting.PostingService
 import backend.model.user.Participant
+import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.utils.distanceCoordsKM
 import backend.view.PostingRequestView
@@ -33,17 +34,20 @@ class PostingController {
     private val configurationService: ConfigurationService
     private val logger: Logger
     private var JWT_SECRET: String
+    private val userService: UserService
 
     @Autowired
     constructor(postingService: PostingService,
                 mediaService: MediaService,
-                configurationService: ConfigurationService) {
+                configurationService: ConfigurationService,
+                userService: UserService) {
 
         this.postingService = postingService
         this.mediaService = mediaService
         this.configurationService = configurationService
         this.logger = Logger.getLogger(PostingController::class.java)
         this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
+        this.userService = userService
     }
 
 
@@ -53,8 +57,9 @@ class PostingController {
     @RequestMapping("/", method = arrayOf(POST))
     @ResponseStatus(CREATED)
     fun createPosting(@Valid @RequestBody body: PostingRequestView,
-                      @AuthenticationPrincipal user: CustomUserDetails): PostingResponseView {
+                      @AuthenticationPrincipal customUserDetails: CustomUserDetails): PostingResponseView {
 
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (body.media == null && body.text == null && body.postingLocation == null)
             throw BadRequestException("empty postings not allowed")
 

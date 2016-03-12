@@ -9,6 +9,7 @@ import backend.model.event.TeamRepository
 import backend.model.event.TeamService
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
+import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.utils.distanceCoordsListKMfromStart
 import backend.view.TeamView
@@ -32,23 +33,31 @@ open class TeamController {
     open val teamRepository: TeamRepository
     open val JWT_SECRET: String
     open val configurationService: ConfigurationService
+    open val userService: UserService
 
 
     @Autowired
-    constructor(teamService: TeamService, eventRepository: EventRepository, teamRepository: TeamRepository, configurationService: ConfigurationService) {
+    constructor(teamService: TeamService,
+                eventRepository: EventRepository,
+                teamRepository: TeamRepository,
+                configurationService: ConfigurationService,
+                userService: UserService) {
+
         this.teamService = teamService
         this.eventRepository = eventRepository
         this.teamRepository = teamRepository
         this.configurationService = configurationService
         this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
+        this.userService = userService
     }
 
     @ResponseStatus(CREATED)
     @RequestMapping("/", method = arrayOf(POST))
     fun createTeam(@PathVariable eventId: Long,
-                   @AuthenticationPrincipal user: CustomUserDetails,
+                   @AuthenticationPrincipal customUserDetails: CustomUserDetails,
                    @RequestBody body: TeamView): TeamView {
 
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val event = eventRepository.findById(eventId) ?: throw NotFoundException("No event with id $eventId")
         val creator = user.getRole(Participant::class) ?: throw UnauthorizedException("User is no participant")
         var team = teamService.create(creator, body.name!!, body.description!!, event)
@@ -77,9 +86,10 @@ open class TeamController {
     @RequestMapping("/{teamId}/member/", method = arrayOf(POST))
     fun joinTeam(@PathVariable eventId: Long,
                  @PathVariable teamId: Long,
-                 @AuthenticationPrincipal user: CustomUserDetails,
+                 @AuthenticationPrincipal customUserDetails: CustomUserDetails,
                  @Valid @RequestBody body: Map<String, String>) {
 
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (eventRepository.exists(eventId) == false) throw NotFoundException("No event with id $eventId")
 
         val team = teamRepository.findOne(teamId) ?: throw NotFoundException("No team with id $teamId")

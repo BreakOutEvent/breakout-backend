@@ -79,8 +79,9 @@ class UserController {
     @RequestMapping("/{id}/", method = arrayOf(PUT))
     fun updateUser(@PathVariable("id") id: Long,
                    @Valid @RequestBody body: UserView,
-                   @AuthenticationPrincipal user: CustomUserDetails): UserView {
+                   @AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
 
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (user.core!!.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")
         user.apply(body)
         userService.save(user)
