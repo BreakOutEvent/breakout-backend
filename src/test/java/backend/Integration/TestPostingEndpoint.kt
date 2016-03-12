@@ -318,7 +318,7 @@ class TestPostingEndpoint : IntegrationTest() {
 
         val user = userService.create("test@mail.com", "password")
         val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null, 0.0);
-        val media = mediaService.createMedia(posting, "image")
+        val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
 
@@ -348,7 +348,7 @@ class TestPostingEndpoint : IntegrationTest() {
 
         val user = userService.create("test@mail.com", "password")
         val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null, 0.0);
-        val media = mediaService.createMedia(posting, "image")
+        val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
 
@@ -379,7 +379,7 @@ class TestPostingEndpoint : IntegrationTest() {
 
         val user = userService.create("test@mail.com", "password")
         val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null, 0.0);
-        val media = mediaService.createMedia(posting, "image")
+        val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
 

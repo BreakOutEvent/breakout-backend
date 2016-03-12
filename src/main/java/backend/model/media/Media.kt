@@ -8,8 +8,6 @@ import javax.persistence.*
 @Entity
 class Media() : BasicEntity() {
 
-    @ManyToOne
-    var posting: Posting? = null
 
     @Enumerated(EnumType.STRING)
     var mediaType: MediaType? = null
@@ -21,9 +19,8 @@ class Media() : BasicEntity() {
     @Transient
     var uploadToken: String? = null
 
-    constructor(posting: Posting, type: String) : this() {
+    constructor(type: String) : this() {
         this.mediaType = MediaType.valueOf(type.toUpperCase())
-        this.posting = posting
     }
 
 }

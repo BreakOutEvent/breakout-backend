@@ -29,6 +29,7 @@ import javax.validation.Valid
 @RequestMapping("/posting")
 class PostingController {
 
+    private val mediaService: MediaService
     private val postingService: PostingService
     private val configurationService: ConfigurationService
     private val logger: Logger
@@ -36,9 +37,11 @@ class PostingController {
 
     @Autowired
     constructor(postingService: PostingService,
+                mediaService: MediaService,
                 configurationService: ConfigurationService) {
 
         this.postingService = postingService
+        this.mediaService = mediaService
         this.configurationService = configurationService
         this.logger = Logger.getLogger(PostingController::class.java)
         this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
@@ -75,7 +78,7 @@ class PostingController {
         if (body.media != null && body.media!! is List<*>) {
             media = arrayListOf()
             body.media!!.forEach {
-                media!!.add(Media(posting, it))
+                media!!.add(mediaService.save(Media(it))!!)
             }
         }
         posting.media = media

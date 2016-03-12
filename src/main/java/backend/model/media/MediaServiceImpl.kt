@@ -11,8 +11,8 @@ class MediaServiceImpl @Autowired constructor(val repository: MediaRepository) :
 
     override fun findAll(): Iterable<Media> = repository.findAll()
 
-    override fun createMedia(posting: Posting, type: String): Media {
-        val media = Media(posting, type)
+    override fun createMedia(type: String): Media {
+        val media = Media(type)
         return repository.save(media)
     }
 
