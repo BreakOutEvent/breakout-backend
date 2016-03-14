@@ -1,5 +1,6 @@
 package backend.controller
 
+import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
 import backend.model.event.EventService
@@ -8,7 +9,7 @@ import backend.model.location.Location
 import backend.model.location.LocationRepository
 import backend.model.location.Point
 import backend.model.user.Participant
-import backend.model.user.User
+import backend.model.user.UserService
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,12 +30,18 @@ open class LocationController {
     private val locationRepository: LocationRepository
     private val teamService: TeamService
     private val eventService: EventService
+    private val userService: UserService
 
     @Autowired
-    constructor(locationRepository: LocationRepository, teamService: TeamService, eventService: EventService) {
+    constructor(locationRepository: LocationRepository,
+                teamService: TeamService,
+                eventService: EventService,
+                userService: UserService) {
+
         this.locationRepository = locationRepository
         this.teamService = teamService
         this.eventService = eventService
+        this.userService = userService
     }
 
     /**
@@ -56,9 +63,10 @@ open class LocationController {
     @RequestMapping("/", method = arrayOf(POST))
     open fun createLocation(@PathVariable("eventId") eventId: Long,
                             @PathVariable("teamId") teamId: Long,
-                            @AuthenticationPrincipal user: User,
+                            @AuthenticationPrincipal customUserDetails: CustomUserDetails,
                             @Valid @RequestBody locationView: LocationView): LocationView {
 
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val participant = user.getRole(Participant::class) ?: throw UnauthorizedException("user is no participant")
         val team = teamService.getByID(eventId) ?: throw NotFoundException("no team with id $teamId found")
         if (!team.isMember(participant)) throw UnauthorizedException("user is not part of team $teamId are therefor cannot upload locations on it's behalf")
