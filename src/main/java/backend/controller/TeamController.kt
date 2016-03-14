@@ -128,7 +128,7 @@ open class TeamController {
     fun getTeamDistance(@PathVariable("id") id: Long): Map<String, Any> {
         val team = teamService.getByID(id) ?: throw NotFoundException("team with id $id does not exist")
         val postings = teamService.findLocationPostingsById(id) ?: throw NotFoundException("team with id $id does not exist")
-        val actualdistance = distanceCoordsListKMfromStart(team.event.startingLocation, postings.map { it.postLocation!! })
+        val actualdistance = distanceCoordsListKMfromStart(team.event.startingLocation, postings.map { it.location!!.toCoord() })
         val postingDistance = teamService.getPostingMaxDistanceById(id)
         var distance = 0.0
         if (postingDistance != null) {

@@ -3,9 +3,9 @@
 package backend.model.user
 
 import backend.model.event.Team
-import javax.persistence.DiscriminatorValue
-import javax.persistence.Entity
-import javax.persistence.ManyToOne
+import backend.model.location.Location
+import java.util.*
+import javax.persistence.*
 
 @Entity
 @DiscriminatorValue("PARTICIPANT")
@@ -19,8 +19,17 @@ class Participant : UserRole {
     @ManyToOne
     var currentTeam: Team? = null
 
+    @OneToMany(mappedBy = "uploader")
+    val locations: MutableList<Location> = ArrayList()
+
     constructor() : super()
     constructor(core: UserCore) : super(core)
 
     override fun getAuthority(): String = "PARTICIPANT"
+
+    @PreRemove
+    fun preRemove() {
+        this.locations.forEach { it.uploader = null }
+        this.locations.clear()
+    }
 }

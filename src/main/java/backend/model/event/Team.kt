@@ -38,7 +38,7 @@ class Team() : BasicEntity() {
     @OneToMany(mappedBy = "currentTeam", fetch = FetchType.EAGER)
     val members: MutableSet<Participant> = HashSet()
 
-    @OneToMany(mappedBy = "team")
+    @OneToMany(cascade = arrayOf(CascadeType.REMOVE), mappedBy = "team", orphanRemoval = true)
     val locations: MutableList<Location> = ArrayList()
 
     private fun addMember(participant: Participant) {
@@ -80,5 +80,7 @@ class Team() : BasicEntity() {
     fun preRemove() {
         this.members.forEach { it.currentTeam = null }
         this.members.clear()
+        this.locations.forEach { it.team = null }
+        this.locations.clear()
     }
 }

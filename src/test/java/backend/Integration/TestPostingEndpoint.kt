@@ -6,6 +6,7 @@ import backend.model.media.Media
 import backend.model.misc.Coord
 import backend.model.user.Admin
 import backend.model.user.Participant
+import backend.model.user.User
 import backend.services.ConfigurationService
 import com.auth0.jwt.Algorithm
 import com.auth0.jwt.JWTSigner
@@ -20,13 +21,15 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-class TestPostingEndpoint : IntegrationTest() {
+open class TestPostingEndpoint : IntegrationTest() {
 
     @Autowired
     private lateinit var configurationService: ConfigurationService
     private lateinit var JWT_SECRET: String
     private lateinit var userCredentials: Credentials
     private val APPLICATION_JSON_UTF_8 = "application/json;charset=UTF-8"
+    private lateinit var user: User
+
 
     @Before
     override fun setUp() {
@@ -55,7 +58,7 @@ class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun createNewPostingWithTextAndLocationAndMedia() {
+    open fun createNewPostingWithTextAndLocationAndMedia() {
         val postData = mapOf(
                 "text" to "TestPost",
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
@@ -101,7 +104,7 @@ class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun createNewPostingWithText() {
+    open fun createNewPostingWithText() {
         val postData = mapOf(
                 "text" to "TestPost",
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
@@ -126,7 +129,7 @@ class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun createNewPostingWithMedia() {
+    open fun createNewPostingWithMedia() {
         val postData = mapOf(
                 "media" to arrayOf(
                         "image",
@@ -163,7 +166,7 @@ class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun createNewPostingWithLocation() {
+    open fun createNewPostingWithLocation() {
         val postData = mapOf(
                 "postingLocation" to mapOf(
                         "latitude" to 0.0,
@@ -193,7 +196,7 @@ class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun dontCreatePostingForInvalidJSON() {
+    open fun dontCreatePostingForInvalidJSON() {
         val postData = mapOf(
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
         ).toJsonString()
@@ -213,7 +216,7 @@ class TestPostingEndpoint : IntegrationTest() {
 
 
     @Test
-    fun dontCreatePostingWithoutValidAuth() {
+    open fun dontCreatePostingWithoutValidAuth() {
         val postData = mapOf(
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
                 "postingLocation" to mapOf(
@@ -236,8 +239,12 @@ class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun getPostingById() {
-        val user = userService.create("test@mail.com", "password")
+    open fun getPostingById() {
+        val user = userService.create("test@mail.com", "password", {
+            addRole(Participant::class)
+        })
+        val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
+        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
         val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null, 0.0)
 
         val request = MockMvcRequestBuilders
@@ -261,8 +268,14 @@ class TestPostingEndpoint : IntegrationTest() {
 
 
     @Test
-    fun getPostingsByIds() {
-        val user = userService.create("test@mail.com", "password")
+    open fun getPostingsByIds() {
+
+        val user = userService.create("test@mail.com", "password", {
+            addRole(Participant::class)
+        })
+        val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
+        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+
         val postingZero = postingService.createPosting("Test0", Coord(0.0, 0.0), user.core!!, null, 0.0)
         postingService.createPosting("Test1", Coord(0.0, 0.0), user.core!!, null, 0.0)
         val postingTwo = postingService.createPosting("Test2", Coord(0.0, 0.0), user.core!!, null, 0.0)
@@ -289,8 +302,13 @@ class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun getPostingIdsSince() {
-        val user = userService.create("test@mail.com", "password")
+    open fun getPostingIdsSince() {
+        val user = userService.create("test@mail.com", "password", {
+            addRole(Participant::class)
+        })
+        val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
+        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+
         val postingZero = postingService.createPosting("Test0", Coord(0.0, 0.0), user.core!!, null, 0.0)
         postingService.createPosting("Test1", Coord(0.0, 0.0), user.core!!, null, 0.0)
         postingService.createPosting("Test2", Coord(0.0, 0.0), user.core!!, null, 0.0)
@@ -313,9 +331,14 @@ class TestPostingEndpoint : IntegrationTest() {
 
 
     @Test
-    fun createNewPostingWithMediaAndAddMediaSizesWithoutToken() {
+    open fun createNewPostingWithMediaAndAddMediaSizesWithoutToken() {
 
-        val user = userService.create("test@mail.com", "password")
+        val user = userService.create("test@mail.com", "password", {
+            addRole(Participant::class)
+        })
+        val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
+        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+
         val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null, 0.0);
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
@@ -343,9 +366,14 @@ class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun createNewPostingWithMediaAndAddMediaSizesWithWrongToken() {
+    open fun createNewPostingWithMediaAndAddMediaSizesWithWrongToken() {
 
-        val user = userService.create("test@mail.com", "password")
+        val user = userService.create("test@mail.com", "password", {
+            addRole(Participant::class)
+        })
+        val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
+        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+
         val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null, 0.0);
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
@@ -374,9 +402,14 @@ class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun createNewPostingWithMediaAndAddMediaSizesWithValidToken() {
+    open fun createNewPostingWithMediaAndAddMediaSizesWithValidToken() {
 
-        val user = userService.create("test@mail.com", "password")
+        val user = userService.create("test@mail.com", "password", {
+            addRole(Participant::class)
+        })
+        val event = eventService.createEvent("title", LocalDateTime.now(), "location", Coord(0.0, 0.0), 36)
+        teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+
         val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null, 0.0);
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
@@ -442,8 +475,12 @@ class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun getAllPostings() {
-        val user = userService.create("test@mail.com", "password")
+    open fun getAllPostings() {
+        val user = userService.create("test@mail.com", "password", {
+            addRole(Participant::class)
+        })
+        val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
+        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
         postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null, 0.0)
         postingService.createPosting("Test 2", Coord(0.0, 0.0), user.core!!, null, 0.0)
 
