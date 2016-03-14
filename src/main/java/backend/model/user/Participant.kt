@@ -22,7 +22,11 @@ class Participant : UserRole {
     @OneToMany(mappedBy = "uploader")
     val locations: MutableList<Location> = ArrayList()
 
-    constructor() : super()
+    /**
+     * Private constructor for JPA
+     */
+    private constructor() : super()
+
     constructor(core: UserCore) : super(core)
 
     override fun getAuthority(): String = "PARTICIPANT"

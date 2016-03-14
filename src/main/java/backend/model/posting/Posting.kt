@@ -11,7 +11,12 @@ import javax.persistence.*
 import javax.persistence.CascadeType.PERSIST
 
 @Entity
-class Posting() : BasicEntity() {
+class Posting : BasicEntity {
+
+    /**
+     * Private constructor for JPA
+     */
+    private constructor() : super()
 
     var text: String? = null
 

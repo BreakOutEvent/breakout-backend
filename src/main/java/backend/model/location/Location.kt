@@ -26,9 +26,9 @@ class Location : BasicEntity {
     var team: Team? = null
 
     /**
-     * no args constructor for orm
+     * Private constructor for JPA
      */
-    constructor() : super()
+    private constructor() : super()
 
     constructor(point: Point, uploader: Participant) {
         this.point = point

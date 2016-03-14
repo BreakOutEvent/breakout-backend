@@ -7,12 +7,17 @@ import javax.persistence.Enumerated
 import javax.persistence.ManyToOne
 
 @Entity
-class MediaSize() : BasicEntity() {
+class MediaSize : BasicEntity {
+
+    /**
+     * Private constructor for JPA
+     */
+    private constructor() : super()
 
     @ManyToOne
     var media: Media? = null
 
-    lateinit var  url: String
+    lateinit var url: String
 
     var width: Int? = null
 

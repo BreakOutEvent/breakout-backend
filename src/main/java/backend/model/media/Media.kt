@@ -5,8 +5,12 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
-class Media() : BasicEntity() {
+class Media : BasicEntity {
 
+    /**
+     * Private constructor for JPA
+     */
+    private constructor() : super()
 
     @Enumerated(EnumType.STRING)
     var mediaType: MediaType? = null

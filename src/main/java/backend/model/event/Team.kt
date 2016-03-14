@@ -12,7 +12,12 @@ import javax.persistence.*
 import javax.persistence.CascadeType.ALL
 
 @Entity
-class Team() : BasicEntity() {
+class Team : BasicEntity {
+
+    /**
+     * Private constructor for JPA
+     */
+    private constructor() : super()
 
     constructor(creator: Participant, name: String, description: String, event: Event) : this() {
         this.addMember(creator)

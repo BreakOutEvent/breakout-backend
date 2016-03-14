@@ -16,8 +16,10 @@ class Employee : UserRole {
     var title: String? = null
     var phonenumber: String? = null
 
-    constructor() : super() {
-    }
+    /**
+     * Private constructor for JPA
+     */
+    private constructor() : super()
 
     constructor(core: UserCore) : super(core) {
     }
