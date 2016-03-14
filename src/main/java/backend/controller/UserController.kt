@@ -82,7 +82,7 @@ class UserController {
                    @AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
-        if (user.core!!.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")
+        if (user.core.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")
         user.apply(body)
         userService.save(user)
         return UserView(user)

@@ -75,7 +75,7 @@ class PostingController {
             distance = distanceCoordsKM(team.event.startingLocation, location)
         }
 
-        var posting = postingService.createPosting(text = body.text, postingLocation = location, user = user.core!!, media = null, distance = distance)
+        var posting = postingService.createPosting(text = body.text, postingLocation = location, user = user.core, media = null, distance = distance)
 
         //Create Media-Objects for each media item requested to add
         var media: MutableList<Media>? = null

@@ -10,7 +10,7 @@ interface User {
     var passwordHash: String
     var isBlocked: Boolean
 
-    val core: UserCore?
+    val core: UserCore
     var firstname: String?
     var lastname: String?
     var gender: String?
@@ -35,5 +35,5 @@ interface User {
     fun createActivationToken(): String
     fun isActivated(): Boolean
 
-    fun isSameUserAs(user: User) = this.core!!.id == user.core!!.id
+    fun isSameUserAs(user: User) = this.core.id == user.core.id
 }

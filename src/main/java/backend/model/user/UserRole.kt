@@ -89,8 +89,10 @@ abstract class UserRole : BasicEntity, User, GrantedAuthority {
          * Create new instance of a subclass of userRole
          * @param clazz The class of which an instance should be created. Must be subclass of UserRole
          *              and have a noargs constructor
+         * @param core  The core with the UserRole will have
          * @return Returns a new instance of the specified class with a corresponding UserCore
          */
+        @Suppress("UNCHECKED_CAST")
         @Throws(Exception::class)
         fun <T : UserRole> createFor(clazz: Class<T>, core: UserCore): UserRole {
             val constructor = clazz.declaredConstructors.filter { it.parameterCount == 0 }.firstOrNull()

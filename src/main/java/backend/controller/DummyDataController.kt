@@ -38,7 +38,7 @@ class DummyDataController {
             val user = userService.create("email$it@mail.com", "password")
             val token = user.createActivationToken()
             user.activate(token)
-            return@map user.core!!.id!!
+            return@map user.core.id!!
         }
     }
 

@@ -48,7 +48,7 @@ class UserServiceImpl : UserService {
 
         sendActivationEmail(token, user)
 
-        return userRepository.save(user.core!!);
+        return userRepository.save(user.core);
     }
 
     override fun activate(user: User, token: String) {
@@ -72,7 +72,7 @@ class UserServiceImpl : UserService {
         return "http://$host:$port/activation?token=$token&email=${user.email}"
     }
 
-    override fun save(user: User): User = userRepository.save(user.core!!)
+    override fun save(user: User): User = userRepository.save(user.core)
 
     override fun create(email: String, password: String, f: User.() -> Unit) : User {
         val user = this.create(email, password)

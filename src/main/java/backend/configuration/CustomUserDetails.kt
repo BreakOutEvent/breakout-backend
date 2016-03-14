@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails
 
 class CustomUserDetails(val user: User) : UserDetails {
 
-    val id = user.core!!.id
+    val id = user.core.id
 
     override fun getUsername() = user.email
 
@@ -15,7 +15,7 @@ class CustomUserDetails(val user: User) : UserDetails {
 
     override fun isAccountNonLocked() = true
 
-    override fun getAuthorities() = user.core!!.getAuthorities()
+    override fun getAuthorities() = user.core.getAuthorities()
 
     override fun isEnabled() = !user.isBlocked
 
