@@ -3,6 +3,7 @@ package backend.model.event
 import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.event.Invitation.InvitationStatus
+import backend.model.location.Location
 import backend.model.media.Media
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
@@ -37,6 +38,9 @@ class Team() : BasicEntity() {
     @OneToMany(mappedBy = "currentTeam", fetch = FetchType.EAGER)
     val members: MutableSet<Participant> = HashSet()
 
+    @OneToMany(cascade = arrayOf(CascadeType.REMOVE), mappedBy = "team", orphanRemoval = true)
+    val locations: MutableList<Location> = ArrayList()
+
     private fun addMember(participant: Participant) {
         if (participant.currentTeam != null) throw DomainException("Participant ${participant.email} already is part of a team")
         if (members.size >= 2) throw DomainException("This team already has two members")
@@ -68,9 +72,15 @@ class Team() : BasicEntity() {
         return this.members.map { participant -> participant.email }.contains(username)
     }
 
+    fun isMember(participant: Participant): Boolean {
+        return this.members.filter { it.isSameUserAs(participant) }.isNotEmpty()
+    }
+
     @PreRemove
     fun preRemove() {
         this.members.forEach { it.currentTeam = null }
         this.members.clear()
+        this.locations.forEach { it.team = null }
+        this.locations.clear()
     }
 }

@@ -11,7 +11,7 @@ interface UserService {
     fun getAllUsers(): MutableIterable<UserCore>?;
 
     fun create(email: String, password: String): User
-    fun create(email: String, password: String, f: User.() -> Unit)
+    fun create(email: String, password: String, f: User.() -> Unit): User
 
     fun save(user: User): User?
 

@@ -67,7 +67,7 @@ open class EventController {
     open fun getEventDistance(@PathVariable("id") id: Long): Map<String, Any> {
         val event = eventService.getById(id) ?: throw NotFoundException("event with id $id does not exist")
         val postings = eventService.findLocationPostingsById(id) ?: throw NotFoundException("event with id $id does not exist")
-        val actualdistance = distanceCoordsListKMfromStart(event.startingLocation, postings.map { it.postLocation!! })
+        val actualdistance = distanceCoordsListKMfromStart(event.startingLocation, postings.map { it.location!!.toCoord() })
         val postingDistance = eventService.getPostingMaxDistanceById(id)
         var distance = 0.0
         if (postingDistance != null) {

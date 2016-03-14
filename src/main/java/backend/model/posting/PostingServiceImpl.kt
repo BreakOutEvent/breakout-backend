@@ -1,7 +1,11 @@
 package backend.model.posting
 
+import backend.exceptions.DomainException
+import backend.model.location.Location
+import backend.model.location.Point
 import backend.model.media.Media
 import backend.model.misc.Coord
+import backend.model.user.Participant
 import backend.model.user.UserCore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -16,7 +20,21 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
 
     override fun findAll(): Iterable<Posting> = repository.findAll()
 
-    override fun createPosting(text: String?, postingLocation: Coord?, user: UserCore, media: MutableList<Media>?, distance: Double?): Posting = repository.save(Posting(text, postingLocation, user, media, distance))
+    override fun createPosting(text: String?,
+                               postingLocation: Coord?,
+                               user: UserCore,
+                               media: MutableList<Media>?,
+                               distance: Double?): Posting {
+
+        var location: Location? = null
+        if (postingLocation != null) {
+            val uploader = user.getRole(Participant::class)
+                    ?: throw DomainException("user is no participant and can therefor not upload location")
+            location = Location(Point(postingLocation.latitude, postingLocation.longitude), uploader)
+        }
+
+        return repository.save(Posting(text, location, user, media, distance))
+    }
 
     override fun getByID(id: Long): Posting? = repository.findById(id)
 }
