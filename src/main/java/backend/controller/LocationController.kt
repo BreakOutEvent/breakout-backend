@@ -10,8 +10,7 @@ import backend.model.location.LocationRepository
 import backend.model.location.Point
 import backend.model.user.Participant
 import backend.model.user.UserService
-import com.fasterxml.jackson.annotation.JsonCreator
-import com.fasterxml.jackson.annotation.JsonProperty
+import backend.view.LocationView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod.POST
 import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
-import javax.validation.constraints.NotNull
 
 @RestController
 @RequestMapping("/event/{eventId}/team/{teamId}/location")
@@ -79,25 +77,4 @@ open class LocationController {
         return LocationView(savedLocation)
     }
 
-}
-
-class LocationView {
-
-    @NotNull
-    val latitude: Double
-
-    @NotNull
-    val longitude: Double
-
-
-    constructor(location: Location) {
-        this.latitude = location.point.latitude
-        this.longitude = location.point.longitude
-    }
-
-    @JsonCreator
-    constructor(@JsonProperty("latitude") latitude: Double, @JsonProperty("longitude") longitude: Double) {
-        this.latitude = latitude
-        this.longitude = longitude
-    }
 }
