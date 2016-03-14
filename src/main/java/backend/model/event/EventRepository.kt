@@ -12,7 +12,7 @@ interface EventRepository : CrudRepository<Event, Long> {
     @Query("Select p.id from Posting p inner join p.user u inner join u.userRoles r inner join r.currentTeam t where t.event.id = :id order by p.date asc")
     fun findPostingsById(@Param("id") id: Long): List<Long>
 
-    @Query("Select p from Posting p inner join p.user u inner join u.userRoles r inner join r.currentTeam t where t.event.id = :id and latitude is not null and longitude is not null order by p.date asc")
+    @Query("Select p from Posting p inner join p.user u inner join u.userRoles r inner join r.currentTeam t where t.event.id = :id and p.location is not null order by p.date asc")
     fun findLocationPostingsById(@Param("id") id: Long): List<Posting>
 
     @Query("Select p from Posting p inner join p.user u inner join u.userRoles r inner join r.currentTeam t where t.event.id = :id and distance is not null order by p.distance asc")
