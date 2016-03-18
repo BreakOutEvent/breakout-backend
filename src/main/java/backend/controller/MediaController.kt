@@ -2,7 +2,9 @@ package backend.controller
 
 import backend.controller.exceptions.UnauthorizedException
 import backend.model.media.MediaService
+import backend.model.media.MediaSize
 import backend.model.media.MediaSizeService
+import backend.model.media.MediaType
 import backend.services.ConfigurationService
 import backend.view.MediaSizeView
 import com.auth0.jwt.JWTVerifier
@@ -55,8 +57,28 @@ class MediaController {
         }
 
         val media = mediaService.getByID(id);
-        var mediaSize = mediaSizeService.createAndSaveMediaSize(media!!, body.url!!, body.width!!, body.height!!, body.length!!, body.size!!, body.type!!)
 
-        return MediaSizeView(mediaSize)
+        //Delete Size, if it already exists
+        var mediaSizeFound: MediaSize?
+        if (body.width!! > body.height!!) {
+            logger.info("findByWidthAndMediaId")
+            mediaSizeFound = mediaSizeService.findByWidthAndMedia(body.width!!, media!!);
+        } else {
+            logger.info("findByHeightAndMediaId")
+            mediaSizeFound = mediaSizeService.findByHeightAndMedia(body.height!!, media!!);
+        }
+        if (mediaSizeFound == null) {
+            var mediaSize = mediaSizeService.createAndSaveMediaSize(media, body.url!!, body.width!!, body.height!!, body.length!!, body.size!!, body.type!!)
+            return MediaSizeView(mediaSize)
+        } else {
+            mediaSizeFound.url = body.url!!
+            mediaSizeFound.width = body.width
+            mediaSizeFound.height = body.height
+            mediaSizeFound.length = body.length
+            mediaSizeFound.size = body.size
+            mediaSizeFound.mediaType = MediaType.valueOf(body.type!!.toUpperCase())
+            mediaSizeService.save(mediaSizeFound)
+            return MediaSizeView(mediaSizeFound)
+        }
     }
 }

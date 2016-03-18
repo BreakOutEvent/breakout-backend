@@ -2,9 +2,11 @@ package backend.model.media
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class MediaSizeServiceImpl : MediaSizeService {
+
 
     private val repository: MediaSizeRepository
     private val mediaRepository: MediaRepository
@@ -29,5 +31,13 @@ class MediaSizeServiceImpl : MediaSizeService {
 
     override fun getByID(id: Long): MediaSize? {
         return repository.findById(id)
+    }
+
+    override fun findByWidthAndMedia(width: Int, media: Media):MediaSize? {
+        return repository.findByWidthAndMedia(width, media)
+    }
+
+    override fun findByHeightAndMedia(height: Int, media: Media):MediaSize? {
+        return repository.findByHeightAndMedia(height, media)
     }
 }
