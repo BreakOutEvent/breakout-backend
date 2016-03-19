@@ -1,8 +1,5 @@
 package backend.Integration
 
-import backend.model.event.Event
-import backend.model.event.Team
-import backend.model.user.User
 import backend.services.ConfigurationService
 import com.auth0.jwt.Algorithm
 import com.auth0.jwt.JWTSigner
@@ -160,7 +157,7 @@ class TestUserEndpoint : IntegrationTest() {
         println(response)
 
         val requestMedia = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/user/${user.core!!.id}/")
+                .request(HttpMethod.GET, "/user/${user.core.id}/")
                 .contentType(MediaType.APPLICATION_JSON)
 
         val responseMedia = mockMvc.perform (requestMedia)

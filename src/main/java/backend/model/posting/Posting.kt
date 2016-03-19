@@ -3,7 +3,6 @@ package backend.model.posting
 import backend.model.BasicEntity
 import backend.model.location.Location
 import backend.model.media.Media
-import backend.model.misc.Coord
 import backend.model.user.UserCore
 import java.time.LocalDateTime
 import java.util.*

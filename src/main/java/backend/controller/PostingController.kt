@@ -11,7 +11,7 @@ import backend.model.posting.PostingService
 import backend.model.user.Participant
 import backend.model.user.UserService
 import backend.services.ConfigurationService
-import backend.utils.distanceCoordsKM
+import backend.util.distanceCoordsKM
 import backend.view.PostingRequestView
 import backend.view.PostingResponseView
 import com.auth0.jwt.Algorithm

@@ -1,7 +1,10 @@
 package backend.model.media
 
 import backend.model.BasicEntity
-import javax.persistence.*
+import javax.persistence.Entity
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
+import javax.persistence.ManyToOne
 
 @Entity
 class MediaSize : BasicEntity {

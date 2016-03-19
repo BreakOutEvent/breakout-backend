@@ -1,10 +1,10 @@
 package backend.util
 
 import backend.model.misc.Coord
-import backend.utils.coordToPoint
-import backend.utils.coordsListToPairList
-import backend.utils.distanceCoordsKM
-import backend.utils.distanceCoordsListKM
+import backend.util.coordToPoint
+import backend.util.coordsListToPairList
+import backend.util.distanceCoordsKM
+import backend.util.distanceCoordsListKM
 import com.grum.geocalc.DegreeCoordinate
 import com.grum.geocalc.Point
 import org.junit.Test

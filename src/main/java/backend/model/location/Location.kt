@@ -6,7 +6,10 @@ import backend.model.event.Team
 import backend.model.misc.Coord
 import backend.model.posting.Posting
 import backend.model.user.Participant
-import javax.persistence.*
+import javax.persistence.Embedded
+import javax.persistence.Entity
+import javax.persistence.ManyToOne
+import javax.persistence.OneToOne
 
 @Entity
 class Location : BasicEntity {

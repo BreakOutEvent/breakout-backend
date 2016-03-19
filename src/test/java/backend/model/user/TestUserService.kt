@@ -16,9 +16,9 @@ class TestUserService : IntegrationTest() {
     @Test
     fun getUserById() {
         val user = userService.create("test@mail.de", "Awesome password")
-        val user2 = userService.getUserById(user.core!!.id!!)
+        val user2 = userService.getUserById(user.core.id!!)
 
-        assertEquals(user.core!!.id, user2!!.core!!.id)
+        assertEquals(user.core.id, user2!!.core.id)
         assertTrue(BCryptPasswordEncoder().matches("Awesome password", user.passwordHash))
         assertFalse(BCryptPasswordEncoder().matches("Not Awesome password", user.passwordHash))
     }
@@ -28,7 +28,7 @@ class TestUserService : IntegrationTest() {
         val user = userService.create("test@mail.de", "password")
         val user2 = userService.getUserByEmail(user.email)
 
-        assertEquals(user.core!!.email, user2!!.core!!.email)
+        assertEquals(user.core.email, user2!!.core.email)
     }
 
     @Test

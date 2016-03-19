@@ -3,7 +3,7 @@ package backend.controller
 import backend.controller.exceptions.NotFoundException
 import backend.model.event.EventService
 import backend.model.misc.Coord
-import backend.utils.distanceCoordsListKMfromStart
+import backend.util.distanceCoordsListKMfromStart
 import backend.view.EventView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED

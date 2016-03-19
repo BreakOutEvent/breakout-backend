@@ -62,8 +62,8 @@ class TestTeamEndpoint : IntegrationTest() {
         val firstLocation = Location(Point(1.0, 1.0), creator.getRole(Participant::class)!!)
         val secondLocation = Location(Point(1.2, 2.0), creator.getRole(Participant::class)!!)
 
-        postingService.save(Posting("test", firstLocation, creator.core!!, null, 156.899568))
-        postingService.save(Posting("test", secondLocation, creator.core!!, null, 259.16669))
+        postingService.save(Posting("test", firstLocation, creator.core, null, 156.899568))
+        postingService.save(Posting("test", secondLocation, creator.core, null, 259.16669))
 
     }
 

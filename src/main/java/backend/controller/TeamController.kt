@@ -11,7 +11,7 @@ import backend.model.misc.EmailAddress
 import backend.model.user.Participant
 import backend.model.user.UserService
 import backend.services.ConfigurationService
-import backend.utils.distanceCoordsListKMfromStart
+import backend.util.distanceCoordsListKMfromStart
 import backend.view.TeamView
 import com.auth0.jwt.Algorithm
 import com.auth0.jwt.JWTSigner
