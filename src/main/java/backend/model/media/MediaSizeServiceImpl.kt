@@ -33,11 +33,11 @@ class MediaSizeServiceImpl : MediaSizeService {
         return repository.findById(id)
     }
 
-    override fun findByWidthAndMedia(width: Int, media: Media):MediaSize? {
-        return repository.findByWidthAndMedia(width, media)
+    override fun findByWidthAndMediaAndMediaType(width: Int, media: Media, type: MediaType): MediaSize? {
+        return repository.findByWidthAndMediaAndMediaType(width, media, type)
     }
 
-    override fun findByHeightAndMedia(height: Int, media: Media):MediaSize? {
-        return repository.findByHeightAndMedia(height, media)
+    override fun findByHeightAndMediaAndMediaType(height: Int, media: Media, type: MediaType): MediaSize? {
+        return repository.findByHeightAndMediaAndMediaType(height, media, type)
     }
 }

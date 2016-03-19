@@ -5,6 +5,6 @@ interface MediaSizeService {
     fun findAll(): Iterable<MediaSize>
     fun getByID(id: Long): MediaSize?
     fun save(mediaSize: MediaSize): MediaSize?
-    fun findByWidthAndMedia(width: Int, media: Media): MediaSize?
-    fun findByHeightAndMedia(height: Int, media: Media): MediaSize?
+    fun findByWidthAndMediaAndMediaType(width: Int, media: Media, type: MediaType): MediaSize?
+    fun findByHeightAndMediaAndMediaType(height: Int, media: Media, type: MediaType): MediaSize?
 }

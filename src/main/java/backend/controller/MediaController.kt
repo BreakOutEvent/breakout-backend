@@ -62,10 +62,10 @@ class MediaController {
         var mediaSizeFound: MediaSize?
         if (body.width!! > body.height!!) {
             logger.info("findByWidthAndMediaId")
-            mediaSizeFound = mediaSizeService.findByWidthAndMedia(body.width!!, media!!);
+            mediaSizeFound = mediaSizeService.findByWidthAndMediaAndMediaType(body.width!!, media!!, MediaType.valueOf(body.type!!.toUpperCase()));
         } else {
             logger.info("findByHeightAndMediaId")
-            mediaSizeFound = mediaSizeService.findByHeightAndMedia(body.height!!, media!!);
+            mediaSizeFound = mediaSizeService.findByHeightAndMediaAndMediaType(body.height!!, media!!, MediaType.valueOf(body.type!!.toUpperCase()));
         }
         if (mediaSizeFound == null) {
             var mediaSize = mediaSizeService.createAndSaveMediaSize(media, body.url!!, body.width!!, body.height!!, body.length!!, body.size!!, body.type!!)
