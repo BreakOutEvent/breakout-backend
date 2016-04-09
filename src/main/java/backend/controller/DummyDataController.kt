@@ -59,7 +59,8 @@ class DummyDataController {
                         postingLocation = Coord(0.0, 0.0),
                         media = null,
                         user = user,
-                        distance = 0.0).id!!
+                        distance = 0.0,
+                        date = LocalDateTime.now()).id!!
             } else 1
         }
     }

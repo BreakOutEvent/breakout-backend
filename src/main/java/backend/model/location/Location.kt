@@ -6,6 +6,7 @@ import backend.model.event.Team
 import backend.model.misc.Coord
 import backend.model.posting.Posting
 import backend.model.user.Participant
+import java.time.LocalDateTime
 import javax.persistence.Embedded
 import javax.persistence.Entity
 import javax.persistence.ManyToOne
@@ -28,15 +29,18 @@ class Location : BasicEntity {
     @ManyToOne
     var team: Team? = null
 
+    lateinit var date: LocalDateTime
+
     /**
      * Private constructor for JPA
      */
     private constructor() : super()
 
-    constructor(point: Point, uploader: Participant) {
+    constructor(point: Point, uploader: Participant, date: LocalDateTime) {
         this.point = point
         this.team = uploader.currentTeam ?: throw DomainException("A user without a team can't upload locations")
         this.uploader = uploader
+        this.date = date
     }
 
     fun toCoord() = Coord(latitude = this.point.latitude, longitude = this.point.longitude)

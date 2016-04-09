@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod.POST
 import org.springframework.web.bind.annotation.RestController
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.validation.Valid
 
 @RestController
@@ -70,7 +73,10 @@ open class LocationController {
         if (!team.isMember(participant)) throw UnauthorizedException("user is not part of team $teamId are therefor cannot upload locations on it's behalf")
 
         val point = Point(locationView.latitude, locationView.longitude)
-        val location = Location(point, participant)
+
+        val instant: Instant = Instant.ofEpochMilli(locationView.date);
+        val date: LocalDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        val location = Location(point, participant, date)
 
         val savedLocation = locationRepository.save(location)
 

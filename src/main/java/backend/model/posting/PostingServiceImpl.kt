@@ -9,6 +9,7 @@ import backend.model.user.Participant
 import backend.model.user.UserCore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class PostingServiceImpl @Autowired constructor(val repository: PostingRepository) : PostingService {
@@ -24,13 +25,14 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
                                postingLocation: Coord?,
                                user: UserCore,
                                media: MutableList<Media>?,
-                               distance: Double?): Posting {
+                               distance: Double?,
+                               date: LocalDateTime): Posting {
 
         var location: Location? = null
         if (postingLocation != null) {
             val uploader = user.getRole(Participant::class)
                     ?: throw DomainException("user is no participant and can therefor not upload location")
-            location = Location(Point(postingLocation.latitude, postingLocation.longitude), uploader)
+            location = Location(Point(postingLocation.latitude, postingLocation.longitude), uploader, date)
         }
 
         return repository.save(Posting(text, location, user, media, distance))

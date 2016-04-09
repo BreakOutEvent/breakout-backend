@@ -23,6 +23,9 @@ import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RequestMethod.POST
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.validation.Valid
 
 @RestController
@@ -75,7 +78,10 @@ class PostingController {
             distance = distanceCoordsKM(team.event.startingLocation, location)
         }
 
-        var posting = postingService.createPosting(text = body.text, postingLocation = location, user = user.core, media = null, distance = distance)
+        val instant: Instant = Instant.ofEpochMilli(body.date!!);
+        val date: LocalDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+
+        var posting = postingService.createPosting(text = body.text, postingLocation = location, user = user.core, media = null, distance = distance, date = date)
 
         //Create Media-Objects for each media item requested to add
         var media: MutableList<Media>? = null
