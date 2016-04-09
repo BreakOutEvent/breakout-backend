@@ -83,4 +83,35 @@ open class LocationController {
         return LocationView(savedLocation)
     }
 
+    /**
+     * Upload multiple new locations for a specific team at a specific event
+     * Mapped to POST /event/{eventId}/team/{teamId}/location/multiple/
+     */
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping("/multiple/", method = arrayOf(POST))
+    open fun createMultipleLocation(@PathVariable("eventId") eventId: Long,
+                                    @PathVariable("teamId") teamId: Long,
+                                    @AuthenticationPrincipal customUserDetails: CustomUserDetails,
+                                    @Valid @RequestBody locationViews: List<LocationView>): List<LocationView> {
+
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
+        val participant = user.getRole(Participant::class) ?: throw UnauthorizedException("user is no participant")
+        val team = teamService.getByID(eventId) ?: throw NotFoundException("no team with id $teamId found")
+        if (!team.isMember(participant)) throw UnauthorizedException("user is not part of team $teamId are therefor cannot upload locations on it's behalf")
+
+        val savedLocations: MutableList<Location> = listOf<Location>() as MutableList<Location>
+
+        locationViews.forEach {
+            val point = Point(it.latitude, it.longitude)
+
+            val instant: Instant = Instant.ofEpochMilli(it.date);
+            val date: LocalDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+            val location = Location(point, participant, date)
+
+            savedLocations.add(locationRepository.save(location))
+        }
+
+        return savedLocations.map { LocationView(it) }
+    }
+
 }
