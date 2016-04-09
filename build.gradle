@@ -61,7 +61,7 @@ dependencies {
     compile 'commons-validator:commons-validator:1.5.0'
     compile 'com.auth0:java-jwt:2.0.1'
     compile 'com.github.grumlimited:geocalc:v0.5.1'
-    compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.7.1-2"
+    compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.6.5-2"
 
     testCompile "org.powermock:powermock-module-junit4:$powermock_version"
     testCompile "org.powermock:powermock-api-mockito:$powermock_version"
