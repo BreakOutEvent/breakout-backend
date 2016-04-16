@@ -3,6 +3,8 @@ package backend.model.event
 import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.event.Invitation.InvitationStatus
+import backend.model.location.Location
+import backend.model.media.Media
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
 import java.util.*
@@ -10,13 +12,19 @@ import javax.persistence.*
 import javax.persistence.CascadeType.ALL
 
 @Entity
-class Team() : BasicEntity() {
+class Team : BasicEntity {
+
+    /**
+     * Private constructor for JPA
+     */
+    private constructor() : super()
 
     constructor(creator: Participant, name: String, description: String, event: Event) : this() {
         this.addMember(creator)
         this.name = name
         this.description = description
         this.event = event
+        this.profilePic = Media("image")
     }
 
     lateinit var name: String
@@ -29,8 +37,14 @@ class Team() : BasicEntity() {
     @OneToOne(cascade = arrayOf(ALL))
     private var invitation: Invitation? = null
 
+    @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true)
+    lateinit var profilePic: Media
+
     @OneToMany(mappedBy = "currentTeam", fetch = FetchType.EAGER)
     val members: MutableSet<Participant> = HashSet()
+
+    @OneToMany(cascade = arrayOf(CascadeType.REMOVE), mappedBy = "team", orphanRemoval = true)
+    val locations: MutableList<Location> = ArrayList()
 
     private fun addMember(participant: Participant) {
         if (participant.currentTeam != null) throw DomainException("Participant ${participant.email} already is part of a team")
@@ -63,9 +77,15 @@ class Team() : BasicEntity() {
         return this.members.map { participant -> participant.email }.contains(username)
     }
 
+    fun isMember(participant: Participant): Boolean {
+        return this.members.filter { it.isSameUserAs(participant) }.isNotEmpty()
+    }
+
     @PreRemove
     fun preRemove() {
         this.members.forEach { it.currentTeam = null }
         this.members.clear()
+        this.locations.forEach { it.team = null }
+        this.locations.clear()
     }
 }

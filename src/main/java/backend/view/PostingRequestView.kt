@@ -24,7 +24,7 @@ class PostingRequestView() {
         this.id = posting.id
         this.text = posting.text
         this.date = posting.date.toEpochSecond(ZoneOffset.UTC)
-        this.postingLocation = CoordView(posting.postLocation)
+        this.postingLocation = CoordView(posting.location?.toCoord())
         this.user = UserView(posting.user!!.core)
         this.media = posting.media?.map { it.mediaType.toString() }
     }

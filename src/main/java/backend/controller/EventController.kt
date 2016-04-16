@@ -3,8 +3,7 @@ package backend.controller
 import backend.controller.exceptions.NotFoundException
 import backend.model.event.EventService
 import backend.model.misc.Coord
-import backend.utils.distanceCoordsListKM
-import backend.utils.distanceCoordsListKMfromStart
+import backend.util.distanceCoordsListKMfromStart
 import backend.view.EventView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
@@ -68,7 +67,7 @@ open class EventController {
     open fun getEventDistance(@PathVariable("id") id: Long): Map<String, Any> {
         val event = eventService.getById(id) ?: throw NotFoundException("event with id $id does not exist")
         val postings = eventService.findLocationPostingsById(id) ?: throw NotFoundException("event with id $id does not exist")
-        val actualdistance = distanceCoordsListKMfromStart(event.startingLocation, postings.map { it.postLocation!! })
+        val actualdistance = distanceCoordsListKMfromStart(event.startingLocation, postings.map { it.location!!.toCoord() })
         val postingDistance = eventService.getPostingMaxDistanceById(id)
         var distance = 0.0
         if (postingDistance != null) {

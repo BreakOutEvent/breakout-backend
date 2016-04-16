@@ -1,5 +1,6 @@
 package backend.model.user
 
+import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.ConflictException
 import backend.exceptions.DomainException
 import backend.model.misc.Email
@@ -25,6 +26,11 @@ class UserServiceImpl : UserService {
         this.port = configurationService.getRequired("org.breakout.api.port")
     }
 
+    override fun getUserFromCustomUserDetails(customUserDetails: CustomUserDetails): User {
+        val user = userRepository.findOne(customUserDetails.id) ?: throw Exception("User could be authenticated but data was not found")
+        return user
+    }
+
     override fun getUserById(id: Long): User? = userRepository.findOne(id)
 
     override fun getUserByEmail(email: String): User? = userRepository.findByEmail(email);
@@ -42,7 +48,7 @@ class UserServiceImpl : UserService {
 
         sendActivationEmail(token, user)
 
-        return userRepository.save(user.core!!);
+        return userRepository.save(user.core);
     }
 
     override fun activate(user: User, token: String) {
@@ -66,12 +72,12 @@ class UserServiceImpl : UserService {
         return "http://$host:$port/activation?token=$token&email=${user.email}"
     }
 
-    override fun save(user: User): User = userRepository.save(user.core!!)
+    override fun save(user: User): User = userRepository.save(user.core)
 
-    override fun create(email: String, password: String, f: User.() -> Unit) {
+    override fun create(email: String, password: String, f: User.() -> Unit) : User {
         val user = this.create(email, password)
         f.invoke(user)
-        this.save(user)
+        return this.save(user)
     }
 }
 

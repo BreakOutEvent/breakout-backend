@@ -1,12 +1,12 @@
-@file:JvmName("TestPostEndpoint")
+@file:JvmName("TestPostingEndpoint")
 
 package backend.Integration
 
-import backend.model.event.Event
+import backend.model.media.Media
 import backend.model.misc.Coord
-import backend.model.posting.Media
 import backend.model.user.Admin
 import backend.model.user.Participant
+import backend.model.user.User
 import backend.services.ConfigurationService
 import com.auth0.jwt.Algorithm
 import com.auth0.jwt.JWTSigner
@@ -21,13 +21,15 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-class TestPostEndpoint : IntegrationTest() {
+open class TestPostingEndpoint : IntegrationTest() {
 
     @Autowired
     private lateinit var configurationService: ConfigurationService
     private lateinit var JWT_SECRET: String
     private lateinit var userCredentials: Credentials
     private val APPLICATION_JSON_UTF_8 = "application/json;charset=UTF-8"
+    private lateinit var user: User
+
 
     @Before
     override fun setUp() {
@@ -56,7 +58,7 @@ class TestPostEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun createNewPostingWithTextAndLocationAndMedia() {
+    open fun createNewPostingWithTextAndLocationAndMedia() {
         val postData = mapOf(
                 "text" to "TestPost",
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
@@ -87,6 +89,7 @@ class TestPostEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.distance").exists())
                 .andExpect(jsonPath("$.postingLocation.latitude").exists())
                 .andExpect(jsonPath("$.postingLocation.longitude").exists())
+                .andExpect(jsonPath("$.postingLocation.date").exists())
                 .andExpect(jsonPath("$.media[0].type").exists())
                 .andExpect(jsonPath("$.media[0].id").exists())
                 .andExpect(jsonPath("$.media[0].uploadToken").exists())
@@ -102,7 +105,7 @@ class TestPostEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun createNewPostingWithText() {
+    open fun createNewPostingWithText() {
         val postData = mapOf(
                 "text" to "TestPost",
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
@@ -127,7 +130,7 @@ class TestPostEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun createNewPostingWithMedia() {
+    open fun createNewPostingWithMedia() {
         val postData = mapOf(
                 "media" to arrayOf(
                         "image",
@@ -164,7 +167,7 @@ class TestPostEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun createNewPostingWithLocation() {
+    open fun createNewPostingWithLocation() {
         val postData = mapOf(
                 "postingLocation" to mapOf(
                         "latitude" to 0.0,
@@ -185,6 +188,7 @@ class TestPostEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.postingLocation.latitude").exists())
                 .andExpect(jsonPath("$.postingLocation.longitude").exists())
+                .andExpect(jsonPath("$.postingLocation.date").exists())
                 .andExpect(jsonPath("$.distance").exists())
                 .andExpect(jsonPath("$.date").exists())
                 .andExpect(jsonPath("$.user").exists())
@@ -194,7 +198,7 @@ class TestPostEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun dontCreatePostingForInvalidJSON() {
+    open fun dontCreatePostingForInvalidJSON() {
         val postData = mapOf(
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
         ).toJsonString()
@@ -214,7 +218,7 @@ class TestPostEndpoint : IntegrationTest() {
 
 
     @Test
-    fun dontCreatePostingWithoutValidAuth() {
+    open fun dontCreatePostingWithoutValidAuth() {
         val postData = mapOf(
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
                 "postingLocation" to mapOf(
@@ -237,9 +241,13 @@ class TestPostEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun getPostingById() {
-        val user = userService.create("test@mail.com", "password")
-        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null, 0.0)
+    open fun getPostingById() {
+        val user = userService.create("test@mail.com", "password", {
+            addRole(Participant::class)
+        })
+        val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
+        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
 
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.GET, "/posting/" + posting.id + "/")
@@ -255,6 +263,7 @@ class TestPostEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.user").exists())
                 .andExpect(jsonPath("$.postingLocation.latitude").exists())
                 .andExpect(jsonPath("$.postingLocation.longitude").exists())
+                .andExpect(jsonPath("$.postingLocation.date").exists())
                 .andReturn().response.contentAsString
 
         println(response)
@@ -262,11 +271,17 @@ class TestPostEndpoint : IntegrationTest() {
 
 
     @Test
-    fun getPostingsByIds() {
-        val user = userService.create("test@mail.com", "password")
-        val postingZero = postingService.createPosting("Test0", Coord(0.0, 0.0), user.core!!, null, 0.0)
-        postingService.createPosting("Test1", Coord(0.0, 0.0), user.core!!, null, 0.0)
-        val postingTwo = postingService.createPosting("Test2", Coord(0.0, 0.0), user.core!!, null, 0.0)
+    open fun getPostingsByIds() {
+
+        val user = userService.create("test@mail.com", "password", {
+            addRole(Participant::class)
+        })
+        val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
+        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+
+        val postingZero = postingService.createPosting("Test0", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
+        postingService.createPosting("Test1", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
+        val postingTwo = postingService.createPosting("Test2", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
 
         val postingsIds: List<Long> = listOf(postingZero.id!!, postingTwo.id!!)
 
@@ -290,11 +305,16 @@ class TestPostEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun getPostingIdsSince() {
-        val user = userService.create("test@mail.com", "password")
-        val postingZero = postingService.createPosting("Test0", Coord(0.0, 0.0), user.core!!, null, 0.0)
-        postingService.createPosting("Test1", Coord(0.0, 0.0), user.core!!, null, 0.0)
-        postingService.createPosting("Test2", Coord(0.0, 0.0), user.core!!, null, 0.0)
+    open fun getPostingIdsSince() {
+        val user = userService.create("test@mail.com", "password", {
+            addRole(Participant::class)
+        })
+        val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
+        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+
+        val postingZero = postingService.createPosting("Test0", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
+        postingService.createPosting("Test1", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
+        postingService.createPosting("Test2", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
 
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.GET, "/posting/get/since/${postingZero.id}/")
@@ -314,11 +334,16 @@ class TestPostEndpoint : IntegrationTest() {
 
 
     @Test
-    fun createNewPostingWithMediaAndAddMediaSizesWithoutToken() {
+    open fun createNewPostingWithMediaAndAddMediaSizesWithoutToken() {
 
-        val user = userService.create("test@mail.com", "password")
-        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null, 0.0);
-        val media = mediaService.createMedia(posting, "image")
+        val user = userService.create("test@mail.com", "password", {
+            addRole(Participant::class)
+        })
+        val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
+        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+
+        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
+        val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
 
@@ -332,7 +357,7 @@ class TestPostEndpoint : IntegrationTest() {
         ).toJsonString()
 
         val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/media/${savedposting!!.media!!.first().id}/")
+                .request(HttpMethod.POST, "/media/${savedposting!!.media!!.first().id}/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(postData)
 
@@ -344,11 +369,16 @@ class TestPostEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun createNewPostingWithMediaAndAddMediaSizesWithWrongToken() {
+    open fun createNewPostingWithMediaAndAddMediaSizesWithWrongToken() {
 
-        val user = userService.create("test@mail.com", "password")
-        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null, 0.0);
-        val media = mediaService.createMedia(posting, "image")
+        val user = userService.create("test@mail.com", "password", {
+            addRole(Participant::class)
+        })
+        val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
+        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+
+        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
+        val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
 
@@ -362,7 +392,7 @@ class TestPostEndpoint : IntegrationTest() {
         ).toJsonString()
 
         val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/media/${savedposting!!.media!!.first().id}/")
+                .request(HttpMethod.POST, "/media/${savedposting!!.media!!.first().id}/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-UPLOAD-TOKEN", "87654321")
                 .content(postData)
@@ -375,11 +405,16 @@ class TestPostEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun createNewPostingWithMediaAndAddMediaSizesWithValidToken() {
+    open fun createNewPostingWithMediaAndAddMediaSizesWithValidToken() {
 
-        val user = userService.create("test@mail.com", "password")
-        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null, 0.0);
-        val media = mediaService.createMedia(posting, "image")
+        val user = userService.create("test@mail.com", "password", {
+            addRole(Participant::class)
+        })
+        val event = eventService.createEvent("title", LocalDateTime.now(), "location", Coord(0.0, 0.0), 36)
+        teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+
+        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
+        val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
 
@@ -395,7 +430,7 @@ class TestPostEndpoint : IntegrationTest() {
         println(posting.media)
 
         val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/media/${savedposting!!.media!!.first().id}/")
+                .request(HttpMethod.POST, "/media/${savedposting!!.media!!.first().id}/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .content(postData)
@@ -412,14 +447,152 @@ class TestPostEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.type").exists())
                 .andReturn().response.contentAsString
 
+
         println(response)
+
+        val requestMedia = MockMvcRequestBuilders
+                .request(HttpMethod.GET, "/posting/${savedposting.id}/")
+                .contentType(MediaType.APPLICATION_JSON)
+
+        val responseMedia = mockMvc.perform (requestMedia)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.media").exists())
+                .andExpect(jsonPath("$.media").isArray)
+                .andExpect(jsonPath("$.media[0]").exists())
+                .andExpect(jsonPath("$.media[0].id").exists())
+                .andExpect(jsonPath("$.media[0].type").exists())
+                .andExpect(jsonPath("$.media[0].sizes").exists())
+                .andExpect(jsonPath("$.media[0].sizes").isArray)
+                .andExpect(jsonPath("$.media[0].sizes[0]").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].id").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].url").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].width").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].height").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].length").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].size").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].type").exists())
+                .andReturn().response.contentAsString
+
+        println(responseMedia)
     }
 
     @Test
-    fun getAllPostings() {
-        val user = userService.create("test@mail.com", "password")
-        postingService.createPosting("Test", Coord(0.0, 0.0), user.core!!, null, 0.0)
-        postingService.createPosting("Test 2", Coord(0.0, 0.0), user.core!!, null, 0.0)
+    open fun createNewPostingWithMediaAndAddMediaSizesUpdateMediaSizes() {
+
+        val user = userService.create("test@mail.com", "password", {
+            addRole(Participant::class)
+        })
+        val event = eventService.createEvent("title", LocalDateTime.now(), "location", Coord(0.0, 0.0), 36)
+        teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+
+        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
+        val media = mediaService.createMedia("image")
+        posting.media = listOf(media) as MutableList<Media>
+        val savedposting = postingService.save(posting)
+
+        var postData = mapOf(
+                "url" to "https://aws.amazon.com/bla.jpg",
+                "width" to 400,
+                "height" to 200,
+                "length" to 0.0,
+                "size" to 0.0,
+                "type" to "image"
+        ).toJsonString()
+
+        println(posting.media)
+
+        var request = MockMvcRequestBuilders
+                .request(HttpMethod.POST, "/media/${savedposting!!.media!!.first().id}/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
+                .content(postData)
+
+        var response = mockMvc.perform (request)
+                .andExpect(status().isCreated)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.url").exists())
+                .andExpect(jsonPath("$.width").exists())
+                .andExpect(jsonPath("$.height").exists())
+                .andExpect(jsonPath("$.length").exists())
+                .andExpect(jsonPath("$.size").exists())
+                .andExpect(jsonPath("$.type").exists())
+                .andReturn().response.contentAsString
+
+
+        println(response)
+
+        postData = mapOf(
+                "url" to "https://aws.amazon.com/bla123.jpg",
+                "width" to 400,
+                "height" to 200,
+                "length" to 0.0,
+                "size" to 0.0,
+                "type" to "image"
+        ).toJsonString()
+
+        println(posting.media)
+
+        request = MockMvcRequestBuilders
+                .request(HttpMethod.POST, "/media/${savedposting.media!!.first().id}/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
+                .content(postData)
+
+        response = mockMvc.perform (request)
+                .andExpect(status().isCreated)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.url").exists())
+                .andExpect(jsonPath("$.width").exists())
+                .andExpect(jsonPath("$.height").exists())
+                .andExpect(jsonPath("$.length").exists())
+                .andExpect(jsonPath("$.size").exists())
+                .andExpect(jsonPath("$.type").exists())
+                .andReturn().response.contentAsString
+
+
+        println(response)
+
+        val requestMedia = MockMvcRequestBuilders
+                .request(HttpMethod.GET, "/posting/${savedposting.id}/")
+                .contentType(MediaType.APPLICATION_JSON)
+
+        val responseMedia = mockMvc.perform (requestMedia)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.media").exists())
+                .andExpect(jsonPath("$.media").isArray)
+                .andExpect(jsonPath("$.media[0]").exists())
+                .andExpect(jsonPath("$.media[0].id").exists())
+                .andExpect(jsonPath("$.media[0].type").exists())
+                .andExpect(jsonPath("$.media[0].sizes").exists())
+                .andExpect(jsonPath("$.media[0].sizes").isArray)
+                .andExpect(jsonPath("$.media[0].sizes[0]").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].id").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].url").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].url").value("https://aws.amazon.com/bla123.jpg"))
+                .andExpect(jsonPath("$.media[0].sizes[0].width").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].height").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].length").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].size").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].type").exists())
+                .andExpect(jsonPath("$.media[1]").doesNotExist())
+                .andReturn().response.contentAsString
+
+        println(responseMedia)
+    }
+
+    @Test
+    open fun getAllPostings() {
+        val user = userService.create("test@mail.com", "password", {
+            addRole(Participant::class)
+        })
+        val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
+        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+        postingService.createPosting("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
+        postingService.createPosting("Test 2", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
 
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.GET, "/posting/")

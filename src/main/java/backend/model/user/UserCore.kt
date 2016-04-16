@@ -2,6 +2,7 @@ package backend.model.user
 
 import backend.exceptions.DomainException
 import backend.model.BasicEntity
+import backend.model.media.Media
 import backend.model.posting.Posting
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.validator.constraints.Email
@@ -16,6 +17,7 @@ open class UserCore : BasicEntity, User {
 
     constructor() : super() {
         this.isBlocked = true
+        this.profilePic = Media("image")
     }
 
     @Email
@@ -33,8 +35,11 @@ open class UserCore : BasicEntity, User {
 
     override var gender: String? = null
 
+    @OneToOne(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+    override var profilePic: Media
+
     @OrderColumn
-    @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+    @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.EAGER, orphanRemoval = true)
     val postings: MutableList<Posting>? = ArrayList()
     /*
      * cascade all operations to children
@@ -75,6 +80,7 @@ open class UserCore : BasicEntity, User {
     // the object stored as the value
     @Suppress("UNCHECKED_CAST")
     override fun <T : UserRole> getRole(clazz: KClass<T>): T? = userRoles[clazz.java] as? T?
+
     override fun <T : UserRole> hasRole(clazz: KClass<T>): Boolean = userRoles.containsKey(clazz.java)
 
     @Suppress("UNCHECKED_CAST")

@@ -1,4 +1,4 @@
-package backend.utils
+package backend.util
 
 import backend.model.misc.Coord
 import com.grum.geocalc.DegreeCoordinate

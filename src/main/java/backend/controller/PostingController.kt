@@ -4,20 +4,18 @@ import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
+import backend.model.media.Media
+import backend.model.media.MediaService
 import backend.model.misc.Coord
-import backend.model.posting.Media
-import backend.model.posting.MediaService
-import backend.model.posting.MediaSizeService
 import backend.model.posting.PostingService
 import backend.model.user.Participant
+import backend.model.user.UserService
 import backend.services.ConfigurationService
-import backend.utils.distanceCoordsKM
-import backend.view.MediaSizeView
+import backend.util.distanceCoordsKM
 import backend.view.PostingRequestView
 import backend.view.PostingResponseView
 import com.auth0.jwt.Algorithm
 import com.auth0.jwt.JWTSigner
-import com.auth0.jwt.JWTVerifier
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
@@ -25,32 +23,34 @@ import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RequestMethod.POST
-import java.security.SignatureException
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/posting")
 class PostingController {
 
-    private val postingService: PostingService
-    private val mediaSizeService: MediaSizeService
     private val mediaService: MediaService
+    private val postingService: PostingService
     private val configurationService: ConfigurationService
     private val logger: Logger
     private var JWT_SECRET: String
+    private val userService: UserService
 
     @Autowired
     constructor(postingService: PostingService,
-                mediaSizeService: MediaSizeService,
                 mediaService: MediaService,
-                configurationService: ConfigurationService) {
+                configurationService: ConfigurationService,
+                userService: UserService) {
 
-        this.mediaService = mediaService
         this.postingService = postingService
-        this.mediaSizeService = mediaSizeService
+        this.mediaService = mediaService
         this.configurationService = configurationService
         this.logger = Logger.getLogger(PostingController::class.java)
         this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
+        this.userService = userService
     }
 
 
@@ -60,8 +60,9 @@ class PostingController {
     @RequestMapping("/", method = arrayOf(POST))
     @ResponseStatus(CREATED)
     fun createPosting(@Valid @RequestBody body: PostingRequestView,
-                      @AuthenticationPrincipal user: CustomUserDetails): PostingResponseView {
+                      @AuthenticationPrincipal customUserDetails: CustomUserDetails): PostingResponseView {
 
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (body.media == null && body.text == null && body.postingLocation == null)
             throw BadRequestException("empty postings not allowed")
 
@@ -77,14 +78,17 @@ class PostingController {
             distance = distanceCoordsKM(team.event.startingLocation, location)
         }
 
-        var posting = postingService.createPosting(text = body.text, postingLocation = location, user = user.core!!, media = null, distance = distance)
+        val instant: Instant = Instant.ofEpochMilli(body.date!!);
+        val date: LocalDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+
+        var posting = postingService.createPosting(text = body.text, postingLocation = location, user = user.core, media = null, distance = distance, date = date)
 
         //Create Media-Objects for each media item requested to add
         var media: MutableList<Media>? = null
         if (body.media != null && body.media!! is List<*>) {
             media = arrayListOf()
             body.media!!.forEach {
-                media!!.add(Media(posting, it))
+                media!!.add(mediaService.save(Media(it))!!)
             }
         }
         posting.media = media
@@ -99,33 +103,6 @@ class PostingController {
         }
 
         return PostingResponseView(posting)
-    }
-
-
-    /**
-     * POST /posting/media/id/
-     */
-    @RequestMapping("/media/{id}/", method = arrayOf(RequestMethod.POST))
-    @ResponseStatus(CREATED)
-    fun createMediaSize(@PathVariable("id") id: Long,
-                        @RequestHeader("X-UPLOAD-TOKEN") uploadToken: String,
-                        @Valid @RequestBody body: MediaSizeView): MediaSizeView {
-
-        try {
-            if (!(JWTVerifier(JWT_SECRET, "audience").verify(uploadToken)["subject"] as String).equals(id.toString())) {
-                throw UnauthorizedException("Invalid JWT token")
-            }
-        } catch (e: SignatureException) {
-            throw UnauthorizedException(e.message ?: "Invalid JWT token")
-        } catch (e: IllegalStateException) {
-            throw UnauthorizedException(e.message ?: "Invalid JWT token")
-        }
-
-        val media = mediaService.getByID(id);
-        var mediaSize = mediaSizeService.createMediaSize(media!!, body.url!!, body.width!!, body.height!!, body.length!!, body.size!!, body.type!!)
-
-        mediaSizeService.save(mediaSize)
-        return MediaSizeView(mediaSize)
     }
 
     /**

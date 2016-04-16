@@ -4,7 +4,12 @@ import backend.model.BasicEntity
 import javax.persistence.Entity
 
 @Entity
-class Address() : BasicEntity() {
+class Address : BasicEntity {
+
+    /**
+     * Private constructor for JPA
+     */
+    private constructor() : super()
 
     constructor(street: String, housenumber: String, city: String, country: String) : this() {
         this.street = street

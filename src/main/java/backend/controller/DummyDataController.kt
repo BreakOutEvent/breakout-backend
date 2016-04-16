@@ -38,7 +38,7 @@ class DummyDataController {
             val user = userService.create("email$it@mail.com", "password")
             val token = user.createActivationToken()
             user.activate(token)
-            return@map user.core!!.id!!
+            return@map user.core.id!!
         }
     }
 
@@ -59,7 +59,8 @@ class DummyDataController {
                         postingLocation = Coord(0.0, 0.0),
                         media = null,
                         user = user,
-                        distance = 0.0).id!!
+                        distance = 0.0,
+                        date = LocalDateTime.now()).id!!
             } else 1
         }
     }

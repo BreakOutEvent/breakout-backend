@@ -7,7 +7,7 @@ import javax.persistence.Embedded
 import javax.persistence.Entity
 
 @Entity
-class Event() : BasicEntity() {
+class Event : BasicEntity {
 
     lateinit var title: String
     lateinit var date: LocalDateTime
@@ -17,6 +17,11 @@ class Event() : BasicEntity() {
     lateinit var startingLocation: Coord
 
     var duration: Int = 36
+
+    /**
+     * Private constructor for JPA
+     */
+    private constructor() : super()
 
     constructor(title: String, date: LocalDateTime, city: String, startingLocation: Coord, duration: Int) : this() {
         this.title = title

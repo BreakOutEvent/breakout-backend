@@ -1,10 +1,16 @@
 package backend.Integration
 
+import backend.services.ConfigurationService
+import com.auth0.jwt.Algorithm
+import com.auth0.jwt.JWTSigner
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.Before
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import kotlin.test.assertEquals
@@ -12,12 +18,20 @@ import kotlin.test.assertNotNull
 
 class TestUserEndpoint : IntegrationTest() {
 
+    @Autowired
+    lateinit var configurationService: ConfigurationService
+    lateinit var JWT_SECRET: String
+    val APPLICATION_JSON_UTF_8 = "application/json;charset=UTF-8"
+
     private fun url(): String = "/user/"
 
     private fun url(id: Int): String = "/user/${id.toString()}/"
 
     @Before
-    override fun setUp() = super.setUp()
+    override fun setUp() {
+        super.setUp()
+        this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
+    }
 
     /**
      * GET /user/
@@ -77,13 +91,97 @@ class TestUserEndpoint : IntegrationTest() {
                 "password" to "password"
         ).toJsonString()
 
+        val response = mockMvc.perform(post(url(), json))
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.profilePic.type").exists())
+                .andExpect(jsonPath("$.profilePic.id").exists())
+                .andExpect(jsonPath("$.profilePic.uploadToken").exists())
+                .andReturn().response.contentAsString
+
+        print(response)
+        val user = userRepository.findByEmail("a@x.de")
+        assertNotNull(user)
+        assertEquals(user.email, "a@x.de")
+    }
+
+
+    @Test
+    fun postUserAndAddMediaSizesWithValidToken() {
+
+        val json = mapOf(
+                "email" to "a@x.de",
+                "password" to "password"
+        ).toJsonString()
+
         mockMvc.perform(post(url(), json))
                 .andExpect(status().isCreated)
                 .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.profilePic.type").exists())
+                .andExpect(jsonPath("$.profilePic.id").exists())
+                .andExpect(jsonPath("$.profilePic.uploadToken").exists())
+                .andReturn().response.contentAsString
 
         val user = userRepository.findByEmail("a@x.de")
         assertNotNull(user)
         assertEquals(user.email, "a@x.de")
+
+        val postData = mapOf(
+                "url" to "https://aws.amazon.com/bla.jpg",
+                "width" to 400,
+                "height" to 200,
+                "length" to 0.0,
+                "size" to 0.0,
+                "type" to "image"
+        ).toJsonString()
+
+        val request = MockMvcRequestBuilders
+                .request(HttpMethod.POST, "/media/${user.profilePic.id}/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to user.profilePic.id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
+                .content(postData)
+
+        val response = mockMvc.perform (request)
+                .andExpect(status().isCreated)
+                .andExpect(MockMvcResultMatchers.content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.url").exists())
+                .andExpect(jsonPath("$.width").exists())
+                .andExpect(jsonPath("$.height").exists())
+                .andExpect(jsonPath("$.length").exists())
+                .andExpect(jsonPath("$.size").exists())
+                .andExpect(jsonPath("$.type").exists())
+                .andReturn().response.contentAsString
+
+
+        println(response)
+
+        val requestMedia = MockMvcRequestBuilders
+                .request(HttpMethod.GET, "/user/${user.core.id}/")
+                .contentType(MediaType.APPLICATION_JSON)
+
+        val responseMedia = mockMvc.perform (requestMedia)
+                .andExpect(status().isOk)
+                .andExpect(MockMvcResultMatchers.content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.email").exists())
+                .andExpect(jsonPath("$.passwordHash").doesNotExist())
+                .andExpect(jsonPath("$.profilePic").exists())
+                .andExpect(jsonPath("$.profilePic.id").exists())
+                .andExpect(jsonPath("$.profilePic.type").exists())
+                .andExpect(jsonPath("$.profilePic.sizes").exists())
+                .andExpect(jsonPath("$.profilePic.sizes").isArray)
+                .andExpect(jsonPath("$.profilePic.sizes[0]").exists())
+                .andExpect(jsonPath("$.profilePic.sizes[0].id").exists())
+                .andExpect(jsonPath("$.profilePic.sizes[0].url").exists())
+                .andExpect(jsonPath("$.profilePic.sizes[0].width").exists())
+                .andExpect(jsonPath("$.profilePic.sizes[0].height").exists())
+                .andExpect(jsonPath("$.profilePic.sizes[0].length").exists())
+                .andExpect(jsonPath("$.profilePic.sizes[0].size").exists())
+                .andExpect(jsonPath("$.profilePic.sizes[0].type").exists())
+                .andReturn().response.contentAsString
+
+        println(responseMedia)
     }
 
     /**

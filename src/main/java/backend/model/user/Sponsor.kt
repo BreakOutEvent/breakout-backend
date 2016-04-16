@@ -15,9 +15,12 @@ class Sponsor : UserRole {
     var address: String? = null
     var isHidden: String? = null
 
-    constructor(core: UserCore) : super(core) {
+    /**
+     * Private constructor for JPA
+     */
+    private constructor() : super()
 
-    }
+    constructor(core: UserCore) : super(core)
 
     constructor(core: UserCore, company: String, logo: String, url: String, address: String, isHidden: String) : super(core) {
         this.company = company

@@ -6,12 +6,17 @@ import javax.persistence.Embedded
 import javax.persistence.Entity
 
 @Entity
-class Invitation() : BasicEntity() {
+class Invitation : BasicEntity {
 
     lateinit var status: InvitationStatus
 
     @Embedded
     lateinit var invitee: EmailAddress
+
+    /**
+     * Private constructor for JPA
+     */
+    private constructor() : super()
 
     constructor(email: EmailAddress) : this() {
         this.status = InvitationStatus.OPEN

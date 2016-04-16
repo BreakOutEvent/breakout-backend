@@ -7,12 +7,14 @@ import backend.controller.exceptions.UnauthorizedException
 import backend.model.event.EventRepository
 import backend.model.event.TeamRepository
 import backend.model.event.TeamService
-import backend.model.misc.Coord
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
-import backend.utils.distanceCoordsListKM
-import backend.utils.distanceCoordsListKMfromStart
+import backend.model.user.UserService
+import backend.services.ConfigurationService
+import backend.util.distanceCoordsListKMfromStart
 import backend.view.TeamView
+import com.auth0.jwt.Algorithm
+import com.auth0.jwt.JWTSigner
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.MediaType
@@ -26,27 +28,43 @@ import javax.validation.Valid
 @RequestMapping("/event/{eventId}/team")
 open class TeamController {
 
-    open var teamService: TeamService
-    open var eventRepository: EventRepository
-    open var teamRepository: TeamRepository
+    open val teamService: TeamService
+    open val eventRepository: EventRepository
+    open val teamRepository: TeamRepository
+    open val JWT_SECRET: String
+    open val configurationService: ConfigurationService
+    open val userService: UserService
+
 
     @Autowired
-    constructor(teamService: TeamService, eventRepository: EventRepository, teamRepository: TeamRepository) {
+    constructor(teamService: TeamService,
+                eventRepository: EventRepository,
+                teamRepository: TeamRepository,
+                configurationService: ConfigurationService,
+                userService: UserService) {
+
         this.teamService = teamService
         this.eventRepository = eventRepository
         this.teamRepository = teamRepository
+        this.configurationService = configurationService
+        this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
+        this.userService = userService
     }
 
     @ResponseStatus(CREATED)
     @RequestMapping("/", method = arrayOf(POST))
     fun createTeam(@PathVariable eventId: Long,
-                   @AuthenticationPrincipal user: CustomUserDetails,
+                   @AuthenticationPrincipal customUserDetails: CustomUserDetails,
                    @RequestBody body: TeamView): TeamView {
 
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val event = eventRepository.findById(eventId) ?: throw NotFoundException("No event with id $eventId")
         val creator = user.getRole(Participant::class) ?: throw UnauthorizedException("User is no participant")
+        var team = teamService.create(creator, body.name!!, body.description!!, event)
 
-        return TeamView(teamService.create(creator, body.name!!, body.description!!, event))
+        team.profilePic.uploadToken = JWTSigner(JWT_SECRET).sign(mapOf("subject" to team.profilePic.id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512))
+
+        return TeamView(team)
     }
 
     @ResponseStatus(CREATED)
@@ -68,9 +86,10 @@ open class TeamController {
     @RequestMapping("/{teamId}/member/", method = arrayOf(POST))
     fun joinTeam(@PathVariable eventId: Long,
                  @PathVariable teamId: Long,
-                 @AuthenticationPrincipal user: CustomUserDetails,
+                 @AuthenticationPrincipal customUserDetails: CustomUserDetails,
                  @Valid @RequestBody body: Map<String, String>) {
 
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (eventRepository.exists(eventId) == false) throw NotFoundException("No event with id $eventId")
 
         val team = teamRepository.findOne(teamId) ?: throw NotFoundException("No team with id $teamId")
@@ -109,7 +128,7 @@ open class TeamController {
     fun getTeamDistance(@PathVariable("id") id: Long): Map<String, Any> {
         val team = teamService.getByID(id) ?: throw NotFoundException("team with id $id does not exist")
         val postings = teamService.findLocationPostingsById(id) ?: throw NotFoundException("team with id $id does not exist")
-        val actualdistance = distanceCoordsListKMfromStart(team.event.startingLocation, postings.map { it.postLocation!! })
+        val actualdistance = distanceCoordsListKMfromStart(team.event.startingLocation, postings.map { it.location!!.toCoord() })
         val postingDistance = teamService.getPostingMaxDistanceById(id)
         var distance = 0.0
         if (postingDistance != null) {
