@@ -5,6 +5,7 @@ import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
 import backend.model.event.EventRepository
+import backend.model.event.Invitation
 import backend.model.event.TeamRepository
 import backend.model.event.TeamService
 import backend.model.misc.EmailAddress
@@ -12,6 +13,7 @@ import backend.model.user.Participant
 import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.util.distanceCoordsListKMfromStart
+import backend.view.InvitationView
 import backend.view.TeamView
 import com.auth0.jwt.Algorithm
 import com.auth0.jwt.JWTSigner
@@ -21,7 +23,7 @@ import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.POST
+import org.springframework.web.bind.annotation.RequestMethod.*
 import javax.validation.Valid
 
 @RestController
@@ -49,6 +51,18 @@ open class TeamController {
         this.configurationService = configurationService
         this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
         this.userService = userService
+    }
+
+    /**
+     * GET /event/id/team/invitation/
+     * Show all invitations for the currently authenticated user
+     */
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping("/invitation/", method = arrayOf(GET))
+    fun showInvitationsForUser(@AuthenticationPrincipal customUserDetails: CustomUserDetails): Iterable<InvitationView> {
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
+        val invitations = teamService.findInvitationsForUser(user)
+        return invitations.map { InvitationView(it) }
     }
 
     @ResponseStatus(CREATED)
@@ -105,7 +119,7 @@ open class TeamController {
 
     @RequestMapping(
             value = "/{id}/",
-            method = arrayOf(RequestMethod.GET),
+            method = arrayOf(GET),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
     fun showTeam(@PathVariable("id") id: Long): TeamView {
         val team = teamService.getByID(id) ?: throw NotFoundException("team with id $id does not exist")
@@ -114,7 +128,7 @@ open class TeamController {
 
     @RequestMapping(
             value = "/{id}/posting/",
-            method = arrayOf(RequestMethod.GET),
+            method = arrayOf(GET),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
     fun getTeamPostings(@PathVariable("id") id: Long): List<Long> {
         val postingIds = teamService.findPostingsById(id) ?: throw NotFoundException("team with id $id does not exist")
@@ -123,7 +137,7 @@ open class TeamController {
 
     @RequestMapping(
             value = "/{id}/distance/",
-            method = arrayOf(RequestMethod.GET),
+            method = arrayOf(GET),
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
     fun getTeamDistance(@PathVariable("id") id: Long): Map<String, Any> {
         val team = teamService.getByID(id) ?: throw NotFoundException("team with id $id does not exist")

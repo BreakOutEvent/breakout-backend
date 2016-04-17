@@ -3,6 +3,7 @@ package backend.model.event
 import backend.model.misc.EmailAddress
 import backend.model.posting.Posting
 import backend.model.user.Participant
+import backend.model.user.User
 import org.springframework.security.access.prepost.PreAuthorize
 
 interface TeamService {
@@ -75,5 +76,7 @@ interface TeamService {
      * @return gotten postings list
      */
     fun getPostingMaxDistanceById(id: Long): Posting?
+
+    fun findInvitationsForUser(user: User): List<Invitation>
 
 }
