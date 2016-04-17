@@ -16,6 +16,7 @@ import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class TeamServiceImplTest : IntegrationTest() {
 
@@ -67,5 +68,46 @@ class TeamServiceImplTest : IntegrationTest() {
         val token = UsernamePasswordAuthenticationToken(details.username, details.password, details.authorities)
         SecurityContextHolder.getContext().authentication = token
         return user
+    }
+
+    @Test
+    fun testSave() {
+        // TODO: Implement tests
+    }
+
+    @Test
+    fun testGetByID() {
+        // TODO: Implement tests
+    }
+
+    @Test
+    fun testFindPostingsById() {
+        // TODO: Implement tests
+    }
+
+    @Test
+    fun testFindLocationPostingsById() {
+        // TODO: Implement tests
+    }
+
+    @Test
+    fun testGetPostingMaxDistanceById() {
+        // TODO: Implement tests
+    }
+
+    @Test
+    fun testFindInvitationsForUser() {
+        // Authenticated as inviting user
+        val creator = setAuthenticatedUser("inviting@mail.com", Participant::class.java).getRole(Participant::class)!!
+        val team = teamService.create(creator, "Team awesome", "description",  event)
+        teamService.invite(EmailAddress("invitee@mail.com"), team)
+
+        // Authenticated as invitee
+        val invitee = setAuthenticatedUser("invitee@mail.com", Participant::class.java).getRole(Participant::class)!!
+
+        // See if all my invitations are there
+        val invitations = teamService.findInvitationsForUser(invitee)
+        assertNotNull(invitations)
+        assertTrue { invitations.map { it.invitee.toString() }.contains(invitee.email) }
     }
 }
