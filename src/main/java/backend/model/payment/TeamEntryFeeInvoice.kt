@@ -3,9 +3,13 @@ package backend.model.payment
 import backend.model.event.Team
 import backend.model.user.Participant
 import org.javamoney.moneta.Money
+import javax.persistence.Entity
+import javax.persistence.OneToOne
 
+@Entity
 class TeamEntryFeeInvoice : Invoice {
 
+    @OneToOne
     var team: Team
         private set
 
@@ -14,7 +18,7 @@ class TeamEntryFeeInvoice : Invoice {
     }
 
     override fun isPaymentEligable(payment: Payment): Boolean {
-        val participant = payment.user.getRole(Participant::class)
+        val participant = payment.user().getRole(Participant::class)
 
         return when {
             participant == null -> false

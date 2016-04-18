@@ -13,7 +13,6 @@ import org.powermock.modules.junit4.PowerMockRunner
 import java.math.BigDecimal
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
-import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 @RunWith(PowerMockRunner::class)
@@ -44,7 +43,7 @@ class TeamEntryFeeInvoiceTest {
     fun testIsPaymentEligable() {
         val invoice = TeamEntryFeeInvoice(team, Money.of(BigDecimal.TEN, "EUR"))
 
-        PowerMockito.`when`(payment.user).thenReturn(user)
+        PowerMockito.`when`(payment.user()).thenReturn(user)
         PowerMockito.`when`(user.getRole(Participant::class)).thenReturn(participant)
         PowerMockito.`when`(payment.amount).thenReturn(Money.of(BigDecimal.valueOf(5), "EUR"))
         PowerMockito.`when`(team.isMember(participant)).thenReturn(true)
@@ -64,7 +63,7 @@ class TeamEntryFeeInvoiceTest {
     fun testAddPayment() {
         val invoice = TeamEntryFeeInvoice(team, Money.of(BigDecimal.TEN, "EUR"))
 
-        PowerMockito.`when`(payment.user).thenReturn(user)
+        PowerMockito.`when`(payment.user()).thenReturn(user)
         PowerMockito.`when`(user.getRole(Participant::class)).thenReturn(participant)
         PowerMockito.`when`(payment.amount).thenReturn(Money.of(BigDecimal.valueOf(5.0), "EUR"))
         PowerMockito.`when`(team.isMember(participant)).thenReturn(true)
@@ -77,7 +76,7 @@ class TeamEntryFeeInvoiceTest {
     fun testFailToAddPaymentIfAmountIsWrong() {
         val invoice = TeamEntryFeeInvoice(team, Money.of(BigDecimal.TEN, "EUR"))
 
-        PowerMockito.`when`(payment.user).thenReturn(user)
+        PowerMockito.`when`(payment.user()).thenReturn(user)
         PowerMockito.`when`(user.getRole(Participant::class)).thenReturn(participant)
         PowerMockito.`when`(payment.amount).thenReturn(Money.of(BigDecimal.valueOf(4.0), "EUR"))
         PowerMockito.`when`(team.isMember(participant)).thenReturn(true)
@@ -89,7 +88,7 @@ class TeamEntryFeeInvoiceTest {
     fun testFailToAddPaymentIfTeamHasOnlyOneMember() {
         val invoice = TeamEntryFeeInvoice(team, Money.of(BigDecimal.TEN, "EUR"))
 
-        PowerMockito.`when`(payment.user).thenReturn(user)
+        PowerMockito.`when`(payment.user()).thenReturn(user)
         PowerMockito.`when`(user.getRole(Participant::class)).thenReturn(participant)
         PowerMockito.`when`(payment.amount).thenReturn(Money.of(BigDecimal.valueOf(4.0), "EUR"))
         PowerMockito.`when`(team.isMember(participant)).thenReturn(true)
@@ -102,7 +101,7 @@ class TeamEntryFeeInvoiceTest {
     fun testFailToAddPaymentIfUserIsNotPartOfTeam() {
         val invoice = TeamEntryFeeInvoice(team, Money.of(BigDecimal.TEN, "EUR"))
 
-        PowerMockito.`when`(payment.user).thenReturn(user)
+        PowerMockito.`when`(payment.user()).thenReturn(user)
         PowerMockito.`when`(user.getRole(Participant::class)).thenReturn(participant)
         PowerMockito.`when`(payment.amount).thenReturn(Money.of(BigDecimal.valueOf(5.0), "EUR"))
         PowerMockito.`when`(team.isMember(participant)).thenReturn(false) // This is the important line!
@@ -114,7 +113,7 @@ class TeamEntryFeeInvoiceTest {
     fun testIsFullyPaid() {
         val invoice = TeamEntryFeeInvoice(team, Money.of(BigDecimal.TEN, "EUR"))
 
-        PowerMockito.`when`(payment.user).thenReturn(user)
+        PowerMockito.`when`(payment.user()).thenReturn(user)
         PowerMockito.`when`(user.getRole(Participant::class)).thenReturn(participant)
         PowerMockito.`when`(payment.amount).thenReturn(Money.of(BigDecimal.valueOf(5.0), "EUR"))
         PowerMockito.`when`(team.isMember(participant)).thenReturn(true)
@@ -125,7 +124,7 @@ class TeamEntryFeeInvoiceTest {
         val secondUser = PowerMockito.mock(User::class.java)
         val secondParticipant = PowerMockito.mock(Participant::class.java)
 
-        PowerMockito.`when`(secondPayment.user).thenReturn(secondUser)
+        PowerMockito.`when`(secondPayment.user()).thenReturn(secondUser)
         PowerMockito.`when`(secondUser.getRole(Participant::class)).thenReturn(participant)
         PowerMockito.`when`(secondPayment.amount).thenReturn(Money.of(BigDecimal.valueOf(5.0), "EUR"))
         PowerMockito.`when`(secondTeam.isMember(secondParticipant)).thenReturn(true)
@@ -141,7 +140,7 @@ class TeamEntryFeeInvoiceTest {
     fun testAmountOfCurrentPayments() {
         val invoice = TeamEntryFeeInvoice(team, Money.of(BigDecimal.TEN, "EUR"))
 
-        PowerMockito.`when`(payment.user).thenReturn(user)
+        PowerMockito.`when`(payment.user()).thenReturn(user)
         PowerMockito.`when`(user.getRole(Participant::class)).thenReturn(participant)
         PowerMockito.`when`(payment.amount).thenReturn(Money.of(BigDecimal.valueOf(5.0), "EUR"))
         PowerMockito.`when`(team.isMember(participant)).thenReturn(true)
@@ -152,7 +151,7 @@ class TeamEntryFeeInvoiceTest {
         val secondUser = PowerMockito.mock(User::class.java)
         val secondParticipant = PowerMockito.mock(Participant::class.java)
 
-        PowerMockito.`when`(secondPayment.user).thenReturn(secondUser)
+        PowerMockito.`when`(secondPayment.user()).thenReturn(secondUser)
         PowerMockito.`when`(secondUser.getRole(Participant::class)).thenReturn(participant)
         PowerMockito.`when`(secondPayment.amount).thenReturn(Money.of(BigDecimal.valueOf(5.0), "EUR"))
         PowerMockito.`when`(secondTeam.isMember(secondParticipant)).thenReturn(true)
@@ -168,7 +167,7 @@ class TeamEntryFeeInvoiceTest {
     fun testGetPayments() {
         val invoice = TeamEntryFeeInvoice(team, Money.of(BigDecimal.TEN, "EUR"))
 
-        PowerMockito.`when`(payment.user).thenReturn(user)
+        PowerMockito.`when`(payment.user()).thenReturn(user)
         PowerMockito.`when`(user.getRole(Participant::class)).thenReturn(participant)
         PowerMockito.`when`(payment.amount).thenReturn(Money.of(BigDecimal.valueOf(5.0), "EUR"))
         PowerMockito.`when`(team.isMember(participant)).thenReturn(true)
@@ -179,7 +178,7 @@ class TeamEntryFeeInvoiceTest {
         val secondUser = PowerMockito.mock(User::class.java)
         val secondParticipant = PowerMockito.mock(Participant::class.java)
 
-        PowerMockito.`when`(secondPayment.user).thenReturn(secondUser)
+        PowerMockito.`when`(secondPayment.user()).thenReturn(secondUser)
         PowerMockito.`when`(secondUser.getRole(Participant::class)).thenReturn(participant)
         PowerMockito.`when`(secondPayment.amount).thenReturn(Money.of(BigDecimal.valueOf(5.0), "EUR"))
         PowerMockito.`when`(secondTeam.isMember(secondParticipant)).thenReturn(true)

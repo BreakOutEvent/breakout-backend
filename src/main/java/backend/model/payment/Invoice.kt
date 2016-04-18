@@ -1,10 +1,15 @@
 package backend.model.payment
 
 import backend.exceptions.DomainException
+import backend.model.BasicEntity
 import org.javamoney.moneta.Money
+import javax.persistence.MappedSuperclass
+import javax.persistence.OneToMany
 
-abstract class Invoice {
+@MappedSuperclass
+abstract class Invoice: BasicEntity {
 
+    @OneToMany
     private val payments: MutableList<Payment> = mutableListOf()
 
     var amount: Money
