@@ -49,7 +49,7 @@ class Team : BasicEntity {
 
     private fun addMember(participant: Participant) {
         if (participant.currentTeam != null) throw DomainException("Participant ${participant.email} already is part of a team")
-        if (members.size >= 2) throw DomainException("This team already has two members")
+        if (this.isFull()) throw DomainException("This team already has two members")
 
         members.add(participant)
         participant.currentTeam = this
@@ -80,6 +80,10 @@ class Team : BasicEntity {
 
     fun isMember(participant: Participant): Boolean {
         return this.members.filter { it.isSameUserAs(participant) }.isNotEmpty()
+    }
+
+    fun isFull(): Boolean {
+        return this.members.count() >= 2
     }
 
     @PreRemove
