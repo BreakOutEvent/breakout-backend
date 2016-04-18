@@ -17,4 +17,6 @@ interface TeamRepository : CrudRepository<Team, Long> {
     @Query("Select p from Posting p inner join p.user u inner join u.userRoles r where r.currentTeam.id = :id and distance is not null order by p.distance asc")
     fun getPostingMaxDistanceById(@Param("id") id: Long): List<Posting>
 
+    @Query("Select i from Invitation i where i.invitee.value = :email")
+    fun findInvitationsWithEmail(@Param("email") email: String): List<Invitation>
 }

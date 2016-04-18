@@ -7,6 +7,7 @@ import backend.model.location.Location
 import backend.model.media.Media
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
+import com.fasterxml.jackson.annotation.JsonIgnore
 import java.util.*
 import javax.persistence.*
 import javax.persistence.CascadeType.ALL
@@ -70,7 +71,7 @@ class Team : BasicEntity {
     @Throws
     fun invite(email: EmailAddress) {
         if (this.invitation != null) throw DomainException("Someone else has already been invited to this team")
-        this.invitation = Invitation(email)
+        this.invitation = Invitation(email, this)
     }
 
     fun isMember(username: String): Boolean {

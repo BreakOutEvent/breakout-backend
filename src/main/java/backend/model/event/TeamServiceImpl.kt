@@ -5,6 +5,7 @@ import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.posting.Posting
 import backend.model.user.Participant
+import backend.model.user.User
 import backend.model.user.UserService
 import backend.services.MailService
 import org.springframework.beans.factory.annotation.Autowired
@@ -62,5 +63,9 @@ class TeamServiceImpl : TeamService {
         } else {
             return postingList.first()
         }
+    }
+
+    override fun findInvitationsForUser(user: User): List<Invitation> {
+        return repository.findInvitationsWithEmail(user.email)
     }
 }
