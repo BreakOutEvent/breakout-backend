@@ -6,18 +6,20 @@ import com.braintreegateway.Environment
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import javax.annotation.PostConstruct
 
 @Configuration
 open class BraintreeConfiguration {
 
-    private val configurationService: ConfigurationService
-    private val environment: String
-    private val merchantID: String
-    private val publicKey: String
-    private val privateKey: String
+    private lateinit var environment: String
+    private lateinit var merchantID: String
+    private lateinit var publicKey: String
+    private lateinit var privateKey: String
 
-    @Autowired
-    constructor(configurationService: ConfigurationService) {
+    @Autowired lateinit var configurationService: ConfigurationService
+
+    @PostConstruct
+    fun setUp() {
         this.configurationService = configurationService
         this.environment = configurationService.get("org.breakout.payment.braintree.environment") ?: "sandbox"
         this.merchantID = configurationService.getRequired("org.breakout.payment.braintree.merchantid")
