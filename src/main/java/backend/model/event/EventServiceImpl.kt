@@ -19,6 +19,7 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository) :
 
     override fun findPostingsById(id: Long): List<Long>? = repository.findPostingsById(id)
 
+    // TODO: Verify that independently uploaded locations are found
     override fun findLocationPostingsById(id: Long): List<Posting>? = repository.findLocationPostingsById(id)
 
     override fun getPostingMaxDistanceById(id: Long): Posting? {

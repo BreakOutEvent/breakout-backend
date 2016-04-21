@@ -39,6 +39,7 @@ open class LocationController {
                 eventService: EventService,
                 userService: UserService) {
 
+        // TODO: Use locationService for database access
         this.locationRepository = locationRepository
         this.teamService = teamService
         this.eventService = eventService
@@ -53,6 +54,7 @@ open class LocationController {
     open fun getAllLocations(@PathVariable("eventId") eventId: Long,
                              @PathVariable("teamId") teamId: Long): Iterable<LocationView> {
 
+        // TODO: Only return those locations specified by eventId and teamId
         return locationRepository.findAll().map { LocationView(it) }
     }
 
@@ -74,6 +76,7 @@ open class LocationController {
 
         val point = Point(locationView.latitude, locationView.longitude)
 
+        // TODO: Move to helper function in util package
         val instant: Instant = Instant.ofEpochMilli(locationView.date);
         val date: LocalDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
         val location = Location(point, participant, date)
@@ -101,6 +104,7 @@ open class LocationController {
 
         val savedLocations: MutableList<Location> = listOf<Location>() as MutableList<Location>
 
+        //TODO: Move to service
         locationViews.forEach {
             val point = Point(it.latitude, it.longitude)
 

@@ -33,7 +33,7 @@ open class AuthorizationServerConfiguration : AuthorizationServerConfigurerAdapt
     @Autowired lateinit private var userDetailsService: CustomUserDetailsService
     @Autowired lateinit private var configurationService: ConfigurationService
 
-    private val tokenStore: TokenStore = InMemoryTokenStore()
+    private val tokenStore: TokenStore = InMemoryTokenStore() // TODO: Change to Redis or other persistent store
     private lateinit var clientName: String
     private lateinit var clientSecret: String
 

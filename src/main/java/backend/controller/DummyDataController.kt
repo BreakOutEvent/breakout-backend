@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
 import java.util.*
 
+// TODO: Remove in production
 @RestController
 @RequestMapping("/createdummydata")
 class DummyDataController {

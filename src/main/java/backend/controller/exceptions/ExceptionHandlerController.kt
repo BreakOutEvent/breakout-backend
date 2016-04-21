@@ -1,4 +1,4 @@
-package backend.controller
+package backend.controller.exceptions
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -11,6 +11,7 @@ import java.time.ZoneOffset.UTC
 @ControllerAdvice
 class ExceptionHandlerController {
 
+    // Used for handling Jackson Parsing Exceptions
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handle(e: MethodArgumentNotValidException): ResponseEntity<Map<String, String>> {
         val errorMessage = createHumanErrorMessage(e)

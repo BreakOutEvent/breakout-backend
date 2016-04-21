@@ -31,6 +31,6 @@ open class ResourceServerConfiguration : ResourceServerConfigurerAdapter() {
                 .antMatchers("/oauth/*").permitAll()
                 .antMatchers(HttpMethod.POST, "/user/{id}/*").authenticated()
                 .antMatchers(HttpMethod.PUT, "/user/{id}/*").authenticated()
-                .antMatchers(HttpMethod.GET, "/user/{id}/*").permitAll()
+                .antMatchers(HttpMethod.GET, "/user/{id}/*").permitAll() //TODO: Add routes which should be secured
     }
 }

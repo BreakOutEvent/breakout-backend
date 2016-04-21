@@ -1,6 +1,7 @@
 package backend.configuration
 
 import backend.model.user.UserService
+import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -10,11 +11,13 @@ import org.springframework.stereotype.Service
 @Service
 class CustomUserDetailsService : UserDetailsService {
 
-    val userService: UserService
+    private val userService: UserService
+    private val logger: Logger
 
     @Autowired
     constructor(userService: UserService) {
         this.userService = userService
+        this.logger = Logger.getLogger(CustomUserDetailsService::class.java)
     }
 
     override fun loadUserByUsername(username: String): UserDetails? {
@@ -22,6 +25,7 @@ class CustomUserDetailsService : UserDetailsService {
             return CustomUserDetails(user)
         }
 
+        logger.warn("User $username does not exist")
         throw UsernameNotFoundException("User $username does not exist")
     }
 
