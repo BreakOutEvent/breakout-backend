@@ -3,7 +3,6 @@ package backend.model.location
 import backend.model.user.Participant
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.transaction.Transactional
 

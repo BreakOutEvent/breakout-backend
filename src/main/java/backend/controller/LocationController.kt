@@ -5,7 +5,6 @@ import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
 import backend.model.event.EventService
 import backend.model.event.TeamService
-import backend.model.location.Location
 import backend.model.location.LocationService
 import backend.model.location.Point
 import backend.model.user.Participant
@@ -72,10 +71,9 @@ open class LocationController {
         if (!team.isMember(participant)) throw UnauthorizedException("user is not part of team $teamId are therefor cannot upload locations on it's behalf")
 
         val point = Point(locationView.latitude, locationView.longitude)
-        val location = Location(point, participant, locationView.date.toLocalDateTime())
-        val savedLocation = locationService.save(location)
+        val location = locationService.create(point, participant, locationView.date.toLocalDateTime())
 
-        return LocationView(savedLocation)
+        return LocationView(location)
     }
 
     /**
