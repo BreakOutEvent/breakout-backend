@@ -94,16 +94,13 @@ open class LocationController {
         val team = teamService.getByID(eventId) ?: throw NotFoundException("no team with id $teamId found")
         if (!team.isMember(participant)) throw UnauthorizedException("user is not part of team $teamId are therefor cannot upload locations on it's behalf")
 
-        val savedLocations: MutableList<Location> = listOf<Location>() as MutableList<Location>
-
-        //TODO: Move to service
-        locationViews.forEach {
+        val savedLocationsAsLocationViews = locationViews.map {
             val point = Point(it.latitude, it.longitude)
-            val location = Location(point, participant, it.date.toLocalDateTime())
-            savedLocations.add(locationService.save(location))
+            val savedLocation = locationService.create(point, participant, it.date.toLocalDateTime())
+            LocationView(savedLocation)
         }
 
-        return savedLocations.map { LocationView(it) }
+        return savedLocationsAsLocationViews
     }
 
 }
