@@ -10,6 +10,7 @@ import backend.model.location.LocationRepository
 import backend.model.location.Point
 import backend.model.user.Participant
 import backend.model.user.UserService
+import backend.util.toLocalDateTime
 import backend.view.LocationView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
@@ -75,12 +76,7 @@ open class LocationController {
         if (!team.isMember(participant)) throw UnauthorizedException("user is not part of team $teamId are therefor cannot upload locations on it's behalf")
 
         val point = Point(locationView.latitude, locationView.longitude)
-
-        // TODO: Move to helper function in util package
-        val instant: Instant = Instant.ofEpochMilli(locationView.date);
-        val date: LocalDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-        val location = Location(point, participant, date)
-
+        val location = Location(point, participant, locationView.date.toLocalDateTime())
         val savedLocation = locationRepository.save(location)
 
         return LocationView(savedLocation)

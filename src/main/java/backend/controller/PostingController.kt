@@ -12,6 +12,7 @@ import backend.model.user.Participant
 import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.util.distanceCoordsKM
+import backend.util.toLocalDateTime
 import backend.view.PostingRequestView
 import backend.view.PostingResponseView
 import com.auth0.jwt.Algorithm
@@ -82,10 +83,7 @@ class PostingController {
             distance = distanceCoordsKM(team.event.startingLocation, location)
         }
 
-        //TODO: move to helper function in util package
-        val instant: Instant = Instant.ofEpochMilli(body.date!!);
-        val date: LocalDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-
+        val date = body.date!!.toLocalDateTime()
         var posting = postingService.createPosting(text = body.text, postingLocation = location, user = user.core, media = null, distance = distance, date = date)
 
         //TODO: maybe move inside createPosting()
