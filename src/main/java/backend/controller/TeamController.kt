@@ -5,7 +5,6 @@ import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
 import backend.model.event.EventRepository
-import backend.model.event.Invitation
 import backend.model.event.TeamRepository
 import backend.model.event.TeamService
 import backend.model.misc.EmailAddress
@@ -13,17 +12,17 @@ import backend.model.user.Participant
 import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.util.distanceCoordsListKMfromStart
+import backend.util.getSignedJwtToken
 import backend.view.InvitationView
 import backend.view.TeamView
 import com.auth0.jwt.Algorithm
 import com.auth0.jwt.JWTSigner
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
-import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.*
+import org.springframework.web.bind.annotation.RequestMethod.POST
 import javax.validation.Valid
 
 @RestController
@@ -75,16 +74,15 @@ open class TeamController {
     @RequestMapping("/", method = arrayOf(POST))
     @PreAuthorize("isAuthenticated()")
     open fun createTeam(@PathVariable eventId: Long,
-                   @AuthenticationPrincipal customUserDetails: CustomUserDetails,
-                   @RequestBody body: TeamView): TeamView {
+                        @AuthenticationPrincipal customUserDetails: CustomUserDetails,
+                        @RequestBody body: TeamView): TeamView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val event = eventRepository.findById(eventId) ?: throw NotFoundException("No event with id $eventId")
         val creator = user.getRole(Participant::class) ?: throw UnauthorizedException("User is no participant")
         var team = teamService.create(creator, body.name!!, body.description!!, event)
 
-        //TODO: move to helper function in util package
-        team.profilePic.uploadToken = JWTSigner(JWT_SECRET).sign(mapOf("subject" to team.profilePic.id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512))
+        team.profilePic.uploadToken = getSignedJwtToken(JWT_SECRET, team.profilePic.id.toString())
 
         return TeamView(team)
     }

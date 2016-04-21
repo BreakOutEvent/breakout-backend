@@ -12,6 +12,7 @@ import backend.model.user.Participant
 import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.util.distanceCoordsKM
+import backend.util.getSignedJwtToken
 import backend.util.toLocalDateTime
 import backend.view.PostingRequestView
 import backend.view.PostingResponseView
@@ -100,13 +101,7 @@ class PostingController {
         postingService.save(posting)
 
         //Adds uploadingTokens to response
-        if (posting.media != null) {
-            posting.media!!.forEach {
-
-                //TODO: move to helper function in util package
-                it.uploadToken = JWTSigner(JWT_SECRET).sign(mapOf("subject" to it.id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512))
-            }
-        }
+        posting.media?.forEach { it.uploadToken = getSignedJwtToken(JWT_SECRET, it.id.toString()) }
 
         return PostingResponseView(posting)
     }
