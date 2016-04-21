@@ -47,11 +47,11 @@ open class LocationController {
     }
 
     /**
+     * GET /event/{eventId}/team/{teamId}/location/
      * Return a list of all locations for a certain team at a certain event
-     * Mapped to GET /event/{eventId}/team/{teamId}/location/
      */
     @RequestMapping("/")
-    open fun getAllLocations(@PathVariable("eventId") eventId: Long,
+    fun getAllLocations(@PathVariable("eventId") eventId: Long,
                              @PathVariable("teamId") teamId: Long): Iterable<LocationView> {
 
         // TODO: Only return those locations specified by eventId and teamId
@@ -59,8 +59,8 @@ open class LocationController {
     }
 
     /**
+     * POST /event/{eventId}/team/{teamId}/location/
      * Upload a new location for a specific team at a specific event
-     * Mapped to POST /event/{eventId}/team/{teamId}/location/
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/", method = arrayOf(POST))
@@ -87,8 +87,8 @@ open class LocationController {
     }
 
     /**
+     * POST /event/{eventId}/team/{teamId}/location/multiple/
      * Upload multiple new locations for a specific team at a specific event
-     * Mapped to POST /event/{eventId}/team/{teamId}/location/multiple/
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/multiple/", method = arrayOf(POST))

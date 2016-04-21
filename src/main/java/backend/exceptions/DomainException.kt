@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 class DomainException : Exception {
+
     constructor() : super()
 
     constructor(cause: Throwable) : super(cause)

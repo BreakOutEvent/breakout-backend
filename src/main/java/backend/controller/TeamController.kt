@@ -30,12 +30,12 @@ import javax.validation.Valid
 @RequestMapping("/event/{eventId}/team")
 open class TeamController {
 
-    open val teamService: TeamService
-    open val eventRepository: EventRepository
-    open val teamRepository: TeamRepository
-    open val JWT_SECRET: String
-    open val configurationService: ConfigurationService
-    open val userService: UserService
+    private val teamService: TeamService
+    private val eventRepository: EventRepository
+    private val teamRepository: TeamRepository
+    private val JWT_SECRET: String
+    private val configurationService: ConfigurationService
+    private val userService: UserService
 
 
     @Autowired
@@ -46,6 +46,8 @@ open class TeamController {
                 userService: UserService) {
 
         this.teamService = teamService
+
+        // TODO: Use eventService/teamService for database access
         this.eventRepository = eventRepository
         this.teamRepository = teamRepository
         this.configurationService = configurationService
@@ -54,20 +56,25 @@ open class TeamController {
     }
 
     /**
-     * GET /event/id/team/invitation/
+     * GET /event/{id}/team/invitation/
      * Show all invitations for the currently authenticated user
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/invitation/", method = arrayOf(GET))
-    fun showInvitationsForUser(@AuthenticationPrincipal customUserDetails: CustomUserDetails): Iterable<InvitationView> {
+    @RequestMapping("/invitation/")
+    open fun showInvitationsForUser(@AuthenticationPrincipal customUserDetails: CustomUserDetails): Iterable<InvitationView> {
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val invitations = teamService.findInvitationsForUser(user)
         return invitations.map { InvitationView(it) }
     }
 
+    /**
+     * POST /event/{id}/team/
+     * creates a new Team, with creator as first member
+     */
     @ResponseStatus(CREATED)
     @RequestMapping("/", method = arrayOf(POST))
-    fun createTeam(@PathVariable eventId: Long,
+    @PreAuthorize("isAuthenticated()")
+    open fun createTeam(@PathVariable eventId: Long,
                    @AuthenticationPrincipal customUserDetails: CustomUserDetails,
                    @RequestBody body: TeamView): TeamView {
 
@@ -76,17 +83,22 @@ open class TeamController {
         val creator = user.getRole(Participant::class) ?: throw UnauthorizedException("User is no participant")
         var team = teamService.create(creator, body.name!!, body.description!!, event)
 
+        //TODO: move to helper function in util package
         team.profilePic.uploadToken = JWTSigner(JWT_SECRET).sign(mapOf("subject" to team.profilePic.id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512))
 
         return TeamView(team)
     }
 
+    /**
+     * POST /event/{id}/team/{id}/invitation/
+     * invites a user with given email to existing Team
+     */
     @ResponseStatus(CREATED)
     @RequestMapping("/{teamId}/invitation/", method = arrayOf(POST))
     @PreAuthorize("isAuthenticated()")
-    fun inviteUser(@PathVariable eventId: Long,
-                   @PathVariable teamId: Long,
-                   @Valid @RequestBody body: Map<String, Any>) {
+    open fun inviteUser(@PathVariable eventId: Long,
+                        @PathVariable teamId: Long,
+                        @Valid @RequestBody body: Map<String, Any>) {
 
         if (eventRepository.exists(eventId) == false) throw NotFoundException("No event with id $eventId")
 
@@ -96,12 +108,17 @@ open class TeamController {
         teamService.invite(email, team)
     }
 
+    /**
+     * POST /event/{id}/team/{id}/member/
+     * allows user with Invitation to join Team
+     */
     @ResponseStatus(CREATED)
     @RequestMapping("/{teamId}/member/", method = arrayOf(POST))
-    fun joinTeam(@PathVariable eventId: Long,
-                 @PathVariable teamId: Long,
-                 @AuthenticationPrincipal customUserDetails: CustomUserDetails,
-                 @Valid @RequestBody body: Map<String, String>) {
+    @PreAuthorize("isAuthenticated()")
+    open fun joinTeam(@PathVariable eventId: Long,
+                      @PathVariable teamId: Long,
+                      @AuthenticationPrincipal customUserDetails: CustomUserDetails,
+                      @Valid @RequestBody body: Map<String, String>) {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (eventRepository.exists(eventId) == false) throw NotFoundException("No event with id $eventId")
@@ -117,31 +134,24 @@ open class TeamController {
         team.join(participant)
     }
 
-    @RequestMapping(
-            value = "/{id}/",
-            method = arrayOf(GET),
-            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun showTeam(@PathVariable("id") id: Long): TeamView {
+    @RequestMapping("/{id}/")
+    fun showTeam(@PathVariable id: Long): TeamView {
         val team = teamService.getByID(id) ?: throw NotFoundException("team with id $id does not exist")
         return TeamView(team)
     }
 
-    @RequestMapping(
-            value = "/{id}/posting/",
-            method = arrayOf(GET),
-            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun getTeamPostings(@PathVariable("id") id: Long): List<Long> {
+    @RequestMapping("/{id}/posting/")
+    fun getTeamPostingIds(@PathVariable id: Long): List<Long> {
         val postingIds = teamService.findPostingsById(id) ?: throw NotFoundException("team with id $id does not exist")
         return postingIds
     }
 
-    @RequestMapping(
-            value = "/{id}/distance/",
-            method = arrayOf(GET),
-            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun getTeamDistance(@PathVariable("id") id: Long): Map<String, Any> {
+    @RequestMapping("/{id}/distance/")
+    fun getTeamDistance(@PathVariable id: Long): Map<String, Any> {
         val team = teamService.getByID(id) ?: throw NotFoundException("team with id $id does not exist")
         val postings = teamService.findLocationPostingsById(id) ?: throw NotFoundException("team with id $id does not exist")
+
+        //TODO: move logic to service layer
         val actualdistance = distanceCoordsListKMfromStart(team.event.startingLocation, postings.map { it.location!!.toCoord() })
         val postingDistance = teamService.getPostingMaxDistanceById(id)
         var distance = 0.0

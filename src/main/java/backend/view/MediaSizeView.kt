@@ -1,21 +1,29 @@
 package backend.view
 
 import backend.model.media.MediaSize
+import javax.validation.constraints.NotNull
 
 class MediaSizeView() {
 
+    @NotNull
     var id: Long? = null
 
+    @NotNull
     var url: String? = null
 
+    @NotNull
     var width: Int? = null
 
+    @NotNull
     var height: Int? = null
 
+    @NotNull
     var length: Int? = null
 
+    @NotNull
     var size: Long? = null
 
+    @NotNull
     var type: String? = null
 
     constructor(mediaSize: MediaSize) : this() {

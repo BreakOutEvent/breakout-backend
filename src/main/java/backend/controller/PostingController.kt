@@ -55,7 +55,7 @@ class PostingController {
 
 
     /**
-     * Post /posting/
+     * POST /posting/
      */
     @RequestMapping("/", method = arrayOf(POST))
     @ResponseStatus(CREATED)
@@ -63,13 +63,17 @@ class PostingController {
                       @AuthenticationPrincipal customUserDetails: CustomUserDetails): PostingResponseView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
+
+        //check if any of the optional posting types is available
         if (body.media == null && body.text == null && body.postingLocation == null)
             throw BadRequestException("empty postings not allowed")
 
         var location: Coord? = null
         var distance: Double? = null
 
-        if (body.postingLocation != null && body.postingLocation!!.latitude != null && body.postingLocation!!.longitude != null) {
+
+        val locationIsAvailable: Boolean = body.postingLocation != null && body.postingLocation!!.latitude != null && body.postingLocation!!.longitude != null
+        if (locationIsAvailable) {
             location = Coord(body.postingLocation!!.latitude!!, body.postingLocation!!.longitude!!)
             val creator = user.getRole(Participant::class) ?: throw UnauthorizedException("User is no participant")
             val team = creator.currentTeam ?: throw UnauthorizedException("User has no team")
@@ -78,11 +82,13 @@ class PostingController {
             distance = distanceCoordsKM(team.event.startingLocation, location)
         }
 
+        //TODO: move to helper function in util package
         val instant: Instant = Instant.ofEpochMilli(body.date!!);
         val date: LocalDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 
         var posting = postingService.createPosting(text = body.text, postingLocation = location, user = user.core, media = null, distance = distance, date = date)
 
+        //TODO: maybe move inside createPosting()
         //Create Media-Objects for each media item requested to add
         var media: MutableList<Media>? = null
         if (body.media != null && body.media!! is List<*>) {
@@ -91,13 +97,15 @@ class PostingController {
                 media!!.add(mediaService.save(Media(it))!!)
             }
         }
-        posting.media = media
 
+        posting.media = media
         postingService.save(posting)
 
         //Adds uploadingTokens to response
         if (posting.media != null) {
             posting.media!!.forEach {
+
+                //TODO: move to helper function in util package
                 it.uploadToken = JWTSigner(JWT_SECRET).sign(mapOf("subject" to it.id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512))
             }
         }
@@ -108,7 +116,7 @@ class PostingController {
     /**
      * GET /posting/id/
      */
-    @RequestMapping("/{id}/", method = arrayOf(GET))
+    @RequestMapping("/{id}/")
     fun getPosting(@PathVariable("id") id: Long): PostingResponseView {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
         return PostingResponseView(posting)
@@ -117,7 +125,7 @@ class PostingController {
     /**
      * GET /posting/
      */
-    @RequestMapping("/", method = arrayOf(GET))
+    @RequestMapping("/")
     fun getAllPostings(): Iterable<PostingResponseView> {
         return postingService.findAll().map { PostingResponseView(it) }
     }

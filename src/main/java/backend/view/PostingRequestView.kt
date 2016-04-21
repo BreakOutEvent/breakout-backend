@@ -3,6 +3,7 @@ package backend.view
 import backend.model.posting.Posting
 import java.time.ZoneOffset
 import javax.validation.Valid
+import javax.validation.constraints.NotNull
 
 class PostingRequestView() {
 
@@ -10,6 +11,7 @@ class PostingRequestView() {
 
     var text: String? = null
 
+    @NotNull
     var date: Long? = null
 
     @Valid
