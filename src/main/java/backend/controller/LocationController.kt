@@ -6,7 +6,7 @@ import backend.controller.exceptions.UnauthorizedException
 import backend.model.event.EventService
 import backend.model.event.TeamService
 import backend.model.location.Location
-import backend.model.location.LocationRepository
+import backend.model.location.LocationService
 import backend.model.location.Point
 import backend.model.user.Participant
 import backend.model.user.UserService
@@ -20,28 +20,24 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod.POST
 import org.springframework.web.bind.annotation.RestController
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/event/{eventId}/team/{teamId}/location")
 open class LocationController {
 
-    private val locationRepository: LocationRepository
+    private val locationService: LocationService
     private val teamService: TeamService
     private val eventService: EventService
     private val userService: UserService
 
     @Autowired
-    constructor(locationRepository: LocationRepository,
+    constructor(locationService: LocationService,
                 teamService: TeamService,
                 eventService: EventService,
                 userService: UserService) {
 
-        // TODO: Use locationService for database access
-        this.locationRepository = locationRepository
+        this.locationService = locationService
         this.teamService = teamService
         this.eventService = eventService
         this.userService = userService
@@ -53,10 +49,10 @@ open class LocationController {
      */
     @RequestMapping("/")
     fun getAllLocations(@PathVariable("eventId") eventId: Long,
-                             @PathVariable("teamId") teamId: Long): Iterable<LocationView> {
+                        @PathVariable("teamId") teamId: Long): Iterable<LocationView> {
 
         // TODO: Only return those locations specified by eventId and teamId
-        return locationRepository.findAll().map { LocationView(it) }
+        return locationService.findAll().map { LocationView(it) }
     }
 
     /**
@@ -77,7 +73,7 @@ open class LocationController {
 
         val point = Point(locationView.latitude, locationView.longitude)
         val location = Location(point, participant, locationView.date.toLocalDateTime())
-        val savedLocation = locationRepository.save(location)
+        val savedLocation = locationService.save(location)
 
         return LocationView(savedLocation)
     }
@@ -103,12 +99,8 @@ open class LocationController {
         //TODO: Move to service
         locationViews.forEach {
             val point = Point(it.latitude, it.longitude)
-
-            val instant: Instant = Instant.ofEpochMilli(it.date);
-            val date: LocalDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-            val location = Location(point, participant, date)
-
-            savedLocations.add(locationRepository.save(location))
+            val location = Location(point, participant, it.date.toLocalDateTime())
+            savedLocations.add(locationService.save(location))
         }
 
         return savedLocations.map { LocationView(it) }
