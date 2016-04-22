@@ -3,6 +3,7 @@ package backend.model.payment
 import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import org.javamoney.moneta.Money
+import javax.persistence.Column
 import javax.persistence.MappedSuperclass
 import javax.persistence.OneToMany
 
@@ -12,6 +13,7 @@ abstract class Invoice: BasicEntity {
     @OneToMany
     private val payments: MutableList<Payment> = mutableListOf()
 
+    @Column
     var amount: Money
         private set
 
