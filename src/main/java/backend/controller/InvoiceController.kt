@@ -44,6 +44,7 @@ open class InvoiceController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/{id}/payment/braintree/client_token/")
     open fun getToken(@PathVariable("id") invoiceId: Long): Map<String, String> {
+        invoiceService.findById(invoiceId) ?: throw NotFoundException("No invoice with id $invoiceId found")
         val token = braintreeGateway.clientToken().generate()
         return mapOf("token" to token)
     }

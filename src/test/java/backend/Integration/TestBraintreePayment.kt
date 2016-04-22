@@ -11,7 +11,6 @@ import org.javamoney.moneta.Money
 import org.junit.Before
 import org.junit.Test
 import org.springframework.http.HttpMethod.GET
-import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -21,7 +20,7 @@ import java.time.LocalDateTime
 
 class TestBraintreePayment : IntegrationTest() {
 
-    private lateinit var invoice: Invoice
+    private lateinit var invoice: TeamEntryFeeInvoice
     private lateinit var event: Event
     private lateinit var team: Team
     private lateinit var user: User
@@ -56,12 +55,23 @@ class TestBraintreePayment : IntegrationTest() {
 
     @Test
     fun testFailToGetTokenForNonexistingPayment() {
+        val request = MockMvcRequestBuilders
+                .request(GET, "/invoice/321/payment/braintree/client_token/")
+                .header("Authorization", "Bearer ${tokens.first}")
+                .contentType(APPLICATION_JSON_VALUE)
 
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound)
     }
 
     @Test
     fun testFailToGetTokenIfUnauthenticated() {
+        val request = MockMvcRequestBuilders
+                .request(GET, "/invoice/1/payment/braintree/client_token/")
+                .contentType(APPLICATION_JSON_VALUE)
 
+        mockMvc.perform(request)
+                .andExpect(status().isUnauthorized)
     }
 
 }

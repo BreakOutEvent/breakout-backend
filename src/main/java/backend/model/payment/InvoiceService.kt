@@ -11,7 +11,7 @@ import javax.transaction.Transactional
 
 interface InvoiceService {
     fun findById(id: Long): Invoice?
-    fun save(invoice: Invoice)
+    fun save(invoice: TeamEntryFeeInvoice)
     fun addPaymentToInvoice(invoice: Invoice, payment: Payment)
     fun addBraintreePaymentToInvoice(invoice: Invoice, user: User, amount: Money, nonce: String)
 }
@@ -57,7 +57,7 @@ class InvoiceServiceImpl : InvoiceService {
     }
 
     @Transactional
-    override fun save(invoice: Invoice) {
+    override fun save(invoice: TeamEntryFeeInvoice) {
         invoiceRepository.save(invoice)
     }
 
