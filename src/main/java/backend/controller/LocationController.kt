@@ -50,8 +50,9 @@ open class LocationController {
     fun getAllLocations(@PathVariable("eventId") eventId: Long,
                         @PathVariable("teamId") teamId: Long): Iterable<LocationView> {
 
-        // TODO: Only return those locations specified by eventId and teamId
-        return locationService.findAll().map { LocationView(it) }
+        //TODO: Is it necessary to check if the team is part of the event or do we just suppress this case
+        //TODO: and assume the client is satisfied with getting all locations for a certain teamId
+        return locationService.findByTeamId(teamId).map { LocationView(it) }
     }
 
     /**

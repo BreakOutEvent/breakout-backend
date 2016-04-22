@@ -30,5 +30,9 @@ class LocationServiceImpl : LocationService {
         return locationRepository.save(location)
     }
 
+    override fun findByTeamId(id: Long): Iterable<Location> {
+        return locationRepository.findByTeamId(id)
+    }
+
 }
 
