@@ -48,7 +48,7 @@ interface TeamService {
      *
      * @return gotten team object
      */
-    fun getByID(id: Long): Team?
+    fun findOne(id: Long): Team?
 
     /**
      * Get Team Postings from database

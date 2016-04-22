@@ -8,7 +8,12 @@ import java.time.LocalDateTime
 
 @Service
 class EventServiceImpl @Autowired constructor(val repository: EventRepository) : EventService {
-    override fun getById(id: Long): Event? = repository.findById(id)
+
+    override fun exists(id: Long): Boolean {
+        return this.repository.exists(id)
+    }
+
+    override fun findById(id: Long): Event? = repository.findById(id)
 
     override fun findAll(): Iterable<Event> = repository.findAll()
 

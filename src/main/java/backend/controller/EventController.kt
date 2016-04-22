@@ -57,7 +57,7 @@ open class EventController {
      */
     @RequestMapping("/{id}/distance/")
     open fun getEventDistance(@PathVariable("id") id: Long): Map<String, Any> {
-        val event = eventService.getById(id) ?: throw NotFoundException("event with id $id does not exist")
+        val event = eventService.findById(id) ?: throw NotFoundException("event with id $id does not exist")
         val postings = eventService.findLocationPostingsById(id) ?: throw NotFoundException("event with id $id does not exist")
 
         // TODO: Move logic to eventService

@@ -4,8 +4,7 @@ import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
-import backend.model.event.EventRepository
-import backend.model.event.TeamRepository
+import backend.model.event.EventService
 import backend.model.event.TeamService
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
@@ -15,8 +14,6 @@ import backend.util.distanceCoordsListKMfromStart
 import backend.util.getSignedJwtToken
 import backend.view.InvitationView
 import backend.view.TeamView
-import com.auth0.jwt.Algorithm
-import com.auth0.jwt.JWTSigner
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
@@ -30,8 +27,7 @@ import javax.validation.Valid
 open class TeamController {
 
     private val teamService: TeamService
-    private val eventRepository: EventRepository
-    private val teamRepository: TeamRepository
+    private val eventService: EventService
     private val JWT_SECRET: String
     private val configurationService: ConfigurationService
     private val userService: UserService
@@ -39,16 +35,12 @@ open class TeamController {
 
     @Autowired
     constructor(teamService: TeamService,
-                eventRepository: EventRepository,
-                teamRepository: TeamRepository,
+                eventService: EventService,
                 configurationService: ConfigurationService,
                 userService: UserService) {
 
         this.teamService = teamService
-
-        // TODO: Use eventService/teamService for database access
-        this.eventRepository = eventRepository
-        this.teamRepository = teamRepository
+        this.eventService = eventService
         this.configurationService = configurationService
         this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
         this.userService = userService
@@ -78,7 +70,7 @@ open class TeamController {
                         @RequestBody body: TeamView): TeamView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
-        val event = eventRepository.findById(eventId) ?: throw NotFoundException("No event with id $eventId")
+        val event = eventService.findById(eventId) ?: throw NotFoundException("No event with id $eventId")
         val creator = user.getRole(Participant::class) ?: throw UnauthorizedException("User is no participant")
         var team = teamService.create(creator, body.name!!, body.description!!, event)
 
@@ -98,9 +90,9 @@ open class TeamController {
                         @PathVariable teamId: Long,
                         @Valid @RequestBody body: Map<String, Any>) {
 
-        if (eventRepository.exists(eventId) == false) throw NotFoundException("No event with id $eventId")
+        if (eventService.exists(eventId) == false) throw NotFoundException("No event with id $eventId")
 
-        val team = teamRepository.findOne(teamId) ?: throw NotFoundException("No team with id $teamId")
+        val team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId")
         val emailString = body["email"] as? String ?: throw BadRequestException("body is missing field email")
         val email = EmailAddress(emailString)
         teamService.invite(email, team)
@@ -119,9 +111,9 @@ open class TeamController {
                       @Valid @RequestBody body: Map<String, String>) {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
-        if (eventRepository.exists(eventId) == false) throw NotFoundException("No event with id $eventId")
+        if (eventService.exists(eventId) == false) throw NotFoundException("No event with id $eventId")
 
-        val team = teamRepository.findOne(teamId) ?: throw NotFoundException("No team with id $teamId")
+        val team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId")
         val emailString = body["email"] ?: throw BadRequestException("body is missing field email")
         val email = EmailAddress(emailString)
 
@@ -134,7 +126,7 @@ open class TeamController {
 
     @RequestMapping("/{id}/")
     open fun showTeam(@PathVariable id: Long): TeamView {
-        val team = teamService.getByID(id) ?: throw NotFoundException("team with id $id does not exist")
+        val team = teamService.findOne(id) ?: throw NotFoundException("team with id $id does not exist")
         return TeamView(team)
     }
 
@@ -146,7 +138,7 @@ open class TeamController {
 
     @RequestMapping("/{id}/distance/")
     open fun getTeamDistance(@PathVariable id: Long): Map<String, Any> {
-        val team = teamService.getByID(id) ?: throw NotFoundException("team with id $id does not exist")
+        val team = teamService.findOne(id) ?: throw NotFoundException("team with id $id does not exist")
         val postings = teamService.findLocationPostingsById(id) ?: throw NotFoundException("team with id $id does not exist")
 
         //TODO: move logic to service layer

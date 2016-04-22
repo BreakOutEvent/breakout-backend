@@ -82,6 +82,7 @@ abstract class IntegrationTest {
         mediaRepository.deleteAll()
         mediaSizeRepository.deleteAll()
         eventRepository.deleteAll()
+        locationRepository.deleteAll()
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .addFilters<DefaultMockMvcBuilder>(springSecurityFilterChain)
