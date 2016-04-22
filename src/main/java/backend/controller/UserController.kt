@@ -9,6 +9,7 @@ import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserService
 import backend.services.ConfigurationService
+import backend.util.getSignedJwtToken
 import backend.view.UserView
 import com.auth0.jwt.Algorithm
 import com.auth0.jwt.JWTSigner
@@ -79,6 +80,7 @@ class UserController {
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (user.core.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")
         user.apply(body)
+        user.profilePic.uploadToken = getSignedJwtToken(JWT_SECRET, user.profilePic.id.toString())
         userService.save(user)
         return UserView(user)
     }
