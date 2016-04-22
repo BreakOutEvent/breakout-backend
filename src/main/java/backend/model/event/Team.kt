@@ -73,6 +73,7 @@ class Team : BasicEntity {
 
     @Throws
     fun invite(email: EmailAddress) {
+        if(isInvited(email)) throw DomainException("User ${email.toString()} already is invited to this team")
         this.invitations.add(Invitation(email, this))
     }
 
