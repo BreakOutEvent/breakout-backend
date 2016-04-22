@@ -135,18 +135,22 @@ open class TeamController {
         return postingIds
     }
 
+    /**
+     * GET /event/{eventId}/team/{id}/distance/
+     * Get the actual distance and the linear distance for a team
+     * TODO: Add endpoint which supports the actual and linear from locations
+     * TODO: This endpoint only considers postings with locations, but not locations without postings
+     *
+     * Example: Having a route of a team from A -> B -> C
+     * Actual distance = |A -> B| + |B -> C|
+     * Linear distance = |A -> C|
+     */
     @RequestMapping("/{id}/distance/")
-    open fun getTeamDistance(@PathVariable id: Long): Map<String, Any> {
-        val team = teamService.findOne(id) ?: throw NotFoundException("team with id $id does not exist")
-        val postings = teamService.findLocationPostingsById(id) ?: throw NotFoundException("team with id $id does not exist")
+    open fun getTeamDistance(@PathVariable("id") teamId: Long): Map<String, Any> {
 
-        //TODO: move logic to service layer
-        val actualdistance = distanceCoordsListKMfromStart(team.event.startingLocation, postings.map { it.location!!.toCoord() })
-        val postingDistance = teamService.getPostingMaxDistanceById(id)
-        var distance = 0.0
-        if (postingDistance != null) {
-            distance = postingDistance.distance ?: 0.0
-        }
-        return mapOf("actualdistance" to actualdistance, "distance" to distance)
+        val linearDistance = this.teamService.getLinearDistanceForTeamFromPostings(teamId)
+        val actualDistance = this.teamService.getActualDistanceForTeamFromPostings(teamId)
+
+        return mapOf("actualdistance" to actualDistance, "distance" to linearDistance)
     }
 }
