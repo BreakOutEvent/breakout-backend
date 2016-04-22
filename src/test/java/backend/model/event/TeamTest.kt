@@ -67,7 +67,6 @@ class TeamTest {
         val secondInvitee = EmailAddress("second@mail.de")
 
         team.invite(firstInvitee)
-
-        assertFails({ team.invite(secondInvitee) })
+        team.invite(secondInvitee)
     }
 }
