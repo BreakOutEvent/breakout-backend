@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
-interface InvoiceService {
+interface TeamEntryFeeService {
     fun findById(id: Long): Invoice?
     fun save(invoice: TeamEntryFeeInvoice)
     fun addPaymentToInvoice(invoice: Invoice, payment: Payment)
@@ -17,16 +17,16 @@ interface InvoiceService {
 }
 
 @Service
-class InvoiceServiceImpl : InvoiceService {
+class TeamEntryFeeServiceImpl : TeamEntryFeeService {
 
-    private val invoiceRepository: InvoiceRepository
+    private val teamEntryFeeInvoiceRepository: TeamEntryFeeInvoiceRepository
     private val braintreeGateway: BraintreeGateway
     private val logger: Logger
 
     @Autowired
-    constructor(invoiceRepository: InvoiceRepository, braintreeGateway: BraintreeGateway) {
-        this.invoiceRepository = invoiceRepository
-        this.logger = Logger.getLogger(InvoiceServiceImpl::class.java)
+    constructor(teamEntryFeeInvoiceRepository: TeamEntryFeeInvoiceRepository, braintreeGateway: BraintreeGateway) {
+        this.teamEntryFeeInvoiceRepository = teamEntryFeeInvoiceRepository
+        this.logger = Logger.getLogger(TeamEntryFeeServiceImpl::class.java)
         this.braintreeGateway = braintreeGateway
     }
 
@@ -34,7 +34,6 @@ class InvoiceServiceImpl : InvoiceService {
     override fun addBraintreePaymentToInvoice(invoice: Invoice, user: User, amount: Money, nonce: String) {
 
         val amountAsBigDecimal = amount.numberStripped
-
         val transactionRequest = TransactionRequest()
                 .amount(amountAsBigDecimal)
                 .paymentMethodNonce(nonce)
@@ -43,6 +42,7 @@ class InvoiceServiceImpl : InvoiceService {
                 .phone("1234567890")
                 .url("http://break-out.org")
                 .done()
+
 
         val transactionResult = braintreeGateway.transaction().sale(transactionRequest).transaction
         val payment = BraintreePayment(Money.of(amountAsBigDecimal, "EUR"), user, transactionResult)
@@ -58,11 +58,11 @@ class InvoiceServiceImpl : InvoiceService {
 
     @Transactional
     override fun save(invoice: TeamEntryFeeInvoice) {
-        invoiceRepository.save(invoice)
+        teamEntryFeeInvoiceRepository.save(invoice)
     }
 
     @Transactional
     override fun findById(id: Long): Invoice? {
-        return invoiceRepository.findOne(id)
+        return teamEntryFeeInvoiceRepository.findOne(id)
     }
 }

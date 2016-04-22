@@ -6,7 +6,6 @@ import backend.model.event.Invitation.InvitationStatus
 import backend.model.location.Location
 import backend.model.media.Media
 import backend.model.misc.EmailAddress
-import backend.model.payment.Invoice
 import backend.model.payment.TeamEntryFeeInvoice
 import backend.model.user.Participant
 import java.util.*

@@ -4,7 +4,7 @@ import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.model.payment.Invoice
-import backend.model.payment.InvoiceService
+import backend.model.payment.TeamEntryFeeService
 import backend.model.user.UserService
 import com.braintreegateway.BraintreeGateway
 import org.apache.log4j.Logger
@@ -25,14 +25,14 @@ import java.math.BigDecimal
 open class InvoiceController {
 
     private val braintreeGateway: BraintreeGateway
-    private val invoiceService: InvoiceService
+    private val teamEntryFeeService: TeamEntryFeeService
     private val userService: UserService
     private val logger: Logger
 
     @Autowired
-    constructor(invoiceService: InvoiceService, braintreeGateway: BraintreeGateway, userService: UserService) {
+    constructor(teamEntryFeeService: TeamEntryFeeService, braintreeGateway: BraintreeGateway, userService: UserService) {
         this.braintreeGateway = braintreeGateway
-        this.invoiceService = invoiceService
+        this.teamEntryFeeService = teamEntryFeeService
         this.userService = userService
         this.logger = Logger.getLogger(InvoiceController::class.java)
     }
@@ -44,7 +44,7 @@ open class InvoiceController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/{id}/payment/braintree/client_token/")
     open fun getToken(@PathVariable("id") invoiceId: Long): Map<String, String> {
-        invoiceService.findById(invoiceId) ?: throw NotFoundException("No invoice with id $invoiceId found")
+        teamEntryFeeService.findById(invoiceId) ?: throw NotFoundException("No invoice with id $invoiceId found")
         val token = braintreeGateway.clientToken().generate()
         return mapOf("token" to token)
     }
@@ -61,10 +61,10 @@ open class InvoiceController {
         // Get all data
         val amount = Money.of(BigDecimal.valueOf(60.0), "EUR") // TODO: How do I get the amount here?
         val user = userService.getUserFromCustomUserDetails(customUserDetails) // TODO: How do I get the authenticated user here?
-        val invoice: Invoice = invoiceService.findById(invoiceId) ?: throw NotFoundException("No invoice with id $invoiceId found")
+        val invoice: Invoice = teamEntryFeeService.findById(invoiceId) ?: throw NotFoundException("No invoice with id $invoiceId found")
         val nonce = body.nonce ?: throw BadRequestException("Missing nonce in body")
 
-        invoiceService.addBraintreePaymentToInvoice(invoice, user, amount, nonce)
+        teamEntryFeeService.addBraintreePaymentToInvoice(invoice, user, amount, nonce)
         return mapOf("message" to "success")
     }
 

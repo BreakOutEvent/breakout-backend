@@ -33,7 +33,7 @@ class TestBraintreePayment : IntegrationTest() {
         event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
         invoice = TeamEntryFeeInvoice(team, Money.of(BigDecimal.valueOf(60.0), "EUR"))
-        invoiceService.save(invoice)
+        teamEntryFeeService.save(invoice)
         tokens = getTokens(this.mockMvc, "email@mail.com", "password")
     }
 
