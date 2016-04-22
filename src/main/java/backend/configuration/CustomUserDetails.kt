@@ -17,7 +17,7 @@ class CustomUserDetails(val user: User) : UserDetails {
 
     override fun getAuthorities() = user.core.getAuthorities()
 
-    override fun isEnabled() = !user.isBlocked
+    override fun isEnabled() = true
 
     override fun getPassword(): String? = user.passwordHash
 }
