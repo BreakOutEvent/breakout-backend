@@ -133,19 +133,19 @@ open class TeamController {
     }
 
     @RequestMapping("/{id}/")
-    fun showTeam(@PathVariable id: Long): TeamView {
+    open fun showTeam(@PathVariable id: Long): TeamView {
         val team = teamService.getByID(id) ?: throw NotFoundException("team with id $id does not exist")
         return TeamView(team)
     }
 
     @RequestMapping("/{id}/posting/")
-    fun getTeamPostingIds(@PathVariable id: Long): List<Long> {
+    open fun getTeamPostingIds(@PathVariable id: Long): List<Long> {
         val postingIds = teamService.findPostingsById(id) ?: throw NotFoundException("team with id $id does not exist")
         return postingIds
     }
 
     @RequestMapping("/{id}/distance/")
-    fun getTeamDistance(@PathVariable id: Long): Map<String, Any> {
+    open fun getTeamDistance(@PathVariable id: Long): Map<String, Any> {
         val team = teamService.getByID(id) ?: throw NotFoundException("team with id $id does not exist")
         val postings = teamService.findLocationPostingsById(id) ?: throw NotFoundException("team with id $id does not exist")
 

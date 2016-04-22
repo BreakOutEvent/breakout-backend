@@ -46,6 +46,7 @@ import javax.servlet.Filter
 @ActiveProfiles("test")
 abstract class IntegrationTest {
 
+    protected val APPLICATION_JSON_UTF_8 = "application/json;charset=UTF-8"
 
     // Spring stuff
     @Autowired lateinit private var context: WebApplicationContext

@@ -20,9 +20,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.time.LocalDateTime
 
 class TestTeamEndpoint : IntegrationTest() {
@@ -36,8 +34,6 @@ class TestTeamEndpoint : IntegrationTest() {
     lateinit var creator: User
     lateinit var inviteeCredentials: Credentials
     lateinit var invitee: User
-    val APPLICATION_JSON_UTF_8 = "application/json;charset=UTF-8"
-
 
     @Before
     override fun setUp() {
@@ -115,7 +111,7 @@ class TestTeamEndpoint : IntegrationTest() {
 
         val response = mockMvc.perform (request)
                 .andExpect(status().isCreated)
-                .andExpect(MockMvcResultMatchers.content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.url").exists())
                 .andExpect(jsonPath("$.width").exists())
@@ -134,7 +130,7 @@ class TestTeamEndpoint : IntegrationTest() {
 
         val responseMedia = mockMvc.perform (requestMedia)
                 .andExpect(status().isOk)
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").exists())
                 .andExpect(jsonPath("$.event").exists())
@@ -178,7 +174,7 @@ class TestTeamEndpoint : IntegrationTest() {
 
         val response = mockMvc.perform (request)
                 .andExpect(status().isOk)
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").exists())
                 .andExpect(jsonPath("$.event").exists())
@@ -197,7 +193,7 @@ class TestTeamEndpoint : IntegrationTest() {
 
         val response = mockMvc.perform (request)
                 .andExpect(status().isOk)
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$").isArray)
                 .andExpect(jsonPath("$[0]").exists())
                 .andExpect(jsonPath("$[1]").exists())
@@ -215,7 +211,7 @@ class TestTeamEndpoint : IntegrationTest() {
 
         val response = mockMvc.perform (request)
                 .andExpect(status().isOk)
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.distance").exists())
                 .andExpect(jsonPath("$.actualdistance").exists())
                 .andReturn().response.contentAsString
