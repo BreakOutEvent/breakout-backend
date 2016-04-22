@@ -15,6 +15,7 @@ import javax.persistence.OneToOne
 @Entity
 class Location : BasicEntity {
 
+    // Use Coord
     @Embedded
     lateinit var point: Point
         private set

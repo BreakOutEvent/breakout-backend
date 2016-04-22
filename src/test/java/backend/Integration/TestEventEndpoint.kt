@@ -9,9 +9,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -132,7 +130,7 @@ class TestEventEndpoint : IntegrationTest() {
         //TODO create Users & Posts
         val response = mockMvc.perform (request)
                 .andExpect(status().isOk)
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$").isArray)
                 .andExpect(jsonPath("$[0]").doesNotExist())
                 .andExpect(jsonPath("$[1]").doesNotExist())
@@ -151,7 +149,7 @@ class TestEventEndpoint : IntegrationTest() {
         //TODO create Users & Posts
         val response = mockMvc.perform (request)
                 .andExpect(status().isOk)
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.distance").exists())
                 .andExpect(jsonPath("$.actualdistance").exists())
                 .andReturn().response.contentAsString

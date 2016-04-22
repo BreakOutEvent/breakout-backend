@@ -5,11 +5,13 @@ import backend.model.posting.Posting
 import java.time.LocalDateTime
 
 interface EventService {
-    fun getById(id: Long): Event?
+    fun findById(id: Long): Event?
 
     fun createEvent(title: String, date: LocalDateTime, city: String, startingLocation: Coord, duration: Int): Event
 
     fun findAll(): Iterable<Event>
+
+    fun exists(id: Long): Boolean
 
     /**
      * Get Event Postings from database

@@ -9,6 +9,7 @@ import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserService
 import backend.services.ConfigurationService
+import backend.util.getSignedJwtToken
 import backend.view.UserView
 import com.auth0.jwt.Algorithm
 import com.auth0.jwt.JWTSigner
@@ -41,11 +42,9 @@ class UserController {
     /**
      * POST /user/
      */
-
     @RequestMapping("/", method = arrayOf(POST))
     @ResponseStatus(CREATED)
-    @ApiOperation(value = "Create a new user", response = UserView::class)
-    fun addUser(@Valid @RequestBody body: UserView): UserView {
+    fun createUser(@Valid @RequestBody body: UserView): UserView {
 
         // Validate existence of email and password by hand
         // because UserView has those as optional because of PUT requests
@@ -56,6 +55,7 @@ class UserController {
 
         val user = userService.create(email, password).apply(body)
 
+        //TODO: move to helper function in util package
         user.profilePic.uploadToken = JWTSigner(JWT_SECRET).sign(mapOf("subject" to user.profilePic.id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512))
 
         return UserView(userService.save(user)!!)
@@ -64,8 +64,7 @@ class UserController {
     /**
      * GET /user/
      */
-    @ResponseStatus(HttpStatus.OK)
-    @RequestMapping("/", method = arrayOf(GET))
+    @RequestMapping("/")
     fun showUsers(): Iterable<UserView> {
         return userService.getAllUsers()!!.map { UserView(it) };
     }
@@ -74,13 +73,14 @@ class UserController {
      * PUT /user/id/
      */
     @RequestMapping("/{id}/", method = arrayOf(PUT))
-    fun updateUser(@PathVariable("id") id: Long,
+    fun updateUser(@PathVariable id: Long,
                    @Valid @RequestBody body: UserView,
                    @AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (user.core.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")
         user.apply(body)
+        user.profilePic.uploadToken = getSignedJwtToken(JWT_SECRET, user.profilePic.id.toString())
         userService.save(user)
         return UserView(user)
     }
@@ -89,11 +89,11 @@ class UserController {
     /**
      * GET /user/id/
      */
-    @RequestMapping("/{id}/", method = arrayOf(GET))
-    fun showUser(@PathVariable("id") id: Long): UserView {
+    @RequestMapping("/{id}/")
+    fun showUser(@PathVariable id: Long): UserView {
 
         val user = userService.getUserById(id) ?: throw NotFoundException("user with id $id does not exist")
-        return (UserView(user))
+        return UserView(user)
     }
 
     private fun User.apply(userView: UserView): User {

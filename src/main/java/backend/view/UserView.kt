@@ -48,13 +48,21 @@ class UserView() {
         var phonenumber: String? = null
         var hometown: String? = null
         var tshirtsize: String? = null
+        var eventId: Long? = null
+        var eventCity: String? = null
+        var teamId: Long? = null
+        var teamName: String? = null
 
         constructor(user: User) : this() {
             this.participant = user.getRole(Participant::class)
-            this.emergencynumber = participant!!.emergencynumber
-            this.hometown = participant!!.hometown
-            this.phonenumber = participant!!.phonenumber
-            this.tshirtsize = participant!!.tshirtsize
+            this.emergencynumber = participant?.emergencynumber
+            this.hometown = participant?.hometown
+            this.phonenumber = participant?.phonenumber
+            this.tshirtsize = participant?.tshirtsize
+            this.eventId = participant?.currentTeam?.event?.id
+            this.eventCity = participant?.currentTeam?.event?.city
+            this.teamId = participant?.currentTeam?.id
+            this.teamName = participant?.currentTeam?.name
         }
     }
 }

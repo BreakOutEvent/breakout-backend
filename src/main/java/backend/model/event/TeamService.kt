@@ -48,7 +48,7 @@ interface TeamService {
      *
      * @return gotten team object
      */
-    fun getByID(id: Long): Team?
+    fun findOne(id: Long): Team?
 
     /**
      * Get Team Postings from database
@@ -78,5 +78,9 @@ interface TeamService {
     fun getPostingMaxDistanceById(id: Long): Posting?
 
     fun findInvitationsForUser(user: User): List<Invitation>
+
+    fun getLinearDistanceForTeamFromPostings(teamId: Long): Double
+
+    fun getActualDistanceForTeamFromPostings(teamId: Long): Double
 
 }

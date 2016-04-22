@@ -21,7 +21,6 @@ class TestUserEndpoint : IntegrationTest() {
     @Autowired
     lateinit var configurationService: ConfigurationService
     lateinit var JWT_SECRET: String
-    val APPLICATION_JSON_UTF_8 = "application/json;charset=UTF-8"
 
     private fun url(): String = "/user/"
 

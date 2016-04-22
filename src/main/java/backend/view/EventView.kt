@@ -10,17 +10,18 @@ class EventView() {
     var id: Long? = null
 
     @NotNull
-    var title: String? = null
+    lateinit var title: String
 
     @NotNull
     var date: Long? = null
 
     @NotNull
-    var city: String? = null
+    lateinit var city: String
 
     @Valid
-    var startingLocation: CoordView? = null
+    lateinit var startingLocation: CoordView
 
+    @NotNull
     var duration: Int = 36
 
     constructor(event: Event) : this() {

@@ -28,7 +28,5 @@ class ActivationController {
                 throw NotFoundException("No user with email $email")
 
         userService.activate(user, token)
-
-
     }
 }

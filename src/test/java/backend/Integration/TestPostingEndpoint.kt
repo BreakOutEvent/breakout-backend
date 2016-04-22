@@ -16,6 +16,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.time.LocalDateTime
@@ -27,7 +28,6 @@ open class TestPostingEndpoint : IntegrationTest() {
     private lateinit var configurationService: ConfigurationService
     private lateinit var JWT_SECRET: String
     private lateinit var userCredentials: Credentials
-    private val APPLICATION_JSON_UTF_8 = "application/json;charset=UTF-8"
     private lateinit var user: User
 
 
@@ -76,7 +76,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.POST, "/posting/")
                 .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(postData)
 
         val response = mockMvc.perform(request)
@@ -114,7 +114,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.POST, "/posting/")
                 .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(postData)
 
         val response = mockMvc.perform(request)
@@ -143,7 +143,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.POST, "/posting/")
                 .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(postData)
 
         val response = mockMvc.perform(request)
@@ -179,7 +179,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.POST, "/posting/")
                 .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(postData)
 
         val response = mockMvc.perform(request)
@@ -206,7 +206,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.POST, "/posting/")
                 .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(postData)
 
         val response = mockMvc.perform(request)
@@ -230,7 +230,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.POST, "/posting/")
                 .header("Authorization", "Bearer invalidToken")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(postData)
 
         val response = mockMvc.perform(request)
@@ -251,7 +251,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.GET, "/posting/" + posting.id + "/")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
 
         val response = mockMvc.perform (request)
                 .andExpect(status().isOk)
@@ -288,7 +288,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.POST, "/posting/get/ids")
                 .content(postingsIds.toJsonString())
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
 
         val response = mockMvc.perform (request)
                 .andExpect(status().isOk)
@@ -318,7 +318,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.GET, "/posting/get/since/${postingZero.id}/")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
 
         val response = mockMvc.perform (request)
                 .andExpect(status().isOk)
@@ -358,7 +358,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.POST, "/media/${savedposting!!.media!!.first().id}/")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(postData)
 
         val response = mockMvc.perform (request)
@@ -393,7 +393,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.POST, "/media/${savedposting!!.media!!.first().id}/")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .header("X-UPLOAD-TOKEN", "87654321")
                 .content(postData)
 
@@ -431,7 +431,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.POST, "/media/${savedposting!!.media!!.first().id}/")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .content(postData)
 
@@ -452,7 +452,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val requestMedia = MockMvcRequestBuilders
                 .request(HttpMethod.GET, "/posting/${savedposting.id}/")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
 
         val responseMedia = mockMvc.perform (requestMedia)
                 .andExpect(status().isOk)
@@ -504,7 +504,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         var request = MockMvcRequestBuilders
                 .request(HttpMethod.POST, "/media/${savedposting!!.media!!.first().id}/")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .content(postData)
 
@@ -536,7 +536,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         request = MockMvcRequestBuilders
                 .request(HttpMethod.POST, "/media/${savedposting.media!!.first().id}/")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .content(postData)
 
@@ -557,7 +557,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val requestMedia = MockMvcRequestBuilders
                 .request(HttpMethod.GET, "/posting/${savedposting.id}/")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
 
         val responseMedia = mockMvc.perform (requestMedia)
                 .andExpect(status().isOk)
@@ -596,7 +596,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.GET, "/posting/")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
 
         mockMvc.perform(request)
                 .andExpect(status().isOk)
@@ -625,7 +625,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val request = MockMvcRequestBuilders.put("/user/${credentials.id}/")
                 .header("Authorization", "Bearer ${credentials.accessToken}")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(json)
 
         val response = mockMvc.perform(request)

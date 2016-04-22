@@ -1,19 +1,22 @@
 package backend.controller
 
-import backend.controller.exceptions.UnauthorizedException
 import backend.model.media.MediaService
 import backend.model.media.MediaSize
 import backend.model.media.MediaSizeService
 import backend.model.media.MediaType
 import backend.services.ConfigurationService
+import backend.util.verifyJwtClaim
 import backend.view.MediaSizeView
-import com.auth0.jwt.JWTVerifier
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.web.bind.annotation.*
-import java.security.SignatureException
+import org.springframework.web.bind.annotation.RequestMethod.POST
 import javax.validation.Valid
+
+/**
+ * Is only called by the media recoding microservice
+ */
 
 @RestController
 @RequestMapping("/media")
@@ -39,25 +42,18 @@ class MediaController {
 
     /**
      * POST /media/id/
+     * Adds single MediaSize to Media
      */
-    @RequestMapping("/{id}/", method = arrayOf(RequestMethod.POST))
+    @RequestMapping("/{id}/", method = arrayOf(POST))
     @ResponseStatus(CREATED)
     fun createMediaSize(@PathVariable("id") id: Long,
                         @RequestHeader("X-UPLOAD-TOKEN") uploadToken: String,
                         @Valid @RequestBody body: MediaSizeView): MediaSizeView {
 
-        try {
-            if (!(JWTVerifier(JWT_SECRET, "audience").verify(uploadToken)["subject"] as String).equals(id.toString())) {
-                throw UnauthorizedException("Invalid JWT token")
-            }
-        } catch (e: SignatureException) {
-            throw UnauthorizedException(e.message ?: "Invalid JWT token")
-        } catch (e: IllegalStateException) {
-            throw UnauthorizedException(e.message ?: "Invalid JWT token")
-        }
-
+        verifyJwtClaim(JWT_SECRET, uploadToken, id.toString())
         val media = mediaService.getByID(id);
 
+        //TODO: move to mediaService
         //Delete Size, if it already exists
         var mediaSizeFound: MediaSize?
         if (body.width!! > body.height!!) {
@@ -67,6 +63,7 @@ class MediaController {
             logger.info("findByHeightAndMediaId")
             mediaSizeFound = mediaSizeService.findByHeightAndMediaAndMediaType(body.height!!, media!!, MediaType.valueOf(body.type!!.toUpperCase()));
         }
+
         if (mediaSizeFound == null) {
             var mediaSize = mediaSizeService.createAndSaveMediaSize(media, body.url!!, body.width!!, body.height!!, body.length!!, body.size!!, body.type!!)
             return MediaSizeView(mediaSize)

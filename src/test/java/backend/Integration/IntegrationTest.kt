@@ -9,6 +9,8 @@ import backend.model.event.EventRepository
 import backend.model.event.EventService
 import backend.model.event.TeamRepository
 import backend.model.event.TeamService
+import backend.model.location.LocationRepository
+import backend.model.location.LocationService
 import backend.model.media.MediaRepository
 import backend.model.media.MediaService
 import backend.model.media.MediaSizeRepository
@@ -47,6 +49,7 @@ import javax.servlet.Filter
 @ActiveProfiles("test")
 abstract class IntegrationTest {
 
+    protected val APPLICATION_JSON_UTF_8 = "application/json;charset=UTF-8"
 
     // Spring stuff
     @Autowired lateinit private var context: WebApplicationContext
@@ -59,6 +62,7 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var postingRepository: PostingRepository
     @Autowired lateinit protected var mediaRepository: MediaRepository
     @Autowired lateinit protected var mediaSizeRepository: MediaSizeRepository
+    @Autowired lateinit protected var locationRepository: LocationRepository
 
     // Services
     @Autowired lateinit protected var userService: UserService
@@ -68,6 +72,7 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var mediaService: MediaService
     @Autowired lateinit protected var mediaSizeService: MediaSizeService
     @Autowired lateinit protected var teamEntryFeeService: TeamEntryFeeService
+    @Autowired lateinit protected var locationService: LocationService
 
     lateinit protected var mockMvc: MockMvc
 
@@ -79,6 +84,7 @@ abstract class IntegrationTest {
         mediaRepository.deleteAll()
         mediaSizeRepository.deleteAll()
         eventRepository.deleteAll()
+        locationRepository.deleteAll()
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .addFilters<DefaultMockMvcBuilder>(springSecurityFilterChain)
