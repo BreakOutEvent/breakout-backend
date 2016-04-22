@@ -10,11 +10,13 @@ import javax.persistence.OneToOne
 class TeamEntryFeeInvoice : Invoice {
 
     @OneToOne
-    var team: Team
-        private set
+    var team: Team? = null
+
+    private constructor(): super()
 
     constructor(team: Team, amount: Money) : super(amount) {
         this.team = team
+        this.team!!.invoice = this
     }
 
     override fun isPaymentEligable(payment: Payment): Boolean {
@@ -22,9 +24,10 @@ class TeamEntryFeeInvoice : Invoice {
 
         return when {
             participant == null -> false
-            !team.isMember(participant) -> false
-            !payment.amount.isEqualTo(this.amount.divide(2)) -> false
-            !team.isFull() -> false
+            !team!!.isMember(participant) -> false
+            //TODO: Also allow half the payment
+            !payment.amount.isEqualTo(this.amount.divide(2)) || payment.amount.isEqualTo(this.amount) -> false
+            !team!!.isFull() -> false
             else -> true
         }
     }

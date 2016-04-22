@@ -14,8 +14,10 @@ abstract class Invoice: BasicEntity {
     private val payments: MutableList<Payment> = mutableListOf()
 
     @Column
-    var amount: Money
+    lateinit var amount: Money
         private set
+
+    protected constructor()
 
     constructor(amount: Money) {
         this.amount = amount

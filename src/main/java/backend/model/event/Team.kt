@@ -6,6 +6,8 @@ import backend.model.event.Invitation.InvitationStatus
 import backend.model.location.Location
 import backend.model.media.Media
 import backend.model.misc.EmailAddress
+import backend.model.payment.Invoice
+import backend.model.payment.TeamEntryFeeInvoice
 import backend.model.user.Participant
 import java.util.*
 import javax.persistence.*
@@ -45,6 +47,9 @@ class Team : BasicEntity {
 
     @OneToMany(cascade = arrayOf(CascadeType.REMOVE), mappedBy = "team", orphanRemoval = true)
     val locations: MutableList<Location> = ArrayList()
+
+    @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "team")
+    var invoice: TeamEntryFeeInvoice? = null
 
     private fun addMember(participant: Participant) {
         if (participant.currentTeam != null) throw DomainException("Participant ${participant.email} already is part of a team")
@@ -91,5 +96,7 @@ class Team : BasicEntity {
         this.members.clear()
         this.locations.forEach { it.team = null }
         this.locations.clear()
+        this.invoice?.team = null
+        this.invoice = null
     }
 }
