@@ -53,7 +53,7 @@ class TeamTest {
     }
 
     @Test
-    fun testFailToJoin() {
+    fun testFailToJoinIfNotInvited() {
         val inviteeEmail = EmailAddress("invitee@mail.com")
         val notInvitee = User.create("notinvitee@mail.com", "password").addRole(Participant::class)
         team.invite(inviteeEmail)
@@ -62,12 +62,59 @@ class TeamTest {
     }
 
     @Test
+    fun testFailToJoinIfTeamAlreadyFull() {
+        val inviteeEmail = EmailAddress("invitee@mail.com")
+        val secondInvitee = EmailAddress("secondInvitee@mail.com")
+
+        team.invite(inviteeEmail)
+        team.invite(secondInvitee)
+
+        val firstUser = User.create(inviteeEmail.toString(), "password").addRole(Participant::class)
+        val secondUser = User.create(secondInvitee.toString(), "password").addRole(Participant::class)
+
+        team.join(firstUser)
+        assertFails { team.join(secondUser) }
+    }
+
+    @Test
     fun testInvite() {
         val firstInvitee = EmailAddress("invitee@mail.de")
         val secondInvitee = EmailAddress("second@mail.de")
 
         team.invite(firstInvitee)
+        team.invite(secondInvitee)
+    }
 
-        assertFails({ team.invite(secondInvitee) })
+    @Test
+    fun testFailToInviteIfAlreadyInvited() {
+        val firstInvitee = EmailAddress("invitee@mail.de")
+        val secondInvitee = EmailAddress("second@mail.de")
+
+        team.invite(firstInvitee)
+        team.invite(secondInvitee)
+
+        assertFails { team.invite(secondInvitee) }
+    }
+
+    @Test
+    fun testIsInvited() {
+        val firstInvitee = EmailAddress("invitee@mail.de")
+        val secondInvitee = EmailAddress("second@mail.de")
+
+        team.invite(firstInvitee)
+        team.invite(secondInvitee)
+
+        assertTrue(team.isInvited(firstInvitee))
+        assertTrue(team.isInvited(secondInvitee))
+    }
+
+    @Test
+    fun testIsFull() {
+        val firstInvitee = EmailAddress("invitee@mail.de")
+        val invitee = User.create(firstInvitee.toString(), "password").addRole(Participant::class)
+        team.invite(firstInvitee)
+        team.join(invitee)
+
+        assertTrue(team.isFull())
     }
 }

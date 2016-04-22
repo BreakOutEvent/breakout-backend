@@ -2,7 +2,6 @@ package backend.model.event
 
 import backend.exceptions.DomainException
 import backend.model.BasicEntity
-import backend.model.event.Invitation.InvitationStatus
 import backend.model.location.Location
 import backend.model.media.Media
 import backend.model.misc.EmailAddress
@@ -35,8 +34,8 @@ class Team : BasicEntity {
 
     lateinit var description: String
 
-    @OneToOne(cascade = arrayOf(ALL))
-    private var invitation: Invitation? = null
+    @OneToMany(cascade = arrayOf(ALL), mappedBy = "team", orphanRemoval = true)
+    private var invitations: MutableList<Invitation> = ArrayList()
 
     @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true)
     lateinit var profilePic: Media
@@ -61,20 +60,25 @@ class Team : BasicEntity {
     @Throws
     fun join(participant: Participant) {
 
-        if (invitation == null) {
-            throw DomainException("${participant.email} can't join team $id because there are no invitations")
-        } else if (invitation!!.invitee.toString() != participant.email) {
-            throw DomainException("${participant.email} is not invited to join this team")
-        }
+        val inviteeEmail = EmailAddress(participant.email)
+        if (!isInvited(inviteeEmail)) {
+            throw DomainException("${participant.email} can't join team because he is not invited")
+        } else if (isFull()) {
+            throw DomainException("${participant.email} can't join team because this team is already full")
+        } else {
+            addMember(participant)
 
-        addMember(participant)
-        invitation!!.status = InvitationStatus.ACCEPTED
+        }
     }
 
     @Throws
     fun invite(email: EmailAddress) {
-        if (this.invitation != null) throw DomainException("Someone else has already been invited to this team")
-        this.invitation = Invitation(email, this)
+        if(isInvited(email)) throw DomainException("User ${email.toString()} already is invited to this team")
+        this.invitations.add(Invitation(email, this))
+    }
+
+    fun isInvited(email: EmailAddress): Boolean {
+        return this.invitations.map { it.invitee }.contains(email)
     }
 
     fun isMember(username: String): Boolean {
@@ -97,5 +101,7 @@ class Team : BasicEntity {
         this.locations.clear()
         this.invoice?.team = null
         this.invoice = null
+        this.invitations.forEach { it.team = null }
+        this.invitations.clear()
     }
 }

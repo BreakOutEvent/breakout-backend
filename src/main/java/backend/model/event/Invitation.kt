@@ -2,18 +2,17 @@ package backend.model.event
 
 import backend.model.BasicEntity
 import backend.model.misc.EmailAddress
-import org.codehaus.jackson.annotate.JsonIgnore
 import javax.persistence.Embedded
 import javax.persistence.Entity
-import javax.persistence.OneToOne
+import javax.persistence.ManyToOne
 
 @Entity
 class Invitation : BasicEntity {
 
     lateinit var status: InvitationStatus
 
-    @OneToOne
-    lateinit var team: Team
+    @ManyToOne
+    var team: Team? = null
 
     @Embedded
     lateinit var invitee: EmailAddress

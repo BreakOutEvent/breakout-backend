@@ -7,7 +7,7 @@ class InvitationView() {
     var name: String? = null
 
     constructor(invitation: Invitation) : this() {
-        this.team = invitation.team.id
-        this.name = invitation.team.name
+        this.team = invitation.team?.id
+        this.name = invitation.team?.name
     }
 }
