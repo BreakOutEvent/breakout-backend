@@ -13,6 +13,7 @@ import backend.model.media.MediaRepository
 import backend.model.media.MediaService
 import backend.model.media.MediaSizeRepository
 import backend.model.media.MediaSizeService
+import backend.model.payment.InvoiceService
 import backend.model.posting.PostingRepository
 import backend.model.posting.PostingService
 import backend.model.user.User
@@ -66,6 +67,7 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var eventService: EventService
     @Autowired lateinit protected var mediaService: MediaService
     @Autowired lateinit protected var mediaSizeService: MediaSizeService
+    @Autowired lateinit protected var invoiceService: InvoiceService
 
     lateinit protected var mockMvc: MockMvc
 
