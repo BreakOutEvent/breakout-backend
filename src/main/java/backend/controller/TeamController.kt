@@ -120,7 +120,6 @@ open class TeamController {
         if (user.email != email.toString()) throw BadRequestException("Authorized user and email from request body don't match")
         val participant = user.getRole(Participant::class) ?: throw RuntimeException("User is no participant")
 
-        // TODO: Handle Exceptions which may occur when user is not invited to team, etc.
         team.join(participant)
     }
 
