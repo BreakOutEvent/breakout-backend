@@ -67,7 +67,7 @@ open class TeamController {
     @PreAuthorize("isAuthenticated()")
     open fun createTeam(@PathVariable eventId: Long,
                         @AuthenticationPrincipal customUserDetails: CustomUserDetails,
-                        @RequestBody body: TeamView): TeamView {
+                        @Valid @RequestBody body: TeamView): TeamView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val event = eventService.findById(eventId) ?: throw NotFoundException("No event with id $eventId")

@@ -37,7 +37,6 @@ class LocationServiceImplTest : IntegrationTest() {
         assertEquals(3, results.count())
         results.forEach {
             assertTrue(it.uploader != null)
-            assertTrue(it.date.isBefore(LocalDateTime.now()))
         }
     }
 
