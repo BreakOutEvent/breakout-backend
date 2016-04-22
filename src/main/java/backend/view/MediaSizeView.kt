@@ -5,7 +5,6 @@ import javax.validation.constraints.NotNull
 
 class MediaSizeView() {
 
-    @NotNull
     var id: Long? = null
 
     @NotNull
