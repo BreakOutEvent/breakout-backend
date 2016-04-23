@@ -340,6 +340,7 @@ class TestUserEndpoint : IntegrationTest() {
                 "participant" to mapOf(
                         "tshirtsize" to "XL",
                         "hometown" to "Dresden",
+                        "birthdate" to "1461439913",
                         "phonenumber" to "01234567890",
                         "emergencynumber" to "0987654321"
                 )
@@ -363,6 +364,7 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.participant").exists())
                 .andExpect(jsonPath("$.participant.tshirtsize").value("XL"))
                 .andExpect(jsonPath("$.participant.hometown").value("Dresden"))
+                .andExpect(jsonPath("$.participant.birthdate").value(1461439913))
                 .andExpect(jsonPath("$.participant.phonenumber").value("01234567890"))
                 .andExpect(jsonPath("$.participant.emergencynumber").value("0987654321"))
                 .andReturn().response.contentAsString
@@ -380,6 +382,7 @@ class TestUserEndpoint : IntegrationTest() {
                 "participant" to mapOf(
                         "tshirtsize" to "XL",
                         "hometown" to "Dresden",
+                        "birthdate" to "1461439913",
                         "phonenumber" to "01234567890",
                         "emergencynumber" to "0987654321"
                 )

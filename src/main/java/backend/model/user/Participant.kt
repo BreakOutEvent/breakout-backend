@@ -15,6 +15,7 @@ class Participant : UserRole {
     var tshirtsize: String? = null
     var hometown: String? = null
     var phonenumber: String? = null
+    var birthdate: Date? = null
 
     @ManyToOne
     var currentTeam: Team? = null

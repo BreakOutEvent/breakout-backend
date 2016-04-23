@@ -113,6 +113,7 @@ class UserController {
         p.tshirtsize = userView.participant?.tshirtsize ?: p.tshirtsize
         p.emergencynumber = userView.participant?.emergencynumber ?: p.emergencynumber
         p.hometown = userView.participant?.hometown ?: p.hometown
+        p.birthdate = userView.participant?.birthdate ?: p.birthdate
         p.phonenumber = userView.participant?.phonenumber ?: p.phonenumber
 
         return this
