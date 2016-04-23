@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.validator.constraints.Email
 import java.util.*
 import javax.validation.Valid
+import javax.validation.constraints.NotNull
 
 class UserView() {
 
@@ -49,11 +50,18 @@ class UserView() {
 
         @JsonIgnore
         var participant: Participant? = null
+
+        @NotNull
         var emergencynumber: String ? = null
+
+        @NotNull
         var phonenumber: String? = null
-        var hometown: String? = null
-        var birthdate: Date? = null
+
+        @NotNull
         var tshirtsize: String? = null
+
+        var birthdate: Date? = null
+        var hometown: String? = null
         var eventId: Long? = null
         var eventCity: String? = null
         var teamId: Long? = null

@@ -50,6 +50,7 @@ class TestTeamEndpoint : IntegrationTest() {
         creatorCredentials = createUser(this.mockMvc, userService = userService)
         inviteeCredentials = createUser(this.mockMvc, email = "invitee@mail.com", userService = userService)
         makeUserParticipant(creatorCredentials)
+        failMakeUserParticipantMissingData(creatorCredentials)
         makeUserParticipant(inviteeCredentials)
         creator = userRepository.findOne(creatorCredentials.id.toLong()).getRole(Participant::class)!!
         invitee = userRepository.findOne(inviteeCredentials.id.toLong())
@@ -247,6 +248,29 @@ class TestTeamEndpoint : IntegrationTest() {
         // Join team
         mockMvc.perform(joinRequest).andExpect(status().isCreated)
     }
+
+    private fun failMakeUserParticipantMissingData(credentials: Credentials) {
+
+        // Update user with role participant
+        val json = mapOf(
+                "firstname" to "Florian",
+                "lastname" to "Schmidt",
+                "gender" to "Male",
+                "blocked" to false,
+                "participant" to mapOf(
+                        "birthdate" to "1461439913"
+                )
+        ).toJsonString()
+
+        val request = put("/user/${credentials.id}/")
+                .header("Authorization", "Bearer ${credentials.accessToken}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest)
+    }
+
 
     private fun makeUserParticipant(credentials: Credentials) {
 
