@@ -31,6 +31,8 @@ interface TeamService {
     @PreAuthorize("#team.isMember(authentication.name)")
     open fun invite(emailAddress: EmailAddress, team: Team)
 
+    open fun leave(team: Team, participant: Participant)
+
     /**
      * Persist a team to the database
      *

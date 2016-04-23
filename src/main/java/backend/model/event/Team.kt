@@ -73,7 +73,7 @@ class Team : BasicEntity {
 
     @Throws
     fun invite(email: EmailAddress): Invitation {
-        if(isInvited(email)) throw DomainException("User ${email.toString()} already is invited to this team")
+        if (isInvited(email)) throw DomainException("User ${email.toString()} already is invited to this team")
         val invitation = Invitation(email, this)
         this.invitations.add(invitation)
         return invitation
@@ -93,6 +93,16 @@ class Team : BasicEntity {
 
     fun isFull(): Boolean {
         return this.members.count() >= 2
+    }
+
+    fun leave(participant: Participant) {
+        if (!this.isMember(participant)) throw DomainException("Can't leave team because user never was a part of it")
+        if (this.isFull()) throw DomainException("Can't leave team because it is already full")
+        this.invitations.forEach { it.team = null }
+        this.invitations.clear()
+
+        this.members.forEach { it.currentTeam = null }
+        this.members.clear()
     }
 
     @PreRemove

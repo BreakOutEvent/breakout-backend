@@ -13,6 +13,7 @@ import backend.services.MailService
 import backend.util.distanceCoordsListKMfromStart
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import javax.transaction.Transactional
 
 @Service
 class TeamServiceImpl : TeamService {
@@ -98,5 +99,10 @@ class TeamServiceImpl : TeamService {
 
     override fun findInvitationsByInviteCode(code: String): Invitation? {
         return repository.findInvitationsByInviteCode(code)
+    }
+
+    @Transactional
+    override fun leave(team: Team, participant: Participant) {
+        team.leave(participant)
     }
 }

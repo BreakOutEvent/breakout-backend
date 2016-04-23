@@ -44,6 +44,21 @@ open class TeamController {
         this.userService = userService
     }
 
+
+    /**
+     * POST /event/{id}/team/leave/
+     * The currently authenticated user can leave it's team at this endpoint
+     */
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping("/leave/", method = arrayOf(POST))
+    open fun leaveTeam(@AuthenticationPrincipal customUserDetails: CustomUserDetails): Map<String, String> {
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
+        val participant = user.getRole(Participant::class) ?: throw BadRequestException("User is no participant")
+        val team = participant.currentTeam ?: throw BadRequestException("User is no part of a team")
+        teamService.leave(team, participant)
+        return mapOf("message" to "success")
+    }
+
     /**
      * GET /event/{id}/team/invitation/
      * Show all invitations for the currently authenticated user
