@@ -5,6 +5,8 @@ import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.ConflictException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
+import backend.model.event.Invitation
+import backend.model.event.TeamService
 import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserService
@@ -14,13 +16,12 @@ import backend.view.UserView
 import com.auth0.jwt.Algorithm
 import com.auth0.jwt.JWTSigner
 import io.swagger.annotations.Api
-import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.*
+import org.springframework.web.bind.annotation.RequestMethod.POST
+import org.springframework.web.bind.annotation.RequestMethod.PUT
 import javax.validation.Valid
 
 @Api
@@ -31,12 +32,14 @@ class UserController {
     private val userService: UserService
     private val JWT_SECRET: String
     private val configurationService: ConfigurationService
+    private val teamService: TeamService
 
     @Autowired
-    constructor(userService: UserService, configurationService: ConfigurationService) {
+    constructor(userService: UserService, teamService: TeamService, configurationService: ConfigurationService) {
         this.userService = userService
         this.configurationService = configurationService
         this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
+        this.teamService = teamService
     }
 
     /**
@@ -112,5 +115,37 @@ class UserController {
         p.phonenumber = userView.participant?.phonenumber ?: p.phonenumber
 
         return this
+    }
+
+    /**
+     * GET /user/invitation?token=lorem
+     * Get an invitation including data such as email address
+     * via a token
+     */
+    @RequestMapping("/invitation")
+    fun showInvitation(@RequestParam token: String): DetailedInvitationView {
+        val invitation = teamService.findInvitationsByInviteCode(token) ?: throw NotFoundException("No invitation for code $token")
+        return DetailedInvitationView(invitation)
+    }
+}
+
+class DetailedInvitationView {
+
+    val teamId: Long
+    val teamName: String?
+    val eventId: Long
+    val eventCity: String
+    val creator: String
+    val email: String
+    val token: String
+
+    constructor(invitation: Invitation) {
+        this.teamId = invitation.team!!.id!!
+        this.teamName = invitation.team?.name
+        this.eventId = invitation.team!!.event.id!!
+        this.eventCity = invitation.team!!.event.city
+        this.creator = invitation.team!!.members.first().email
+        this.email = invitation.invitee.toString()
+        this.token = invitation.invitationToken
     }
 }

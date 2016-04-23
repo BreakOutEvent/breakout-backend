@@ -39,14 +39,13 @@ class TeamServiceImpl : TeamService {
 
         // TODO: What if user already exists?
         // TODO: Should the creation of emails be moved to a seperate entity?
+        val invitation = team.invite(emailAddress)
         val email = Email(
                 to = listOf(emailAddress),
-                subject = "${team.members.first().email} hat dich eingeladen, ein Teil seines Breakout-Teams zu werden",
-                body = "Melde dich jetzt an auf www.break-out.org"
-        )
+                subject = "${team.members.first().email} hat dich eingeladen, ein Teil seines Breakout-Teams zu werden.",
+                body = "Melde dich jetzt an auf www.break-out.org an. Dein Einladungscode lautet ${invitation.invitationToken}")
 
         mailService.send(email)
-        team.invite(emailAddress)
         this.save(team)
     }
 
@@ -86,5 +85,9 @@ class TeamServiceImpl : TeamService {
         val distance = distanceCoordsListKMfromStart(startingCoordinates, postingCoordinates)
 
         return distance
+    }
+
+    override fun findInvitationsByInviteCode(code: String): Invitation? {
+        return repository.findInvitationsByInviteCode(code)
     }
 }

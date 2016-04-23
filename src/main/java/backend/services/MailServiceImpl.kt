@@ -38,6 +38,9 @@ class MailServiceImpl : MailService {
         }
         val body = ObjectMapper().writeValueAsString(email)
         val request = HttpEntity<String>(body, headers)
+
+        logger.info("Content of email: $body")
+
         try {
             val sendurl = getSendUrl(url, port)
             logger.info("sending mail via: $sendurl")

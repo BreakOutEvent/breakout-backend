@@ -10,7 +10,6 @@ import backend.model.misc.EmailAddress
 import backend.model.user.Participant
 import backend.model.user.UserService
 import backend.services.ConfigurationService
-import backend.util.distanceCoordsListKMfromStart
 import backend.util.getSignedJwtToken
 import backend.view.InvitationView
 import backend.view.TeamView
@@ -31,7 +30,6 @@ open class TeamController {
     private val JWT_SECRET: String
     private val configurationService: ConfigurationService
     private val userService: UserService
-
 
     @Autowired
     constructor(teamService: TeamService,
