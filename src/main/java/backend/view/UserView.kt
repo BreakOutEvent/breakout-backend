@@ -1,5 +1,6 @@
 package backend.view
 
+import backend.configuration.CustomUserDetails
 import backend.model.user.Participant
 import backend.model.user.User
 import com.fasterxml.jackson.annotation.JsonIgnore
@@ -28,6 +29,8 @@ class UserView() {
 
     var profilePic: MediaView? = null
 
+    var roles: List<String> = arrayListOf()
+
     constructor(user: User) : this() {
         this.user = user
         this.firstname = user.firstname
@@ -38,6 +41,7 @@ class UserView() {
         this.isBlocked = user.isBlocked
         this.participant = if (user.hasRole(Participant::class)) ParticipantViewModel(user) else null
         this.profilePic = MediaView(user.profilePic)
+        this.roles = user.core.getAuthorities().map { it.authority }
     }
 
     class ParticipantViewModel() {
