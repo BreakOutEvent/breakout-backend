@@ -47,6 +47,8 @@ class MailServiceImplTest {
                 .andExpect(MockRestRequestMatchers.jsonPath("$.tos").isArray)
                 .andExpect(MockRestRequestMatchers.jsonPath("$.subject").exists())
                 .andExpect(MockRestRequestMatchers.jsonPath("$.html").exists())
+                .andExpect(MockRestRequestMatchers.jsonPath("$.buttonText").doesNotExist())
+                .andExpect(MockRestRequestMatchers.jsonPath("$.buttonUrl").doesNotExist())
                 .andRespond(MockRestResponseCreators.withSuccess(response, MediaType.APPLICATION_JSON))
 
         val email = createEmail()
@@ -68,6 +70,8 @@ class MailServiceImplTest {
                 .andExpect(MockRestRequestMatchers.jsonPath("$.html").exists())
                 .andExpect(MockRestRequestMatchers.jsonPath("$.files").exists())
                 .andExpect(MockRestRequestMatchers.jsonPath("$.files").isArray)
+                .andExpect(MockRestRequestMatchers.jsonPath("$.buttonText").doesNotExist())
+                .andExpect(MockRestRequestMatchers.jsonPath("$.buttonUrl").doesNotExist())
                 .andRespond(MockRestResponseCreators.withSuccess(response, MediaType.APPLICATION_JSON))
 
         val email = createEmailWithAttachements()
@@ -89,6 +93,8 @@ class MailServiceImplTest {
                 .andExpect(MockRestRequestMatchers.jsonPath("$.html").exists())
                 .andExpect(MockRestRequestMatchers.jsonPath("$.bccs").exists())
                 .andExpect(MockRestRequestMatchers.jsonPath("$.bccs").isArray)
+                .andExpect(MockRestRequestMatchers.jsonPath("$.buttonText").doesNotExist())
+                .andExpect(MockRestRequestMatchers.jsonPath("$.buttonUrl").doesNotExist())
                 .andRespond(MockRestResponseCreators.withSuccess(response, MediaType.APPLICATION_JSON))
 
         val email = createEmailWithBCCs()
@@ -109,9 +115,32 @@ class MailServiceImplTest {
                 .andExpect(MockRestRequestMatchers.jsonPath("$.subject").exists())
                 .andExpect(MockRestRequestMatchers.jsonPath("$.html").exists())
                 .andExpect(MockRestRequestMatchers.jsonPath("$.campaign_code").exists())
+                .andExpect(MockRestRequestMatchers.jsonPath("$.buttonText").doesNotExist())
+                .andExpect(MockRestRequestMatchers.jsonPath("$.buttonUrl").doesNotExist())
                 .andRespond(MockRestResponseCreators.withSuccess(response, MediaType.APPLICATION_JSON))
 
         val email = createEmailWithCampaignCode()
+        mailService.send(email)
+        mockServer.verify()
+    }
+
+    @Test
+    fun testSendWithButton() {
+        val response = mapOf("success" to "ok", "mailerId" to "somerandomid").toJsonString()
+
+        mockServer.expect(requestTo("$BASE_URL/send"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(MockRestRequestMatchers.header("Content-Type", "application/json;charset=utf-8"))
+                .andExpect(MockRestRequestMatchers.header("X-AUTH-TOKEN", "randomtoken"))
+                .andExpect(MockRestRequestMatchers.jsonPath("$.tos").exists())
+                .andExpect(MockRestRequestMatchers.jsonPath("$.tos").isArray)
+                .andExpect(MockRestRequestMatchers.jsonPath("$.subject").exists())
+                .andExpect(MockRestRequestMatchers.jsonPath("$.html").exists())
+                .andExpect(MockRestRequestMatchers.jsonPath("$.buttonText").exists())
+                .andExpect(MockRestRequestMatchers.jsonPath("$.buttonUrl").exists())
+                .andRespond(MockRestResponseCreators.withSuccess(response, MediaType.APPLICATION_JSON))
+
+        val email = createEmailWithButton()
         mailService.send(email)
         mockServer.verify()
     }
@@ -150,6 +179,17 @@ class MailServiceImplTest {
                 subject = basicEmail.subject,
                 body = basicEmail.body,
                 campaignCode = "campaignCode123456"
+        )
+    }
+
+    private fun createEmailWithButton(): Email {
+        val basicEmail = createEmail()
+        return Email(
+                to = basicEmail.to,
+                subject = basicEmail.subject,
+                body = basicEmail.body,
+                buttonText = "button",
+                buttonUrl = "link"
         )
     }
 }

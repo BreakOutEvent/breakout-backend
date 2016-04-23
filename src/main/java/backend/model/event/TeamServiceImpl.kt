@@ -44,11 +44,20 @@ class TeamServiceImpl : TeamService {
         // TODO: What if user already exists?
         // TODO: Should the creation of emails be moved to a seperate entity?
         val invitation = team.invite(emailAddress)
-        val inviteUrl = getInvitationUrl(invitation.invitationToken)
         val email = Email(
                 to = listOf(emailAddress),
-                subject = "${team.members.first().email} hat dich eingeladen, ein Teil seines Breakout-Teams zu werden.",
-                body = "Klicke folgenden Link, um ein Teil von BreakOut zu werden: $inviteUrl")
+                subject = "Du wurdest zur Teilnahme an BreakOut 2016 eingeladen!",
+                body = "${team.members.first().firstname} ${team.members.first().lastname} möchte mit Dir ein Abenteuer bestreiten!<br><br>" +
+                        "BreakOut ist ein Spendenmarathon, bei dem Geld für das DAFI-Projekt der UNO-Flüchtlingshilfe gesammelt wird. <br><br>" +
+                        " In Zweierteams versucht Ihr, euch ab Startschuss binnen 36 Stunden so weit wie möglich von München zu entfernen. Dabei gilt es, für das Reisen kein Geld auszugeben – vielmehr sammelt Ihr pro zurückgelegtem Kilometer Geld für das DAFI-Programm der UNO-Flüchtlingshilfe.<br>" +
+                        "Das Konzept folgt damit der Idee eines Spendenmarathons: Im Vorfeld akquiriert Ihr eigene Sponsoren, die dann pro gereistem Kilometer einen vorab festgelegten Betrag an die UNO-Flüchtlingshilfe spenden.<br><br>" +
+                        "Wenn Du Lust hast bei BreakOut teilzunehmen, klicke auf den Button am Ende der E-Mail.<br><br>" +
+                        "Du hast Fragen oder benötgist Unterstützung? Schreib uns eine E-Mail an event@break-out.org.<br><br>" +
+                        "Beste Grüße,<br>" +
+                        "Dein BreakOut-Team",
+                buttonText = "EINLADUNG ANNEHMEN",
+                buttonUrl = getInvitationUrl(invitation.invitationToken)
+        )
 
         mailService.send(email)
         this.save(team)
