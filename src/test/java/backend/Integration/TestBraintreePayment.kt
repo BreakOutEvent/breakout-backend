@@ -9,6 +9,7 @@ import backend.model.user.Participant
 import backend.model.user.User
 import org.javamoney.moneta.Money
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
@@ -38,6 +39,7 @@ class TestBraintreePayment : IntegrationTest() {
     }
 
     @Test
+    @Ignore
     fun testGetTokenForBraintreePaymentForInvoice() {
 
         val request = MockMvcRequestBuilders

@@ -36,9 +36,9 @@ repositories {
 dependencies {
 
     // MySQL
-//    compile "mysql:mysql-connector-java"
-//    testCompile "mysql:mysql-connector-java"
-//    runtime "mysql:mysql-connector-java"
+    //compile "mysql:mysql-connector-java"
+    //testCompile "mysql:mysql-connector-java"
+    //runtime "mysql:mysql-connector-java"
 
     // HSQLDB
     compile "org.hsqldb:hsqldb"

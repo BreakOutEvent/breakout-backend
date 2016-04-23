@@ -18,8 +18,7 @@ import org.springframework.web.client.RestTemplate
 
 class MailServiceImplTest {
 
-    private val BASE_URL = "localhost"
-    private val PORT = "3000"
+    private val BASE_URL = "http://localhost:3000"
 
     private lateinit var restTemplate: RestTemplate
     private lateinit var mailService: MailService
@@ -31,7 +30,6 @@ class MailServiceImplTest {
         val configurationService = Mockito.mock(ConfigurationService::class.java)
         Mockito.`when`(configurationService.getRequired("org.breakout.mailer.xauthtoken")).thenReturn("randomtoken")
         Mockito.`when`(configurationService.getRequired("org.breakout.mailer.url")).thenReturn(BASE_URL)
-        Mockito.`when`(configurationService.getRequired("org.breakout.mailer.port")).thenReturn(PORT)
         mailService = MailServiceImpl(restTemplate, configurationService)
         mockServer = MockRestServiceServer.createServer(restTemplate)
     }
@@ -41,7 +39,7 @@ class MailServiceImplTest {
 
         val response = mapOf("success" to "ok", "mailerId" to "somerandomid").toJsonString()
 
-        mockServer.expect(requestTo("http://$BASE_URL:$PORT/send"))
+        mockServer.expect(requestTo("$BASE_URL/send"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(MockRestRequestMatchers.header("Content-Type", "application/json;charset=utf-8"))
                 .andExpect(MockRestRequestMatchers.header("X-AUTH-TOKEN", "randomtoken"))
@@ -60,7 +58,7 @@ class MailServiceImplTest {
     fun testSendWithAttachments() {
         val response = mapOf("success" to "ok", "mailerId" to "somerandomid").toJsonString()
 
-        mockServer.expect(requestTo("http://$BASE_URL:$PORT/send"))
+        mockServer.expect(requestTo("$BASE_URL/send"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(MockRestRequestMatchers.header("Content-Type", "application/json;charset=utf-8"))
                 .andExpect(MockRestRequestMatchers.header("X-AUTH-TOKEN", "randomtoken"))
@@ -81,7 +79,7 @@ class MailServiceImplTest {
     fun testWithBccs() {
         val response = mapOf("success" to "ok", "mailerId" to "somerandomid").toJsonString()
 
-        mockServer.expect(requestTo("http://$BASE_URL:$PORT/send"))
+        mockServer.expect(requestTo("$BASE_URL/send"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(MockRestRequestMatchers.header("Content-Type", "application/json;charset=utf-8"))
                 .andExpect(MockRestRequestMatchers.header("X-AUTH-TOKEN", "randomtoken"))
@@ -102,7 +100,7 @@ class MailServiceImplTest {
     fun testSendWithCampaignCode() {
         val response = mapOf("success" to "ok", "mailerId" to "somerandomid").toJsonString()
 
-        mockServer.expect(requestTo("http://$BASE_URL:$PORT/send"))
+        mockServer.expect(requestTo("$BASE_URL/send"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(MockRestRequestMatchers.header("Content-Type", "application/json;charset=utf-8"))
                 .andExpect(MockRestRequestMatchers.header("X-AUTH-TOKEN", "randomtoken"))

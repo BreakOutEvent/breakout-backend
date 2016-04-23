@@ -17,7 +17,6 @@ import org.springframework.web.util.UriComponentsBuilder
 class MailServiceImpl : MailService {
 
     private val url: String
-    private val port: String
     private val token: String
     private val restTemplate: RestOperations
 
@@ -26,7 +25,6 @@ class MailServiceImpl : MailService {
     @Autowired
     constructor(restTemplate: RestOperations, configurationService: ConfigurationService) {
         this.restTemplate = restTemplate
-        this.port = configurationService.getRequired("org.breakout.mailer.port")
         this.token = configurationService.getRequired("org.breakout.mailer.xauthtoken")
         this.url = configurationService.getRequired("org.breakout.mailer.url")
     }
@@ -42,7 +40,7 @@ class MailServiceImpl : MailService {
         logger.info("Content of email: $body")
 
         try {
-            val sendurl = getSendUrl(url, port)
+            val sendurl = getSendUrl(url)
             logger.info("sending mail via: $sendurl")
             restTemplate.exchange(sendurl, HttpMethod.POST, request, String::class.java)
         } catch (e: Exception) {
@@ -53,9 +51,8 @@ class MailServiceImpl : MailService {
 
     }
 
-    private fun getSendUrl(baseUrl: String, port: String) = UriComponentsBuilder
-            .fromHttpUrl("http://$baseUrl")
-            .port(port)
+    private fun getSendUrl(baseUrl: String) = UriComponentsBuilder
+            .fromHttpUrl(baseUrl)
             .path("send")
             .build().toUriString()
 }
