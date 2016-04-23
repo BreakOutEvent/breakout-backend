@@ -12,6 +12,7 @@ import backend.model.user.User
 import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.util.getSignedJwtToken
+import backend.view.BasicUserView
 import backend.view.UserView
 import com.auth0.jwt.Algorithm
 import com.auth0.jwt.JWTSigner
@@ -68,8 +69,8 @@ class UserController {
      * GET /user/
      */
     @RequestMapping("/")
-    fun showUsers(): Iterable<UserView> {
-        return userService.getAllUsers()!!.map { UserView(it) };
+    fun showUsers(): Iterable<BasicUserView> {
+        return userService.getAllUsers()!!.map { BasicUserView(it) };
     }
 
     /**
@@ -93,10 +94,10 @@ class UserController {
      * GET /user/id/
      */
     @RequestMapping("/{id}/")
-    fun showUser(@PathVariable id: Long): UserView {
+    fun showUser(@PathVariable id: Long): BasicUserView {
 
         val user = userService.getUserById(id) ?: throw NotFoundException("user with id $id does not exist")
-        return UserView(user)
+        return BasicUserView(user)
     }
 
     private fun User.apply(userView: UserView): User {

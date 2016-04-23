@@ -20,7 +20,7 @@ class PostingResponseView() {
     var media: List<MediaView>? = null
 
     @Valid
-    var user: UserView? = null
+    var user: BasicUserView? = null
 
     constructor(posting: Posting) : this() {
         this.id = posting.id
@@ -28,7 +28,7 @@ class PostingResponseView() {
         this.date = posting.date.toEpochSecond(ZoneOffset.UTC)
         this.postingLocation = if (posting.location != null) LocationView(posting.location!!) else null
 
-        this.user = UserView(posting.user!!.core)
+        this.user = BasicUserView(posting.user!!.core)
         this.media = posting.media?.map { MediaView(it) }
         this.distance = posting.distance
     }
