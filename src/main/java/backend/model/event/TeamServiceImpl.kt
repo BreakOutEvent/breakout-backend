@@ -8,6 +8,7 @@ import backend.model.posting.Posting
 import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserService
+import backend.services.ConfigurationService
 import backend.services.MailService
 import backend.util.distanceCoordsListKMfromStart
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,12 +20,14 @@ class TeamServiceImpl : TeamService {
     private val repository: TeamRepository
     private val userService: UserService
     private val mailService: MailService
+    private val configurationService: ConfigurationService
 
     @Autowired
-    constructor(teamRepository: TeamRepository, userService: UserService, mailService: MailService) {
+    constructor(teamRepository: TeamRepository, userService: UserService, mailService: MailService, configurationService: ConfigurationService) {
         this.repository = teamRepository
         this.userService = userService
         this.mailService = mailService
+        this.configurationService = configurationService
     }
 
     override fun create(creator: Participant, name: String, description: String, event: Event): Team {
@@ -39,15 +42,20 @@ class TeamServiceImpl : TeamService {
 
         // TODO: What if user already exists?
         // TODO: Should the creation of emails be moved to a seperate entity?
+        val invitation = team.invite(emailAddress)
+        val inviteUrl = getInvitationUrl(invitation.invitationToken)
         val email = Email(
                 to = listOf(emailAddress),
-                subject = "${team.members.first().email} hat dich eingeladen, ein Teil seines Breakout-Teams zu werden",
-                body = "Melde dich jetzt an auf www.break-out.org"
-        )
+                subject = "${team.members.first().email} hat dich eingeladen, ein Teil seines Breakout-Teams zu werden.",
+                body = "Klicke folgenden Link, um ein Teil von BreakOut zu werden: $inviteUrl")
 
         mailService.send(email)
-        team.invite(emailAddress)
         this.save(team)
+    }
+
+    private fun getInvitationUrl(token: String): String {
+        val baseUrl = configurationService.getRequired("org.breakout.team.invitationurl")
+        return baseUrl.replace("CUSTOMTOKEN", token)
     }
 
     override fun save(team: Team) = repository.save(team)
@@ -86,5 +94,9 @@ class TeamServiceImpl : TeamService {
         val distance = distanceCoordsListKMfromStart(startingCoordinates, postingCoordinates)
 
         return distance
+    }
+
+    override fun findInvitationsByInviteCode(code: String): Invitation? {
+        return repository.findInvitationsByInviteCode(code)
     }
 }
