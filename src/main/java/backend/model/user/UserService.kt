@@ -19,4 +19,6 @@ interface UserService {
     fun exists(email: String): Boolean
 
     fun activate(user: User, token: String)
+
+    fun getUserByActivationToken(token: String): User?
 }

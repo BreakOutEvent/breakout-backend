@@ -21,11 +21,10 @@ class ActivationController {
     }
 
     @RequestMapping(method = arrayOf(GET))
-    fun activateAccount(@RequestParam token: String,
-                        @RequestParam email: EmailAddress) {
+    fun activateAccount(@RequestParam token: String) {
 
-        val user = userService.getUserByEmail(email.toString()) ?:
-                throw NotFoundException("No user with email $email")
+        val user = userService.getUserByActivationToken(token) ?:
+                throw NotFoundException("No user with token $token")
 
         userService.activate(user, token)
     }

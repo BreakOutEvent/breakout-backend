@@ -16,14 +16,12 @@ class UserServiceImpl : UserService {
     private val userRepository: UserRepository
     private val mailService: MailService
     private val host: String
-    private val port: String
 
     @Autowired
     constructor(userRepository: UserRepository, mailService: MailService, configurationService: ConfigurationService) {
         this.userRepository = userRepository
         this.mailService = mailService
         this.host = configurationService.getRequired("org.breakout.api.host")
-        this.port = configurationService.getRequired("org.breakout.api.port")
     }
 
     override fun getUserFromCustomUserDetails(customUserDetails: CustomUserDetails): User {
@@ -32,6 +30,8 @@ class UserServiceImpl : UserService {
     }
 
     override fun getUserById(id: Long): User? = userRepository.findOne(id)
+
+    override fun getUserByActivationToken(token: String): User? = userRepository.findByActivationToken(token)
 
     override fun getUserByEmail(email: String): User? = userRepository.findByEmail(email);
 
@@ -59,7 +59,7 @@ class UserServiceImpl : UserService {
     }
 
     private fun sendActivationEmail(token: String, user: User) {
-        val activationUrl = createActivationUrl(token, user)
+        val activationUrl = createActivationUrl(token)
         val email = Email(
                 to = listOf(EmailAddress(user.email)),
                 subject = "Please activate your BreakOut Account",
@@ -68,13 +68,13 @@ class UserServiceImpl : UserService {
         mailService.send(email)
     }
 
-    private fun createActivationUrl(token: String, user: User): String {
-        return "http://$host:$port/activation?token=$token&email=${user.email}"
+    private fun createActivationUrl(token: String): String {
+        return "$host/activation/$token"
     }
 
     override fun save(user: User): User = userRepository.save(user.core)
 
-    override fun create(email: String, password: String, f: User.() -> Unit) : User {
+    override fun create(email: String, password: String, f: User.() -> Unit): User {
         val user = this.create(email, password)
         f.invoke(user)
         return this.save(user)
