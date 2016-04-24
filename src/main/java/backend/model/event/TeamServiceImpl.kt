@@ -89,6 +89,10 @@ class TeamServiceImpl : TeamService {
         return repository.findInvitationsWithEmail(user.email)
     }
 
+    override fun findInvitationsForUserAndEvent(user: User, eventId: Long): List<Invitation> {
+        return repository.findInvitationsWithEmailAndEventId(user.email, eventId)
+    }
+
     override fun getLinearDistanceForTeamFromPostings(teamId: Long): Double {
         val postingDistance = this.getPostingMaxDistanceById(teamId)
         var distance = postingDistance?.distance ?: 0.0

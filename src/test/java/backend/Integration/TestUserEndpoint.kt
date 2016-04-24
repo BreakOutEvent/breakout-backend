@@ -80,6 +80,21 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.email").exists())
     }
 
+    @Test
+    fun getAuthenticatedUserInvites() {
+        val credentials = createUser(this.mockMvc, userService = userService)
+
+        val request = MockMvcRequestBuilders.get("/me/invitation/")
+                .header("Authorization", "Bearer ${credentials.accessToken}")
+
+        val response = mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andReturn().response.contentAsString
+
+        println(response)
+    }
+
     /**
      * POST /user/
      * Create user with email and password

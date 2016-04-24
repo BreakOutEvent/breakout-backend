@@ -20,6 +20,9 @@ interface TeamRepository : CrudRepository<Team, Long> {
     @Query("Select i from Invitation i where i.invitee.value = :email")
     fun findInvitationsWithEmail(@Param("email") email: String): List<Invitation>
 
+    @Query("Select i from Invitation i where i.invitee.value = :email and i.team.event.id = :eventId")
+    fun findInvitationsWithEmailAndEventId(@Param("email") email: String, @Param("eventId") eventId: Long): List<Invitation>
+
     @Query("Select i from Invitation i where i.invitationToken = :code")
     fun findInvitationsByInviteCode(@Param("code") code: String): Invitation?
 }

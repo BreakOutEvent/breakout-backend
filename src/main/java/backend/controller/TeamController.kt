@@ -61,13 +61,14 @@ open class TeamController {
 
     /**
      * GET /event/{id}/team/invitation/
-     * Show all invitations for the currently authenticated user
+     * Show all invitations for the currently authenticated user in requested event
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/invitation/")
-    open fun showInvitationsForUser(@AuthenticationPrincipal customUserDetails: CustomUserDetails): Iterable<InvitationView> {
+    open fun showInvitationsForUserAndEvent(@PathVariable eventId: Long,
+                                            @AuthenticationPrincipal customUserDetails: CustomUserDetails): Iterable<InvitationView> {
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
-        val invitations = teamService.findInvitationsForUser(user)
+        val invitations = teamService.findInvitationsForUserAndEvent(user, eventId)
         return invitations.map { InvitationView(it) }
     }
 

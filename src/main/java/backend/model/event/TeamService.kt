@@ -81,6 +81,8 @@ interface TeamService {
 
     fun findInvitationsForUser(user: User): List<Invitation>
 
+    fun findInvitationsForUserAndEvent(user: User, eventId: Long): List<Invitation>
+
     fun findInvitationsByInviteCode(code: String): Invitation?
 
     fun getLinearDistanceForTeamFromPostings(teamId: Long): Double
