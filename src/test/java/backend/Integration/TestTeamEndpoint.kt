@@ -260,6 +260,23 @@ class TestTeamEndpoint : IntegrationTest() {
                 .andReturn().response.contentAsString
 
         println(response)
+
+        val request = MockMvcRequestBuilders
+                .request(HttpMethod.GET, "/event/${event.id}/team/${team.id}/")
+                .contentType(MediaType.APPLICATION_JSON)
+
+        mockMvc.perform (request)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.name").exists())
+                .andExpect(jsonPath("$.event").exists())
+                .andExpect(jsonPath("$.description").exists())
+                .andExpect(jsonPath("$.members").isArray)
+                .andExpect(jsonPath("$.members[0]").exists())
+                .andExpect(jsonPath("$.members[1]").exists())
+                .andReturn().response.contentAsString
+
     }
 
     private fun failMakeUserParticipantMissingData(credentials: Credentials) {
