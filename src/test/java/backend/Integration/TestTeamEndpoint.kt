@@ -181,6 +181,11 @@ class TestTeamEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.event").exists())
                 .andExpect(jsonPath("$.description").exists())
                 .andExpect(jsonPath("$.members").exists())
+                .andExpect(jsonPath("$.members[0].id").exists())
+                .andExpect(jsonPath("$.members[0].firstname").exists())
+                .andExpect(jsonPath("$.members[0].lastname").exists())
+                .andExpect(jsonPath("$.members[0].profilePic").exists())
+                .andExpect(jsonPath("$.members[0].roles").exists())
                 .andReturn().response.contentAsString
 
         println(response)
@@ -273,8 +278,16 @@ class TestTeamEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.event").exists())
                 .andExpect(jsonPath("$.description").exists())
                 .andExpect(jsonPath("$.members").isArray)
-                .andExpect(jsonPath("$.members[0]").exists())
-                .andExpect(jsonPath("$.members[1]").exists())
+                .andExpect(jsonPath("$.members[0].id").exists())
+                .andExpect(jsonPath("$.members[0].firstname").exists())
+                .andExpect(jsonPath("$.members[0].lastname").exists())
+                .andExpect(jsonPath("$.members[0].profilePic").exists())
+                .andExpect(jsonPath("$.members[0].roles").exists())
+                .andExpect(jsonPath("$.members[1].id").exists())
+                .andExpect(jsonPath("$.members[1].firstname").exists())
+                .andExpect(jsonPath("$.members[1].lastname").exists())
+                .andExpect(jsonPath("$.members[1].profilePic").exists())
+                .andExpect(jsonPath("$.members[1].roles").exists())
                 .andReturn().response.contentAsString
 
     }

@@ -15,7 +15,7 @@ class TeamView() {
 
     var description: String = ""
 
-    var members: MutableList<String>? = null
+    var members: MutableList<BasicUserView>? = null
 
     var profilePic: MediaView? = null
 
@@ -24,8 +24,8 @@ class TeamView() {
         this.name = team.name
         this.event = team.event.id
         this.description = team.description
-        this.members = ArrayList<String>()
-        team.members.forEach { this.members!!.add(it.email) }
+        this.members = ArrayList()
+        team.members.forEach { this.members!!.add(BasicUserView(it)) }
         this.profilePic = MediaView(team.profilePic)
     }
 }
