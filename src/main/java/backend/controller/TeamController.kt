@@ -101,7 +101,7 @@ open class TeamController {
     @PreAuthorize("isAuthenticated()")
     open fun inviteUser(@PathVariable eventId: Long,
                         @PathVariable teamId: Long,
-                        @Valid @RequestBody body: Map<String, Any>) {
+                        @Valid @RequestBody body: Map<String, Any>): Map<String, String> {
 
         if (eventService.exists(eventId) == false) throw NotFoundException("No event with id $eventId")
 
@@ -109,6 +109,8 @@ open class TeamController {
         val emailString = body["email"] as? String ?: throw BadRequestException("body is missing field email")
         val email = EmailAddress(emailString)
         teamService.invite(email, team)
+
+        return mapOf("status" to "sent invitation")
     }
 
     /**
@@ -121,7 +123,7 @@ open class TeamController {
     open fun joinTeam(@PathVariable eventId: Long,
                       @PathVariable teamId: Long,
                       @AuthenticationPrincipal customUserDetails: CustomUserDetails,
-                      @Valid @RequestBody body: Map<String, String>) {
+                      @Valid @RequestBody body: Map<String, String>): TeamView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (eventService.exists(eventId) == false) throw NotFoundException("No event with id $eventId")
@@ -133,7 +135,11 @@ open class TeamController {
         if (user.email != email.toString()) throw BadRequestException("Authorized user and email from request body don't match")
         val participant = user.getRole(Participant::class) ?: throw RuntimeException("User is no participant")
 
+        //TODO: Move join to service Layer, instead of model
         team.join(participant)
+        teamService.save(team)
+
+        return TeamView(team)
     }
 
     @RequestMapping("/{id}/")

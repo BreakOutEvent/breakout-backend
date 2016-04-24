@@ -229,8 +229,12 @@ class TestTeamEndpoint : IntegrationTest() {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body)
 
-        mockMvc.perform(request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.status").exists())
+                .andReturn().response.contentAsString
+
+        println(response)
     }
 
     @Test
@@ -246,7 +250,16 @@ class TestTeamEndpoint : IntegrationTest() {
                 .content(body)
 
         // Join team
-        mockMvc.perform(joinRequest).andExpect(status().isCreated)
+        val response = mockMvc.perform(joinRequest)
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.name").exists())
+                .andExpect(jsonPath("$.event").exists())
+                .andExpect(jsonPath("$.description").exists())
+                .andExpect(jsonPath("$.members").exists())
+                .andReturn().response.contentAsString
+
+        println(response)
     }
 
     private fun failMakeUserParticipantMissingData(credentials: Credentials) {
