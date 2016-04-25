@@ -62,7 +62,7 @@ open class EventController {
 
         // TODO: Move logic to eventService
         // Distance calculated with from all uploaded calculations, including steps in between (e.g A -> B -> C)
-        val actualdistance = distanceCoordsListKMfromStart(event.startingLocation, postings.map { it.location!!.toCoord() })
+        val actualdistance = distanceCoordsListKMfromStart(event.startingLocation, postings.map { it.location!!.coord })
 
         // TODO: Sum max distances for teams
         val postingDistance = eventService.getPostingMaxDistanceById(id)

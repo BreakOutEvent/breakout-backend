@@ -20,8 +20,8 @@ class LocationView {
     val date: Long
 
     constructor(location: Location) {
-        this.latitude = location.point.latitude
-        this.longitude = location.point.longitude
+        this.latitude = location.coord.latitude
+        this.longitude = location.coord.longitude
         this.date = location.date.toEpochSecond(ZoneOffset.UTC)
     }
 

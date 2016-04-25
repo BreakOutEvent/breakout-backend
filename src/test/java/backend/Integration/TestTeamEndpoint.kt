@@ -3,7 +3,6 @@ package backend.Integration
 import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.location.Location
-import backend.model.location.Point
 import backend.model.misc.Coord
 import backend.model.posting.Posting
 import backend.model.user.Participant
@@ -56,8 +55,8 @@ class TestTeamEndpoint : IntegrationTest() {
         invitee = userRepository.findOne(inviteeCredentials.id.toLong())
         team = teamService.create(creator as Participant, "name", "description", event)
 
-        val firstLocation = Location(Point(1.0, 1.0), creator.getRole(Participant::class)!!, LocalDateTime.now())
-        val secondLocation = Location(Point(1.2, 2.0), creator.getRole(Participant::class)!!, LocalDateTime.now())
+        val firstLocation = Location(Coord(1.0, 1.0), creator.getRole(Participant::class)!!, LocalDateTime.now())
+        val secondLocation = Location(Coord(1.2, 2.0), creator.getRole(Participant::class)!!, LocalDateTime.now())
 
         postingService.save(Posting("test", firstLocation, creator.core, null, 156.899568))
         postingService.save(Posting("test", secondLocation, creator.core, null, 259.16669))

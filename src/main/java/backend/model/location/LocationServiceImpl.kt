@@ -1,5 +1,6 @@
 package backend.model.location
 
+import backend.model.misc.Coord
 import backend.model.user.Participant
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -25,8 +26,8 @@ class LocationServiceImpl : LocationService {
     }
 
     @Transactional
-    override fun create(point: Point, particpant: Participant, date: LocalDateTime): Location {
-        val location = Location(point, particpant, date)
+    override fun create(coord: Coord, particpant: Participant, date: LocalDateTime): Location {
+        val location = Location(coord, particpant, date)
         return locationRepository.save(location)
     }
 

@@ -15,9 +15,8 @@ import javax.persistence.OneToOne
 @Entity
 class Location : BasicEntity {
 
-    //TODO: Use Coord
     @Embedded
-    lateinit var point: Point
+    lateinit var coord: Coord
         private set
 
     @ManyToOne
@@ -37,12 +36,10 @@ class Location : BasicEntity {
      */
     private constructor() : super()
 
-    constructor(point: Point, uploader: Participant, date: LocalDateTime) {
-        this.point = point
+    constructor(coord: Coord, uploader: Participant, date: LocalDateTime) {
+        this.coord = coord
         this.team = uploader.currentTeam ?: throw DomainException("A user without a team can't upload locations")
         this.uploader = uploader
         this.date = date
     }
-
-    fun toCoord() = Coord(latitude = this.point.latitude, longitude = this.point.longitude)
 }

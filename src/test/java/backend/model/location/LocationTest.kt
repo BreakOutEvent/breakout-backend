@@ -1,6 +1,7 @@
 package backend.model.location
 
 import backend.model.event.Team
+import backend.model.misc.Coord
 import backend.model.user.Participant
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -16,7 +17,7 @@ import java.time.LocalDateTime
 @PrepareForTest(Participant::class, Team::class)
 class LocationTest {
 
-    private lateinit var point: Point
+    private lateinit var coord: Coord
     private lateinit var participant: Participant
     private lateinit var team: Team
     private lateinit var location: Location
@@ -25,17 +26,17 @@ class LocationTest {
     @Before
     fun setUp() {
         team = PowerMockito.mock(Team::class.java)
-        point = Point(0.0, 1.1)
+        coord = Coord(0.0, 1.1)
         participant = PowerMockito.mock(Participant::class.java)
 
         Mockito.`when`(participant.currentTeam).thenReturn(team)
         date = PowerMockito.mock(LocalDateTime::class.java)
-        location = Location(point, participant, date)
+        location = Location(coord, participant, date)
     }
 
     @Test
     fun testGetPoint() {
-        assertEquals(point, location.point)
+        assertEquals(coord, location.coord)
     }
 
     @Test
