@@ -41,6 +41,7 @@ open class UserCore : BasicEntity, User {
     @OrderColumn
     @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.EAGER, orphanRemoval = true)
     val postings: MutableList<Posting>? = ArrayList()
+
     /*
      * cascade all operations to children
      * orphanRemoval = true allows removing a role from the database
@@ -50,15 +51,19 @@ open class UserCore : BasicEntity, User {
     @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.EAGER, orphanRemoval = true)
     private var userRoles: MutableMap<Class<out UserRole>, UserRole> = HashMap()
 
-    private lateinit var activationToken: String
+    private var activationToken: String? = null
 
     fun getAuthorities(): Collection<GrantedAuthority> {
         return this.userRoles.values
     }
 
     override fun activate(token: String) {
-        if (isActivationTokenCorrect(token)) this.isBlocked = false
-        else throw DomainException("Provided token $token does not match the activation token")
+        if (isActivationTokenCorrect(token)) {
+            this.isBlocked = false
+            this.activationToken = null;
+        } else {
+            throw DomainException("Provided token $token does not match the activation token")
+        }
     }
 
     override fun isActivationTokenCorrect(token: String): Boolean {
@@ -67,7 +72,7 @@ open class UserCore : BasicEntity, User {
 
     override fun createActivationToken(): String {
         this.activationToken = UUID.randomUUID().toString()
-        return this.activationToken
+        return this.activationToken!!
     }
 
     override fun isActivated(): Boolean {
