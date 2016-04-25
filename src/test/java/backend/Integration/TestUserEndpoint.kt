@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -346,6 +347,8 @@ class TestUserEndpoint : IntegrationTest() {
 
         val credentials = createUser(this.mockMvc, userService = userService)
 
+        val date = LocalDate.now().toString()
+
         // Update user with role participant
         val json = mapOf(
                 "firstname" to "Florian",
@@ -355,7 +358,7 @@ class TestUserEndpoint : IntegrationTest() {
                 "participant" to mapOf(
                         "tshirtsize" to "XL",
                         "hometown" to "Dresden",
-                        "birthdate" to "1461439913",
+                        "birthdate" to date,
                         "phonenumber" to "01234567890",
                         "emergencynumber" to "0987654321"
                 )
@@ -379,7 +382,7 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.participant").exists())
                 .andExpect(jsonPath("$.participant.tshirtsize").value("XL"))
                 .andExpect(jsonPath("$.participant.hometown").value("Dresden"))
-                .andExpect(jsonPath("$.participant.birthdate").value(1461439913))
+                .andExpect(jsonPath("$.participant.birthdate").value(date))
                 .andExpect(jsonPath("$.participant.phonenumber").value("01234567890"))
                 .andExpect(jsonPath("$.participant.emergencynumber").value("0987654321"))
                 .andReturn().response.contentAsString
@@ -387,6 +390,8 @@ class TestUserEndpoint : IntegrationTest() {
 
     @Test
     fun failToMakeUserParticipantIfUnauthorized() {
+
+        val date = LocalDate.now().toString()
 
         val credentials = createUser(mockMvc, userService = userService)
         val json = mapOf(
@@ -397,7 +402,7 @@ class TestUserEndpoint : IntegrationTest() {
                 "participant" to mapOf(
                         "tshirtsize" to "XL",
                         "hometown" to "Dresden",
-                        "birthdate" to "1461439913",
+                        "birthdate" to date,
                         "phonenumber" to "01234567890",
                         "emergencynumber" to "0987654321"
                 )

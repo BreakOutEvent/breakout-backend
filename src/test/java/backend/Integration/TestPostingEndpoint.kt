@@ -19,6 +19,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -609,6 +610,8 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     private fun makeUserParticipant(credentials: Credentials) {
 
+        val date = LocalDate.now().toString()
+
         // Update user with role participant
         val json = mapOf(
                 "firstname" to "Florian",
@@ -619,10 +622,12 @@ open class TestPostingEndpoint : IntegrationTest() {
                         "tshirtsize" to "XL",
                         "hometown" to "Dresden",
                         "phonenumber" to "01234567890",
-                        "birthdate" to "1461439913",
+                        "birthdate" to date,
                         "emergencynumber" to "0987654321"
                 )
         ).toJsonString()
+
+        println(json);
 
         val request = MockMvcRequestBuilders.put("/user/${credentials.id}/")
                 .header("Authorization", "Bearer ${credentials.accessToken}")
@@ -639,7 +644,7 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.participant").exists())
                 .andExpect(jsonPath("$.participant.tshirtsize").value("XL"))
                 .andExpect(jsonPath("$.participant.hometown").value("Dresden"))
-                .andExpect(jsonPath("$.participant.birthdate").value(1461439913))
+                .andExpect(jsonPath("$.participant.birthdate").value(date))
                 .andExpect(jsonPath("$.participant.phonenumber").value("01234567890"))
                 .andExpect(jsonPath("$.participant.emergencynumber").value("0987654321"))
                 .andReturn().response.contentAsString

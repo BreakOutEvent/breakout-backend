@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 class TestTeamEndpoint : IntegrationTest() {
@@ -293,6 +294,8 @@ class TestTeamEndpoint : IntegrationTest() {
 
     private fun failMakeUserParticipantMissingData(credentials: Credentials) {
 
+        val date = LocalDate.now().toString()
+
         // Update user with role participant
         val json = mapOf(
                 "firstname" to "Florian",
@@ -300,7 +303,7 @@ class TestTeamEndpoint : IntegrationTest() {
                 "gender" to "Male",
                 "blocked" to false,
                 "participant" to mapOf(
-                        "birthdate" to "1461439913"
+                        "birthdate" to date
                 )
         ).toJsonString()
 
@@ -316,6 +319,8 @@ class TestTeamEndpoint : IntegrationTest() {
 
     private fun makeUserParticipant(credentials: Credentials) {
 
+        val date = LocalDate.now().toString()
+
         // Update user with role participant
         val json = mapOf(
                 "firstname" to "Florian",
@@ -325,7 +330,7 @@ class TestTeamEndpoint : IntegrationTest() {
                 "participant" to mapOf(
                         "tshirtsize" to "XL",
                         "hometown" to "Dresden",
-                        "birthdate" to "1461439913",
+                        "birthdate" to date,
                         "phonenumber" to "01234567890",
                         "emergencynumber" to "0987654321"
                 )
@@ -346,7 +351,7 @@ class TestTeamEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.participant").exists())
                 .andExpect(jsonPath("$.participant.tshirtsize").value("XL"))
                 .andExpect(jsonPath("$.participant.hometown").value("Dresden"))
-                .andExpect(jsonPath("$.participant.birthdate").value(1461439913))
+                .andExpect(jsonPath("$.participant.birthdate").value(date))
                 .andExpect(jsonPath("$.participant.phonenumber").value("01234567890"))
                 .andExpect(jsonPath("$.participant.emergencynumber").value("0987654321"))
     }

@@ -24,6 +24,7 @@ import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.POST
 import org.springframework.web.bind.annotation.RequestMethod.PUT
+import java.time.LocalDate
 import javax.validation.Valid
 
 @Api
@@ -80,8 +81,8 @@ open class UserController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/{id}/", method = arrayOf(PUT))
     open fun updateUser(@PathVariable id: Long,
-                   @Valid @RequestBody body: UserView,
-                   @AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
+                        @Valid @RequestBody body: UserView,
+                        @AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (user.core.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")
@@ -115,7 +116,11 @@ open class UserController {
         p.tshirtsize = userView.participant?.tshirtsize ?: p.tshirtsize
         p.emergencynumber = userView.participant?.emergencynumber ?: p.emergencynumber
         p.hometown = userView.participant?.hometown ?: p.hometown
-        p.birthdate = userView.participant?.birthdate ?: p.birthdate
+        p.birthdate = try {
+            LocalDate.parse(userView.participant?.birthdate)
+        } catch (e: Exception) {
+            p.birthdate
+        }
         p.phonenumber = userView.participant?.phonenumber ?: p.phonenumber
 
         return this

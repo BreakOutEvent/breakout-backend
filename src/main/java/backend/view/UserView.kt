@@ -5,6 +5,7 @@ import backend.model.user.Participant
 import backend.model.user.User
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.validator.constraints.Email
+import java.time.LocalDate
 import java.util.*
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
@@ -60,7 +61,7 @@ class UserView() {
         @NotNull
         var tshirtsize: String? = null
 
-        var birthdate: Date? = null
+        var birthdate: String? = null
         var hometown: String? = null
         var eventId: Long? = null
         var eventCity: String? = null
@@ -71,7 +72,7 @@ class UserView() {
             this.participant = user.getRole(Participant::class)
             this.emergencynumber = participant?.emergencynumber
             this.hometown = participant?.hometown
-            this.birthdate = participant?.birthdate
+            this.birthdate = participant?.birthdate.toString()
             this.phonenumber = participant?.phonenumber
             this.tshirtsize = participant?.tshirtsize
             this.eventId = participant?.currentTeam?.event?.id
