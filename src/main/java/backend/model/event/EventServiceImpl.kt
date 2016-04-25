@@ -1,7 +1,9 @@
 package backend.model.event
 
+import backend.controller.exceptions.NotFoundException
 import backend.model.misc.Coord
 import backend.model.posting.Posting
+import backend.util.distanceCoordsListKMfromStart
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -35,4 +37,21 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository) :
             return postingList.first()
         }
     }
+
+    override fun getDistance(id: Long): Map<String, Double> {
+        val event = this.findById(id) ?: throw NotFoundException("event with id $id does not exist")
+        val postings = this.findLocationPostingsById(id)
+
+        // Distance calculated with from all uploaded calculations, including steps in between (e.g A -> B -> C)
+        val actualdistance = distanceCoordsListKMfromStart(event.startingLocation, postings.map { it.location!!.coord })
+
+        // TODO: Sum max distances for teams
+        val postingDistance = this.getPostingMaxDistanceById(id)
+        var distance = 0.0
+        if (postingDistance != null) {
+            distance = postingDistance.distance ?: 0.0
+        }
+        return mapOf("actualdistance" to actualdistance, "distance" to distance)
+    }
+
 }

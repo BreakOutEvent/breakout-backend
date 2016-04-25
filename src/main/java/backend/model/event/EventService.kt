@@ -32,4 +32,6 @@ interface EventService {
     fun findLocationPostingsById(id: Long): List<Posting>?
 
     fun getPostingMaxDistanceById(id: Long): Posting?
+
+    fun getDistance(id: Long): Map<String,Double>
 }

@@ -56,20 +56,7 @@ open class EventController {
      * Returns the sum of the distance of all teams of the event with {id}
      */
     @RequestMapping("/{id}/distance/")
-    open fun getEventDistance(@PathVariable("id") id: Long): Map<String, Any> {
-        val event = eventService.findById(id) ?: throw NotFoundException("event with id $id does not exist")
-        val postings = eventService.findLocationPostingsById(id) ?: throw NotFoundException("event with id $id does not exist")
-
-        // TODO: Move logic to eventService
-        // Distance calculated with from all uploaded calculations, including steps in between (e.g A -> B -> C)
-        val actualdistance = distanceCoordsListKMfromStart(event.startingLocation, postings.map { it.location!!.coord })
-
-        // TODO: Sum max distances for teams
-        val postingDistance = eventService.getPostingMaxDistanceById(id)
-        var distance = 0.0
-        if (postingDistance != null) {
-            distance = postingDistance.distance ?: 0.0
-        }
-        return mapOf("actualdistance" to actualdistance, "distance" to distance)
+    open fun getEventDistance(@PathVariable("id") id: Long): Map<String, Double> {
+       return eventService.getDistance(id)
     }
 }
