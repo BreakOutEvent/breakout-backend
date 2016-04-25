@@ -60,7 +60,7 @@ class DummyDataController {
                 postingService.createPosting(
                         text = "text$it",
                         postingLocation = Coord(0.0, 0.0),
-                        media = null,
+                        mediaTypes = null,
                         user = user,
                         distance = 0.0,
                         date = LocalDateTime.now()).id!!

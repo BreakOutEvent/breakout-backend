@@ -24,7 +24,7 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
     override fun createPosting(text: String?,
                                postingLocation: Coord?,
                                user: UserCore,
-                               media: MutableList<Media>?,
+                               mediaTypes: List<String>?,
                                distance: Double?,
                                date: LocalDateTime): Posting {
 
@@ -33,6 +33,13 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
             val uploader = user.getRole(Participant::class)
                     ?: throw DomainException("user is no participant and can therefor not upload location")
             location = Location(Point(postingLocation.latitude, postingLocation.longitude), uploader, date)
+        }
+
+        //Create Media-Objects for each media item requested to add
+        var media: MutableList<Media>?
+        media = arrayListOf()
+        mediaTypes?.forEach {
+            media!!.add(Media(it))
         }
 
         return repository.save(Posting(text, location, user, media, distance))
