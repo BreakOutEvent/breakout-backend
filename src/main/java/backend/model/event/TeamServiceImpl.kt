@@ -2,6 +2,7 @@ package backend.model.event
 
 import backend.controller.exceptions.NotFoundException
 import backend.exceptions.DomainException
+import backend.model.location.Location
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.posting.Posting
@@ -75,8 +76,8 @@ class TeamServiceImpl : TeamService {
 
     override fun findLocationPostingsById(id: Long) = repository.findLocationPostingsById(id)
 
-    override fun getPostingMaxDistanceById(id: Long): Posting? {
-        val postingList = repository.getPostingMaxDistanceById(id)
+    override fun getLocationMaxDistanceById(id: Long): Location? {
+        val postingList = repository.getLocationMaxDistanceById(id)
         if (postingList.size <= 0) {
             return null
         } else {
@@ -93,7 +94,7 @@ class TeamServiceImpl : TeamService {
     }
 
     override fun getLinearDistanceForTeamFromPostings(teamId: Long): Double {
-        val postingDistance = this.getPostingMaxDistanceById(teamId)
+        val postingDistance = this.getLocationMaxDistanceById(teamId)
         var distance = postingDistance?.distance ?: 0.0
 
         return distance
@@ -103,7 +104,7 @@ class TeamServiceImpl : TeamService {
 
         val team: Team = this.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")
         val startingCoordinates = team.event.startingLocation
-        val postingCoordinates = this.findLocationPostingsById(teamId).map { it.location!!.toCoord() }
+        val postingCoordinates = this.findLocationPostingsById(teamId).map { it.coord }
         val distance = distanceCoordsListKMfromStart(startingCoordinates, postingCoordinates)
 
         return distance
@@ -116,5 +117,12 @@ class TeamServiceImpl : TeamService {
     @Transactional
     override fun leave(team: Team, participant: Participant) {
         team.leave(participant)
+    }
+
+    override fun getDistance(teamId: Long): Map<String, Double> {
+        val linearDistance = this.getLinearDistanceForTeamFromPostings(teamId)
+        val actualDistance = this.getActualDistanceForTeamFromPostings(teamId)
+
+        return mapOf("actual_distance" to actualDistance, "linear_distance" to linearDistance)
     }
 }

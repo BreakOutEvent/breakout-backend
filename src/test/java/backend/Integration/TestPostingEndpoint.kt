@@ -86,10 +86,10 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.text").exists())
                 .andExpect(jsonPath("$.date").exists())
                 .andExpect(jsonPath("$.user").exists())
-                .andExpect(jsonPath("$.distance").exists())
                 .andExpect(jsonPath("$.postingLocation.latitude").exists())
                 .andExpect(jsonPath("$.postingLocation.longitude").exists())
                 .andExpect(jsonPath("$.postingLocation.date").exists())
+                .andExpect(jsonPath("$.postingLocation.distance").exists())
                 .andExpect(jsonPath("$.media[0].type").exists())
                 .andExpect(jsonPath("$.media[0].id").exists())
                 .andExpect(jsonPath("$.media[0].uploadToken").exists())
@@ -189,7 +189,7 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.postingLocation.latitude").exists())
                 .andExpect(jsonPath("$.postingLocation.longitude").exists())
                 .andExpect(jsonPath("$.postingLocation.date").exists())
-                .andExpect(jsonPath("$.distance").exists())
+                .andExpect(jsonPath("$.postingLocation.distance").exists())
                 .andExpect(jsonPath("$.date").exists())
                 .andExpect(jsonPath("$.user").exists())
                 .andReturn().response.contentAsString
@@ -259,11 +259,11 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.text").exists())
                 .andExpect(jsonPath("$.date").exists())
-                .andExpect(jsonPath("$.distance").exists())
                 .andExpect(jsonPath("$.user").exists())
                 .andExpect(jsonPath("$.postingLocation.latitude").exists())
                 .andExpect(jsonPath("$.postingLocation.longitude").exists())
                 .andExpect(jsonPath("$.postingLocation.date").exists())
+                .andExpect(jsonPath("$.postingLocation.distance").exists())
                 .andReturn().response.contentAsString
 
         println(response)

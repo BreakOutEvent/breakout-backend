@@ -2,7 +2,6 @@ package backend.model.posting
 
 import backend.exceptions.DomainException
 import backend.model.location.Location
-import backend.model.location.Point
 import backend.model.media.Media
 import backend.model.misc.Coord
 import backend.model.user.Participant
@@ -24,18 +23,24 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
     override fun createPosting(text: String?,
                                postingLocation: Coord?,
                                user: UserCore,
-                               media: MutableList<Media>?,
+                               mediaTypes: List<String>?,
                                distance: Double?,
                                date: LocalDateTime): Posting {
 
         var location: Location? = null
         if (postingLocation != null) {
-            val uploader = user.getRole(Participant::class)
-                    ?: throw DomainException("user is no participant and can therefor not upload location")
-            location = Location(Point(postingLocation.latitude, postingLocation.longitude), uploader, date)
+            val uploader = user.getRole(Participant::class) ?: throw DomainException("user is no participant and can therefor not upload location")
+            location = Location(postingLocation, uploader, date, distance)
         }
 
-        return repository.save(Posting(text, location, user, media, distance))
+        //Create Media-Objects for each media item requested to add
+        var media: MutableList<Media>?
+        media = arrayListOf()
+        mediaTypes?.forEach {
+            media!!.add(Media(it))
+        }
+
+        return repository.save(Posting(text, location, user, media))
     }
 
     override fun getByID(id: Long): Posting? = repository.findById(id)

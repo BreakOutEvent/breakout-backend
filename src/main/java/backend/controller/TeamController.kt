@@ -86,7 +86,7 @@ open class TeamController {
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val event = eventService.findById(eventId) ?: throw NotFoundException("No event with id $eventId")
         val creator = user.getRole(Participant::class) ?: throw UnauthorizedException("User is no participant")
-        var team = teamService.create(creator, body.name!!, body.description!!, event)
+        var team = teamService.create(creator, body.name!!, body.description, event)
 
         team.profilePic.uploadToken = getSignedJwtToken(JWT_SECRET, team.profilePic.id.toString())
 
@@ -158,19 +158,13 @@ open class TeamController {
     /**
      * GET /event/{eventId}/team/{id}/distance/
      * Get the actual distance and the linear distance for a team
-     * TODO: Add endpoint which supports the actual and linear from locations
-     * TODO: This endpoint only considers postings with locations, but not locations without postings
      *
      * Example: Having a route of a team from A -> B -> C
      * Actual distance = |A -> B| + |B -> C|
      * Linear distance = |A -> C|
      */
     @RequestMapping("/{id}/distance/")
-    open fun getTeamDistance(@PathVariable("id") teamId: Long): Map<String, Any> {
-
-        val linearDistance = this.teamService.getLinearDistanceForTeamFromPostings(teamId)
-        val actualDistance = this.teamService.getActualDistanceForTeamFromPostings(teamId)
-
-        return mapOf("actualdistance" to actualDistance, "distance" to linearDistance)
+    open fun getTeamDistance(@PathVariable("id") teamId: Long): Map<String, Double> {
+        return teamService.getDistance(teamId)
     }
 }

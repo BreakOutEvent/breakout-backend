@@ -1,12 +1,11 @@
 package backend.model.posting
 
-import backend.model.media.Media
 import backend.model.misc.Coord
 import backend.model.user.UserCore
 import java.time.LocalDateTime
 
 interface PostingService {
-    fun createPosting(text: String?, postingLocation: Coord?, user: UserCore, media: MutableList<Media>?, distance: Double?, date: LocalDateTime): Posting
+    fun createPosting(text: String?, postingLocation: Coord?, user: UserCore, mediaTypes: List<String>?, distance: Double?, date: LocalDateTime): Posting
     fun findAll(): Iterable<Posting>
     fun getByID(id: Long): Posting?
     fun save(posting: Posting): Posting?

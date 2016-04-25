@@ -69,7 +69,6 @@ open class PostingController {
         var location: Coord? = null
         var distance: Double? = null
 
-
         val locationIsAvailable: Boolean = body.postingLocation != null && body.postingLocation!!.latitude != null && body.postingLocation!!.longitude != null
         if (locationIsAvailable) {
             location = Coord(body.postingLocation!!.latitude!!, body.postingLocation!!.longitude!!)
@@ -81,20 +80,7 @@ open class PostingController {
         }
 
         val date = body.date!!.toLocalDateTime()
-        var posting = postingService.createPosting(text = body.text, postingLocation = location, user = user.core, media = null, distance = distance, date = date)
-
-        //TODO: maybe move inside createPosting()
-        //Create Media-Objects for each media item requested to add
-        var media: MutableList<Media>? = null
-        if (body.media != null && body.media!! is List<*>) {
-            media = arrayListOf()
-            body.media!!.forEach {
-                media!!.add(mediaService.save(Media(it))!!)
-            }
-        }
-
-        posting.media = media
-        postingService.save(posting)
+        var posting = postingService.createPosting(text = body.text, postingLocation = location, user = user.core, mediaTypes = body.media, distance = distance, date = date)
 
         //Adds uploadingTokens to response
         posting.media?.forEach { it.uploadToken = getSignedJwtToken(JWT_SECRET, it.id.toString()) }

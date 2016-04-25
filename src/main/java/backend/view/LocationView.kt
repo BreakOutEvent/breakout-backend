@@ -16,12 +16,15 @@ class LocationView {
     @NotNull
     val longitude: Double
 
+    var distance: Double? = null
+
     @NotNull
     val date: Long
 
     constructor(location: Location) {
-        this.latitude = location.point.latitude
-        this.longitude = location.point.longitude
+        this.latitude = location.coord.latitude
+        this.longitude = location.coord.longitude
+        this.distance = location.distance
         this.date = location.date.toEpochSecond(ZoneOffset.UTC)
     }
 

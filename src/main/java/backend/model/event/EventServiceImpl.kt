@@ -1,7 +1,10 @@
 package backend.model.event
 
+import backend.controller.exceptions.NotFoundException
+import backend.model.location.Location
 import backend.model.misc.Coord
 import backend.model.posting.Posting
+import backend.util.distanceCoordsListKMfromStart
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -27,12 +30,18 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository) :
     // TODO: Verify that independently uploaded locations are found
     override fun findLocationPostingsById(id: Long) = repository.findLocationPostingsById(id)
 
-    override fun getPostingMaxDistanceById(id: Long): Posting? {
-        val postingList = repository.getPostingMaxDistanceById(id)
-        if (postingList.size <= 0) {
-            return null
-        } else {
-            return postingList.first()
-        }
+    override fun getLocationMaxDistanceByIdEachTeam(id: Long): List<Location> = repository.getLocationMaxDistanceByIdEachTeam(id)
+
+    override fun getDistance(id: Long): Map<String, Double> {
+        val event = this.findById(id) ?: throw NotFoundException("event with id $id does not exist")
+        val locations = this.findLocationPostingsById(id)
+
+        // Distance calculated with from all uploaded calculations, including steps in between (e.g A -> B -> C)
+        val actualDistance = distanceCoordsListKMfromStart(event.startingLocation, locations.map { it.coord })
+
+        val postingDistances = this.getLocationMaxDistanceByIdEachTeam(id)
+        var linearDistance = postingDistances.sumByDouble { it.distance ?: 0.0 }
+        return mapOf("actual_distance" to actualDistance, "linear_distance" to linearDistance)
     }
+
 }

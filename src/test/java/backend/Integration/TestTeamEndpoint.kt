@@ -3,7 +3,6 @@ package backend.Integration
 import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.location.Location
-import backend.model.location.Point
 import backend.model.misc.Coord
 import backend.model.posting.Posting
 import backend.model.user.Participant
@@ -56,11 +55,11 @@ class TestTeamEndpoint : IntegrationTest() {
         invitee = userRepository.findOne(inviteeCredentials.id.toLong())
         team = teamService.create(creator as Participant, "name", "description", event)
 
-        val firstLocation = Location(Point(1.0, 1.0), creator.getRole(Participant::class)!!, LocalDateTime.now())
-        val secondLocation = Location(Point(1.2, 2.0), creator.getRole(Participant::class)!!, LocalDateTime.now())
+        val firstLocation = Location(Coord(1.0, 1.0), creator.getRole(Participant::class)!!, LocalDateTime.now(), 156.899568)
+        val secondLocation = Location(Coord(1.2, 2.0), creator.getRole(Participant::class)!!, LocalDateTime.now(), 259.16669)
 
-        postingService.save(Posting("test", firstLocation, creator.core, null, 156.899568))
-        postingService.save(Posting("test", secondLocation, creator.core, null, 259.16669))
+        postingService.save(Posting("test", firstLocation, creator.core, null))
+        postingService.save(Posting("test", secondLocation, creator.core, null))
 
     }
 
@@ -218,8 +217,8 @@ class TestTeamEndpoint : IntegrationTest() {
         val response = mockMvc.perform (request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.distance").exists())
-                .andExpect(jsonPath("$.actualdistance").exists())
+                .andExpect(jsonPath("$.linear_distance").exists())
+                .andExpect(jsonPath("$.actual_distance").exists())
                 .andReturn().response.contentAsString
 
         println(response)
