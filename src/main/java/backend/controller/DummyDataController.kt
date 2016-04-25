@@ -4,14 +4,16 @@ import backend.model.event.EventService
 import backend.model.misc.Coord
 import backend.model.posting.PostingService
 import backend.model.user.UserService
+import backend.util.Profiles
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod.POST
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
 import java.util.*
 
-// TODO: Remove in production
+@Profile(Profiles.DEVELOPMENT)
 @RestController
 @RequestMapping("/createdummydata")
 class DummyDataController {
