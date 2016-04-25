@@ -31,7 +31,7 @@ class LocationTest {
 
         Mockito.`when`(participant.currentTeam).thenReturn(team)
         date = PowerMockito.mock(LocalDateTime::class.java)
-        location = Location(coord, participant, date)
+        location = Location(coord, participant, date, 0.0)
     }
 
     @Test

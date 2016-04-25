@@ -12,8 +12,6 @@ class PostingResponseView() {
 
     var date: Long? = null
 
-    var distance: Double? = null
-
     @Valid
     var postingLocation: LocationView? = null
 
@@ -27,10 +25,8 @@ class PostingResponseView() {
         this.text = posting.text
         this.date = posting.date.toEpochSecond(ZoneOffset.UTC)
         this.postingLocation = if (posting.location != null) LocationView(posting.location!!) else null
-
         this.user = BasicUserView(posting.user!!.core)
         this.media = posting.media?.map { MediaView(it) }
-        this.distance = posting.distance
     }
 
 

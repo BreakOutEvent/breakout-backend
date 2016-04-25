@@ -1,5 +1,6 @@
 package backend.model.event
 
+import backend.model.location.Location
 import backend.model.misc.Coord
 import backend.model.posting.Posting
 import java.time.LocalDateTime
@@ -29,9 +30,9 @@ interface EventService {
      *
      * @return gotten postings list
      */
-    fun findLocationPostingsById(id: Long): List<Posting>?
+    fun findLocationPostingsById(id: Long): List<Location>
 
-    fun getPostingMaxDistanceByIdEachTeam(id: Long): List<Posting>
+    fun getLocationMaxDistanceByIdEachTeam(id: Long): List<Location>
 
-    fun getDistance(id: Long): Map<String,Double>
+    fun getDistance(id: Long): Map<String, Double>
 }

@@ -24,7 +24,6 @@ class Posting : BasicEntity {
     @OneToOne(cascade = arrayOf(PERSIST))
     var location: Location? = null
 
-    var distance: Double? = null
 
     @ManyToOne
     var user: UserCore? = null
@@ -34,13 +33,12 @@ class Posting : BasicEntity {
     var media: MutableList<Media>? = ArrayList()
 
 
-    constructor(text: String?, location: Location?, user: UserCore, media: MutableList<Media>?, distance: Double?) : this() {
+    constructor(text: String?, location: Location?, user: UserCore, media: MutableList<Media>?) : this() {
         this.text = text
         this.date = LocalDateTime.now()
         this.location = location
         this.user = user
         this.media = media
-        this.distance = distance
     }
 
 }

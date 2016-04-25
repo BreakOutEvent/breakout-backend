@@ -31,15 +31,18 @@ class Location : BasicEntity {
 
     lateinit var date: LocalDateTime
 
+    var distance: Double? = null
+
     /**
      * Private constructor for JPA
      */
     private constructor() : super()
 
-    constructor(coord: Coord, uploader: Participant, date: LocalDateTime) {
+    constructor(coord: Coord, uploader: Participant, date: LocalDateTime, distance: Double?) {
         this.coord = coord
         this.team = uploader.currentTeam ?: throw DomainException("A user without a team can't upload locations")
         this.uploader = uploader
         this.date = date
+        this.distance = distance
     }
 }

@@ -2,6 +2,7 @@ package backend.model.location
 
 import backend.model.misc.Coord
 import backend.model.user.Participant
+import backend.util.distanceCoordsKM
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -26,8 +27,9 @@ class LocationServiceImpl : LocationService {
     }
 
     @Transactional
-    override fun create(coord: Coord, particpant: Participant, date: LocalDateTime): Location {
-        val location = Location(coord, particpant, date)
+    override fun create(coord: Coord, participant: Participant, date: LocalDateTime): Location {
+        val distance = distanceCoordsKM(participant.currentTeam!!.event.startingLocation, coord)
+        val location = Location(coord, participant, date, distance)
         return locationRepository.save(location)
     }
 

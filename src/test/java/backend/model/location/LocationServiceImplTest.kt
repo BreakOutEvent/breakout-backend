@@ -42,7 +42,7 @@ class LocationServiceImplTest : IntegrationTest() {
 
     @Test
     fun testSave() {
-        val location = Location(Coord(0.0, 0.0), user.getRole(Participant::class)!!, LocalDateTime.now())
+        val location = Location(Coord(0.0, 0.0), user.getRole(Participant::class)!!, LocalDateTime.now(), 0.0)
         locationService.save(location)
 
         val foundLocations = locationService.findAll()
@@ -59,7 +59,7 @@ class LocationServiceImplTest : IntegrationTest() {
 
     @Test
     fun testFindByTeamId() {
-        val secondUser = userService.create("emai2@test.com", "password", {addRole(Participant::class)})
+        val secondUser = userService.create("emai2@test.com", "password", { addRole(Participant::class) })
         val secondParticipant = secondUser.getRole(Participant::class)!!
         val secondTeam = teamService.create(secondParticipant, "other name", "other description", event)
 

@@ -1,5 +1,6 @@
 package backend.model.event
 
+import backend.model.location.Location
 import backend.model.misc.EmailAddress
 import backend.model.posting.Posting
 import backend.model.user.Participant
@@ -59,7 +60,7 @@ interface TeamService {
      *
      * @return gotten postings list
      */
-    fun findPostingsById(id: Long): List<Long>?
+    fun findPostingsById(id: Long): List<Long>
 
     /**
      * Get Team Postings from database only including location
@@ -68,7 +69,7 @@ interface TeamService {
      *
      * @return gotten postings list
      */
-    fun findLocationPostingsById(id: Long): List<Posting>?
+    fun findLocationPostingsById(id: Long): List<Location>
 
     /**
      * Get Team Posting from database with max distance
@@ -77,7 +78,7 @@ interface TeamService {
      *
      * @return gotten postings list
      */
-    fun getPostingMaxDistanceById(id: Long): Posting?
+    fun getLocationMaxDistanceById(id: Long): Location?
 
     fun findInvitationsForUser(user: User): List<Invitation>
 
