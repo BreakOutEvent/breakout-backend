@@ -15,8 +15,7 @@ interface EventRepository : CrudRepository<Event, Long> {
     @Query("Select l from Location l inner join l.team t where t.event.id = :id order by l.date asc")
     fun findLocationPostingsById(@Param("id") id: Long): List<Location>
 
-    //TODO: write correct query
-    @Query("Select l from Location l inner join l.team t where t.event.id = :id order by l.distance asc")
-    fun getLocationMaxDistanceByIdEachTeam(@Param("id") id: Long): List<Location>
 
+    @Query("SELECT loc FROM Location loc WHERE (loc.distance, loc.team.id) IN (Select max(l.distance), l.team.id from Location l inner join l.team t where t.event.id = :id group by l.team.id)")
+    fun getLocationMaxDistanceByIdEachTeam(@Param("id") id: Long): List<Location>
 }
