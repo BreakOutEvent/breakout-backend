@@ -9,12 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/me")
-class AuthenticatedUserController {
+open class AuthenticatedUserController {
 
 
     private val userService: UserService
@@ -26,8 +25,13 @@ class AuthenticatedUserController {
         this.teamService = teamService
     }
 
-    @RequestMapping("/", method = arrayOf(GET))
-    fun getAuthenticatedUser(@AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
+    /**
+     * GET /me/
+     * Get information to the currently authenticated user
+     */
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping("/")
+    open fun getAuthenticatedUser(@AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         return UserView(user)
     }
@@ -36,8 +40,9 @@ class AuthenticatedUserController {
      * GET /me/invitation/
      * Show all invitations for the currently authenticated user
      */
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping("/invitation/")
-    fun showInvitationsForUser(@AuthenticationPrincipal customUserDetails: CustomUserDetails): Iterable<InvitationView> {
+    open fun showInvitationsForUser(@AuthenticationPrincipal customUserDetails: CustomUserDetails): Iterable<InvitationView> {
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val invitations = teamService.findInvitationsForUser(user)
         return invitations.map { InvitationView(it) }

@@ -19,6 +19,7 @@ import com.auth0.jwt.JWTSigner
 import io.swagger.annotations.Api
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.POST
@@ -28,7 +29,7 @@ import javax.validation.Valid
 @Api
 @RestController
 @RequestMapping("/user")
-class UserController {
+open class UserController {
 
     private val userService: UserService
     private val JWT_SECRET: String
@@ -48,7 +49,7 @@ class UserController {
      */
     @RequestMapping("/", method = arrayOf(POST))
     @ResponseStatus(CREATED)
-    fun createUser(@Valid @RequestBody body: UserView): UserView {
+    open fun createUser(@Valid @RequestBody body: UserView): UserView {
 
         // Validate existence of email and password by hand
         // because UserView has those as optional because of PUT requests
@@ -59,7 +60,7 @@ class UserController {
 
         val user = userService.create(email, password).apply(body)
 
-        //TODO: move to helper function in util package
+        //TODO: move to helper open function in util package
         user.profilePic.uploadToken = JWTSigner(JWT_SECRET).sign(mapOf("subject" to user.profilePic.id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512))
 
         return UserView(userService.save(user)!!)
@@ -69,15 +70,16 @@ class UserController {
      * GET /user/
      */
     @RequestMapping("/")
-    fun showUsers(): Iterable<BasicUserView> {
+    open fun showUsers(): Iterable<BasicUserView> {
         return userService.getAllUsers()!!.map { BasicUserView(it) };
     }
 
     /**
      * PUT /user/id/
      */
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping("/{id}/", method = arrayOf(PUT))
-    fun updateUser(@PathVariable id: Long,
+    open fun updateUser(@PathVariable id: Long,
                    @Valid @RequestBody body: UserView,
                    @AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
 
@@ -94,7 +96,7 @@ class UserController {
      * GET /user/id/
      */
     @RequestMapping("/{id}/")
-    fun showUser(@PathVariable id: Long): BasicUserView {
+    open fun showUser(@PathVariable id: Long): BasicUserView {
 
         val user = userService.getUserById(id) ?: throw NotFoundException("user with id $id does not exist")
         return BasicUserView(user)
@@ -125,7 +127,7 @@ class UserController {
      * via a token
      */
     @RequestMapping("/invitation")
-    fun showInvitation(@RequestParam token: String): DetailedInvitationView {
+    open fun showInvitation(@RequestParam token: String): DetailedInvitationView {
         val invitation = teamService.findInvitationsByInviteCode(token) ?: throw NotFoundException("No invitation for code $token")
         return DetailedInvitationView(invitation)
     }

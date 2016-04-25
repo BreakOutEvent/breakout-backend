@@ -16,23 +16,18 @@ import backend.util.getSignedJwtToken
 import backend.util.toLocalDateTime
 import backend.view.PostingRequestView
 import backend.view.PostingResponseView
-import com.auth0.jwt.Algorithm
-import com.auth0.jwt.JWTSigner
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RequestMethod.POST
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/posting")
-class PostingController {
+open class PostingController {
 
     private val mediaService: MediaService
     private val postingService: PostingService
@@ -59,10 +54,11 @@ class PostingController {
     /**
      * POST /posting/
      */
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping("/", method = arrayOf(POST))
     @ResponseStatus(CREATED)
-    fun createPosting(@Valid @RequestBody body: PostingRequestView,
-                      @AuthenticationPrincipal customUserDetails: CustomUserDetails): PostingResponseView {
+    open fun createPosting(@Valid @RequestBody body: PostingRequestView,
+                           @AuthenticationPrincipal customUserDetails: CustomUserDetails): PostingResponseView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
 
@@ -110,7 +106,7 @@ class PostingController {
      * GET /posting/id/
      */
     @RequestMapping("/{id}/")
-    fun getPosting(@PathVariable("id") id: Long): PostingResponseView {
+    open fun getPosting(@PathVariable("id") id: Long): PostingResponseView {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
         return PostingResponseView(posting)
     }
@@ -119,7 +115,7 @@ class PostingController {
      * GET /posting/
      */
     @RequestMapping("/")
-    fun getAllPostings(): Iterable<PostingResponseView> {
+    open fun getAllPostings(): Iterable<PostingResponseView> {
         return postingService.findAll().map { PostingResponseView(it) }
     }
 
@@ -127,7 +123,7 @@ class PostingController {
      * POST /posting/get/ids/
      */
     @RequestMapping("/get/ids", method = arrayOf(POST))
-    fun getPostingsById(@Valid @RequestBody body: List<Long>): Iterable<PostingResponseView> {
+    open fun getPostingsById(@Valid @RequestBody body: List<Long>): Iterable<PostingResponseView> {
         return postingService.findAllByIds(body).map { PostingResponseView(it) }
     }
 
@@ -135,7 +131,7 @@ class PostingController {
      * GET /posting/get/since/id/
      */
     @RequestMapping("/get/since/{id}/")
-    fun getPostingIdsSince(@PathVariable("id") id: Long): Iterable<Long> {
+    open fun getPostingIdsSince(@PathVariable("id") id: Long): Iterable<Long> {
         return postingService.findAllSince(id).map { it.id!! }
     }
 }
