@@ -47,7 +47,7 @@ open class LocationController {
      * Return a list of all locations for a certain team at a certain event
      */
     @RequestMapping("/")
-    fun getAllLocations(@PathVariable("eventId") eventId: Long,
+    open fun getAllLocations(@PathVariable("eventId") eventId: Long,
                         @PathVariable("teamId") teamId: Long): Iterable<LocationView> {
 
         //TODO: Is it necessary to check if the team is part of the event or do we just suppress this case
