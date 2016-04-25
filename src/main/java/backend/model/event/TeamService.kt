@@ -89,4 +89,5 @@ interface TeamService {
 
     fun getActualDistanceForTeamFromPostings(teamId: Long): Double
 
+    fun getDistance(teamId: Long): Map<String, Double>
 }

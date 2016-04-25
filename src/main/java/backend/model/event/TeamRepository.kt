@@ -11,9 +11,11 @@ interface TeamRepository : CrudRepository<Team, Long> {
     @Query("Select p.id from Posting p inner join p.user u inner join u.userRoles r where r.currentTeam.id = :id order by p.date asc")
     fun findPostingsById(@Param("id") id: Long): List<Long>
 
+    //TODO: get Locations without posting
     @Query("Select p from Posting p inner join p.user u inner join u.userRoles r where r.currentTeam.id = :id and p.location is not null order by p.date asc")
     fun findLocationPostingsById(@Param("id") id: Long): List<Posting>
 
+    //TODO: get Locations without posting
     @Query("Select p from Posting p inner join p.user u inner join u.userRoles r where r.currentTeam.id = :id and distance is not null order by p.distance asc")
     fun getPostingMaxDistanceById(@Param("id") id: Long): List<Posting>
 

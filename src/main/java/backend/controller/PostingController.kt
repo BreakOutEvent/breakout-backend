@@ -73,7 +73,6 @@ class PostingController {
         var location: Coord? = null
         var distance: Double? = null
 
-
         val locationIsAvailable: Boolean = body.postingLocation != null && body.postingLocation!!.latitude != null && body.postingLocation!!.longitude != null
         if (locationIsAvailable) {
             location = Coord(body.postingLocation!!.latitude!!, body.postingLocation!!.longitude!!)

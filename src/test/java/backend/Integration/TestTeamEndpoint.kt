@@ -217,8 +217,8 @@ class TestTeamEndpoint : IntegrationTest() {
         val response = mockMvc.perform (request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.distance").exists())
-                .andExpect(jsonPath("$.actualdistance").exists())
+                .andExpect(jsonPath("$.linear_distance").exists())
+                .andExpect(jsonPath("$.actual_distance").exists())
                 .andReturn().response.contentAsString
 
         println(response)

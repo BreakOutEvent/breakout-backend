@@ -29,29 +29,18 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository) :
     // TODO: Verify that independently uploaded locations are found
     override fun findLocationPostingsById(id: Long) = repository.findLocationPostingsById(id)
 
-    override fun getPostingMaxDistanceById(id: Long): Posting? {
-        val postingList = repository.getPostingMaxDistanceById(id)
-        if (postingList.size <= 0) {
-            return null
-        } else {
-            return postingList.first()
-        }
-    }
+    override fun getPostingMaxDistanceByIdEachTeam(id: Long): List<Posting> = repository.getPostingMaxDistanceByIdEachTeam(id)
 
     override fun getDistance(id: Long): Map<String, Double> {
         val event = this.findById(id) ?: throw NotFoundException("event with id $id does not exist")
         val postings = this.findLocationPostingsById(id)
 
         // Distance calculated with from all uploaded calculations, including steps in between (e.g A -> B -> C)
-        val actualdistance = distanceCoordsListKMfromStart(event.startingLocation, postings.map { it.location!!.coord })
+        val actualDistance = distanceCoordsListKMfromStart(event.startingLocation, postings.map { it.location!!.coord })
 
-        // TODO: Sum max distances for teams
-        val postingDistance = this.getPostingMaxDistanceById(id)
-        var distance = 0.0
-        if (postingDistance != null) {
-            distance = postingDistance.distance ?: 0.0
-        }
-        return mapOf("actualdistance" to actualdistance, "distance" to distance)
+        val postingDistances = this.getPostingMaxDistanceByIdEachTeam(id)
+        var linearDistance = postingDistances.sumByDouble { it.distance ?: 0.0 }
+        return mapOf("actual_distance" to actualDistance, "linear_distance" to linearDistance)
     }
 
 }

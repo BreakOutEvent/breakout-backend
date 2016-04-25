@@ -166,11 +166,7 @@ open class TeamController {
      * Linear distance = |A -> C|
      */
     @RequestMapping("/{id}/distance/")
-    open fun getTeamDistance(@PathVariable("id") teamId: Long): Map<String, Any> {
-
-        val linearDistance = this.teamService.getLinearDistanceForTeamFromPostings(teamId)
-        val actualDistance = this.teamService.getActualDistanceForTeamFromPostings(teamId)
-
-        return mapOf("actualdistance" to actualDistance, "distance" to linearDistance)
+    open fun getTeamDistance(@PathVariable("id") teamId: Long): Map<String, Double> {
+        return teamService.getDistance(teamId)
     }
 }

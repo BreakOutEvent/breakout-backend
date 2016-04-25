@@ -117,4 +117,12 @@ class TeamServiceImpl : TeamService {
     override fun leave(team: Team, participant: Participant) {
         team.leave(participant)
     }
+
+    override fun getDistance(teamId: Long): Map<String, Double> {
+        val linearDistance = this.getLinearDistanceForTeamFromPostings(teamId)
+        val actualDistance = this.getActualDistanceForTeamFromPostings(teamId)
+
+        return mapOf("actual_distance" to actualDistance, "linear_distance" to linearDistance)
+
+    }
 }
