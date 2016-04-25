@@ -10,8 +10,6 @@ import javax.persistence.ManyToOne
 @Entity
 class Invitation : BasicEntity {
 
-    lateinit var status: InvitationStatus
-
     @ManyToOne
     var team: Team? = null
 
@@ -26,13 +24,8 @@ class Invitation : BasicEntity {
     private constructor() : super()
 
     constructor(email: EmailAddress, team: Team) : this() {
-        this.status = InvitationStatus.OPEN
         this.invitee = email
         this.team = team
         this.invitationToken = UUID.randomUUID().toString()
-    }
-
-    enum class InvitationStatus {
-        OPEN, ACCEPTED, REJECTED
     }
 }

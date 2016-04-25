@@ -2,6 +2,7 @@ package backend.model.media
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import javax.transaction.Transactional
 
 @Service
 class MediaSizeServiceImpl : MediaSizeService {
@@ -20,12 +21,11 @@ class MediaSizeServiceImpl : MediaSizeService {
 
     override fun findAll(): Iterable<MediaSize> = repository.findAll()
 
+    @Transactional
     override fun createAndSaveMediaSize(media: Media, url: String, width: Int, height: Int, length: Int, size: Long, type: String): MediaSize {
         val mediaSize = MediaSize(media, url, width, height, length, size, type)
-        val mediaSizeSaved = this.save(mediaSize)
-        media.sizes!!.add(mediaSizeSaved)
-        mediaRepository.save(media)
-        return mediaSizeSaved
+        media.sizes!!.add(mediaSize)
+        return mediaSize
     }
 
     override fun getByID(id: Long): MediaSize? {

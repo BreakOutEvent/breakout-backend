@@ -3,7 +3,7 @@ package backend.services
 import backend.Integration.toJsonString
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
-import backend.model.misc.URL
+import backend.model.misc.Url
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
@@ -158,7 +158,7 @@ class MailServiceImplTest {
                 to = basicEmail.to,
                 subject = basicEmail.subject,
                 body = basicEmail.body,
-                files = listOf(URL("http://www.google.de/somelink"), URL("http://www.google.de/somelink"))
+                files = listOf(Url("http://www.google.de/somelink"), Url("http://www.google.de/somelink"))
         )
     }
 

@@ -19,13 +19,13 @@ class TeamEntryFeeInvoice : Invoice {
         this.team!!.invoice = this
     }
 
+    // TODO: Make this entity great again
     override fun isPaymentEligable(payment: Payment): Boolean {
         val participant = payment.user().getRole(Participant::class)
 
         return when {
             participant == null -> false
             !team!!.isMember(participant) -> false
-            //TODO: Also allow half the payment
             !payment.amount.isEqualTo(this.amount.divide(2)) || payment.amount.isEqualTo(this.amount) -> false
             !team!!.isFull() -> false
             else -> true

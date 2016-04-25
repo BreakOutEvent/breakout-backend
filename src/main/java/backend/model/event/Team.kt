@@ -9,7 +9,7 @@ import backend.model.payment.TeamEntryFeeInvoice
 import backend.model.user.Participant
 import java.util.*
 import javax.persistence.*
-import javax.persistence.CascadeType.ALL
+import javax.persistence.CascadeType.*
 
 @Entity
 class Team : BasicEntity {
@@ -43,7 +43,7 @@ class Team : BasicEntity {
     @OneToMany(mappedBy = "currentTeam", fetch = FetchType.EAGER)
     val members: MutableSet<Participant> = HashSet()
 
-    @OneToMany(cascade = arrayOf(CascadeType.REMOVE), mappedBy = "team", orphanRemoval = true)
+    @OneToMany(cascade = arrayOf(REMOVE), mappedBy = "team", orphanRemoval = true)
     val locations: MutableList<Location> = ArrayList()
 
     @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "team")
@@ -67,7 +67,6 @@ class Team : BasicEntity {
             throw DomainException("${participant.email} can't join team because this team is already full")
         } else {
             addMember(participant)
-
         }
     }
 
@@ -83,6 +82,7 @@ class Team : BasicEntity {
         return this.invitations.map { it.invitee }.contains(email)
     }
 
+    //TODO: Suppress warning as this is used by an @PreAuthorize statement
     fun isMember(username: String): Boolean {
         return this.members.map { participant -> participant.email }.contains(username)
     }

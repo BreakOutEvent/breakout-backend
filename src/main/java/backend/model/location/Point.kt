@@ -2,6 +2,7 @@ package backend.model.location
 
 import javax.persistence.Embeddable
 
+// TODO: Deprecated, use Coord instead
 @Embeddable
 class Point {
 

@@ -7,7 +7,7 @@ import java.util.*
 class Email(to: List<EmailAddress>,
             subject: String,
             body: String,
-            files: List<URL> = ArrayList(),
+            files: List<Url> = ArrayList(),
             bcc: List<EmailAddress> = ArrayList(),
             campaignCode: String? = null,
             buttonText: String? = null,
@@ -20,7 +20,7 @@ class Email(to: List<EmailAddress>,
     val bcc: List<EmailAddress> = bcc
 
     @JsonIgnore
-    val files: List<URL> = files
+    val files: List<Url> = files
 
     // This is a workAround because I don't know  how to serialize the List<EmailAddress>
     // to an [] of strings using jackson

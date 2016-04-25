@@ -13,7 +13,7 @@ import backend.services.MailService
 import backend.util.distanceCoordsListKMfromStart
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import javax.transaction.Transactional
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class TeamServiceImpl : TeamService {
@@ -31,6 +31,7 @@ class TeamServiceImpl : TeamService {
         this.configurationService = configurationService
     }
 
+    // TODO: Maybe make this transactional
     override fun create(creator: Participant, name: String, description: String, event: Event): Team {
         if (creator.currentTeam != null) throw DomainException("participant ${creator.core.id} already is part of a team")
         val team = Team(creator, name, description, event)
@@ -41,8 +42,6 @@ class TeamServiceImpl : TeamService {
 
     override fun invite(emailAddress: EmailAddress, team: Team) {
 
-        // TODO: What if user already exists?
-        // TODO: Should the creation of emails be moved to a seperate entity?
         val invitation = team.invite(emailAddress)
         val email = Email(
                 to = listOf(emailAddress),
@@ -70,11 +69,11 @@ class TeamServiceImpl : TeamService {
 
     override fun save(team: Team) = repository.save(team)
 
-    override fun findOne(id: Long): Team? = repository.findById(id)
+    override fun findOne(id: Long) = repository.findById(id)
 
-    override fun findPostingsById(id: Long): List<Long>? = repository.findPostingsById(id)
+    override fun findPostingsById(id: Long) = repository.findPostingsById(id)
 
-    override fun findLocationPostingsById(id: Long): List<Posting> = repository.findLocationPostingsById(id)
+    override fun findLocationPostingsById(id: Long) = repository.findLocationPostingsById(id)
 
     override fun getPostingMaxDistanceById(id: Long): Posting? {
         val postingList = repository.getPostingMaxDistanceById(id)
