@@ -8,6 +8,8 @@ import javax.persistence.Entity
 @Entity
 class AdminPayment : Payment {
 
+    constructor(): super()
+
     constructor(amount: Money, admin: Admin) : super(amount, admin)
 
     override fun getPaymentMethod() = "Payment added by Admin"

@@ -9,11 +9,13 @@ import javax.persistence.*
 @Entity
 abstract class Payment: BasicEntity {
 
-    var amount: Money
+    lateinit var amount: Money
         private set
 
     @ManyToOne
-    private var user: UserCore
+    private lateinit var user: UserCore
+
+    constructor()
 
     constructor(amount: Money, user: User) {
         this.amount = amount

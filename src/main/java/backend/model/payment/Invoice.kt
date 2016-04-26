@@ -2,6 +2,7 @@ package backend.model.payment
 
 import backend.model.BasicEntity
 import org.javamoney.moneta.Money
+import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.MappedSuperclass
 import javax.persistence.OneToMany
@@ -9,7 +10,7 @@ import javax.persistence.OneToMany
 @MappedSuperclass
 abstract class Invoice : BasicEntity {
 
-    @OneToMany
+    @OneToMany(cascade = arrayOf(CascadeType.ALL))
     private val payments: MutableList<Payment> = mutableListOf()
 
     @Column
