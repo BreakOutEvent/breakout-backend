@@ -1,7 +1,7 @@
 package backend.model.payment
 
+import backend.exceptions.DomainException
 import backend.model.event.Team
-import backend.model.user.Participant
 import org.javamoney.moneta.Money
 import javax.persistence.Entity
 import javax.persistence.OneToOne
@@ -12,23 +12,22 @@ class TeamEntryFeeInvoice : Invoice {
     @OneToOne
     var team: Team? = null
 
-    private constructor(): super()
+    private constructor() : super()
 
     constructor(team: Team, amount: Money) : super(amount) {
         this.team = team
         this.team!!.invoice = this
     }
 
-    // TODO: Make this entity great again
-    override fun isPaymentEligable(payment: Payment): Boolean {
-        val participant = payment.user().getRole(Participant::class)
+    override fun checkPaymentEligability(payment: Payment) {
+        if (payment !is AdminPayment) throw DomainException("Currently only payments via admins can be added to team invoices")
+        if (!isHalfOrFullAmount(payment.amount)) throw DomainException("Only the half or full amount of a payment can be added!")
+        if (!team!!.isFull()) throw DomainException("Payments can only be added to teams which already have two members")
+    }
 
-        return when {
-            participant == null -> false
-            !team!!.isMember(participant) -> false
-            !payment.amount.isEqualTo(this.amount.divide(2)) || payment.amount.isEqualTo(this.amount) -> false
-            !team!!.isFull() -> false
-            else -> true
-        }
+    private fun isHalfOrFullAmount(money: Money): Boolean {
+        val isHalfAmount = money.isEqualTo(this.amount.divide(2))
+        val isFullAmount = money.isEqualTo(this.amount)
+        return (isHalfAmount || isFullAmount)
     }
 }
