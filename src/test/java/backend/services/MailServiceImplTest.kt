@@ -3,10 +3,12 @@ package backend.services
 import backend.Integration.toJsonString
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
+import backend.model.misc.EmailRepository
 import backend.model.misc.Url
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
+import org.mockito.Mockito.mock
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.web.client.MockRestServiceServer
@@ -23,14 +25,16 @@ class MailServiceImplTest {
     private lateinit var restTemplate: RestTemplate
     private lateinit var mailService: MailService
     private lateinit var mockServer: MockRestServiceServer
+    private lateinit var emailRepository: EmailRepository
 
     @Before
     fun setUp() {
         restTemplate = RestTemplate()
+        emailRepository = mock(EmailRepository::class.java)
         val configurationService = Mockito.mock(ConfigurationService::class.java)
         Mockito.`when`(configurationService.getRequired("org.breakout.mailer.xauthtoken")).thenReturn("randomtoken")
         Mockito.`when`(configurationService.getRequired("org.breakout.mailer.url")).thenReturn(BASE_URL)
-        mailService = MailServiceImpl(restTemplate, configurationService)
+        mailService = MailServiceImpl(restTemplate, configurationService, emailRepository)
         mockServer = MockRestServiceServer.createServer(restTemplate)
     }
 

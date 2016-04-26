@@ -1,9 +1,14 @@
 package backend.model.misc;
 
+import backend.model.BasicEntity
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.*
+import javax.persistence.Column
+import javax.persistence.ElementCollection
+import javax.persistence.Entity
 
+@Entity
 class Email(to: List<EmailAddress>,
             subject: String,
             body: String,
@@ -11,15 +16,21 @@ class Email(to: List<EmailAddress>,
             bcc: List<EmailAddress> = ArrayList(),
             campaignCode: String? = null,
             buttonText: String? = null,
-            buttonUrl: String? = null) {
+            buttonUrl: String? = null) : BasicEntity() {
 
     @JsonIgnore
+    val isSent: Boolean = false
+
+    @JsonIgnore
+    @ElementCollection
     val to: List<EmailAddress> = to
 
     @JsonIgnore
+    @ElementCollection
     val bcc: List<EmailAddress> = bcc
 
     @JsonIgnore
+    @ElementCollection
     val files: List<Url> = files
 
     // This is a workAround because I don't know  how to serialize the List<EmailAddress>
@@ -46,6 +57,7 @@ class Email(to: List<EmailAddress>,
     val buttonUrl: String? = buttonUrl
 
     @JsonProperty("html")
+    @Column(columnDefinition="TEXT")
     val body: String = body
 
     @JsonProperty("campaign_code")

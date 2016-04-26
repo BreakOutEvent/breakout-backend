@@ -1,6 +1,7 @@
 package backend.services
 
 import backend.model.misc.Email
+import backend.model.misc.EmailRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,12 +20,14 @@ class MailServiceImpl : MailService {
     private val url: String
     private val token: String
     private val restTemplate: RestOperations
+    private val emailRepository: EmailRepository
 
     private val logger = Logger.getLogger(MailServiceImpl::class.java)
 
     @Autowired
-    constructor(restTemplate: RestOperations, configurationService: ConfigurationService) {
+    constructor(restTemplate: RestOperations, configurationService: ConfigurationService, emailRepository: EmailRepository) {
         this.restTemplate = restTemplate
+        this.emailRepository = emailRepository
         this.token = configurationService.getRequired("org.breakout.mailer.xauthtoken")
         this.url = configurationService.getRequired("org.breakout.mailer.url")
     }
@@ -45,8 +48,8 @@ class MailServiceImpl : MailService {
             restTemplate.exchange(sendurl, HttpMethod.POST, request, String::class.java)
         } catch (e: Exception) {
             logger.error(e.message)
-            // TODO: Implement better fallback in this case!
-            logger.error("Mailer not available at this time")
+            emailRepository.save(email)
+            logger.error("Mailer not available at this time, saved mail")
         }
 
     }
