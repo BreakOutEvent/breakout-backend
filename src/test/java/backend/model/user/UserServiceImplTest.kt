@@ -56,7 +56,7 @@ class UserServiceImplTest {
 
         userServiceImpl.create("mail@mail.de", "password")
 
-        verify(mailService).send(anyObject())
+        verify(mailService).send(anyObject(), eq(false))
         verify(userRepository).save(anyObject<UserCore>())
     }
 

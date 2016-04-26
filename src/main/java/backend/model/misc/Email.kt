@@ -9,29 +9,42 @@ import javax.persistence.ElementCollection
 import javax.persistence.Entity
 
 @Entity
-class Email(to: List<EmailAddress>,
-            subject: String,
-            body: String,
-            files: List<Url> = ArrayList(),
-            bcc: List<EmailAddress> = ArrayList(),
-            campaignCode: String? = null,
-            buttonText: String? = null,
-            buttonUrl: String? = null) : BasicEntity() {
+class Email : BasicEntity {
+
+    constructor()
+
+    constructor(to: List<EmailAddress>,
+                subject: String,
+                body: String,
+                files: List<Url> = ArrayList(),
+                bcc: List<EmailAddress> = ArrayList(),
+                campaignCode: String? = null,
+                buttonText: String? = null,
+                buttonUrl: String? = null) {
+        this.to = to
+        this.subject = subject
+        this.body = body
+        this.files = files
+        this.bcc = bcc
+        this.campaignCode = campaignCode
+        this.buttonText = buttonText
+        this.buttonUrl = buttonUrl
+    }
 
     @JsonIgnore
-    val isSent: Boolean = false
+    var isSent: Boolean = false
 
     @JsonIgnore
     @ElementCollection
-    val to: List<EmailAddress> = to
+    lateinit var to: List<EmailAddress>
 
     @JsonIgnore
     @ElementCollection
-    val bcc: List<EmailAddress> = bcc
+    lateinit var bcc: List<EmailAddress>
 
     @JsonIgnore
     @ElementCollection
-    val files: List<Url> = files
+    lateinit var files: List<Url>
 
     // This is a workAround because I don't know  how to serialize the List<EmailAddress>
     // to an [] of strings using jackson
@@ -50,18 +63,18 @@ class Email(to: List<EmailAddress>,
         return files.map { it.toString() }
     }
 
-    val subject: String = subject
+    lateinit var subject: String
 
-    val buttonText: String? = buttonText
+    var buttonText: String? = null
 
-    val buttonUrl: String? = buttonUrl
+    var buttonUrl: String? = null
 
     @JsonProperty("html")
-    @Column(columnDefinition="TEXT")
-    val body: String = body
+    @Column(columnDefinition = "TEXT")
+    lateinit var body: String
 
     @JsonProperty("campaign_code")
-    val campaignCode: String? = campaignCode
+    var campaignCode: String? = null
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

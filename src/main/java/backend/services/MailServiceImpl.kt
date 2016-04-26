@@ -32,7 +32,7 @@ class MailServiceImpl : MailService {
         this.url = configurationService.getRequired("org.breakout.mailer.url")
     }
 
-    override fun send(email: Email) {
+    override fun send(email: Email, saveToDb: Boolean) {
         val headers = HttpHeaders().apply {
             set("Content-Type", "application/json;charset=utf-8")
             set("X-AUTH-TOKEN", "$token")
@@ -46,16 +46,28 @@ class MailServiceImpl : MailService {
             val sendurl = getSendUrl(url)
             logger.info("sending mail via: $sendurl")
             restTemplate.exchange(sendurl, HttpMethod.POST, request, String::class.java)
+            if (saveToDb) {
+                email.isSent = true
+                emailRepository.save(email)
+            }
         } catch (e: Exception) {
             logger.error(e.message)
+            email.isSent = false
             emailRepository.save(email)
             logger.error("Mailer not available at this time, saved mail")
         }
-
     }
 
     private fun getSendUrl(baseUrl: String) = UriComponentsBuilder
             .fromHttpUrl(baseUrl)
             .path("send")
             .build().toUriString()
+
+    override fun resendFailed(): Int {
+        val failedMails = emailRepository.findByIsSent(false)
+        failedMails.forEach { email ->
+            send(email = email, saveToDb = true)
+        }
+        return failedMails.size
+    }
 }

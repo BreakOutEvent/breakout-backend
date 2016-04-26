@@ -13,7 +13,7 @@ import org.springframework.web.client.RestOperations
 class FakeMailServiceImpl @Autowired constructor(restTemplate: RestOperations, configurationService: ConfigurationService, emailRepository: EmailRepository) : MailService by MailServiceImpl(restTemplate, configurationService, emailRepository) {
     val logger = Logger.getLogger(FakeMailServiceImpl::class.java)
 
-    override fun send(email: Email) {
+    override fun send(email: Email, saveToDb: Boolean) {
         logger.info("Email to ${email.to} with subject \"${email.subject}\" would be sent now")
     }
 }
