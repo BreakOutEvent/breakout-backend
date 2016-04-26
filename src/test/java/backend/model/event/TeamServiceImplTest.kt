@@ -50,7 +50,6 @@ class TeamServiceImplTest : IntegrationTest() {
         val team = teamService.create(creator, "name", "description", event)
 
         teamService.invite(EmailAddress("invitee@mail.de"), team)
-        // TODO: Make sure an Email is sent!
     }
 
     @Test

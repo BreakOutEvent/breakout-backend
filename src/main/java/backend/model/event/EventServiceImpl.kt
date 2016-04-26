@@ -3,7 +3,6 @@ package backend.model.event
 import backend.controller.exceptions.NotFoundException
 import backend.model.location.Location
 import backend.model.misc.Coord
-import backend.model.posting.Posting
 import backend.util.distanceCoordsListKMfromStart
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -27,7 +26,6 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository) :
 
     override fun findPostingsById(id: Long) = repository.findPostingsById(id)
 
-    // TODO: Verify that independently uploaded locations are found
     override fun findLocationPostingsById(id: Long) = repository.findLocationPostingsById(id)
 
     override fun getLocationMaxDistanceByIdEachTeam(id: Long): List<Location> = repository.getLocationMaxDistanceByIdEachTeam(id)

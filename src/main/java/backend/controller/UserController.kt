@@ -14,8 +14,6 @@ import backend.services.ConfigurationService
 import backend.util.getSignedJwtToken
 import backend.view.BasicUserView
 import backend.view.UserView
-import com.auth0.jwt.Algorithm
-import com.auth0.jwt.JWTSigner
 import io.swagger.annotations.Api
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
@@ -59,12 +57,12 @@ open class UserController {
 
         if (userService.exists(email)) throw ConflictException("email ${body.email!!} already exists")
 
-        val user = userService.create(email, password).apply(body)
+        val user = userService.create(email, password)
+        user.apply(body)
+        userService.save(user)
 
-        //TODO: move to helper open function in util package
-        user.profilePic.uploadToken = JWTSigner(JWT_SECRET).sign(mapOf("subject" to user.profilePic.id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512))
-
-        return UserView(userService.save(user)!!)
+        user.profilePic.uploadToken = getSignedJwtToken(JWT_SECRET, user.profilePic.id.toString())
+        return UserView(user)
     }
 
     /**
@@ -87,8 +85,9 @@ open class UserController {
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (user.core.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")
         user.apply(body)
-        user.profilePic.uploadToken = getSignedJwtToken(JWT_SECRET, user.profilePic.id.toString())
         userService.save(user)
+
+        user.profilePic.uploadToken = getSignedJwtToken(JWT_SECRET, user.profilePic.id.toString())
         return UserView(user)
     }
 
