@@ -1,6 +1,10 @@
 package backend.model.payment
 
+import backend.exceptions.DomainException
+import backend.model.user.Admin
+import backend.model.user.User
 import org.apache.log4j.Logger
+import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
@@ -18,9 +22,13 @@ class TeamEntryFeeServiceImpl : TeamEntryFeeService {
     }
 
     @Transactional
-    override fun addPaymentToInvoice(invoice: Invoice, payment: Payment) {
+    override fun addAdminPaymentToInvoice(user: User, amount: Money, invoice: TeamEntryFeeInvoice): Invoice {
+        val admin = user.getRole(Admin::class) ?: throw DomainException("User ${user.core.id} can't add payments because he is no Admin")
+        val payment = AdminPayment(amount, admin)
         invoice.addPayment(payment)
-        // TODO: Check whether this is saved automatically thanks to @Transactional
+        return invoice
+
+        //TODO: Make sure emails are sent here!
     }
 
     @Transactional
@@ -29,7 +37,7 @@ class TeamEntryFeeServiceImpl : TeamEntryFeeService {
     }
 
     @Transactional
-    override fun findById(id: Long): Invoice? {
+    override fun findById(id: Long): TeamEntryFeeInvoice? {
         return teamEntryFeeInvoiceRepository.findOne(id)
     }
 }

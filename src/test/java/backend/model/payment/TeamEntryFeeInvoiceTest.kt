@@ -2,7 +2,6 @@ package backend.model.payment
 
 import backend.model.event.Team
 import backend.model.user.Admin
-import backend.model.user.User
 import org.javamoney.moneta.Money
 import org.junit.Before
 import org.junit.Test
