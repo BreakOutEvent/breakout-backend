@@ -23,7 +23,7 @@ class TeamEntryFeeServiceImpl : TeamEntryFeeService {
     override fun addAdminPaymentToInvoice(admin: Admin, amount: Money, invoice: TeamEntryFeeInvoice): TeamEntryFeeInvoice {
         val payment = AdminPayment(amount, admin)
         invoice.addPayment(payment)
-        return this.save(invoice)
+        return invoice
         //TODO: Make sure emails are sent here!
     }
 
