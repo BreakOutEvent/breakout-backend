@@ -17,6 +17,6 @@ class PaymentView {
     constructor(payment: Payment) {
         this.amount = payment.amount.numberStripped.toDouble()
         this.paymentMethod = payment.getPaymentMethod()
-        this.user = payment.user().core.id
+        this.user = payment.user()!!.core.id
     }
 }

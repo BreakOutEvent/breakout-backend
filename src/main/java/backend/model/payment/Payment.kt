@@ -4,16 +4,21 @@ import backend.model.BasicEntity
 import backend.model.user.User
 import backend.model.user.UserCore
 import org.javamoney.moneta.Money
-import javax.persistence.*
+import javax.persistence.Entity
+import javax.persistence.ManyToOne
+import javax.persistence.PreRemove
 
 @Entity
-abstract class Payment: BasicEntity {
+abstract class Payment : BasicEntity {
 
     lateinit var amount: Money
         private set
 
     @ManyToOne
-    private lateinit var user: UserCore
+    var user: UserCore? = null
+
+    @ManyToOne
+    var invoice: Invoice? = null
 
     constructor()
 
@@ -24,7 +29,13 @@ abstract class Payment: BasicEntity {
 
     abstract fun getPaymentMethod(): String
 
-    fun user(): User {
+    fun user(): User? {
         return this.user
+    }
+
+    @PreRemove
+    fun preRemove() {
+        this.user?.payments?.remove(this)
+        this.user = null
     }
 }

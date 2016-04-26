@@ -50,6 +50,7 @@ open class InvoiceControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.amount").value(60.0))
                 .andExpect(jsonPath("$.team").value(team.id!!.toInt()))
                 .andExpect(jsonPath("$.payments").isArray)
-                .andExpect(jsonPath("$.payments[0]").exists())
+                .andExpect(jsonPath("$.payments.[0]").exists())
+                .andExpect(jsonPath("$.payments.[1]").doesNotExist())
     }
 }

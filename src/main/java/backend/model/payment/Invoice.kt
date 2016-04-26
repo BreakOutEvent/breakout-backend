@@ -2,15 +2,14 @@ package backend.model.payment
 
 import backend.model.BasicEntity
 import org.javamoney.moneta.Money
-import javax.persistence.CascadeType
-import javax.persistence.Column
-import javax.persistence.MappedSuperclass
-import javax.persistence.OneToMany
+import javax.persistence.*
+import javax.persistence.CascadeType.MERGE
+import javax.persistence.CascadeType.PERSIST
 
-@MappedSuperclass
+@Entity
 abstract class Invoice : BasicEntity {
 
-    @OneToMany(cascade = arrayOf(CascadeType.ALL))
+    @OneToMany(cascade = arrayOf(MERGE, PERSIST), mappedBy = "invoice", orphanRemoval = true)
     private val payments: MutableList<Payment> = mutableListOf()
 
     @Column
@@ -25,6 +24,7 @@ abstract class Invoice : BasicEntity {
 
     fun addPayment(payment: Payment) {
         checkPaymentEligability(payment)
+        payment.invoice = this
         this.payments.add(payment)
     }
 
@@ -43,4 +43,10 @@ abstract class Invoice : BasicEntity {
 
     @Throws
     abstract fun checkPaymentEligability(payment: Payment)
+
+    @PreRemove
+    fun preRemove() {
+        this.payments.forEach { it.invoice = null }
+        payments.clear()
+    }
 }

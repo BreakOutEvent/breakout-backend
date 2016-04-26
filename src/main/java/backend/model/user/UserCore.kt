@@ -3,6 +3,7 @@ package backend.model.user
 import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.media.Media
+import backend.model.payment.Payment
 import backend.model.posting.Posting
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.validator.constraints.Email
@@ -41,6 +42,9 @@ open class UserCore : BasicEntity, User {
     @OrderColumn
     @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.EAGER, orphanRemoval = true)
     val postings: MutableList<Posting>? = ArrayList()
+
+    @OneToMany
+    val payments: MutableList<Payment> = ArrayList()
 
     /*
      * cascade all operations to children
@@ -104,4 +108,10 @@ open class UserCore : BasicEntity, User {
     override val core: UserCore
         @JsonIgnore
         get() = this
+
+    @PreRemove
+    fun preRemove() {
+        this.payments.forEach { it.user = null }
+        this.payments.clear()
+    }
 }
