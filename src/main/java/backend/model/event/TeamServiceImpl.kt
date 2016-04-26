@@ -5,7 +5,6 @@ import backend.exceptions.DomainException
 import backend.model.location.Location
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
-import backend.model.posting.Posting
 import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserService
@@ -117,6 +116,12 @@ class TeamServiceImpl : TeamService {
     @Transactional
     override fun leave(team: Team, participant: Participant) {
         team.leave(participant)
+    }
+
+    @Transactional
+    override fun join(participant: Participant, team: Team) {
+        team.join(participant)
+        // TODO: Send email
     }
 
     override fun getDistance(teamId: Long): Map<String, Double> {

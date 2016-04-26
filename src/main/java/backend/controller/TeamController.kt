@@ -136,9 +136,7 @@ open class TeamController {
         if (user.email != email.toString()) throw BadRequestException("Authorized user and email from request body don't match")
         val participant = user.getRole(Participant::class) ?: throw RuntimeException("User is no participant")
 
-        //TODO: Move join to service Layer, instead of model
-        team.join(participant)
-        teamService.save(team)
+        teamService.join(participant, team)
 
         return TeamView(team)
     }

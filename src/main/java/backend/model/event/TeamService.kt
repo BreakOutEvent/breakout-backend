@@ -6,6 +6,7 @@ import backend.model.posting.Posting
 import backend.model.user.Participant
 import backend.model.user.User
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.transaction.annotation.Transactional
 
 interface TeamService {
 
@@ -91,4 +92,6 @@ interface TeamService {
     fun getActualDistanceForTeamFromPostings(teamId: Long): Double
 
     fun getDistance(teamId: Long): Map<String, Double>
+
+    fun join(participant: Participant, team: Team)
 }
