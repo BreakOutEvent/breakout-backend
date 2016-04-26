@@ -39,4 +39,27 @@ class MediaSizeServiceImpl : MediaSizeService {
     override fun findByHeightAndMediaAndMediaType(height: Int, media: Media, type: MediaType): MediaSize? {
         return repository.findByHeightAndMediaAndMediaType(height, media, type)
     }
+
+    @Transactional
+    override fun createOrUpdate(media: Media, url: String, width: Int, height: Int, length: Int, size: Long, type: String): MediaSize {
+        var mediaSizeFound: MediaSize?
+        if (width > height) {
+            mediaSizeFound = this.findByWidthAndMediaAndMediaType(width, media, MediaType.valueOf(type.toUpperCase()));
+        } else {
+            mediaSizeFound = this.findByHeightAndMediaAndMediaType(height, media, MediaType.valueOf(type.toUpperCase()));
+        }
+
+        if (mediaSizeFound == null) {
+            return this.createAndSaveMediaSize(media, url, width, height, length, size, type)
+        } else {
+            mediaSizeFound.url = url
+            mediaSizeFound.width = width
+            mediaSizeFound.height = height
+            mediaSizeFound.length = length
+            mediaSizeFound.size = size
+            mediaSizeFound.mediaType = MediaType.valueOf(type.toUpperCase())
+
+            return this.save(mediaSizeFound)
+        }
+    }
 }
