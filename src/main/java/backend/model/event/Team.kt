@@ -7,6 +7,8 @@ import backend.model.media.Media
 import backend.model.misc.EmailAddress
 import backend.model.payment.TeamEntryFeeInvoice
 import backend.model.user.Participant
+import org.javamoney.moneta.Money
+import java.math.BigDecimal
 import java.util.*
 import javax.persistence.*
 import javax.persistence.CascadeType.*
@@ -25,6 +27,7 @@ class Team : BasicEntity {
         this.description = description
         this.event = event
         this.profilePic = Media("image")
+        this.invoice = TeamEntryFeeInvoice(this, Money.of(BigDecimal.valueOf(60), "EUR"))
     }
 
     lateinit var name: String
