@@ -14,8 +14,7 @@ import backend.services.ConfigurationService
 import backend.util.distanceCoordsKM
 import backend.util.getSignedJwtToken
 import backend.util.toLocalDateTime
-import backend.view.PostingRequestView
-import backend.view.PostingResponseView
+import backend.view.PostingView
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
@@ -57,21 +56,21 @@ open class PostingController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/", method = arrayOf(POST))
     @ResponseStatus(CREATED)
-    open fun createPosting(@Valid @RequestBody body: PostingRequestView,
-                           @AuthenticationPrincipal customUserDetails: CustomUserDetails): PostingResponseView {
+    open fun createPosting(@Valid @RequestBody body: PostingView,
+                           @AuthenticationPrincipal customUserDetails: CustomUserDetails): PostingView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
 
         //check if any of the optional posting types is available
-        if (body.media == null && body.text == null && body.postingLocation == null)
+        if (body.uploadMediaTypes == null && body.text == null && body.postingLocation == null)
             throw BadRequestException("empty postings not allowed")
 
         var location: Coord? = null
         var distance: Double? = null
 
-        val locationIsAvailable: Boolean = body.postingLocation != null && body.postingLocation!!.latitude != null && body.postingLocation!!.longitude != null
+        val locationIsAvailable: Boolean = body.postingLocation != null
         if (locationIsAvailable) {
-            location = Coord(body.postingLocation!!.latitude!!, body.postingLocation!!.longitude!!)
+            location = Coord(body.postingLocation!!.latitude, body.postingLocation!!.longitude)
             val creator = user.getRole(Participant::class) ?: throw UnauthorizedException("User is no participant")
             val team = creator.currentTeam ?: throw UnauthorizedException("User has no team")
 
@@ -80,37 +79,37 @@ open class PostingController {
         }
 
         val date = body.date!!.toLocalDateTime()
-        var posting = postingService.createPosting(text = body.text, postingLocation = location, user = user.core, mediaTypes = body.media, distance = distance, date = date)
+        var posting = postingService.createPosting(text = body.text, postingLocation = location, user = user.core, mediaTypes = body.uploadMediaTypes, distance = distance, date = date)
 
         //Adds uploadingTokens to response
         posting.media?.forEach { it.uploadToken = getSignedJwtToken(JWT_SECRET, it.id.toString()) }
 
-        return PostingResponseView(posting)
+        return PostingView(posting)
     }
 
     /**
      * GET /posting/id/
      */
     @RequestMapping("/{id}/")
-    open fun getPosting(@PathVariable("id") id: Long): PostingResponseView {
+    open fun getPosting(@PathVariable("id") id: Long): PostingView {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
-        return PostingResponseView(posting)
+        return PostingView(posting)
     }
 
     /**
      * GET /posting/
      */
     @RequestMapping("/")
-    open fun getAllPostings(): Iterable<PostingResponseView> {
-        return postingService.findAll().map { PostingResponseView(it) }
+    open fun getAllPostings(): Iterable<PostingView> {
+        return postingService.findAll().map { PostingView(it) }
     }
 
     /**
      * POST /posting/get/ids/
      */
     @RequestMapping("/get/ids", method = arrayOf(POST))
-    open fun getPostingsById(@Valid @RequestBody body: List<Long>): Iterable<PostingResponseView> {
-        return postingService.findAllByIds(body).map { PostingResponseView(it) }
+    open fun getPostingsById(@Valid @RequestBody body: List<Long>): Iterable<PostingView> {
+        return postingService.findAllByIds(body).map { PostingView(it) }
     }
 
     /**

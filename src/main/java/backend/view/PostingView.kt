@@ -1,11 +1,13 @@
 package backend.view
 
 import backend.model.posting.Posting
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import java.time.ZoneOffset
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
-class PostingRequestView() {
+class PostingView() {
 
     var id: Long? = null
 
@@ -15,9 +17,12 @@ class PostingRequestView() {
     var date: Long? = null
 
     @Valid
-    var postingLocation: CoordView? = null
+    var postingLocation: LocationView? = null
 
-    var media: List<String>? = null
+    var media: List<MediaView>? = null
+
+    @JsonInclude(NON_NULL)
+    var uploadMediaTypes: List<String>? = null
 
     @Valid
     var user: BasicUserView? = null
@@ -26,8 +31,10 @@ class PostingRequestView() {
         this.id = posting.id
         this.text = posting.text
         this.date = posting.date.toEpochSecond(ZoneOffset.UTC)
-        this.postingLocation = CoordView(posting.location?.coord)
+        this.postingLocation = if (posting.location != null) LocationView(posting.location!!) else null
         this.user = BasicUserView(posting.user!!.core)
-        this.media = posting.media?.map { it.mediaType.toString() }
+        this.media = posting.media?.map { MediaView(it) }
     }
+
+
 }

@@ -1,12 +1,9 @@
 package backend.view
 
-import backend.configuration.CustomUserDetails
 import backend.model.user.Participant
 import backend.model.user.User
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.validator.constraints.Email
-import java.time.LocalDate
-import java.util.*
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 

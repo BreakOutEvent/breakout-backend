@@ -82,6 +82,7 @@ class TestTeamEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.profilePic.type").exists())
                 .andExpect(jsonPath("$.profilePic.id").exists())
                 .andExpect(jsonPath("$.profilePic.uploadToken").exists())
+                .andExpect(jsonPath("$.profilePic.type").value("IMAGE"))
                 .andExpect(jsonPath("$.event").value(event.id!!.toInt()))
                 .andExpect(jsonPath("$.name").value("Team awesome"))
                 .andExpect(jsonPath("$.description").value("Our team is awesome"))

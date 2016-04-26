@@ -114,6 +114,7 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.profilePic.type").exists())
                 .andExpect(jsonPath("$.profilePic.id").exists())
                 .andExpect(jsonPath("$.profilePic.uploadToken").exists())
+                .andExpect(jsonPath("$.profilePic.type").value("IMAGE"))
                 .andReturn().response.contentAsString
 
         print(response)
@@ -270,6 +271,8 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.lastname").value("Schmidt"))
                 .andExpect(jsonPath("$.gender").value("Male"))
                 .andExpect(jsonPath("$.blocked").value(false)) // A user can't block itself
+                .andExpect(jsonPath("$.profilePic.uploadToken").exists())
+                .andExpect(jsonPath("$.profilePic.type").value("IMAGE"))
                 .andExpect(jsonPath("$.passwordHash").doesNotExist())
 
         // TODO: Can't override existing properties with null!

@@ -151,7 +151,7 @@ open class TeamController {
 
     @RequestMapping("/{id}/posting/")
     open fun getTeamPostingIds(@PathVariable id: Long): List<Long> {
-        val postingIds = teamService.findPostingsById(id) ?: throw NotFoundException("team with id $id does not exist")
+        val postingIds = teamService.findPostingsById(id)
         return postingIds
     }
 

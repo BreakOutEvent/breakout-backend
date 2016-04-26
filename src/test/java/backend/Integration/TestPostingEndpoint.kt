@@ -67,7 +67,7 @@ open class TestPostingEndpoint : IntegrationTest() {
                         "latitude" to 0.0,
                         "longitude" to 0.0
                 ),
-                "media" to arrayOf(
+                "uploadMediaTypes" to arrayOf(
                         "image",
                         "image",
                         "audio"
@@ -133,7 +133,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewPostingWithMedia() {
         val postData = mapOf(
-                "media" to arrayOf(
+                "uploadMediaTypes" to arrayOf(
                         "image",
                         "image",
                         "audio"
