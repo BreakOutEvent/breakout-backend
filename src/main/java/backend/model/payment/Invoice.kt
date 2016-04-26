@@ -2,9 +2,13 @@ package backend.model.payment
 
 import backend.model.BasicEntity
 import org.javamoney.moneta.Money
-import javax.persistence.*
+import java.math.BigDecimal
 import javax.persistence.CascadeType.MERGE
 import javax.persistence.CascadeType.PERSIST
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.OneToMany
+import javax.persistence.PreRemove
 
 @Entity
 abstract class Invoice : BasicEntity {
@@ -33,7 +37,9 @@ abstract class Invoice : BasicEntity {
     }
 
     fun amountOfCurrentPayments(): Money {
-        return this.payments.map { it.amount }.reduce { a, b -> a.add(b) }
+        val amounts = this.payments.map { it.amount }
+        val zero = Money.of(BigDecimal.ZERO, "EUR")
+        return amounts.fold(zero) { total, next -> total.add(next) }
     }
 
     fun getPayments(): Iterable<Payment> {
