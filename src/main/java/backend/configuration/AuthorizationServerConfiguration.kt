@@ -13,8 +13,9 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices
 import org.springframework.security.oauth2.provider.token.TokenStore
-import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore
+import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore
 import javax.annotation.PostConstruct
+import javax.sql.DataSource
 
 /*
  *
@@ -32,10 +33,15 @@ open class AuthorizationServerConfiguration : AuthorizationServerConfigurerAdapt
     @Autowired lateinit private var authenticationManager: AuthenticationManager
     @Autowired lateinit private var userDetailsService: CustomUserDetailsService
     @Autowired lateinit private var configurationService: ConfigurationService
+    @Autowired lateinit private var dataSource: DataSource
 
-    private val tokenStore: TokenStore = InMemoryTokenStore() // TODO: Change to Redis or other persistent store
     private lateinit var clientName: String
     private lateinit var clientSecret: String
+
+    @Bean
+    open fun tokenStore(): TokenStore {
+        return JdbcTokenStore(dataSource)
+    }
 
     @PostConstruct
     open fun setUp() {
@@ -48,7 +54,7 @@ open class AuthorizationServerConfiguration : AuthorizationServerConfigurerAdapt
     open fun tokenServices(): DefaultTokenServices {
         return DefaultTokenServices().apply {
             setSupportRefreshToken(true)
-            setTokenStore(this@AuthorizationServerConfiguration.tokenStore)
+            setTokenStore(this@AuthorizationServerConfiguration.tokenStore())
         }
     }
 
@@ -60,8 +66,8 @@ open class AuthorizationServerConfiguration : AuthorizationServerConfigurerAdapt
      */
     @Throws(Exception::class)
     override fun configure(clients: ClientDetailsServiceConfigurer) {
-        clients.inMemory()
-                .withClient(clientName)
+        clients.jdbc(dataSource)
+                .withClient(clientName) //TODO: Can't be called each time server is started, otherwise exception!!
                 .authorizedGrantTypes("password", "refresh_token")
                 .authorities("USER") // Authorities that are granted to the client (regular Spring Security authorities)
                 .scopes("read", "write") // Set scope "read" and "write" for breakout_app, can be checked with @PreAuthorize
@@ -76,7 +82,7 @@ open class AuthorizationServerConfiguration : AuthorizationServerConfigurerAdapt
      */
     override fun configure(endpoints: AuthorizationServerEndpointsConfigurer) {
         endpoints
-                .tokenStore(this.tokenStore)
+                .tokenStore(this.tokenStore())
                 .authenticationManager(this.authenticationManager)
                 .userDetailsService(this.userDetailsService)
     }
