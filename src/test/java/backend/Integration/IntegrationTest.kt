@@ -46,7 +46,6 @@ import javax.servlet.Filter
 @SpringApplicationConfiguration(classes = arrayOf(TestBackendConfiguration::class, WebSecurityConfiguration::class, ResourceServerConfiguration::class, AuthorizationServerConfiguration::class))
 @WebAppConfiguration
 @IntegrationTest("server.port:0")
-@ActiveProfiles("test")
 abstract class IntegrationTest {
 
     protected val APPLICATION_JSON_UTF_8 = "application/json;charset=UTF-8"

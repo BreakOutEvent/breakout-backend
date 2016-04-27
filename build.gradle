@@ -78,7 +78,7 @@ task wrapper(type: Wrapper) {
 }
 
 // See: http://stackoverflow.com/questions/26389679/running-spring-app-built-with-gradle-on-heroku
-task stage(type: Copy, dependsOn: [clean, build]) {
+task stage(type: Copy, dependsOn: [clean, assemble]) {
     from jar.archivePath
     into project.rootDir
     rename {
