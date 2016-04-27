@@ -58,7 +58,7 @@ open class UserCore : BasicEntity, User {
     private var activationToken: String? = null
 
     fun getAuthorities(): Collection<GrantedAuthority> {
-        return this.userRoles.values
+        return this.userRoles.values.map { BasicGrantedAuthority(it) }
     }
 
     override fun activate(token: String) {
@@ -113,5 +113,18 @@ open class UserCore : BasicEntity, User {
     fun preRemove() {
         this.payments.forEach { it.user = null }
         this.payments.clear()
+    }
+}
+
+class BasicGrantedAuthority : GrantedAuthority {
+
+    private val internal: String
+
+    constructor(userRole: UserRole) {
+        this.internal = userRole.authority
+    }
+
+    override fun getAuthority(): String? {
+        return internal
     }
 }
