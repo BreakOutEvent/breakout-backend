@@ -67,12 +67,6 @@ open class AuthorizationServerConfiguration : AuthorizationServerConfigurerAdapt
     @Throws(Exception::class)
     override fun configure(clients: ClientDetailsServiceConfigurer) {
         clients.jdbc(dataSource)
-                .withClient(clientName) //TODO: Can't be called each time server is started, otherwise exception!!
-                .authorizedGrantTypes("password", "refresh_token")
-                .authorities("USER") // Authorities that are granted to the client (regular Spring Security authorities)
-                .scopes("read", "write") // Set scope "read" and "write" for breakout_app, can be checked with @PreAuthorize
-                .resourceIds("BREAKOUT_BACKEND") // Allow breakout_app to access all resources with id BREAKOUT_BACKEND
-                .secret(clientSecret)
     }
 
     /*

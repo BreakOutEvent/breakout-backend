@@ -9,7 +9,4 @@ CREATE TABLE oauth_access_token (token_id VARCHAR(256),  token BLOB,  authentica
 CREATE TABLE oauth_refresh_token (token_id VARCHAR(256),  token BLOB,  authentication BLOB);
 CREATE TABLE oauth_code (code VARCHAR(256), authentication BLOB);
 
--- customized oauth_client_details TABLE
--- CREATE TABLE ClientDetails (appId VARCHAR(256) PRIMARY KEY,  resourceIds VARCHAR(256),  appSecret VARCHAR(256),  scope VARCHAR(256),  grantTypes VARCHAR(256),  redirectUrl VARCHAR(256),  authorities VARCHAR(256),  access_token_validity INTEGER,  refresh_token_validity INTEGER,  additionalInformation VARCHAR(4096));
-
--- insert into oauth_client_details (client_secret, resource_ids, scope, authorized_grant_types, web_server_redirect_uri, authorities, access_token_validity, refresh_token_validity, additional_information, autoapprove, client_id) values (?,?,?,?,?,?,?,?,?,?,?)]; nested exception is com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Unknown column 'autoapprove' in 'field list'"
+INSERT INTO `oauth_client_details` (`client_id`, `resource_ids`, `client_secret`, `scope`, `authorized_grant_types`, `web_server_redirect_uri`, `authorities`, `access_token_validity`, `refresh_token_validity`, `additional_information`, `autoapprove`) VALUES	('breakout_app', 'BREAKOUT_BACKEND', '123456789', 'read,write', 'password,refresh_token', '', 'USER', NULL, NULL, '{}', '');
