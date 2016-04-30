@@ -60,7 +60,7 @@ class TeamEntryFeeServiceImpl : TeamEntryFeeService {
             to = invoice.team!!.members.map { EmailAddress(it.email) },
             subject = "BreakOut 2016 - Du bist Dabei!",
             body = "Liebes Team ${invoice.team!!.name},<br><br>" +
-                    "Eure Startgebühr ist vollständig bei uns eingegnagen. Ihr seid jetzt vollständig bei BreakOut angemeldet, yuhuuu!! Jetzt gehts für Euch ans Sponsoren suchen. Über alles weitere halten wir Euch auf dem Laufenden!" +
+                    "Eure Startgebühr ist vollständig bei uns eingegnagen. Ihr seid jetzt vollständig bei BreakOut angemeldet, yuhuuu!! Jetzt gehts für Euch ans Sponsoren suchen. Über alles weitere halten wir Euch auf dem Laufenden!<br>" +
                     "Bis zum 3. Juni wir freuen uns auf Euch!<br><br>" +
                     "Liebe Grüße<br>" +
                     "Euer BreakOut-Team"
