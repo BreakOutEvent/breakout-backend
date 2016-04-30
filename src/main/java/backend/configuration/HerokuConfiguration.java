@@ -25,6 +25,10 @@ public class HerokuConfiguration {
         basicDataSource.setUsername(username);
         basicDataSource.setPassword(password);
 
+        basicDataSource.setTestWhileIdle(true);
+        basicDataSource.setTimeBetweenEvictionRunsMillis(30000);
+        basicDataSource.setValidationQuery("SELECT 1");
+
         return basicDataSource;
     }
 }
