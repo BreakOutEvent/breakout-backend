@@ -137,7 +137,7 @@ class TeamServiceImpl : TeamService {
         return mapOf("actual_distance" to actualDistance, "linear_distance" to linearDistance)
     }
 
-    private fun getFullTeamMailForMember(participants: Set<Participant>): List<Email> {
+    override fun getFullTeamMailForMember(participants: Set<Participant>): List<Email> {
         val first = participants.first()
         val second = participants.last()
 

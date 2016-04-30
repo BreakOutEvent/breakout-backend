@@ -1,6 +1,7 @@
 package backend.model.event
 
 import backend.model.location.Location
+import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.posting.Posting
 import backend.model.user.Participant
@@ -94,4 +95,7 @@ interface TeamService {
     fun getDistance(teamId: Long): Map<String, Double>
 
     fun join(participant: Participant, team: Team)
+
+    fun getFullTeamMailForMember(participants: Set<Participant>): List<Email>
+
 }
