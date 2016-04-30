@@ -11,7 +11,8 @@ import org.javamoney.moneta.Money
 import java.math.BigDecimal
 import java.util.*
 import javax.persistence.*
-import javax.persistence.CascadeType.*
+import javax.persistence.CascadeType.ALL
+import javax.persistence.CascadeType.REMOVE
 
 @Entity
 class Team : BasicEntity {
@@ -61,7 +62,7 @@ class Team : BasicEntity {
     }
 
     @Throws
-    fun join(participant: Participant) {
+    fun join(participant: Participant): Set<Participant> {
 
         val inviteeEmail = EmailAddress(participant.email)
         if (!isInvited(inviteeEmail)) {
@@ -70,6 +71,7 @@ class Team : BasicEntity {
             throw DomainException("${participant.email} can't join team because this team is already full")
         } else {
             addMember(participant)
+            return this.members
         }
     }
 

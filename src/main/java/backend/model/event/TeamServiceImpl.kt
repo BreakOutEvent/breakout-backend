@@ -120,8 +120,13 @@ class TeamServiceImpl : TeamService {
 
     @Transactional
     override fun join(participant: Participant, team: Team) {
-        team.join(participant)
-        // TODO: Send email
+        val members = team.join(participant)
+        if (members.size == 2) {
+            val emails = getFullTeamMailForMember(members)
+            emails.forEach { email ->
+                mailService.send(email)
+            }
+        }
     }
 
     override fun getDistance(teamId: Long): Map<String, Double> {
@@ -129,5 +134,50 @@ class TeamServiceImpl : TeamService {
         val actualDistance = this.getActualDistanceForTeamFromPostings(teamId)
 
         return mapOf("actual_distance" to actualDistance, "linear_distance" to linearDistance)
+    }
+
+    private fun getFullTeamMailForMember(participants: Set<Participant>): List<Email> {
+        val first = participants.first()
+        val second = participants.last()
+
+        val toFirst = Email(to = listOf(EmailAddress(first.email)),
+                subject = "BreakOut 2016 - Dein Team ist vollständig, bitte zahle die Startgebühr",
+                body = "Hallo ${first.firstname},<br>" +
+                        "Herzlichen Glückwunsch Du bist jetzt mit ${second.firstname} in einem Team und Euer Team ist damit vollständig." +
+                        "Um endgültig angemeldet zu sein müsst Ihr jetzt nur noch die Teilnahmegebühr von 30€ pro Person bis spätestens 18. Mai an folgendes Konto überweisen:<br><br>" +
+                        "Inhaber: 	Daria Brauner<br>" +
+                        "IBAN: 		DE60 7002 2200 0072 7083 26<br>" +
+                        "BIC: 		FDDODEMMXXX<br>" +
+                        "Zweck:		${getBankingSubject(first)}<br><br>" +
+                        "Davon sind 10€ Deposit, die Du zurück bekommst, wenn Dein Team mehr als 100€ Spenden eingenommen hat.<br><br>" +
+                        "Liebe Grüße<br>" +
+                        "Euer BreakOut-Team<br>"
+        )
+
+        val toSecond = Email(to = listOf(EmailAddress(second.email)),
+                subject = "BreakOut 2016 - Dein Team ist vollständig, bitte zahle die Startgebühr",
+                body = "Hallo ${second.firstname},<br>" +
+                        "Herzlichen Glückwunsch Du bist jetzt mit ${first.firstname} in einem Team und Euer Team ist damit vollständig." +
+                        "Um endgültig angemeldet zu sein müsst Ihr jetzt nur noch die Teilnahmegebühr von 30€ pro Person bis spätestens 18. Mai an folgendes Konto überweisen:<br><br>" +
+                        "Inhaber: 	Daria Brauner<br>" +
+                        "IBAN: 		DE60 7002 2200 0072 7083 26<br>" +
+                        "BIC: 		FDDODEMMXXX<br>" +
+                        "Zweck:		${getBankingSubject(second)}<br><br>" +
+                        "Davon sind 10€ Deposit, die Du zurück bekommst, wenn Dein Team mehr als 100€ Spenden eingenommen hat.<br><br>" +
+                        "Liebe Grüße<br>" +
+                        "Euer BreakOut-Team<br>"
+        )
+
+        return listOf(toFirst, toSecond)
+    }
+
+    private fun getBankingSubject(participant: Participant): String {
+        var subject: String = "${participant.currentTeam!!.id}-BO16-${participant.firstname}-${participant.lastname}"
+        subject = subject.replace("ä", "ae").replace("ü", "ue").replace("ö", "oe").replace("ß", "ss");
+        if (subject.length > 140) {
+            return subject.substring(0, 140)
+        } else {
+            return subject
+        }
     }
 }
