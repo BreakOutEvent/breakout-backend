@@ -18,3 +18,4 @@ server.pid
 .idea/
 build
 .gradle
+src/main/resources/application-production.properties
