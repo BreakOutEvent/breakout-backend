@@ -61,13 +61,13 @@ class UserServiceImpl : UserService {
     private fun sendActivationEmail(token: String, user: User) {
         val email = Email(
                 to = listOf(EmailAddress(user.email)),
-                subject = "Bitte aktiviere Deinen BreakOut Account",
+                subject = "BreakOut 2016 - Bitte aktiviere Deinen Account",
                 body = "Vielen Dank für Dein Interesse an BreakOut 2016.<br><br>" +
                         "Zum Schutz Deiner Daten müssen wir sicherstellen, dass diese E-Mail-Adresse Dir gehört. Bitte klicke dazu auf den Button am Ende der E-Mail.<br><br>" +
                         "Du hast Dich nicht für BreakOut angemeldet? Dann ignoriere diese E-Mail einfach.<br><br>" +
                         "Du hast Fragen oder benötigst Unterstützung? Schreib uns eine E-Mail an <a href='mailto:event@break-out.org'>event@break-out.org</a>.<br><br>" +
-                        "Beste Grüße,<br>" +
-                        "Dein BreakOut-Team",
+                        "Liebe Grüße<br>" +
+                        "Euer BreakOut-Team",
                 buttonText = "E-MAIL-ADRESSE BESTÄTIGEN",
                 buttonUrl = createActivationUrl(token)
         )

@@ -11,6 +11,7 @@ import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.services.MailService
 import backend.util.distanceCoordsListKMfromStart
+import backend.util.getBankingSubject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -45,15 +46,15 @@ class TeamServiceImpl : TeamService {
         val invitation = team.invite(emailAddress)
         val email = Email(
                 to = listOf(emailAddress),
-                subject = "Du wurdest zur Teilnahme an BreakOut 2016 eingeladen!",
+                subject = "BreakOut 2016 - Du wurdest zur Teilnahme eingeladen!",
                 body = "${team.members.first().firstname} ${team.members.first().lastname} möchte mit Dir ein Abenteuer bestreiten!<br><br>" +
                         "BreakOut ist ein Spendenmarathon, bei dem Geld für das DAFI-Projekt der UNO-Flüchtlingshilfe gesammelt wird. <br><br>" +
                         " In Zweierteams versucht Ihr, euch ab Startschuss binnen 36 Stunden so weit wie möglich von München zu entfernen. Dabei gilt es, für das Reisen kein Geld auszugeben – vielmehr sammelt Ihr pro zurückgelegtem Kilometer Geld für das DAFI-Programm der UNO-Flüchtlingshilfe.<br>" +
                         "Das Konzept folgt damit der Idee eines Spendenmarathons: Im Vorfeld akquiriert Ihr eigene Sponsoren, die dann pro gereistem Kilometer einen vorab festgelegten Betrag an die UNO-Flüchtlingshilfe spenden.<br><br>" +
                         "Wenn Du Lust hast bei BreakOut teilzunehmen, klicke auf den Button am Ende der E-Mail.<br><br>" +
-                        "Du hast Fragen oder benötgist Unterstützung? Schreib uns eine E-Mail an event@break-out.org.<br><br>" +
-                        "Beste Grüße,<br>" +
-                        "Dein BreakOut-Team",
+                        "Du hast Fragen oder benötigst Unterstützung? Schreib uns eine E-Mail an <a href=\"event@break-out.org\">event@break-out.org</a>.<br><br>" +
+                        "Liebe Grüße<br>" +
+                        "Euer BreakOut-Team",
                 buttonText = "EINLADUNG ANNEHMEN",
                 buttonUrl = getInvitationUrl(invitation.invitationToken)
         )
@@ -142,7 +143,7 @@ class TeamServiceImpl : TeamService {
 
         val toFirst = Email(to = listOf(EmailAddress(first.email)),
                 subject = "BreakOut 2016 - Dein Team ist vollständig, bitte zahle die Startgebühr",
-                body = "Hallo ${first.firstname},<br>" +
+                body = "Hallo ${first.firstname},<br><br>" +
                         "Herzlichen Glückwunsch Du bist jetzt mit ${second.firstname} in einem Team und Euer Team ist damit vollständig." +
                         "Um endgültig angemeldet zu sein müsst Ihr jetzt nur noch die Teilnahmegebühr von 30€ pro Person bis spätestens 18. Mai an folgendes Konto überweisen:<br><br>" +
                         "Inhaber: 	Daria Brauner<br>" +
@@ -151,12 +152,12 @@ class TeamServiceImpl : TeamService {
                         "Zweck:		${getBankingSubject(first)}<br><br>" +
                         "Davon sind 10€ Deposit, die Du zurück bekommst, wenn Dein Team mehr als 100€ Spenden eingenommen hat.<br><br>" +
                         "Liebe Grüße<br>" +
-                        "Euer BreakOut-Team<br>"
+                        "Euer BreakOut-Team"
         )
 
         val toSecond = Email(to = listOf(EmailAddress(second.email)),
                 subject = "BreakOut 2016 - Dein Team ist vollständig, bitte zahle die Startgebühr",
-                body = "Hallo ${second.firstname},<br>" +
+                body = "Hallo ${second.firstname},<br><br>" +
                         "Herzlichen Glückwunsch Du bist jetzt mit ${first.firstname} in einem Team und Euer Team ist damit vollständig." +
                         "Um endgültig angemeldet zu sein müsst Ihr jetzt nur noch die Teilnahmegebühr von 30€ pro Person bis spätestens 18. Mai an folgendes Konto überweisen:<br><br>" +
                         "Inhaber: 	Daria Brauner<br>" +
@@ -165,19 +166,11 @@ class TeamServiceImpl : TeamService {
                         "Zweck:		${getBankingSubject(second)}<br><br>" +
                         "Davon sind 10€ Deposit, die Du zurück bekommst, wenn Dein Team mehr als 100€ Spenden eingenommen hat.<br><br>" +
                         "Liebe Grüße<br>" +
-                        "Euer BreakOut-Team<br>"
+                        "Euer BreakOut-Team"
         )
 
         return listOf(toFirst, toSecond)
     }
 
-    private fun getBankingSubject(participant: Participant): String {
-        var subject: String = "${participant.currentTeam!!.id}-BO16-${participant.firstname}-${participant.lastname}"
-        subject = subject.replace("ä", "ae").replace("ü", "ue").replace("ö", "oe").replace("ß", "ss");
-        if (subject.length > 140) {
-            return subject.substring(0, 140)
-        } else {
-            return subject
-        }
-    }
+
 }
