@@ -69,13 +69,14 @@ class UserServiceImpl : UserService {
                         "Liebe Grüße<br>" +
                         "Euer BreakOut-Team",
                 buttonText = "E-MAIL-ADRESSE BESTÄTIGEN",
-                buttonUrl = createActivationUrl(token)
+                buttonUrl = createActivationUrl(token),
+                campaignCode = "confirm"
         )
         mailService.send(email)
     }
 
     private fun createActivationUrl(token: String): String {
-        return "$host/activation/$token"
+        return "$host/activation/$token?utm_source=backend&utm_medium=email&utm_campaign=confirm"
     }
 
     override fun save(user: User): User = userRepository.save(user.core)

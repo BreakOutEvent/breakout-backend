@@ -4,7 +4,6 @@ import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.user.Admin
 import backend.services.MailService
-import backend.util.getBankingSubject
 import org.apache.log4j.Logger
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
@@ -45,14 +44,13 @@ class TeamEntryFeeServiceImpl : TeamEntryFeeService {
             subject = "BreakOut 2016 - Wir haben Eure Zahlung erhalten",
             body = "Liebes Team ${invoice.team!!.name},<br><br>" +
                     "schön dass Ihr Euch für BreakOut angemeldet habt. Bei uns ist bereits eine Zahlung von 30€ eingegangen. Für das gesamte Team ist aber eine Zahlung von 60€ fällig.<br>" +
-                    "Um vollständig angemeldet zu sein musst entweder Du oder Dein Teampartner noch 30€ an folgendes Konto überweisen:<br><br>" +
-                    "Inhaber: 	Daria Brauner<br>" +
-                    "IBAN: 		DE60 7002 2200 0072 7083 26<br>" +
-                    "BIC: 		FDDODEMMXXX<br>" +
-                    "Zweck:		${getBankingSubject(invoice.team!!.id!!, "VORNAME", "NACHNAME")}<br><br>" +
+                    "Um vollständig angemeldet zu sein müsst Ihr als Team bis zum 18. Mai noch weitere 30€ überweisen.<br>" +
                     "Wenn das erledigt ist seid Ihr vollständig angemeldet!<br><br>" +
                     "Liebe Grüße<br>" +
-                    "Euer BreakOut-Team"
+                    "Euer BreakOut-Team",
+            buttonText = "JETZT ZAHLEN",
+            buttonUrl = "https://anmeldung.break-out.org/payment?utm_source=backend&utm_medium=email&utm_content=half&utm_campaign=payment",
+            campaignCode = "payment_half"
 
     )
 
@@ -60,10 +58,14 @@ class TeamEntryFeeServiceImpl : TeamEntryFeeService {
             to = invoice.team!!.members.map { EmailAddress(it.email) },
             subject = "BreakOut 2016 - Du bist Dabei!",
             body = "Liebes Team ${invoice.team!!.name},<br><br>" +
-                    "Eure Startgebühr ist vollständig bei uns eingegnagen. Ihr seid jetzt vollständig bei BreakOut angemeldet, yuhuuu!! Jetzt gehts für Euch ans Sponsoren suchen. Über alles weitere halten wir Euch auf dem Laufenden!<br>" +
+                    "Eure Startgebühr ist vollständig bei uns eingegangen. Eure Anmelung bei BreakOut ist damit abgeschlossen! Infos über die nächsten Schritte findet ihr auf unserer Webseite.<br>" +
+                    "Über alles weitere halten wir Euch über Facebook und gelegentliche E-Mails auf dem Laufenden!<br>" +
                     "Bis zum 3. Juni wir freuen uns auf Euch!<br><br>" +
                     "Liebe Grüße<br>" +
-                    "Euer BreakOut-Team"
+                    "Euer BreakOut-Team",
+            buttonText = "NÄCHSTE SCHRITTE",
+            buttonUrl = "http://www.break-out.org/naechste-schritte/?utm_source=backend&utm_medium=email&utm_content=full&utm_campaign=payment",
+            campaignCode = "payment_full"
     )
 
     @Transactional

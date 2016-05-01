@@ -11,7 +11,6 @@ import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.services.MailService
 import backend.util.distanceCoordsListKMfromStart
-import backend.util.getBankingSubject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -48,15 +47,16 @@ class TeamServiceImpl : TeamService {
                 to = listOf(emailAddress),
                 subject = "BreakOut 2016 - Du wurdest zur Teilnahme eingeladen!",
                 body = "${team.members.first().firstname} ${team.members.first().lastname} möchte mit Dir ein Abenteuer bestreiten!<br><br>" +
-                        "BreakOut ist ein Spendenmarathon, bei dem Geld für das DAFI-Projekt der UNO-Flüchtlingshilfe gesammelt wird. <br><br>" +
-                        " In Zweierteams versucht Ihr, euch ab Startschuss binnen 36 Stunden so weit wie möglich von München zu entfernen. Dabei gilt es, für das Reisen kein Geld auszugeben – vielmehr sammelt Ihr pro zurückgelegtem Kilometer Geld für das DAFI-Programm der UNO-Flüchtlingshilfe.<br>" +
+                        "BreakOut ist ein Spendenmarathon, bei dem Geld für das DAFI-Projekt der UNO-Flüchtlingshilfe gesammelt wird.<br><br>" +
+                        "In Zweierteams versucht Ihr, euch ab Startschuss binnen 36 Stunden so weit wie möglich von München zu entfernen. Dabei gilt es, für das Reisen kein Geld auszugeben – vielmehr sammelt Ihr pro zurückgelegtem Kilometer Geld für das DAFI-Programm der UNO-Flüchtlingshilfe.<br>" +
                         "Das Konzept folgt damit der Idee eines Spendenmarathons: Im Vorfeld akquiriert Ihr eigene Sponsoren, die dann pro gereistem Kilometer einen vorab festgelegten Betrag an die UNO-Flüchtlingshilfe spenden.<br><br>" +
                         "Wenn Du Lust hast bei BreakOut teilzunehmen, klicke auf den Button am Ende der E-Mail.<br><br>" +
                         "Du hast Fragen oder benötigst Unterstützung? Schreib uns eine E-Mail an <a href=\"event@break-out.org\">event@break-out.org</a>.<br><br>" +
                         "Liebe Grüße<br>" +
                         "Euer BreakOut-Team",
                 buttonText = "EINLADUNG ANNEHMEN",
-                buttonUrl = getInvitationUrl(invitation.invitationToken)
+                buttonUrl = getInvitationUrl(invitation.invitationToken),
+                campaignCode = "invite"
         )
 
         mailService.send(email)
@@ -65,7 +65,7 @@ class TeamServiceImpl : TeamService {
 
     private fun getInvitationUrl(token: String): String {
         val baseUrl = configurationService.getRequired("org.breakout.team.invitationurl")
-        return baseUrl.replace("CUSTOMTOKEN", token)
+        return "${baseUrl.replace("CUSTOMTOKEN", token)}?utm_source=backend&utm_medium=email&utm_campaign=invite"
     }
 
     override fun save(team: Team) = repository.save(team)
@@ -145,28 +145,24 @@ class TeamServiceImpl : TeamService {
                 subject = "BreakOut 2016 - Dein Team ist vollständig, bitte zahle die Startgebühr",
                 body = "Hallo ${first.firstname},<br><br>" +
                         "Herzlichen Glückwunsch Du bist jetzt mit ${second.firstname} in einem Team und Euer Team ist damit vollständig." +
-                        "Um endgültig angemeldet zu sein müsst Ihr jetzt nur noch die Teilnahmegebühr von 30€ pro Person bis spätestens 18. Mai an folgendes Konto überweisen:<br><br>" +
-                        "Inhaber: 	Daria Brauner<br>" +
-                        "IBAN: 		DE60 7002 2200 0072 7083 26<br>" +
-                        "BIC: 		FDDODEMMXXX<br>" +
-                        "Zweck:		${getBankingSubject(first)}<br><br>" +
-                        "Davon sind 10€ Deposit, die Du zurück bekommst, wenn Dein Team mehr als 100€ Spenden eingenommen hat.<br><br>" +
+                        "Um Eure Anmeldung abzuschließen, müsst Ihr nur noch die Teilnahmegebühr von 30€ pro Person bis spätestens 18. Mai überweisen.<br><br>" +
                         "Liebe Grüße<br>" +
-                        "Euer BreakOut-Team"
+                        "Euer BreakOut-Team",
+                buttonText = "JETZT ZAHLEN",
+                buttonUrl = "https://anmeldung.break-out.org/payment?utm_source=backend&utm_medium=email&utm_content=intial&utm_campaign=payment",
+                campaignCode = "payment_initial"
         )
 
         val toSecond = Email(to = listOf(EmailAddress(second.email)),
                 subject = "BreakOut 2016 - Dein Team ist vollständig, bitte zahle die Startgebühr",
                 body = "Hallo ${second.firstname},<br><br>" +
                         "Herzlichen Glückwunsch Du bist jetzt mit ${first.firstname} in einem Team und Euer Team ist damit vollständig." +
-                        "Um endgültig angemeldet zu sein müsst Ihr jetzt nur noch die Teilnahmegebühr von 30€ pro Person bis spätestens 18. Mai an folgendes Konto überweisen:<br><br>" +
-                        "Inhaber: 	Daria Brauner<br>" +
-                        "IBAN: 		DE60 7002 2200 0072 7083 26<br>" +
-                        "BIC: 		FDDODEMMXXX<br>" +
-                        "Zweck:		${getBankingSubject(second)}<br><br>" +
-                        "Davon sind 10€ Deposit, die Du zurück bekommst, wenn Dein Team mehr als 100€ Spenden eingenommen hat.<br><br>" +
+                        "Um Eure Anmeldung abzuschließen, müsst Ihr nur noch die Teilnahmegebühr von 30€ pro Person bis spätestens 18. Mai überweisen.<br><br>" +
                         "Liebe Grüße<br>" +
-                        "Euer BreakOut-Team"
+                        "Euer BreakOut-Team",
+                buttonText = "JETZT ZAHLEN",
+                buttonUrl = "https://anmeldung.break-out.org/payment?utm_source=backend&utm_medium=email&utm_content=intial&utm_campaign=payment",
+                campaignCode = "payment_initial"
         )
 
         return listOf(toFirst, toSecond)
