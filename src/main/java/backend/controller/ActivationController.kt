@@ -1,7 +1,6 @@
 package backend.controller
 
 import backend.controller.exceptions.NotFoundException
-import backend.model.misc.EmailAddress
 import backend.model.user.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RequestMapping

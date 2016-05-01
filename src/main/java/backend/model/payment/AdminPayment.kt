@@ -8,7 +8,7 @@ import javax.persistence.Entity
 @Entity
 class AdminPayment : Payment {
 
-    constructor(): super()
+    constructor() : super()
 
     constructor(amount: Money, admin: Admin) : super(amount, admin)
 

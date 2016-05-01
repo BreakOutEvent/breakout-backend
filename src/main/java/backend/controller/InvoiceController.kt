@@ -3,8 +3,6 @@ package backend.controller
 import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
-import backend.model.payment.Payment
-import backend.model.payment.TeamEntryFeeInvoice
 import backend.model.payment.TeamEntryFeeService
 import backend.model.user.Admin
 import backend.model.user.UserService

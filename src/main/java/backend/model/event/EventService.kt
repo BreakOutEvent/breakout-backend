@@ -2,7 +2,6 @@ package backend.model.event
 
 import backend.model.location.Location
 import backend.model.misc.Coord
-import backend.model.posting.Posting
 import java.time.LocalDateTime
 
 interface EventService {

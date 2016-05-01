@@ -1,4 +1,5 @@
 @file:JvmName("SpringBootApplication")
+
 package backend
 
 import backend.configuration.SwaggerConfiguration

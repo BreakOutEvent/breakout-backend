@@ -26,7 +26,7 @@ open class ConfigurationServiceImpl : ConfigurationService {
     }
 
     private fun propertiesToEnv(properties: String): String {
-        return properties.slice(4..properties.length-1).replace(".", "_").toUpperCase()
+        return properties.slice(4..properties.length - 1).replace(".", "_").toUpperCase()
     }
 }
 

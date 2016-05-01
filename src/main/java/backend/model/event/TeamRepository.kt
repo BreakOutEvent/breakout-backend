@@ -1,7 +1,6 @@
 package backend.model.event
 
 import backend.model.location.Location
-import backend.model.posting.Posting
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param

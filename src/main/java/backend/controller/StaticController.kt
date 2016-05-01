@@ -4,8 +4,7 @@ import backend.util.Profiles
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.RequestMethod.*
+import org.springframework.web.bind.annotation.RequestMethod.GET
 import springfox.documentation.annotations.ApiIgnore
 
 @Profile(Profiles.DEVELOPMENT)

@@ -16,7 +16,7 @@ class Media : BasicEntity {
     var mediaType: MediaType? = null
 
     @OrderColumn
-    @OneToMany(cascade= arrayOf(CascadeType.ALL), mappedBy = "media", fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(cascade = arrayOf(CascadeType.ALL), mappedBy = "media", fetch = FetchType.EAGER, orphanRemoval = true)
     var sizes: MutableList<MediaSize>? = ArrayList()
 
     @Transient

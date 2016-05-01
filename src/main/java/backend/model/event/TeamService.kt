@@ -3,11 +3,9 @@ package backend.model.event
 import backend.model.location.Location
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
-import backend.model.posting.Posting
 import backend.model.user.Participant
 import backend.model.user.User
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.transaction.annotation.Transactional
 
 interface TeamService {
 

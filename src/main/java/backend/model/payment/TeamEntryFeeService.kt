@@ -1,8 +1,6 @@
 package backend.model.payment
 
-import backend.model.misc.Email
 import backend.model.user.Admin
-import backend.model.user.Participant
 import org.javamoney.moneta.Money
 
 interface TeamEntryFeeService {

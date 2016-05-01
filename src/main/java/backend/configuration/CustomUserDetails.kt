@@ -46,7 +46,7 @@ class CustomUserDetails : UserDetails, Serializable {
 
     override fun getPassword(): String? = passwordHash
 
-    override fun equals(other: Any?): Boolean{
+    override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is CustomUserDetails) return false
 
@@ -62,7 +62,7 @@ class CustomUserDetails : UserDetails, Serializable {
         return true
     }
 
-    override fun hashCode(): Int{
+    override fun hashCode(): Int {
         var result = id.hashCode()
         result += 31 * result + username.hashCode()
         result += 31 * result + isCredentialsNonExpired.hashCode()
@@ -74,7 +74,7 @@ class CustomUserDetails : UserDetails, Serializable {
         return result
     }
 
-    override fun toString(): String{
+    override fun toString(): String {
         return "CustomUserDetails(id=$id, username='$username', isCredentialsNonExpired=$isCredentialsNonExpired, isAccountNonExpired=$isAccountNonExpired, isAccountNonLocked=$isAccountNonLocked, authorities=$authorities, isEnabled=$isEnabled, passwordHash='$passwordHash')"
     }
 }

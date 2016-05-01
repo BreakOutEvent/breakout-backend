@@ -98,7 +98,7 @@ class TeamServiceImplTest : IntegrationTest() {
     fun testFindInvitationsForUser() {
         // Authenticated as inviting user
         val creator = setAuthenticatedUser("inviting@mail.com", Participant::class.java).getRole(Participant::class)!!
-        val team = teamService.create(creator, "Team awesome", "description",  event)
+        val team = teamService.create(creator, "Team awesome", "description", event)
         teamService.invite(EmailAddress("invitee@mail.com"), team)
 
         // Authenticated as invitee

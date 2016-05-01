@@ -26,7 +26,7 @@ class EmailAddress() {
         return other.value == this.value
     }
 
-    override fun hashCode(): Int{
+    override fun hashCode(): Int {
         return value.hashCode()
     }
 }

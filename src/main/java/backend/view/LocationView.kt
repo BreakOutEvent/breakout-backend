@@ -3,8 +3,6 @@ package backend.view
 import backend.model.location.Location
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.ZoneOffset
 import javax.validation.constraints.NotNull
 

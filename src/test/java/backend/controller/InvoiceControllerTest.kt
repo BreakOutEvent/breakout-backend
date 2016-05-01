@@ -10,7 +10,8 @@ import backend.model.user.Participant
 import org.junit.Before
 import org.junit.Test
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
 
 open class InvoiceControllerTest : IntegrationTest() {
