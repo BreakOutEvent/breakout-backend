@@ -25,6 +25,10 @@ open class EventController {
         this.eventService = eventService
     }
 
+    /**
+     * POST /event/
+     * Allows admin to create new event
+     */
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(CREATED)
     @RequestMapping("/", method = arrayOf(POST))
@@ -40,11 +44,19 @@ open class EventController {
         return EventView(event)
     }
 
+    /**
+     * GET /event/
+     * Gets a list of all events
+     */
     @RequestMapping("/")
     open fun getAllEvents(): Iterable<EventView> {
         return eventService.findAll().map { EventView(it) }
     }
 
+    /**
+     * GET /event/{id}/posting/
+     * Gets all Postings for given event
+     */
     @RequestMapping("/{id}/posting/")
     open fun getEventPostings(@PathVariable("id") id: Long): List<Long> {
         val postingIds = eventService.findPostingsById(id) ?: throw NotFoundException("event with id $id does not exist")
@@ -57,6 +69,6 @@ open class EventController {
      */
     @RequestMapping("/{id}/distance/")
     open fun getEventDistance(@PathVariable("id") id: Long): Map<String, Double> {
-       return eventService.getDistance(id)
+        return eventService.getDistance(id)
     }
 }

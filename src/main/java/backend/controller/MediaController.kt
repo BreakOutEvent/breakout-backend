@@ -37,7 +37,7 @@ class MediaController {
     }
 
     /**
-     * POST /media/id/
+     * POST /media/{id}/
      * Adds single MediaSize to Media
      */
     @RequestMapping("/{id}/", method = arrayOf(POST))

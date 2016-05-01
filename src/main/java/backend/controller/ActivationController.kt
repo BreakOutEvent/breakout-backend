@@ -20,6 +20,10 @@ class ActivationController {
         this.userService = userService
     }
 
+    /**
+     * GET /activation?={token}
+     * Activates account with given token
+     */
     @RequestMapping(method = arrayOf(GET))
     fun activateAccount(@RequestParam token: String): Map<String, String> {
 

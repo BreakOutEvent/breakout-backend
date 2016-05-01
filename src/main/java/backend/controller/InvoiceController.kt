@@ -38,6 +38,10 @@ open class InvoiceController {
         this.logger = Logger.getLogger(InvoiceController::class.java)
     }
 
+    /**
+     * POST /invoice/{id}/payment/
+     * Allows admin to add payment to given invoice
+     */
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping("/{invoiceId}/payment/", method = arrayOf(POST))
     open fun createPayment(@PathVariable invoiceId: Long,

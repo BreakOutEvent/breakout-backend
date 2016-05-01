@@ -52,6 +52,7 @@ open class PostingController {
 
     /**
      * POST /posting/
+     * Creates new posting
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/", method = arrayOf(POST))
@@ -88,7 +89,8 @@ open class PostingController {
     }
 
     /**
-     * GET /posting/id/
+     * GET /posting/{id}/
+     * Gets posting by id
      */
     @RequestMapping("/{id}/")
     open fun getPosting(@PathVariable("id") id: Long): PostingView {
@@ -98,6 +100,7 @@ open class PostingController {
 
     /**
      * GET /posting/
+     * Gets all postings
      */
     @RequestMapping("/")
     open fun getAllPostings(): Iterable<PostingView> {
@@ -106,6 +109,7 @@ open class PostingController {
 
     /**
      * POST /posting/get/ids/
+     * Gets postings with given ids
      */
     @RequestMapping("/get/ids", method = arrayOf(POST))
     open fun getPostingsById(@Valid @RequestBody body: List<Long>): Iterable<PostingView> {
@@ -114,6 +118,7 @@ open class PostingController {
 
     /**
      * GET /posting/get/since/id/
+     * Gets all postings after a given posting
      */
     @RequestMapping("/get/since/{id}/")
     open fun getPostingIdsSince(@PathVariable("id") id: Long): Iterable<Long> {

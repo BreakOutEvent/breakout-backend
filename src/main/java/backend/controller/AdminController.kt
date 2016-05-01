@@ -1,10 +1,12 @@
 package backend.controller
 
 import backend.configuration.CustomUserDetails
+import backend.configuration.CustomUserDetailsService
 import backend.controller.exceptions.NotFoundException
 import backend.model.event.TeamService
 import backend.model.payment.TeamEntryFeeInvoice
 import backend.services.MailService
+import org.apache.log4j.Logger
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
@@ -21,11 +23,14 @@ open class AdminController {
 
     private val mailService: MailService
     private val teamService: TeamService
+    private val logger: Logger
 
     @Autowired
     constructor(mailService: MailService, teamService: TeamService) {
         this.mailService = mailService
         this.teamService = teamService
+        this.logger = Logger.getLogger(AdminController::class.java)
+
     }
 
     /**
@@ -36,6 +41,8 @@ open class AdminController {
     @RequestMapping("/resendmail/")
     open fun resendMail(@AuthenticationPrincipal customUserDetails: CustomUserDetails): Map<String, Int> {
         val count = mailService.resendFailed()
+
+        logger.info("Resent $count mails from admin request")
         return mapOf("count" to count)
     }
 
