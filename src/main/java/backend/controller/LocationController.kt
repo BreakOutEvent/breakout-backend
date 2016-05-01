@@ -14,11 +14,8 @@ import backend.view.LocationView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod.POST
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.RequestMethod.*
 import javax.validation.Valid
 
 @RestController
@@ -46,9 +43,9 @@ open class LocationController {
      * GET /event/{eventId}/team/{teamId}/location/
      * Return a list of all locations for a certain team at a certain event
      */
-    @RequestMapping("/")
+    @RequestMapping("/", method = arrayOf(GET))
     open fun getAllLocations(@PathVariable("eventId") eventId: Long,
-                        @PathVariable("teamId") teamId: Long): Iterable<LocationView> {
+                             @PathVariable("teamId") teamId: Long): Iterable<LocationView> {
 
         //TODO: Is it necessary to check if the team is part of the event or do we just suppress this case
         //TODO: and assume the client is satisfied with getting all locations for a certain teamId

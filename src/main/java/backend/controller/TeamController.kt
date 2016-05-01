@@ -18,7 +18,7 @@ import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.POST
+import org.springframework.web.bind.annotation.RequestMethod.*
 import javax.validation.Valid
 
 @RestController
@@ -64,7 +64,7 @@ open class TeamController {
      * Show all invitations for the currently authenticated user in requested event
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/invitation/")
+    @RequestMapping("/invitation/", method = arrayOf(GET))
     open fun showInvitationsForUserAndEvent(@PathVariable eventId: Long,
                                             @AuthenticationPrincipal customUserDetails: CustomUserDetails): Iterable<InvitationView> {
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
@@ -141,13 +141,13 @@ open class TeamController {
         return TeamView(team)
     }
 
-    @RequestMapping("/{id}/")
+    @RequestMapping("/{id}/", method = arrayOf(GET))
     open fun showTeam(@PathVariable id: Long): TeamView {
         val team = teamService.findOne(id) ?: throw NotFoundException("team with id $id does not exist")
         return TeamView(team)
     }
 
-    @RequestMapping("/{id}/posting/")
+    @RequestMapping("/{id}/posting/", method = arrayOf(GET))
     open fun getTeamPostingIds(@PathVariable id: Long): List<Long> {
         val postingIds = teamService.findPostingsById(id)
         return postingIds
@@ -161,7 +161,7 @@ open class TeamController {
      * Actual distance = |A -> B| + |B -> C|
      * Linear distance = |A -> C|
      */
-    @RequestMapping("/{id}/distance/")
+    @RequestMapping("/{id}/distance/", method = arrayOf(GET))
     open fun getTeamDistance(@PathVariable("id") teamId: Long): Map<String, Double> {
         return teamService.getDistance(teamId)
     }

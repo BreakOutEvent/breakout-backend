@@ -21,7 +21,7 @@ import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.POST
+import org.springframework.web.bind.annotation.RequestMethod.*
 import javax.validation.Valid
 
 @RestController
@@ -92,7 +92,7 @@ open class PostingController {
      * GET /posting/{id}/
      * Gets posting by id
      */
-    @RequestMapping("/{id}/")
+    @RequestMapping("/{id}/", method = arrayOf(GET))
     open fun getPosting(@PathVariable("id") id: Long): PostingView {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
         return PostingView(posting)
@@ -102,7 +102,7 @@ open class PostingController {
      * GET /posting/
      * Gets all postings
      */
-    @RequestMapping("/")
+    @RequestMapping("/", method = arrayOf(GET))
     open fun getAllPostings(): Iterable<PostingView> {
         return postingService.findAll().map { PostingView(it) }
     }
@@ -120,7 +120,7 @@ open class PostingController {
      * GET /posting/get/since/id/
      * Gets all postings after a given posting
      */
-    @RequestMapping("/get/since/{id}/")
+    @RequestMapping("/get/since/{id}/", method = arrayOf(GET))
     open fun getPostingIdsSince(@PathVariable("id") id: Long): Iterable<Long> {
         return postingService.findAllSince(id).map { it.id!! }
     }

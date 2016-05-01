@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.POST
+import org.springframework.web.bind.annotation.RequestMethod.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import javax.validation.Valid
@@ -48,7 +48,7 @@ open class EventController {
      * GET /event/
      * Gets a list of all events
      */
-    @RequestMapping("/")
+    @RequestMapping("/", method = arrayOf(GET))
     open fun getAllEvents(): Iterable<EventView> {
         return eventService.findAll().map { EventView(it) }
     }
@@ -57,7 +57,7 @@ open class EventController {
      * GET /event/{id}/posting/
      * Gets all Postings for given event
      */
-    @RequestMapping("/{id}/posting/")
+    @RequestMapping("/{id}/posting/", method = arrayOf(GET))
     open fun getEventPostings(@PathVariable("id") id: Long): List<Long> {
         val postingIds = eventService.findPostingsById(id) ?: throw NotFoundException("event with id $id does not exist")
         return postingIds
@@ -67,7 +67,7 @@ open class EventController {
      * GET /event/{id}/distance/
      * Returns the sum of the distance of all teams of the event with {id}
      */
-    @RequestMapping("/{id}/distance/")
+    @RequestMapping("/{id}/distance/", method = arrayOf(GET))
     open fun getEventDistance(@PathVariable("id") id: Long): Map<String, Double> {
         return eventService.getDistance(id)
     }

@@ -13,6 +13,7 @@ import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.util.getSignedJwtToken
 import backend.view.BasicUserView
+import backend.view.DetailedInvitationView
 import backend.view.UserView
 import io.swagger.annotations.Api
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,8 +21,7 @@ import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.POST
-import org.springframework.web.bind.annotation.RequestMethod.PUT
+import org.springframework.web.bind.annotation.RequestMethod.*
 import java.time.LocalDate
 import javax.validation.Valid
 
@@ -45,6 +45,7 @@ open class UserController {
 
     /**
      * POST /user/
+     * Registers a new user
      */
     @RequestMapping("/", method = arrayOf(POST))
     @ResponseStatus(CREATED)
@@ -67,14 +68,16 @@ open class UserController {
 
     /**
      * GET /user/
+     * Gets all users
      */
-    @RequestMapping("/")
+    @RequestMapping("/", method = arrayOf(GET))
     open fun showUsers(): Iterable<BasicUserView> {
         return userService.getAllUsers()!!.map { BasicUserView(it) };
     }
 
     /**
-     * PUT /user/id/
+     * PUT /user/{id}/
+     * Edits user with given id
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/{id}/", method = arrayOf(PUT))
@@ -93,9 +96,10 @@ open class UserController {
 
 
     /**
-     * GET /user/id/
+     * GET /user/{id}/
+     * Gets user with given id
      */
-    @RequestMapping("/{id}/")
+    @RequestMapping("/{id}/", method = arrayOf(GET))
     open fun showUser(@PathVariable id: Long): BasicUserView {
 
         val user = userService.getUserById(id) ?: throw NotFoundException("user with id $id does not exist")
@@ -127,33 +131,11 @@ open class UserController {
 
     /**
      * GET /user/invitation?token=lorem
-     * Get an invitation including data such as email address
-     * via a token
+     * Get an invitation including data such as email address via a token
      */
-    @RequestMapping("/invitation")
+    @RequestMapping("/invitation", method = arrayOf(GET))
     open fun showInvitation(@RequestParam token: String): DetailedInvitationView {
         val invitation = teamService.findInvitationsByInviteCode(token) ?: throw NotFoundException("No invitation for code $token")
         return DetailedInvitationView(invitation)
-    }
-}
-
-class DetailedInvitationView {
-
-    val teamId: Long
-    val teamName: String?
-    val eventId: Long
-    val eventCity: String
-    val creator: String
-    val email: String
-    val token: String
-
-    constructor(invitation: Invitation) {
-        this.teamId = invitation.team!!.id!!
-        this.teamName = invitation.team?.name
-        this.eventId = invitation.team!!.event.id!!
-        this.eventCity = invitation.team!!.event.city
-        this.creator = invitation.team!!.members.first().email
-        this.email = invitation.invitee.toString()
-        this.token = invitation.invitationToken
     }
 }

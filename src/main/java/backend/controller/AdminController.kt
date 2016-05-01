@@ -13,6 +13,8 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestMethod.*
 import org.springframework.web.bind.annotation.RestController
 import java.math.BigDecimal
 
@@ -38,7 +40,7 @@ open class AdminController {
      * Allows Admin to resend failed mails
      */
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping("/resendmail/")
+    @RequestMapping("/resendmail/", method = arrayOf(GET))
     open fun resendMail(@AuthenticationPrincipal customUserDetails: CustomUserDetails): Map<String, Int> {
         val count = mailService.resendFailed()
 
@@ -51,7 +53,7 @@ open class AdminController {
      * Allows Admin to add invoices to teams missing it and send full team mail
      */
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping("/fullteam/{teamId}/")
+    @RequestMapping("/fullteam/{teamId}/", method = arrayOf(GET))
     open fun redoFullTeam(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
                           @PathVariable("teamId") teamId: Long): Map<String, String> {
 

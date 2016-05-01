@@ -35,8 +35,7 @@ open class SwaggerConfiguration {
     private fun apiInfo() = ApiInfoBuilder()
             .title("Breakout Backend REST API")
             .description("This is the description of the REST API for the Breakout Backend")
-            .version("0.0.1").contact("florian.schmidt@break-out.org")
-            .license("Add some license here")
-            .termsOfServiceUrl("Add url to terms of service here")
+            .version("1.1.0").contact("florian.schmidt@break-out.org, philipp.piwowarsky@break-out.org")
+            .license("GNU AGPL v3").licenseUrl("https://www.gnu.org/licenses/agpl-3.0.de.html")
             .build()
 }

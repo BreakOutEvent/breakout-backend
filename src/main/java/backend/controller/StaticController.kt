@@ -4,6 +4,8 @@ import backend.util.Profiles
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestMethod.*
 import springfox.documentation.annotations.ApiIgnore
 
 @Profile(Profiles.DEVELOPMENT)
@@ -11,7 +13,7 @@ import springfox.documentation.annotations.ApiIgnore
 class StaticController {
 
     @ApiIgnore
-    @RequestMapping("/")
+    @RequestMapping("/", method = arrayOf(GET))
     fun apiDoc(): String {
         return "redirect:swagger-ui.html"
     }
