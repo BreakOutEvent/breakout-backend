@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/event/{eventId}/team/{teamId}/location")
+@RequestMapping("/event/{eventId}")
 open class LocationController {
 
     private val locationService: LocationService
@@ -44,12 +44,21 @@ open class LocationController {
     }
 
     /**
+     * GET /event/{eventId}/location/
+     * Return a list of all locations for a specific event
+     */
+    @RequestMapping("/location/", method = arrayOf(GET))
+    open fun getAllLocationsForEvent(@PathVariable eventId: Long): Iterable<LocationView> {
+        return locationService.findByEventId(eventId).map { LocationView(it) }
+    }
+
+    /**
      * GET /event/{eventId}/team/{teamId}/location/
      * Return a list of all locations for a certain team at a certain event
      */
-    @RequestMapping("/", method = arrayOf(GET))
-    open fun getAllLocations(@PathVariable("eventId") eventId: Long,
-                             @PathVariable("teamId") teamId: Long): Iterable<LocationView> {
+    @RequestMapping("/team/{teamId}/location/", method = arrayOf(GET))
+    open fun getAllLocationsForEventAndTeam(@PathVariable("eventId") eventId: Long,
+                                            @PathVariable("teamId") teamId: Long): Iterable<LocationView> {
 
         //TODO: Is it necessary to check if the team is part of the event or do we just suppress this case
         //TODO: and assume the client is satisfied with getting all locations for a certain teamId
@@ -61,7 +70,7 @@ open class LocationController {
      * Upload a new location for a specific team at a specific event
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/", method = arrayOf(POST))
+    @RequestMapping("/team/{teamId}/location/", method = arrayOf(POST))
     open fun createLocation(@PathVariable("eventId") eventId: Long,
                             @PathVariable("teamId") teamId: Long,
                             @AuthenticationPrincipal customUserDetails: CustomUserDetails,
@@ -83,7 +92,7 @@ open class LocationController {
      * Upload multiple new locations for a specific team at a specific event
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/multiple/", method = arrayOf(POST))
+    @RequestMapping("/team/{teamId}/location/multiple/", method = arrayOf(POST))
     open fun createMultipleLocation(@PathVariable("eventId") eventId: Long,
                                     @PathVariable("teamId") teamId: Long,
                                     @AuthenticationPrincipal customUserDetails: CustomUserDetails,

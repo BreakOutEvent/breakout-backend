@@ -9,4 +9,5 @@ interface LocationService {
     fun save(location: Location): Location
     fun findAll(): Iterable<Location>
     fun findByTeamId(id: Long): Iterable<Location>
+    fun findByEventId(id: Long): Iterable<Location>
 }

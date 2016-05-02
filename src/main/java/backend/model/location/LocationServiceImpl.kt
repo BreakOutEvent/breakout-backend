@@ -37,5 +37,9 @@ class LocationServiceImpl : LocationService {
         return locationRepository.findByTeamId(id)
     }
 
+    override fun findByEventId(id: Long): Iterable<Location> {
+        return locationRepository.findByEventId(id)
+    }
+
 }
 
