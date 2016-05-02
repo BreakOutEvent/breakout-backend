@@ -31,7 +31,7 @@ class ExceptionHandlerController {
         return fieldErrors.map { "${it.field} ${it.defaultMessage}" }.reduce { first, second -> "$first; $second" }
     }
 
-    @ExceptionHandler(Exception::class)
+    @ExceptionHandler(DomainException::class)
     fun handle(e: DomainException): ResponseEntity<Map<String, String>> {
         logger.info("A domain exception with cause ${e.message} was returned as BadRequest to user")
         val message = mapOf(
