@@ -16,6 +16,14 @@ class LocationView {
 
     var distance: Double? = null
 
+    var team: String? = null
+
+    var teamId: Long? = null
+
+    var event: String? = null
+
+    var eventId: Long? = null
+
     @NotNull
     val date: Long
 
@@ -24,6 +32,12 @@ class LocationView {
         this.longitude = location.coord.longitude
         this.distance = location.distance
         this.date = location.date.toEpochSecond(ZoneOffset.UTC)
+
+        this.team = location.team?.name
+        this.teamId = location.team?.id
+
+        this.event = location.team?.event?.title
+        this.eventId = location.team?.event?.id
     }
 
     @JsonCreator
