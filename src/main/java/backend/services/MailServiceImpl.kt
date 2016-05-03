@@ -3,7 +3,7 @@ package backend.services
 import backend.model.misc.Email
 import backend.model.misc.EmailRepository
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.apache.log4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpEntity
@@ -22,7 +22,7 @@ class MailServiceImpl : MailService {
     private val restTemplate: RestOperations
     private val emailRepository: EmailRepository
 
-    private val logger = Logger.getLogger(MailServiceImpl::class.java)
+    private val logger = LoggerFactory.getLogger(MailServiceImpl::class.java)
 
     @Autowired
     constructor(restTemplate: RestOperations, configurationService: ConfigurationService, emailRepository: EmailRepository) {

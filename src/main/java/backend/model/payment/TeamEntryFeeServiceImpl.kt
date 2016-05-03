@@ -4,8 +4,9 @@ import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.user.Admin
 import backend.services.MailService
-import org.apache.log4j.Logger
 import org.javamoney.moneta.Money
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
@@ -20,7 +21,7 @@ class TeamEntryFeeServiceImpl : TeamEntryFeeService {
     @Autowired
     constructor(teamEntryFeeInvoiceRepository: TeamEntryFeeInvoiceRepository, mailService: MailService) {
         this.teamEntryFeeInvoiceRepository = teamEntryFeeInvoiceRepository
-        this.logger = Logger.getLogger(TeamEntryFeeServiceImpl::class.java)
+        this.logger = LoggerFactory.getLogger(TeamEntryFeeServiceImpl::class.java)
         this.mailService = mailService
     }
 

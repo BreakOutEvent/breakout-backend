@@ -1,7 +1,7 @@
 package backend.controller.exceptions
 
 import backend.exceptions.DomainException
-import org.apache.log4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
@@ -13,7 +13,7 @@ import java.time.ZoneOffset.UTC
 @ControllerAdvice
 class ExceptionHandlerController {
 
-    private val logger = Logger.getLogger(ExceptionHandlerController::class.java)
+    private val logger = LoggerFactory.getLogger(ExceptionHandlerController::class.java)
 
     // Used for handling Jackson Parsing Exceptions
     @ExceptionHandler(MethodArgumentNotValidException::class)

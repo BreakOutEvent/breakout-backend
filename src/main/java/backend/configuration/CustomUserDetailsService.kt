@@ -1,7 +1,8 @@
 package backend.configuration
 
 import backend.model.user.UserService
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -17,7 +18,7 @@ class CustomUserDetailsService : UserDetailsService {
     @Autowired
     constructor(userService: UserService) {
         this.userService = userService
-        this.logger = Logger.getLogger(CustomUserDetailsService::class.java)
+        this.logger = LoggerFactory.getLogger(CustomUserDetailsService::class.java)
     }
 
     override fun loadUserByUsername(username: String): UserDetails? {

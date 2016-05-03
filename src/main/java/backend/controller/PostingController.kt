@@ -14,7 +14,8 @@ import backend.util.distanceCoordsKM
 import backend.util.getSignedJwtToken
 import backend.util.toLocalDateTime
 import backend.view.PostingView
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
@@ -44,7 +45,7 @@ open class PostingController {
         this.postingService = postingService
         this.mediaService = mediaService
         this.configurationService = configurationService
-        this.logger = Logger.getLogger(PostingController::class.java)
+        this.logger = LoggerFactory.getLogger(PostingController::class.java)
         this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
         this.userService = userService
     }

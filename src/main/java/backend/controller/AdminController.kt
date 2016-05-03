@@ -5,8 +5,9 @@ import backend.controller.exceptions.NotFoundException
 import backend.model.event.TeamService
 import backend.model.payment.TeamEntryFeeInvoice
 import backend.services.MailService
-import org.apache.log4j.Logger
 import org.javamoney.moneta.Money
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
@@ -29,7 +30,7 @@ open class AdminController {
     constructor(mailService: MailService, teamService: TeamService) {
         this.mailService = mailService
         this.teamService = teamService
-        this.logger = Logger.getLogger(AdminController::class.java)
+        this.logger = LoggerFactory.getLogger(AdminController::class.java)
 
     }
 

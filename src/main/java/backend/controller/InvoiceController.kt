@@ -8,8 +8,9 @@ import backend.model.user.Admin
 import backend.model.user.UserService
 import backend.view.PaymentView
 import backend.view.TeamEntryFeeInvoiceView
-import org.apache.log4j.Logger
 import org.javamoney.moneta.Money
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
@@ -33,7 +34,7 @@ open class InvoiceController {
     constructor(teamEntryFeeService: TeamEntryFeeService, userService: UserService) {
         this.teamEntryFeeService = teamEntryFeeService
         this.userService = userService
-        this.logger = Logger.getLogger(InvoiceController::class.java)
+        this.logger = LoggerFactory.getLogger(InvoiceController::class.java)
     }
 
     /**
