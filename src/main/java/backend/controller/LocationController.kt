@@ -78,7 +78,7 @@ open class LocationController {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val participant = user.getRole(Participant::class) ?: throw UnauthorizedException("user is no participant")
-        val team = teamService.findOne(eventId) ?: throw NotFoundException("no team with id $teamId found")
+        val team = teamService.findOne(teamId) ?: throw NotFoundException("no team with id $teamId found")
         if (!team.isMember(participant)) throw UnauthorizedException("user is not part of team $teamId are therefor cannot upload locations on it's behalf")
 
         val coord = Coord(locationView.latitude, locationView.longitude)
@@ -100,7 +100,7 @@ open class LocationController {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val participant = user.getRole(Participant::class) ?: throw UnauthorizedException("user is no participant")
-        val team = teamService.findOne(eventId) ?: throw NotFoundException("no team with id $teamId found")
+        val team = teamService.findOne(teamId) ?: throw NotFoundException("no team with id $teamId found")
         if (!team.isMember(participant)) throw UnauthorizedException("user is not part of team $teamId are therefor cannot upload locations on it's behalf")
 
         val savedLocationsAsLocationViews = locationViews.map {
