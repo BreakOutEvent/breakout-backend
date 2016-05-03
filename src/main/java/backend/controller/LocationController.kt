@@ -12,14 +12,12 @@ import backend.model.user.UserService
 import backend.util.toLocalDateTime
 import backend.view.LocationView
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RequestMethod.POST
-import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
 @RestController
@@ -71,6 +69,7 @@ open class LocationController {
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/team/{teamId}/location/", method = arrayOf(POST))
+    @ResponseStatus(CREATED)
     open fun createLocation(@PathVariable("eventId") eventId: Long,
                             @PathVariable("teamId") teamId: Long,
                             @AuthenticationPrincipal customUserDetails: CustomUserDetails,
@@ -93,6 +92,7 @@ open class LocationController {
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/team/{teamId}/location/multiple/", method = arrayOf(POST))
+    @ResponseStatus(CREATED)
     open fun createMultipleLocation(@PathVariable("eventId") eventId: Long,
                                     @PathVariable("teamId") teamId: Long,
                                     @AuthenticationPrincipal customUserDetails: CustomUserDetails,
