@@ -47,7 +47,7 @@ open class TeamController {
 
 
     /**
-     * POST /event/{id}/team/leave/
+     * POST /event/{eventId}/team/leave/
      * The currently authenticated user can leave it's team at this endpoint
      */
     @PreAuthorize("isAuthenticated()")
@@ -61,7 +61,7 @@ open class TeamController {
     }
 
     /**
-     * GET /event/{id}/team/invitation/
+     * GET /event/{eventId}/team/invitation/
      * Show all invitations for the currently authenticated user in requested event
      */
     @PreAuthorize("isAuthenticated()")
@@ -95,7 +95,7 @@ open class TeamController {
     }
 
     /**
-     * POST /event/{id}/team/{id}/invitation/
+     * POST /event/{eventId}/team/{teamId}/invitation/
      * invites a user with given email to existing Team
      */
     @ResponseStatus(CREATED)
@@ -116,7 +116,7 @@ open class TeamController {
     }
 
     /**
-     * POST /event/{id}/team/{id}/member/
+     * POST /event/{eventId}/team/{teamId}/member/
      * allows user with Invitation to join Team
      */
     @ResponseStatus(CREATED)
@@ -142,15 +142,33 @@ open class TeamController {
         return TeamView(team)
     }
 
-    @RequestMapping("/{id}/", method = arrayOf(GET))
-    open fun showTeam(@PathVariable id: Long): TeamView {
-        val team = teamService.findOne(id) ?: throw NotFoundException("team with id $id does not exist")
+    /**
+     * GET /event/{eventId}/team/{teamId}/
+     * gets a specific Team
+     */
+    @RequestMapping("/{teamId}/", method = arrayOf(GET))
+    open fun showTeam(@PathVariable teamId: Long): TeamView {
+        val team = teamService.findOne(teamId) ?: throw NotFoundException("team with id $teamId does not exist")
         return TeamView(team)
     }
 
-    @RequestMapping("/{id}/posting/", method = arrayOf(GET))
-    open fun getTeamPostingIds(@PathVariable id: Long): List<Long> {
-        val postingIds = teamService.findPostingsById(id)
+    /**
+     * GET /event/{eventId}/team/
+     * gets all Teams for Event
+     */
+    @RequestMapping("/", method = arrayOf(GET))
+    open fun showTeamsByEvent(@PathVariable eventId: Long): Iterable<TeamView> {
+        val teams = teamService.findByEventId(eventId)
+        return teams.map { TeamView(it) }
+    }
+
+    /**
+     * GET /event/{eventId}/team/{teamId}/posting/
+     * gets all Postings for Team
+     */
+    @RequestMapping("/{teamId}/posting/", method = arrayOf(GET))
+    open fun getTeamPostingIds(@PathVariable teamId: Long): List<Long> {
+        val postingIds = teamService.findPostingsById(teamId)
         return postingIds
     }
 

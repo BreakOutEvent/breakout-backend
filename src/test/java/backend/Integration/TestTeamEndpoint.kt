@@ -196,6 +196,30 @@ class TestTeamEndpoint : IntegrationTest() {
     }
 
     @Test
+    fun testGetTeamsByEvent() {
+        val request = MockMvcRequestBuilders
+                .request(HttpMethod.GET, "/event/${event.id}/team/")
+                .contentType(MediaType.APPLICATION_JSON)
+
+        val response = mockMvc.perform (request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$[0].name").exists())
+                .andExpect(jsonPath("$[0].event").exists())
+                .andExpect(jsonPath("$[0].invoiceId").exists())
+                .andExpect(jsonPath("$[0].description").exists())
+                .andExpect(jsonPath("$[0].members").exists())
+                .andExpect(jsonPath("$[0].members[0].id").exists())
+                .andExpect(jsonPath("$[0].members[0].firstname").exists())
+                .andExpect(jsonPath("$[0].members[0].lastname").exists())
+                .andExpect(jsonPath("$[0].members[0].profilePic").exists())
+                .andExpect(jsonPath("$[0].members[0].roles").exists())
+                .andReturn().response.contentAsString
+
+        println(response)
+    }
+
+    @Test
     fun testGetTeamPostingsById() {
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.GET, "/event/${event.id}/team/${team.id}/posting/")

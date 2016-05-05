@@ -96,4 +96,5 @@ interface TeamService {
 
     fun getFullTeamMailForMember(participants: Set<Participant>): List<Email>
 
+    fun findByEventId(eventId: Long): List<Team>
 }

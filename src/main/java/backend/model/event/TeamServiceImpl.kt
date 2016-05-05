@@ -144,7 +144,7 @@ class TeamServiceImpl : TeamService {
         val toFirst = Email(to = listOf(EmailAddress(first.email)),
                 subject = "BreakOut 2016 - Dein Team ist vollständig, bitte zahle die Startgebühr",
                 body = "Hallo ${first.firstname},<br><br>" +
-                        "Herzlichen Glückwunsch Du bist jetzt mit ${second.firstname} in einem Team und Euer Team ist damit vollständig." +
+                        "Herzlichen Glückwunsch Du bist jetzt mit ${second.firstname} in einem Team und Euer Team ist damit vollständig.<br>" +
                         "Um Eure Anmeldung abzuschließen, müsst Ihr nur noch die Teilnahmegebühr von 30€ pro Person bis spätestens 18. Mai überweisen.<br><br>" +
                         "Liebe Grüße<br>" +
                         "Euer BreakOut-Team",
@@ -156,7 +156,7 @@ class TeamServiceImpl : TeamService {
         val toSecond = Email(to = listOf(EmailAddress(second.email)),
                 subject = "BreakOut 2016 - Dein Team ist vollständig, bitte zahle die Startgebühr",
                 body = "Hallo ${second.firstname},<br><br>" +
-                        "Herzlichen Glückwunsch Du bist jetzt mit ${first.firstname} in einem Team und Euer Team ist damit vollständig." +
+                        "Herzlichen Glückwunsch Du bist jetzt mit ${first.firstname} in einem Team und Euer Team ist damit vollständig.<br>" +
                         "Um Eure Anmeldung abzuschließen, müsst Ihr nur noch die Teilnahmegebühr von 30€ pro Person bis spätestens 18. Mai überweisen.<br><br>" +
                         "Liebe Grüße<br>" +
                         "Euer BreakOut-Team",
@@ -168,5 +168,7 @@ class TeamServiceImpl : TeamService {
         return listOf(toFirst, toSecond)
     }
 
-
+    override fun findByEventId(eventId: Long): List<Team> {
+        return repository.findByEventId(eventId)
+    }
 }
