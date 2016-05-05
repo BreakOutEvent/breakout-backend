@@ -27,6 +27,8 @@ class PostingView() {
     @Valid
     var user: BasicUserView? = null
 
+    var comments: List<CommentView>? = null
+
     constructor(posting: Posting) : this() {
         this.id = posting.id
         this.text = posting.text
@@ -34,6 +36,7 @@ class PostingView() {
         this.postingLocation = if (posting.location != null) LocationView(posting.location!!) else null
         this.user = BasicUserView(posting.user!!.core)
         this.media = posting.media?.map { MediaView(it) }
+        this.comments = posting.comments.map { CommentView(it) }
     }
 
 

@@ -12,9 +12,6 @@ import javax.persistence.CascadeType.PERSIST
 @Entity
 class Posting : BasicEntity {
 
-    /**
-     * Private constructor for JPA
-     */
     private constructor() : super()
 
     var text: String? = null
@@ -24,7 +21,6 @@ class Posting : BasicEntity {
     @OneToOne(cascade = arrayOf(PERSIST))
     var location: Location? = null
 
-
     @ManyToOne
     var user: UserCore? = null
 
@@ -32,10 +28,12 @@ class Posting : BasicEntity {
     @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
     var media: MutableList<Media>? = ArrayList()
 
+    @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+    var comments: MutableList<Comment> = ArrayList()
 
-    constructor(text: String?, location: Location?, user: UserCore, media: MutableList<Media>?) : this() {
+    constructor(text: String?, date: LocalDateTime, location: Location?, user: UserCore, media: MutableList<Media>?) : this() {
         this.text = text
-        this.date = LocalDateTime.now()
+        this.date = date
         this.location = location
         this.user = user
         this.media = media

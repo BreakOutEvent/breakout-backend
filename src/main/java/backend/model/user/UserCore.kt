@@ -4,6 +4,7 @@ import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.media.Media
 import backend.model.payment.Payment
+import backend.model.posting.Comment
 import backend.model.posting.Posting
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.validator.constraints.Email
@@ -40,8 +41,12 @@ open class UserCore : BasicEntity, User {
     override var profilePic: Media
 
     @OrderColumn
-    @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.EAGER, orphanRemoval = true)
-    val postings: MutableList<Posting>? = ArrayList()
+    @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY, orphanRemoval = true)
+    val postings: MutableList<Posting> = ArrayList()
+
+    @OrderColumn
+    @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY, orphanRemoval = true)
+    val comments: MutableList<Comment> = ArrayList()
 
     @OneToMany
     val payments: MutableList<Payment> = ArrayList()

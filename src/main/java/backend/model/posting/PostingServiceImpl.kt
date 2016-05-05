@@ -40,7 +40,7 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
             media!!.add(Media(it))
         }
 
-        return repository.save(Posting(text, location, user, media))
+        return repository.save(Posting(text, date, location, user, media))
     }
 
     override fun getByID(id: Long): Posting? = repository.findById(id)
