@@ -17,6 +17,7 @@ import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RequestMethod.POST
 import org.springframework.web.bind.annotation.RestController
 import java.math.BigDecimal
@@ -55,5 +56,22 @@ open class InvoiceController {
         val savedInvoice = teamEntryFeeService.addAdminPaymentToInvoice(admin, amount, invoice)
         val responseView = TeamEntryFeeInvoiceView(savedInvoice)
         return responseView
+    }
+
+
+    /**
+     * GET /invoice/{id}/
+     * Allows admin to get given invoice
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping("/{invoiceId}/", method = arrayOf(GET))
+    open fun getInvoice(@PathVariable invoiceId: Long,
+                        @AuthenticationPrincipal customUserDetails: CustomUserDetails): TeamEntryFeeInvoiceView {
+
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
+        val invoice = teamEntryFeeService.findById(invoiceId) ?: throw NotFoundException("No invoice with id $invoiceId found")
+        user.getRole(Admin::class) ?: throw UnauthorizedException("User is no admin")
+
+        return TeamEntryFeeInvoiceView(invoice)
     }
 }

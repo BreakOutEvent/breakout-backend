@@ -87,6 +87,7 @@ class TestTeamEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.name").value("Team awesome"))
                 .andExpect(jsonPath("$.description").value("Our team is awesome"))
                 .andExpect(jsonPath("$.members").isArray)
+                .andExpect(jsonPath("$.invoiceId").exists())
                 .andExpect(jsonPath<MutableCollection<out Any>>("$.members", hasSize(1)))
                 .andReturn().response.contentAsString
 
@@ -136,6 +137,7 @@ class TestTeamEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").exists())
                 .andExpect(jsonPath("$.event").exists())
+                .andExpect(jsonPath("$.invoiceId").exists())
                 .andExpect(jsonPath("$.description").exists())
                 .andExpect(jsonPath("$.members").exists())
                 .andExpect(jsonPath("$.profilePic").exists())
@@ -180,6 +182,7 @@ class TestTeamEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").exists())
                 .andExpect(jsonPath("$.event").exists())
+                .andExpect(jsonPath("$.invoiceId").exists())
                 .andExpect(jsonPath("$.description").exists())
                 .andExpect(jsonPath("$.members").exists())
                 .andExpect(jsonPath("$.members[0].id").exists())
@@ -261,6 +264,7 @@ class TestTeamEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").exists())
                 .andExpect(jsonPath("$.event").exists())
+                .andExpect(jsonPath("$.invoiceId").exists())
                 .andExpect(jsonPath("$.description").exists())
                 .andExpect(jsonPath("$.members").exists())
                 .andReturn().response.contentAsString
@@ -277,6 +281,7 @@ class TestTeamEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").exists())
                 .andExpect(jsonPath("$.event").exists())
+                .andExpect(jsonPath("$.invoiceId").exists())
                 .andExpect(jsonPath("$.description").exists())
                 .andExpect(jsonPath("$.members").isArray)
                 .andExpect(jsonPath("$.members[0].id").exists())

@@ -54,4 +54,18 @@ open class InvoiceControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.payments.[0]").exists())
                 .andExpect(jsonPath("$.payments.[1]").doesNotExist())
     }
+
+
+    @Test
+    open fun testGetInvoice() {
+        val request = MockMvcRequestBuilders.get("/invoice/${team.invoice!!.id}/")
+                .header("Authorization", "Bearer ${tokens.first}")
+                .contentType(APPLICATION_JSON_UTF_8)
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.amount").value(60.0))
+                .andExpect(jsonPath("$.team").value(team.id!!.toInt()))
+                .andExpect(jsonPath("$.payments").isArray)
+    }
 }

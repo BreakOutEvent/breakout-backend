@@ -19,6 +19,8 @@ class TeamView() {
 
     var profilePic: MediaView? = null
 
+    var invoiceId: Long? = null
+
     constructor(team: Team) : this() {
         this.id = team.id
         this.name = team.name
@@ -27,5 +29,6 @@ class TeamView() {
         this.members = ArrayList()
         team.members.forEach { this.members!!.add(BasicUserView(it)) }
         this.profilePic = MediaView(team.profilePic)
+        this.invoiceId = team.invoice?.id
     }
 }
