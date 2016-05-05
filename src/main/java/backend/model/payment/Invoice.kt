@@ -8,7 +8,6 @@ import javax.persistence.CascadeType.PERSIST
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.OneToMany
-import javax.persistence.PreRemove
 
 @Entity
 abstract class Invoice : BasicEntity {
@@ -50,9 +49,5 @@ abstract class Invoice : BasicEntity {
     @Throws
     abstract fun checkPaymentEligability(payment: Payment)
 
-    @PreRemove
-    fun preRemove() {
-        this.payments.forEach { it.invoice = null }
-        payments.clear()
-    }
+
 }

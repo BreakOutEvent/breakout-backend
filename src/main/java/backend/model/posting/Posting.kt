@@ -38,5 +38,4 @@ class Posting : BasicEntity {
         this.user = user
         this.media = media
     }
-
 }

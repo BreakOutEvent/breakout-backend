@@ -33,9 +33,6 @@ class Location : BasicEntity {
 
     var distance: Double? = null
 
-    /**
-     * Private constructor for JPA
-     */
     private constructor() : super()
 
     constructor(coord: Coord, uploader: Participant, date: LocalDateTime, distance: Double?) {

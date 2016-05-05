@@ -9,9 +9,6 @@ import javax.persistence.ManyToOne
 @Entity
 class MediaSize : BasicEntity {
 
-    /**
-     * Private constructor for JPA
-     */
     private constructor() : super()
 
     @ManyToOne

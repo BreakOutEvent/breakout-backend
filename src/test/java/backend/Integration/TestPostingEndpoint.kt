@@ -251,7 +251,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
 
         val request = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/posting/" + posting.id + "/")
+                .request(HttpMethod.GET, "/posting/${posting.id}/")
                 .contentType(APPLICATION_JSON)
 
         val response = mockMvc.perform (request)
@@ -822,6 +822,24 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .andReturn().response.contentAsString
 
         println(response)
+
+
+        val requestPosting = MockMvcRequestBuilders
+                .request(HttpMethod.GET, "/posting/${posting.id}/")
+                .contentType(APPLICATION_JSON)
+
+        val responsePosting = mockMvc.perform (requestPosting)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.text").exists())
+                .andExpect(jsonPath("$.date").exists())
+                .andExpect(jsonPath("$.user").exists())
+                .andExpect(jsonPath("$.comments").isArray)
+                .andExpect(jsonPath("$.comments[0].text").value("TestComment"))
+                .andReturn().response.contentAsString
+
+        println(responsePosting)
     }
 
     private fun makeUserParticipant(credentials: Credentials) {

@@ -81,8 +81,8 @@ abstract class IntegrationTest {
     @Before
     open fun setUp() {
         teamRepository.deleteAll()
-        commentRepository.deleteAll()
         postingRepository.deleteAll()
+        commentRepository.deleteAll()
         userRepository.deleteAll()
         mediaRepository.deleteAll()
         mediaSizeRepository.deleteAll()

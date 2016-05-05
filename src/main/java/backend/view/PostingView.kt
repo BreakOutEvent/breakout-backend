@@ -38,6 +38,4 @@ class PostingView() {
         this.media = posting.media?.map { MediaView(it) }
         this.comments = posting.comments.map { CommentView(it) }
     }
-
-
 }
