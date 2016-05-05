@@ -55,6 +55,10 @@ open class TestPostingEndpoint : IntegrationTest() {
             addRole(Admin::class)
             isBlocked = false
         })
+
+        user = userService.create("test@mail.com", "password", {
+            addRole(Participant::class)
+        })
     }
 
     @Test
@@ -121,7 +125,7 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .andExpect(status().isCreated)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.text").exists())
+                .andExpect(jsonPath("$.text").value("TestPost"))
                 .andExpect(jsonPath("$.date").exists())
                 .andExpect(jsonPath("$.user").exists())
                 .andReturn().response.contentAsString
@@ -242,9 +246,6 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun getPostingById() {
-        val user = userService.create("test@mail.com", "password", {
-            addRole(Participant::class)
-        })
         val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
         val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
         val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
@@ -272,10 +273,6 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun getPostingsByIds() {
-
-        val user = userService.create("test@mail.com", "password", {
-            addRole(Participant::class)
-        })
         val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
         val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
@@ -306,9 +303,6 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun getPostingIdsSince() {
-        val user = userService.create("test@mail.com", "password", {
-            addRole(Participant::class)
-        })
         val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
         val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
@@ -336,9 +330,6 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewPostingWithMediaAndAddMediaSizesWithoutToken() {
 
-        val user = userService.create("test@mail.com", "password", {
-            addRole(Participant::class)
-        })
         val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
         val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
@@ -371,9 +362,6 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewPostingWithMediaAndAddMediaSizesWithWrongToken() {
 
-        val user = userService.create("test@mail.com", "password", {
-            addRole(Participant::class)
-        })
         val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
         val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
@@ -407,9 +395,6 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewPostingWithMediaAndAddMediaSizesWithValidToken() {
 
-        val user = userService.create("test@mail.com", "password", {
-            addRole(Participant::class)
-        })
         val event = eventService.createEvent("title", LocalDateTime.now(), "location", Coord(0.0, 0.0), 36)
         teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
@@ -480,9 +465,6 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewPostingWithMediaAndAddMediaSizesUpdateMediaSizes() {
 
-        val user = userService.create("test@mail.com", "password", {
-            addRole(Participant::class)
-        })
         val event = eventService.createEvent("title", LocalDateTime.now(), "location", Coord(0.0, 0.0), 36)
         teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
@@ -587,9 +569,6 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewPostingWithMediaAndAddMediaSizesUpdateMediaSizesWithVariationWidth() {
 
-        val user = userService.create("test@mail.com", "password", {
-            addRole(Participant::class)
-        })
         val event = eventService.createEvent("title", LocalDateTime.now(), "location", Coord(0.0, 0.0), 36)
         teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
@@ -694,9 +673,6 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewPostingWithMediaAndAddMediaSizesUpdateMediaSizesWithVariationHeight() {
 
-        val user = userService.create("test@mail.com", "password", {
-            addRole(Participant::class)
-        })
         val event = eventService.createEvent("title", LocalDateTime.now(), "location", Coord(0.0, 0.0), 36)
         teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
@@ -800,9 +776,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun getAllPostings() {
-        val user = userService.create("test@mail.com", "password", {
-            addRole(Participant::class)
-        })
+
         val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
         val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
         postingService.createPosting("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
@@ -819,6 +793,35 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$[0]").exists())
                 .andExpect(jsonPath("$[1]").exists())
                 .andReturn().response.contentAsString
+    }
+
+
+    @Test
+    open fun createNewComment() {
+
+        val posting = postingService.createPosting("Test", null, user.core, null, 0.0, LocalDateTime.now())
+
+        val postData = mapOf(
+                "text" to "TestComment",
+                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+        ).toJsonString()
+
+        val request = MockMvcRequestBuilders
+                .request(HttpMethod.POST, "/posting/${posting.id}/comment/")
+                .header("Authorization", "Bearer ${userCredentials.accessToken}")
+                .contentType(APPLICATION_JSON)
+                .content(postData)
+
+        val response = mockMvc.perform(request)
+                .andExpect(status().isCreated)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.text").value("TestComment"))
+                .andExpect(jsonPath("$.date").exists())
+                .andExpect(jsonPath("$.user").exists())
+                .andReturn().response.contentAsString
+
+        println(response)
     }
 
     private fun makeUserParticipant(credentials: Credentials) {

@@ -6,6 +6,7 @@ import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
 import backend.model.media.MediaService
 import backend.model.misc.Coord
+import backend.model.posting.CommentService
 import backend.model.posting.PostingService
 import backend.model.user.Participant
 import backend.model.user.UserService
@@ -13,6 +14,7 @@ import backend.services.ConfigurationService
 import backend.util.distanceCoordsKM
 import backend.util.getSignedJwtToken
 import backend.util.toLocalDateTime
+import backend.view.CommentView
 import backend.view.PostingView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -30,6 +32,7 @@ import javax.validation.Valid
 open class PostingController {
 
     private val mediaService: MediaService
+    private val commentService: CommentService
     private val postingService: PostingService
     private val configurationService: ConfigurationService
     private val logger: Logger
@@ -38,11 +41,13 @@ open class PostingController {
 
     @Autowired
     constructor(postingService: PostingService,
+                commentService: CommentService,
                 mediaService: MediaService,
                 configurationService: ConfigurationService,
                 userService: UserService) {
 
         this.postingService = postingService
+        this.commentService = commentService
         this.mediaService = mediaService
         this.configurationService = configurationService
         this.logger = LoggerFactory.getLogger(PostingController::class.java)
@@ -124,5 +129,23 @@ open class PostingController {
     @RequestMapping("/get/since/{id}/", method = arrayOf(GET))
     open fun getPostingIdsSince(@PathVariable("id") id: Long): Iterable<Long> {
         return postingService.findAllSince(id).map { it.id!! }
+    }
+
+    /**
+     * POST /posting/{id}/comment/
+     * creates Comment for Posting
+     */
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping("/{id}/comment/", method = arrayOf(POST))
+    @ResponseStatus(CREATED)
+    open fun createComment(@PathVariable("id") id: Long,
+                           @Valid @RequestBody body: CommentView,
+                           @AuthenticationPrincipal customUserDetails: CustomUserDetails): CommentView {
+
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
+        val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
+        val comment = commentService.createComment(body.text, body.date!!.toLocalDateTime(), posting, user.core)
+
+        return CommentView(comment)
     }
 }

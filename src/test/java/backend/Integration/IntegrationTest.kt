@@ -16,6 +16,8 @@ import backend.model.media.MediaService
 import backend.model.media.MediaSizeRepository
 import backend.model.media.MediaSizeService
 import backend.model.payment.TeamEntryFeeService
+import backend.model.posting.CommentRepository
+import backend.model.posting.CommentService
 import backend.model.posting.PostingRepository
 import backend.model.posting.PostingService
 import backend.model.user.User
@@ -57,6 +59,7 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var userRepository: UserRepository
     @Autowired lateinit protected var eventRepository: EventRepository
     @Autowired lateinit protected var teamRepository: TeamRepository
+    @Autowired lateinit protected var commentRepository: CommentRepository
     @Autowired lateinit protected var postingRepository: PostingRepository
     @Autowired lateinit protected var mediaRepository: MediaRepository
     @Autowired lateinit protected var mediaSizeRepository: MediaSizeRepository
@@ -65,6 +68,7 @@ abstract class IntegrationTest {
     // Services
     @Autowired lateinit protected var userService: UserService
     @Autowired lateinit protected var teamService: TeamService
+    @Autowired lateinit protected var commentService: CommentService
     @Autowired lateinit protected var postingService: PostingService
     @Autowired lateinit protected var eventService: EventService
     @Autowired lateinit protected var mediaService: MediaService
@@ -77,6 +81,7 @@ abstract class IntegrationTest {
     @Before
     open fun setUp() {
         teamRepository.deleteAll()
+        commentRepository.deleteAll()
         postingRepository.deleteAll()
         userRepository.deleteAll()
         mediaRepository.deleteAll()

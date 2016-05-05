@@ -23,6 +23,6 @@ class CommentView() {
         this.id = comment.id
         this.text = comment.text
         this.date = comment.date.toEpochSecond(ZoneOffset.UTC)
-        this.user = BasicUserView(comment.user.core)
+        this.user = BasicUserView(comment.user!!.core)
     }
 }

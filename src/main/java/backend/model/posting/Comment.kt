@@ -19,7 +19,7 @@ class Comment : BasicEntity {
     lateinit var posting: Posting
 
     @ManyToOne
-    lateinit var user: UserCore
+    var user: UserCore? = null
 
     constructor(text: String, date: LocalDateTime, posting: Posting, user: UserCore) : this() {
         this.text = text
