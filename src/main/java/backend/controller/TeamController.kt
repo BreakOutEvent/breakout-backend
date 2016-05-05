@@ -18,8 +18,7 @@ import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.GET
-import org.springframework.web.bind.annotation.RequestMethod.POST
+import org.springframework.web.bind.annotation.RequestMethod.*
 import javax.validation.Valid
 
 @RestController
@@ -93,6 +92,34 @@ open class TeamController {
 
         return TeamView(team)
     }
+
+    /**
+     * PUT /event/{id}/team/{teamId}/
+     * allows teammembers to edit teamname and description
+     */
+    @ResponseStatus(CREATED)
+    @RequestMapping("/{teamId}/", method = arrayOf(PUT))
+    @PreAuthorize("isAuthenticated()")
+    open fun editTeam(@PathVariable eventId: Long,
+                      @PathVariable teamId: Long,
+                      @AuthenticationPrincipal customUserDetails: CustomUserDetails,
+                      @Valid @RequestBody body: TeamView): TeamView {
+
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
+        val participant = user.getRole(Participant::class) ?: throw RuntimeException("User is no participant")
+        var team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId")
+        if (team.members.contains(participant) == false) throw UnauthorizedException("User is not part of team")
+
+        team.description = body.description
+        if (body.name != null) team.name = body.name!!
+
+        teamService.save(team)
+
+        team.profilePic.uploadToken = getSignedJwtToken(JWT_SECRET, team.profilePic.id.toString())
+
+        return TeamView(team)
+    }
+
 
     /**
      * POST /event/{eventId}/team/{teamId}/invitation/

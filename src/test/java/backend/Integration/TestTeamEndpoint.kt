@@ -195,6 +195,53 @@ class TestTeamEndpoint : IntegrationTest() {
         println(response)
     }
 
+
+    @Test
+    fun testEditTeam() {
+
+        val body = mapOf("name" to "Team megaAwesome", "description" to "Our team is super awesome").toJsonString()
+
+        val request = put("/event/${event.id}/team/${team.id}/")
+                .header("Authorization", "Bearer ${creatorCredentials.accessToken}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body)
+
+        val response = mockMvc.perform(request)
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.profilePic.type").exists())
+                .andExpect(jsonPath("$.profilePic.id").exists())
+                .andExpect(jsonPath("$.profilePic.uploadToken").exists())
+                .andExpect(jsonPath("$.profilePic.type").value("IMAGE"))
+                .andExpect(jsonPath("$.event").value(event.id!!.toInt()))
+                .andExpect(jsonPath("$.name").value("Team megaAwesome"))
+                .andExpect(jsonPath("$.description").value("Our team is super awesome"))
+                .andExpect(jsonPath("$.members").isArray)
+                .andExpect(jsonPath("$.invoiceId").exists())
+                .andReturn().response.contentAsString
+
+        print(response)
+    }
+
+
+    @Test
+    fun testEditTeamNotMemberFails() {
+
+        val body = mapOf("name" to "Team megaAwesome", "description" to "Our team is super awesome").toJsonString()
+
+        //invitee not yet Member
+        val request = put("/event/${event.id}/team/${team.id}/")
+                .header("Authorization", "Bearer ${inviteeCredentials.accessToken}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body)
+
+        val response = mockMvc.perform(request)
+                .andExpect(status().isUnauthorized)
+                .andReturn().response.contentAsString
+
+        print(response)
+    }
+
     @Test
     fun testGetTeamsByEvent() {
         val request = MockMvcRequestBuilders
