@@ -1,7 +1,6 @@
 package backend.controller
 
 import backend.configuration.CustomUserDetails
-import backend.controller.exceptions.NotFoundException
 import backend.model.event.TeamService
 import backend.services.MailService
 import org.slf4j.Logger
@@ -9,7 +8,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RestController
@@ -43,29 +41,4 @@ open class AdminController {
         logger.info("Resent $count mails from admin request")
         return mapOf("count" to count)
     }
-
-    /**
-     * GET /admin/fullteam/{teamId}/
-     * Allows Admin to add invoices to teams missing it and send full team mail
-     */
-    @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping("/fullteam/{teamId}/", method = arrayOf(GET))
-    open fun redoFullTeamEmail(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
-                               @PathVariable("teamId") teamId: Long): Map<String, String> {
-
-        val team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId")
-
-        if (team.members.size == 2 && team.invoice != null) {
-
-            val emails = teamService.getFullTeamMailForMember(team.members)
-            emails.forEach { email ->
-                mailService.send(email)
-            }
-        } else {
-            throw NotFoundException("Team doesn't have two members, or has no invoice")
-        }
-
-        return mapOf("message" to "success")
-    }
-
 }
