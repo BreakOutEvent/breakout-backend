@@ -39,13 +39,13 @@ class TestUserEndpoint : IntegrationTest() {
     @Test
     fun getUser() {
 
-        userService.create("test@mail.com", "password", {
+        userService.create("test@break-out.org", "password", {
             firstname = "Florian"
             lastname = "Schmidt"
             gender = "Male"
         })
 
-        userService.create("secondTest@mail.com", "password", {
+        userService.create("secondTest@break-out.org", "password", {
             firstname = "Leo"
             lastname = "Theo"
             gender = "Male"
@@ -324,8 +324,8 @@ class TestUserEndpoint : IntegrationTest() {
 
     @Test
     fun putUserCanOnlyModifyItsOwnData() {
-        val firstUserCredentials = createUser(this.mockMvc, "first@email.com", "pwd", this.userService)
-        val secondUserCredentials = createUser(this.mockMvc, "second@email.com", "pwd", this.userService)
+        val firstUserCredentials = createUser(this.mockMvc, "first@break-out.org", "pwd", this.userService)
+        val secondUserCredentials = createUser(this.mockMvc, "second@break-out.org", "pwd", this.userService)
 
         val json = mapOf("firstname" to "ChangeMe").toJsonString()
         val request = MockMvcRequestBuilders
@@ -451,5 +451,59 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.email").doesNotExist())
                 .andExpect(jsonPath("$.gender").doesNotExist())
                 .andExpect(jsonPath("$.passwordHash").doesNotExist())
+    }
+
+    @Test
+    fun requestPasswordReset() {
+
+        userService.create("test@break-out.org", "password", {
+            firstname = "Florian"
+            lastname = "Schmidt"
+            gender = "Male"
+        })
+
+        var json = mapOf(
+                "email" to "test@break-out.org"
+        ).toJsonString()
+
+        val request = MockMvcRequestBuilders
+                .post("/user/requestreset/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.status").value("sent reset mail"))
+                .andReturn().response.contentAsString
+    }
+
+
+    @Test
+    fun passwordReset() {
+
+        val user = userService.create("test@break-out.org", "password", {
+            firstname = "Florian"
+            lastname = "Schmidt"
+            gender = "Male"
+        })
+
+        val token = user.createActivationToken()
+        userService.save(user)
+
+        var json = mapOf(
+                "email" to "test@break-out.org",
+                "token" to token,
+                "password" to "otherPassword"
+        ).toJsonString()
+
+        val request = MockMvcRequestBuilders
+                .post("/user/passwordreset/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.status").value("reset password"))
+                .andReturn().response.contentAsString
     }
 }

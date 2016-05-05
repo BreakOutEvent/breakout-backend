@@ -1,6 +1,5 @@
 package backend.model.user
 
-import backend.controller.exceptions.UnauthorizedException
 import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.media.Media
@@ -91,7 +90,7 @@ open class UserCore : BasicEntity, User {
     }
 
     override fun setNewPassword(password: String, token: String) {
-        if (!isActivationTokenCorrect(token)) throw UnauthorizedException("token doesn't match email")
+        if (!isActivationTokenCorrect(token)) throw DomainException("Provided token $token does not match the activation token")
 
         this.passwordHash = BCryptPasswordEncoder().encode(password)
     }
