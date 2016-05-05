@@ -82,6 +82,7 @@ abstract class UserRole : BasicEntity, User, GrantedAuthority {
     override fun isActivationTokenCorrect(token: String): Boolean = this.core.isActivationTokenCorrect(token)
     override fun createActivationToken(): String = this.core.createActivationToken()
     override fun isActivated(): Boolean = this.core.isActivated()
+    override fun setNewPassword(password: String, token: String) = this.core.setNewPassword(password, token)
 
     companion object {
 

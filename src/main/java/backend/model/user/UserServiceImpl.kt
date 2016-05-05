@@ -2,6 +2,7 @@ package backend.model.user
 
 import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.ConflictException
+import backend.controller.exceptions.NotFoundException
 import backend.exceptions.DomainException
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
@@ -72,11 +73,16 @@ class UserServiceImpl : UserService {
                 buttonUrl = createActivationUrl(token),
                 campaignCode = "confirm"
         )
+
         mailService.send(email)
     }
 
     private fun createActivationUrl(token: String): String {
         return "$host/activation/$token?utm_source=backend&utm_medium=email&utm_campaign=confirm"
+    }
+
+    private fun createResetUrl(token: String): String {
+        return "$host/reset/$token?utm_source=backend&utm_medium=email&utm_campaign=pwreset"
     }
 
     override fun save(user: User): User = userRepository.save(user.core)
@@ -85,6 +91,33 @@ class UserServiceImpl : UserService {
         val user = this.create(email, password)
         f.invoke(user)
         return this.save(user)
+    }
+
+    override fun requestReset(emailString: String) {
+        val user = this.getUserByEmail(emailString) ?: throw NotFoundException("No user found with email")
+        val token = user.createActivationToken()
+
+        val email = Email(
+                to = listOf(EmailAddress(user.email)),
+                subject = "BreakOut 2016 - Passwort zurücksetzen",
+                body = "Hallo ${user.firstname ?: ""},<br><br>" +
+                        "du hast angefordert dein Passwort für BreakOut zurück zu setzen.<br>" +
+                        "Folge dem Knopf am Ende der Email um ein neues Passwort zu setzen.<br><br>" +
+                        "Wenn du diese Email nicht angefordert hast, ignoriere sie einfach.<br><br>" +
+                        "Liebe Grüße<br>" +
+                        "Euer BreakOut-Team",
+                buttonText = "PASSWORT ZURÜCKSETZEN",
+                buttonUrl = createResetUrl(token),
+                campaignCode = "pwreset"
+        )
+
+        mailService.send(email)
+    }
+
+    override fun resetPassword(emailString: String, password: String, token: String) {
+        val user = this.getUserByEmail(emailString) ?: throw NotFoundException("No user found with email")
+        user.setNewPassword(password, token)
+        this.save(user)
     }
 }
 

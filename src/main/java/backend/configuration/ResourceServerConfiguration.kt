@@ -29,7 +29,6 @@ open class ResourceServerConfiguration : ResourceServerConfigurerAdapter() {
     override fun configure(http: HttpSecurity?) {
         http!!.authorizeRequests()
                 .antMatchers("/oauth/*").permitAll()
-                .antMatchers(HttpMethod.POST, "/user/{id}/*").authenticated()
                 .antMatchers(HttpMethod.PUT, "/user/{id}/*").authenticated()
                 .antMatchers(HttpMethod.GET, "/user/{id}/*").permitAll() //TODO: Add routes which should be secured
     }

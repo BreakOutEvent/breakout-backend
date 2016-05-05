@@ -1,5 +1,6 @@
 package backend.model.user
 
+import backend.controller.exceptions.UnauthorizedException
 import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.media.Media
@@ -10,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.validator.constraints.Email
 import org.hibernate.validator.constraints.NotEmpty
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import java.util.*
 import javax.persistence.*
 import kotlin.reflect.KClass
@@ -86,6 +88,12 @@ open class UserCore : BasicEntity, User {
 
     override fun isActivated(): Boolean {
         return !isBlocked;
+    }
+
+    override fun setNewPassword(password: String, token: String) {
+        if (!isActivationTokenCorrect(token)) throw UnauthorizedException("token doesn't match email")
+
+        this.passwordHash = BCryptPasswordEncoder().encode(password)
     }
 
     // This cast will always succeed because the specific type of the value / object

@@ -9,8 +9,6 @@ import backend.model.event.Team
 import backend.model.misc.Coord
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
-import backend.model.user.User
-import backend.model.user.UserRole
 import org.hamcrest.Matchers.hasSize
 import org.junit.Before
 import org.junit.Test

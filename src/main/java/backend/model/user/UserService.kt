@@ -21,4 +21,8 @@ interface UserService {
     fun activate(user: User, token: String)
 
     fun getUserByActivationToken(token: String): User?
+
+    fun requestReset(emailString: String)
+
+    fun resetPassword(emailString: String, password: String, token: String)
 }

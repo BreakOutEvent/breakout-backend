@@ -66,6 +66,37 @@ open class UserController {
     }
 
     /**
+     * POST /user/requestreset/
+     * allows User to request password reset
+     */
+    @RequestMapping("/requestreset/", method = arrayOf(POST))
+    open fun requestPasswordReset(@Valid @RequestBody body: Map<String, Any>): Map<String, String> {
+
+        val emailString = body["email"] as? String ?: throw BadRequestException("body is missing field email")
+        userService.requestReset(emailString)
+
+        return mapOf("status" to "sent reset mail")
+    }
+
+
+    /**
+     * POST /user/passwordreset/
+     * Sets a new Password for User with given token
+     */
+    @RequestMapping("/passwordreset/", method = arrayOf(POST))
+    open fun resetPassword(@Valid @RequestBody body: Map<String, Any>): Map<String, String> {
+
+        val emailString = body["email"] as? String ?: throw BadRequestException("body is missing field email")
+        val password = body["password"] as? String ?: throw BadRequestException("body is missing field password")
+        val token = body["token"] as? String ?: throw BadRequestException("body is missing field token")
+
+        userService.resetPassword(emailString, password, token)
+
+        return mapOf("status" to "reset password")
+
+    }
+
+    /**
      * GET /user/
      * Gets all users
      */
