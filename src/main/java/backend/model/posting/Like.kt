@@ -6,13 +6,13 @@ import java.time.LocalDateTime
 import javax.persistence.Entity
 import javax.persistence.ManyToOne
 import javax.persistence.PreRemove
+import javax.persistence.Table
 
 @Entity
-class Comment : BasicEntity {
+@Table(name = "postinglike")
+class Like : BasicEntity {
 
     private constructor() : super()
-
-    lateinit var text: String
 
     lateinit var date: LocalDateTime
 
@@ -22,17 +22,15 @@ class Comment : BasicEntity {
     @ManyToOne
     var user: UserCore? = null
 
-    constructor(text: String, date: LocalDateTime, posting: Posting, user: UserCore) : this() {
-        this.text = text
+    constructor(date: LocalDateTime, posting: Posting, user: UserCore) : this() {
         this.date = date
         this.posting = posting
         this.user = user
     }
 
-
     @PreRemove
     fun preRemove() {
-        this.posting.comments.remove(this)
+        this.posting.likes.remove(this)
         this.user = null
     }
 }

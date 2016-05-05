@@ -31,11 +31,23 @@ class Posting : BasicEntity {
     @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
     var comments: MutableList<Comment> = ArrayList()
 
+    @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+    var likes: MutableList<Like> = ArrayList()
+
     constructor(text: String?, date: LocalDateTime, location: Location?, user: UserCore, media: MutableList<Media>?) : this() {
         this.text = text
         this.date = date
         this.location = location
         this.user = user
         this.media = media
+    }
+
+
+    @PreRemove
+    fun preRemove() {
+        this.likes.clear()
+        this.comments.clear()
+        this.media?.clear()
+        this.user = null
     }
 }

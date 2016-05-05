@@ -7,6 +7,7 @@ import backend.controller.exceptions.UnauthorizedException
 import backend.model.media.MediaService
 import backend.model.misc.Coord
 import backend.model.posting.CommentService
+import backend.model.posting.LikeService
 import backend.model.posting.PostingService
 import backend.model.user.Participant
 import backend.model.user.UserService
@@ -15,6 +16,7 @@ import backend.util.distanceCoordsKM
 import backend.util.getSignedJwtToken
 import backend.util.toLocalDateTime
 import backend.view.CommentView
+import backend.view.LikeView
 import backend.view.PostingView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -33,6 +35,7 @@ open class PostingController {
 
     private val mediaService: MediaService
     private val commentService: CommentService
+    private val likeService: LikeService
     private val postingService: PostingService
     private val configurationService: ConfigurationService
     private val logger: Logger
@@ -42,12 +45,14 @@ open class PostingController {
     @Autowired
     constructor(postingService: PostingService,
                 commentService: CommentService,
+                likeService: LikeService,
                 mediaService: MediaService,
                 configurationService: ConfigurationService,
                 userService: UserService) {
 
         this.postingService = postingService
         this.commentService = commentService
+        this.likeService = likeService
         this.mediaService = mediaService
         this.configurationService = configurationService
         this.logger = LoggerFactory.getLogger(PostingController::class.java)
@@ -147,5 +152,35 @@ open class PostingController {
         val comment = commentService.createComment(body.text, body.date!!.toLocalDateTime(), posting, user.core)
 
         return CommentView(comment)
+    }
+
+
+    /**
+     * POST /posting/{id}/like/
+     * creates Like for Posting
+     */
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping("/{id}/like/", method = arrayOf(POST))
+    @ResponseStatus(CREATED)
+    open fun createLike(@PathVariable("id") id: Long,
+                        @Valid @RequestBody body: LikeView,
+                        @AuthenticationPrincipal customUserDetails: CustomUserDetails): LikeView {
+
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
+        val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
+        val like = likeService.createLike(body.date!!.toLocalDateTime(), posting, user.core)
+
+        return LikeView(like)
+    }
+
+    /**
+     * GET /posting/{id}/like/
+     * Gets Likes for Posting
+     */
+    @RequestMapping("/{id}/like/", method = arrayOf(GET))
+    open fun getLikesForPosting(@PathVariable("id") id: Long): List<LikeView> {
+        val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
+        val likes = likeService.findAllByPosting(posting)
+        return likes.map { LikeView(it) }
     }
 }

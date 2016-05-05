@@ -13,6 +13,4 @@ interface CommentService {
 
     fun save(comment: Comment): Comment?
 
-    fun findByPosting(posting: Posting): List<Comment>
-
 }

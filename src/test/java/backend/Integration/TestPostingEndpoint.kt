@@ -842,6 +842,72 @@ open class TestPostingEndpoint : IntegrationTest() {
         println(responsePosting)
     }
 
+    @Test
+    open fun createNewLike() {
+
+        val posting = postingService.createPosting("Test", null, user.core, null, 0.0, LocalDateTime.now())
+
+        val postData = mapOf(
+                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+        ).toJsonString()
+
+        val request = MockMvcRequestBuilders
+                .request(HttpMethod.POST, "/posting/${posting.id}/like/")
+                .header("Authorization", "Bearer ${userCredentials.accessToken}")
+                .contentType(APPLICATION_JSON)
+                .content(postData)
+
+        val response = mockMvc.perform(request)
+                .andExpect(status().isCreated)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.date").exists())
+                .andExpect(jsonPath("$.user").exists())
+                .andReturn().response.contentAsString
+
+        println(response)
+
+
+        val requestPosting = MockMvcRequestBuilders
+                .request(HttpMethod.GET, "/posting/${posting.id}/")
+                .contentType(APPLICATION_JSON)
+
+        val responsePosting = mockMvc.perform (requestPosting)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.text").exists())
+                .andExpect(jsonPath("$.date").exists())
+                .andExpect(jsonPath("$.user").exists())
+                .andExpect(jsonPath("$.likes").exists())
+                .andExpect(jsonPath("$.likes").value(1))
+                .andReturn().response.contentAsString
+
+        println(responsePosting)
+    }
+
+    @Test
+    open fun getLikesForPosting() {
+        val posting = postingService.createPosting("Test", null, user.core, null, 0.0, LocalDateTime.now())
+        likeService.createLike(LocalDateTime.now(), posting, user.core)
+
+        val request = MockMvcRequestBuilders
+                .request(HttpMethod.GET, "/posting/${posting.id}/like/")
+                .header("Authorization", "Bearer ${userCredentials.accessToken}")
+                .contentType(APPLICATION_JSON)
+
+        val response = mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$[0].id").exists())
+                .andExpect(jsonPath("$[0].date").exists())
+                .andExpect(jsonPath("$[0].user").exists())
+                .andReturn().response.contentAsString
+
+        println(response)
+    }
+
     private fun makeUserParticipant(credentials: Credentials) {
 
         val date = LocalDate.now().toString()

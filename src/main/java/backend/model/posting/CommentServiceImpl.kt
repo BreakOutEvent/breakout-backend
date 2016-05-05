@@ -8,7 +8,6 @@ import java.time.LocalDateTime
 
 @Service
 class CommentServiceImpl @Autowired constructor(val repository: CommentRepository) : CommentService {
-    override fun findByPosting(posting: Posting): List<Comment> = repository.findByPosting(posting)
 
     @Transactional
     override fun createComment(text: String, date: LocalDateTime, posting: Posting, user: UserCore): Comment {

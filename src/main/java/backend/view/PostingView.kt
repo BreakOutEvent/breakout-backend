@@ -29,6 +29,8 @@ class PostingView() {
 
     var comments: List<CommentView>? = null
 
+    var likes: Int? = null
+
     constructor(posting: Posting) : this() {
         this.id = posting.id
         this.text = posting.text
@@ -37,5 +39,6 @@ class PostingView() {
         this.user = BasicUserView(posting.user!!.core)
         this.media = posting.media?.map { MediaView(it) }
         this.comments = posting.comments.map { CommentView(it) }
+        this.likes = posting.likes.count()
     }
 }

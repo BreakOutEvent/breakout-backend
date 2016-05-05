@@ -26,4 +26,8 @@ class Media : BasicEntity {
         this.mediaType = MediaType.valueOf(type.toUpperCase())
     }
 
+    @PreRemove
+    fun preRemove() {
+        this.sizes?.clear()
+    }
 }

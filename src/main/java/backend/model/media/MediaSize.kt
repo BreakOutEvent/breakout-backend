@@ -1,10 +1,7 @@
 package backend.model.media
 
 import backend.model.BasicEntity
-import javax.persistence.Entity
-import javax.persistence.EnumType
-import javax.persistence.Enumerated
-import javax.persistence.ManyToOne
+import javax.persistence.*
 
 @Entity
 class MediaSize : BasicEntity {
@@ -37,4 +34,8 @@ class MediaSize : BasicEntity {
         this.mediaType = MediaType.valueOf(type.toUpperCase())
     }
 
+    @PreRemove
+    fun preRemove() {
+        this.media?.sizes?.remove(this)
+    }
 }
