@@ -134,6 +134,59 @@ open class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
+    open fun createNewPostingWithTextAndHashtags() {
+        val postData = mapOf(
+                "text" to "hello #breakout bla blub #awsome",
+                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+        ).toJsonString()
+
+        val request = MockMvcRequestBuilders
+                .request(HttpMethod.POST, "/posting/")
+                .header("Authorization", "Bearer ${userCredentials.accessToken}")
+                .contentType(APPLICATION_JSON)
+                .content(postData)
+
+        val response = mockMvc.perform(request)
+                .andExpect(status().isCreated)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.text").value("hello #breakout bla blub #awsome"))
+                .andExpect(jsonPath("$.hashtags").isArray)
+                .andExpect(jsonPath("$.hashtags[0]").value("breakout"))
+                .andExpect(jsonPath("$.hashtags[1]").value("awsome"))
+                .andExpect(jsonPath("$.date").exists())
+                .andExpect(jsonPath("$.user").exists())
+                .andReturn().response.contentAsString
+
+        println(response)
+    }
+
+    @Test
+    open fun getPostingsByHashTag() {
+        val posting = postingService.savePostingWithLocationAndMedia("hello #breakout", null, user.core, null, 0.0, LocalDateTime.now())
+        postingService.savePostingWithLocationAndMedia("hello #awsome", null, user.core, null, 0.0, LocalDateTime.now())
+
+        val request = MockMvcRequestBuilders
+                .request(HttpMethod.GET, "/posting/hashtag/breakout/")
+                .contentType(APPLICATION_JSON)
+
+        val response = mockMvc.perform (request)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$[0].id").exists())
+                .andExpect(jsonPath("$[0].text").exists())
+                .andExpect(jsonPath("$[0].date").exists())
+                .andExpect(jsonPath("$[0].user").exists())
+                .andExpect(jsonPath("$[0].text").value("hello #breakout"))
+                .andExpect(jsonPath("$[0].hashtags").isArray)
+                .andExpect(jsonPath("$[0].hashtags[0]").value("breakout"))
+                .andExpect(jsonPath("$[1]").doesNotExist())
+                .andReturn().response.contentAsString
+
+        println(response)
+    }
+
+    @Test
     open fun createNewPostingWithMedia() {
         val postData = mapOf(
                 "uploadMediaTypes" to arrayOf(

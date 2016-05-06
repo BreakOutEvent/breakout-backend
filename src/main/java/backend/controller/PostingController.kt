@@ -158,4 +158,14 @@ open class PostingController {
         val likes = likeService.findAllByPosting(posting)
         return likes.map { LikeView(it) }
     }
+
+    /**
+     * GET /posting/hashtag/{hashtag}/
+     * Gets Likes for Posting
+     */
+    @RequestMapping("/hashtag/{hashtag}/", method = arrayOf(GET))
+    open fun getPostingsByHashtag(@PathVariable("hashtag") hashtag: String): List<PostingView> {
+        val posting = postingService.findByHashtag(hashtag)
+        return posting.map { PostingView(it) }
+    }
 }

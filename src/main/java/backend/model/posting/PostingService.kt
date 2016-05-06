@@ -22,4 +22,6 @@ interface PostingService {
 
     fun findAllSince(id: Long): Iterable<Posting>
 
+    fun findByHashtag(hashtag: String): Iterable<Posting>
+
 }

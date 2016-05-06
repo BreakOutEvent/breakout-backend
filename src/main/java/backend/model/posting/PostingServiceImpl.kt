@@ -14,6 +14,7 @@ import backend.util.toLocalDateTime
 import backend.view.LocationView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
@@ -26,6 +27,7 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
 
     override fun findAll(): Iterable<Posting> = repository.findAll()
 
+    @Transactional
     override fun savePostingWithLocationAndMedia(text: String?,
                                                  postingLocation: Coord?,
                                                  user: UserCore,
@@ -77,4 +79,7 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
     }
 
     override fun getByID(id: Long): Posting? = repository.findById(id)
+
+    override fun findByHashtag(hashtag: String): Iterable<Posting> = repository.findByHashtag(hashtag)
+
 }

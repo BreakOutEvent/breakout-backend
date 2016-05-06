@@ -9,4 +9,7 @@ interface PostingRepository : CrudRepository<Posting, Long> {
 
     @Query("from Posting where id > :id order by id desc")
     fun findAllSince(@Param("id") id: Long): Iterable<Posting>
+
+    @Query("select p from Posting p inner join p.hashtags h where h.value = :hashtag")
+    fun findByHashtag(@Param("hashtag") hashtag: String): Iterable<Posting>
 }
