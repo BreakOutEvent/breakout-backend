@@ -4,6 +4,7 @@ import backend.model.posting.Posting
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import java.time.ZoneOffset
+import java.util.*
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
@@ -31,7 +32,7 @@ class PostingView() {
 
     var likes: Int? = null
 
-    var hashtags: List<String> = listOf()
+    var hashtags: List<String> = ArrayList()
 
     constructor(posting: Posting) : this() {
         this.id = posting.id

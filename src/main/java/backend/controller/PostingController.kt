@@ -1,18 +1,13 @@
 package backend.controller
 
 import backend.configuration.CustomUserDetails
-import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
-import backend.controller.exceptions.UnauthorizedException
 import backend.model.media.MediaService
-import backend.model.misc.Coord
 import backend.model.posting.CommentService
 import backend.model.posting.LikeService
 import backend.model.posting.PostingService
-import backend.model.user.Participant
 import backend.model.user.UserService
 import backend.services.ConfigurationService
-import backend.util.distanceCoordsKM
 import backend.util.getSignedJwtToken
 import backend.util.toLocalDateTime
 import backend.view.CommentView
@@ -73,27 +68,7 @@ open class PostingController {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
 
-        //check if any of the optional posting types is available
-        if (body.uploadMediaTypes == null && body.text == null && body.postingLocation == null)
-            throw BadRequestException("empty postings not allowed")
-
-        var location: Coord? = null
-        var distance: Double? = null
-
-        val locationIsAvailable: Boolean = body.postingLocation != null
-        if (locationIsAvailable) {
-            location = Coord(body.postingLocation!!.latitude, body.postingLocation!!.longitude)
-            val creator = user.getRole(Participant::class) ?: throw UnauthorizedException("User is no participant")
-            val team = creator.currentTeam ?: throw UnauthorizedException("User has no team")
-
-            //Calculate Distance from starting point of Event to Location Position and
-            distance = distanceCoordsKM(team.event.startingLocation, location)
-        }
-
-        val date = body.date!!.toLocalDateTime()
-        var posting = postingService.createPosting(text = body.text, postingLocation = location, user = user.core, mediaTypes = body.uploadMediaTypes, distance = distance, date = date)
-
-        //Adds uploadingTokens to response
+        val posting = postingService.createPosting(user, body.text, body.uploadMediaTypes, body.postingLocation, body.date)
         posting.media?.forEach { it.uploadToken = getSignedJwtToken(JWT_SECRET, it.id.toString()) }
 
         return PostingView(posting)

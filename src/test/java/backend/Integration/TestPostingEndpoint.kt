@@ -248,7 +248,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun getPostingById() {
         val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
         val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
-        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
 
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.GET, "/posting/${posting.id}/")
@@ -276,9 +276,9 @@ open class TestPostingEndpoint : IntegrationTest() {
         val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
         val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
-        val postingZero = postingService.createPosting("Test0", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
-        postingService.createPosting("Test1", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
-        val postingTwo = postingService.createPosting("Test2", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
+        val postingZero = postingService.savePostingWithLocationAndMedia("Test0", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
+        postingService.savePostingWithLocationAndMedia("Test1", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
+        val postingTwo = postingService.savePostingWithLocationAndMedia("Test2", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
 
         val postingsIds: List<Long> = listOf(postingZero.id!!, postingTwo.id!!)
 
@@ -306,9 +306,9 @@ open class TestPostingEndpoint : IntegrationTest() {
         val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
         val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
-        val postingZero = postingService.createPosting("Test0", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
-        postingService.createPosting("Test1", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
-        postingService.createPosting("Test2", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
+        val postingZero = postingService.savePostingWithLocationAndMedia("Test0", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
+        postingService.savePostingWithLocationAndMedia("Test1", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
+        postingService.savePostingWithLocationAndMedia("Test2", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
 
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.GET, "/posting/get/since/${postingZero.id}/")
@@ -333,7 +333,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
         val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
-        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -365,7 +365,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
         val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
-        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -398,7 +398,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "location", Coord(0.0, 0.0), 36)
         teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
-        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -468,7 +468,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "location", Coord(0.0, 0.0), 36)
         teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
-        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -572,7 +572,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "location", Coord(0.0, 0.0), 36)
         teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
-        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -676,7 +676,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "location", Coord(0.0, 0.0), 36)
         teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
-        val posting = postingService.createPosting("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -779,8 +779,8 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
         val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
-        postingService.createPosting("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
-        postingService.createPosting("Test 2", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
+        postingService.savePostingWithLocationAndMedia("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
+        postingService.savePostingWithLocationAndMedia("Test 2", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
 
         val request = MockMvcRequestBuilders
                 .request(HttpMethod.GET, "/posting/")
@@ -799,7 +799,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewComment() {
 
-        val posting = postingService.createPosting("Test", null, user.core, null, 0.0, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, 0.0, LocalDateTime.now())
 
         val postData = mapOf(
                 "text" to "TestComment",
@@ -845,7 +845,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewLike() {
 
-        val posting = postingService.createPosting("Test", null, user.core, null, 0.0, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, 0.0, LocalDateTime.now())
 
         val postData = mapOf(
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
@@ -888,7 +888,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun getLikesForPosting() {
-        val posting = postingService.createPosting("Test", null, user.core, null, 0.0, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, 0.0, LocalDateTime.now())
         likeService.createLike(LocalDateTime.now(), posting, user.core)
 
         val request = MockMvcRequestBuilders

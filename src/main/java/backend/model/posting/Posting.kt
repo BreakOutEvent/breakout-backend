@@ -17,7 +17,7 @@ class Posting : BasicEntity {
     var text: String? = null
 
     @ElementCollection
-    lateinit var hashtags: List<Hashtag>
+    var hashtags: List<Hashtag> = ArrayList()
 
     lateinit var date: LocalDateTime
 

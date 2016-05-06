@@ -57,7 +57,7 @@ class DummyDataController {
             val id = random.nextInt(max - 1).toLong() + 1
             val user = userService.getUserById(id)?.core
             if (user != null) {
-                postingService.createPosting(
+                postingService.savePostingWithLocationAndMedia(
                         text = "text$it",
                         postingLocation = Coord(0.0, 0.0),
                         mediaTypes = null,
