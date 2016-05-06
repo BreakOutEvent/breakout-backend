@@ -6,6 +6,8 @@ import backend.model.media.Media
 import backend.model.user.UserCore
 import java.time.LocalDateTime
 import java.util.*
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 import javax.persistence.*
 import javax.persistence.CascadeType.PERSIST
 
@@ -43,6 +45,21 @@ class Posting : BasicEntity {
         this.location = location
         this.user = user
         this.media = media
+        if (text != null) this.hashtags = extractHashtags(text)
+    }
+
+    private fun extractHashtags(text: String): List<Hashtag> {
+        val pattern: Pattern = Pattern.compile("\\#(\\w+)");
+        val matcher: Matcher = pattern.matcher(text)
+
+        val hashtags = ArrayList<Hashtag>()
+
+        while (matcher.find()) {
+            val hashtag = matcher.group(1)
+            hashtags.add(Hashtag(hashtag))
+        }
+
+        return hashtags
     }
 
 
