@@ -16,6 +16,9 @@ class Posting : BasicEntity {
 
     var text: String? = null
 
+    @ElementCollection
+    lateinit var hashtags: List<Hashtag>
+
     lateinit var date: LocalDateTime
 
     @OneToOne(cascade = arrayOf(PERSIST))

@@ -31,9 +31,12 @@ class PostingView() {
 
     var likes: Int? = null
 
+    var hashtags: List<String> = listOf()
+
     constructor(posting: Posting) : this() {
         this.id = posting.id
         this.text = posting.text
+        this.hashtags = posting.hashtags.map { it.value }
         this.date = posting.date.toEpochSecond(ZoneOffset.UTC)
         this.postingLocation = if (posting.location != null) LocationView(posting.location!!) else null
         this.user = BasicUserView(posting.user!!.core)
