@@ -8,9 +8,13 @@ import org.junit.Test
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 class UserControllerTest : IntegrationTest() {
 
+    // The ignored tests here are located in Integration.TestUserEndpoint
+    // These should be moved to the corresponding controller test (e.g. here)
+    // in the future. For now these auto generated tests will be left here ignored
     @Test
     @Ignore("Needs to be migrated from package integration")
     fun testCreateUser() {
@@ -66,22 +70,22 @@ class UserControllerTest : IntegrationTest() {
                 .content(json)
 
         val result = mockMvc.perform(request)
-                .andExpect(MockMvcResultMatchers.status().isOk)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(credentials.id))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("a@x.de"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.firstname").value("Florian"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.lastname").value("Schmidt"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.gender").value("Male"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.blocked").value(false))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.sponsor").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.sponsor.company").value("ABC GmBH"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.sponsor.url").value("http://www.test.de"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.sponsor.hidden").value(false))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.sponsor.address").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.sponsor.address.city").value("Dresden"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.sponsor.address.housenumber").value("79c"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.sponsor.address.country").value("Germany"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.sponsor.address.street").value("Würzburger Straße"))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.id").value(credentials.id))
+                .andExpect(jsonPath("$.email").value("a@x.de"))
+                .andExpect(jsonPath("$.firstname").value("Florian"))
+                .andExpect(jsonPath("$.lastname").value("Schmidt"))
+                .andExpect(jsonPath("$.gender").value("Male"))
+                .andExpect(jsonPath("$.blocked").value(false))
+                .andExpect(jsonPath("$.sponsor").exists())
+                .andExpect(jsonPath("$.sponsor.company").value("ABC GmBH"))
+                .andExpect(jsonPath("$.sponsor.url").value("http://www.test.de"))
+                .andExpect(jsonPath("$.sponsor.hidden").value(false))
+                .andExpect(jsonPath("$.sponsor.address").exists())
+                .andExpect(jsonPath("$.sponsor.address.city").value("Dresden"))
+                .andExpect(jsonPath("$.sponsor.address.housenumber").value("79c"))
+                .andExpect(jsonPath("$.sponsor.address.country").value("Germany"))
+                .andExpect(jsonPath("$.sponsor.address.street").value("Würzburger Straße"))
                 .andReturn().response.contentAsString
 
         println(result)
