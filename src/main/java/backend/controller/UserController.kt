@@ -60,7 +60,10 @@ open class UserController {
         user.setValuesFrom(body)
         userService.save(user)
 
-        user.profilePic.uploadToken = getSignedJwtToken(JWT_SECRET, user.profilePic.id.toString())
+        // Dynamically generate upload tokens before showing view to user
+        user.profilePic.generateSignedUploadToken(JWT_SECRET)
+        user.getRole(Sponsor::class)?.logo?.generateSignedUploadToken(JWT_SECRET)
+
         return UserView(user)
     }
 

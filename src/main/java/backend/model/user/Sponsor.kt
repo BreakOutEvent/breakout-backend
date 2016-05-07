@@ -17,7 +17,7 @@ class Sponsor : UserRole {
     var company: String? = null
 
     @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true)
-    var logo: Media? = null
+    lateinit var logo: Media
 
     @Embedded
     var url: Url? = null
@@ -36,7 +36,7 @@ class Sponsor : UserRole {
 
     constructor(core: UserCore, company: String, logo: String, url: Url, address: Address, isHidden: Boolean) : super(core) {
         this.company = company
-//        this.logo = logo //TODO: Checkout how to integrate this with media
+        this.logo = Media("IMAGE")
         this.url = url
         this.address = address
         this.isHidden = isHidden
