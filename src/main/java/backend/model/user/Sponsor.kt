@@ -12,8 +12,11 @@ class Sponsor : UserRole {
     var company: String? = null
     var logo: String? = null
     var url: String? = null
-    var address: String? = null
     var isHidden: String? = null
+
+    @Embedded
+    var address: Address? = null
+
 
     /**
      * Private constructor for JPA
