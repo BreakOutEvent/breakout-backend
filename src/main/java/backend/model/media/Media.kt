@@ -1,6 +1,7 @@
 package backend.model.media
 
 import backend.model.BasicEntity
+import backend.util.getSignedJwtToken
 import java.util.*
 import javax.persistence.*
 
@@ -21,6 +22,11 @@ class Media : BasicEntity {
 
     @Transient
     var uploadToken: String? = null
+
+    fun generateSignedUploadToken(secret: String) {
+        val subject = this.id?.toString() ?: throw Exception("Can't generate upload token for object without id")
+        this.uploadToken = getSignedJwtToken(secret, subject)
+    }
 
     constructor(type: String) : this() {
         this.mediaType = MediaType.valueOf(type.toUpperCase())

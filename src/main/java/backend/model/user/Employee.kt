@@ -8,7 +8,7 @@ import javax.persistence.*
 @DiscriminatorValue("EMPLOYEE")
 class Employee : UserRole {
 
-    @OneToOne(cascade = arrayOf(CascadeType.ALL))
+    @Embedded
     var address: Address? = null
 
     @Column(name = "emp_tshirtsize")

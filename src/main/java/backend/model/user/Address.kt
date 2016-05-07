@@ -1,10 +1,9 @@
 package backend.model.user
 
-import backend.model.BasicEntity
-import javax.persistence.Entity
+import javax.persistence.Embeddable
 
-@Entity
-class Address : BasicEntity {
+@Embeddable
+class Address {
 
     /**
      * Private constructor for JPA

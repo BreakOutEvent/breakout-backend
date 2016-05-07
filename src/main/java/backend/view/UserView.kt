@@ -1,6 +1,8 @@
 package backend.view
 
+import backend.model.user.Address
 import backend.model.user.Participant
+import backend.model.user.Sponsor
 import backend.model.user.User
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.validator.constraints.Email
@@ -27,6 +29,9 @@ class UserView() {
     @Valid
     var participant: ParticipantViewModel? = null
 
+    @Valid
+    var sponsor: SponsorView? = null
+
     var profilePic: MediaView? = null
 
     var roles: List<String> = arrayListOf()
@@ -40,6 +45,7 @@ class UserView() {
         this.id = user.core.id
         this.isBlocked = user.isBlocked
         this.participant = if (user.hasRole(Participant::class)) ParticipantViewModel(user) else null
+        this.sponsor = if (user.hasRole(Sponsor::class)) SponsorView(user) else null
         this.profilePic = MediaView(user.profilePic)
         this.roles = user.core.getAuthorities().map { it.authority }
     }
@@ -76,6 +82,51 @@ class UserView() {
             this.eventCity = participant?.currentTeam?.event?.city
             this.teamId = participant?.currentTeam?.id
             this.teamName = participant?.currentTeam?.name
+        }
+    }
+
+    class SponsorView() {
+
+        @JsonIgnore
+        var sponsor: Sponsor? = null
+
+        var company: String? = null
+
+        var url: String? = null
+
+        @Valid
+        var address: AddressView? = null
+
+        var isHidden: Boolean? = null
+
+        constructor(user: User) : this() {
+            this.sponsor = user.getRole(Sponsor::class)
+            this.company = sponsor?.company
+            this.url = sponsor?.url.toString()
+            this.address = AddressView(sponsor?.address)
+            this.isHidden = sponsor?.isHidden
+        }
+    }
+
+    class AddressView() {
+
+        @NotNull
+        var street: String? = null
+
+        @NotNull
+        var housenumber: String? = null
+
+        @NotNull
+        var city: String? = null
+
+        @NotNull
+        var country: String? = null
+
+        constructor(address: Address?) : this() {
+            this.street = address?.street
+            this.housenumber = address?.housenumber
+            this.city = address?.city
+            this.country = address?.country
         }
     }
 }
