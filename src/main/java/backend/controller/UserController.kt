@@ -6,9 +6,8 @@ import backend.controller.exceptions.ConflictException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
 import backend.model.event.TeamService
-import backend.model.user.Participant
-import backend.model.user.User
-import backend.model.user.UserService
+import backend.model.misc.Url
+import backend.model.user.*
 import backend.services.ConfigurationService
 import backend.util.getSignedJwtToken
 import backend.view.BasicUserView
@@ -58,7 +57,7 @@ open class UserController {
         if (userService.exists(email)) throw ConflictException("email ${body.email!!} already exists")
 
         val user = userService.create(email, password)
-        user.apply(body)
+        user.setValuesFrom(body)
         userService.save(user)
 
         user.profilePic.uploadToken = getSignedJwtToken(JWT_SECRET, user.profilePic.id.toString())
@@ -117,7 +116,8 @@ open class UserController {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (user.core.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")
-        user.apply(body)
+
+        user.setValuesFrom(body)
         userService.save(user)
 
         user.profilePic.uploadToken = getSignedJwtToken(JWT_SECRET, user.profilePic.id.toString())
@@ -136,27 +136,47 @@ open class UserController {
         return BasicUserView(user)
     }
 
-    private fun User.apply(userView: UserView): User {
+    private fun User.setValuesFrom(userView: UserView): User {
 
         this.firstname = userView.firstname ?: this.firstname
         this.lastname = userView.lastname ?: this.lastname
         this.gender = userView.gender ?: this.gender
 
-        if (userView.participant == null) return this;
+        userView.participant?.let { this.becomeOrModifyParticipant(it) }
+        userView.sponsor?.let { this.becomeOrModifySponsor(it) }
 
-        if (!this.hasRole(Participant::class)) this.addRole(Participant::class)
-        val p = this.getRole(Participant::class)!!
-        p.tshirtsize = userView.participant?.tshirtsize ?: p.tshirtsize
-        p.emergencynumber = userView.participant?.emergencynumber ?: p.emergencynumber
-        p.hometown = userView.participant?.hometown ?: p.hometown
+        return this
+    }
+
+    private fun User.becomeOrModifyParticipant(participantViewModel: UserView.ParticipantViewModel) {
+        val p = this.getRole(Participant::class) ?: this.addRole(Participant::class)
+
+        p.tshirtsize = participantViewModel.tshirtsize ?: p.tshirtsize
+        p.emergencynumber = participantViewModel.emergencynumber ?: p.emergencynumber
+        p.hometown = participantViewModel.hometown ?: p.hometown
         p.birthdate = try {
-            LocalDate.parse(userView.participant?.birthdate)
+            LocalDate.parse(participantViewModel.birthdate)
         } catch (e: Exception) {
             p.birthdate
         }
-        p.phonenumber = userView.participant?.phonenumber ?: p.phonenumber
+        p.phonenumber = participantViewModel.phonenumber ?: p.phonenumber
+    }
+
+    private fun User.becomeOrModifySponsor(sponsorView: UserView.SponsorView): User {
+        val sponsor: Sponsor = this.getRole(Sponsor::class) ?: this.addRole(Sponsor::class)
+
+        sponsor.address = sponsorView.address?.toAddress() ?: sponsor.address
+        sponsor.isHidden = sponsorView.isHidden ?: sponsor.isHidden
+        sponsor.company = sponsorView.company ?: sponsor.company
+
+        val urlString = sponsorView.url
+        if (urlString != null) sponsor.url = Url(urlString)
 
         return this
+    }
+
+    fun UserView.AddressView.toAddress(): Address? {
+        return Address(this.street!!, this.housenumber!!, this.city!!, this.country!!)
     }
 
     /**
