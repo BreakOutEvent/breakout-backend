@@ -6,6 +6,7 @@ import backend.controller.exceptions.UnauthorizedException
 import backend.model.event.TeamService
 import backend.model.sponsoring.Sponsoring
 import backend.model.sponsoring.SponsoringService
+import backend.model.user.Participant
 import backend.model.user.Sponsor
 import backend.model.user.UserService
 import org.javamoney.moneta.Money
@@ -37,10 +38,21 @@ open class SponsoringController {
         this.teamService = teamService
     }
 
-    // TODO: Who is authorized to do this?
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping("/", method = arrayOf(GET))
-    open fun getAllSponsorings(@PathVariable teamId: Long): Iterable<SponsoringView> {
-        return sponsoringService.findByTeamId(teamId).map { SponsoringView(it) }
+    open fun getAllSponsorings(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
+                               @PathVariable teamId: Long): Iterable<SponsoringView> {
+
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
+
+        val participant = user.getRole(Participant::class)
+        val team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId found")
+
+        if (participant != null && team.isMember(participant)) {
+            return sponsoringService.findByTeamId(teamId).map { SponsoringView(it) }
+        } else {
+            throw UnauthorizedException("Only members of the team $teamId can view its sponsorings")
+        }
     }
 
     @PreAuthorize("isAuthenticated()")

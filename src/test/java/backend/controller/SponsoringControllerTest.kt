@@ -24,7 +24,10 @@ class SponsoringControllerTest : IntegrationTest() {
         val team = teamService.create(participant, "name", "description", event)
         sponsoringService.createSponsoring(sponsor, team, Money.parse("EUR 1"), Money.parse("EUR 200"))
 
+        val tokens = getTokens(this.mockMvc, participant.email, "password")
+
         val request = get("/event/${event.id}/team/${team.id}/sponsoring/")
+                .header("Authorization", "Bearer ${tokens.first}")
 
         mockMvc.perform(request)
                 .andExpect(status().isOk)
@@ -35,6 +38,9 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[0].teamId").exists())
                 .andExpect(jsonPath("$.[0].team").exists())
                 .andExpect(jsonPath("$.[0].sponsorId").exists())
+
+        val unauthorized = get("/event/${event.id}/team/${team.id}/sponsoring/")
+        mockMvc.perform(unauthorized).andExpect(status().isUnauthorized)
     }
 
     @Test
