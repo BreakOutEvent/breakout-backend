@@ -7,4 +7,5 @@ import org.javamoney.moneta.Money
 interface SponsoringService {
 
     fun createSponsoring(sponsor: Sponsor, team: Team, amountPerKm: Money, limit: Money): Sponsoring
+    fun findByTeamId(teamId: Long): Iterable<Sponsoring>
 }

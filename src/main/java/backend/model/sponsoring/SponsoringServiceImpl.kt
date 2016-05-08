@@ -22,4 +22,6 @@ class SponsoringServiceImpl : SponsoringService {
         val sponsoring = Sponsoring(sponsor, team, amountPerKm, limit)
         return sponsoringRepository.save(sponsoring)
     }
+
+    override fun findByTeamId(teamId: Long) = sponsoringRepository.findByTeamId(teamId)
 }
