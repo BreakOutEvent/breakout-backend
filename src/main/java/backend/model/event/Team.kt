@@ -6,6 +6,7 @@ import backend.model.location.Location
 import backend.model.media.Media
 import backend.model.misc.EmailAddress
 import backend.model.payment.TeamEntryFeeInvoice
+import backend.model.sponsoring.Sponsoring
 import backend.model.user.Participant
 import org.javamoney.moneta.Money
 import java.math.BigDecimal
@@ -52,6 +53,9 @@ class Team : BasicEntity {
 
     @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "team")
     var invoice: TeamEntryFeeInvoice? = null
+
+    @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "team")
+    var sponsoring: MutableList<Sponsoring> = ArrayList()
 
     private fun addMember(participant: Participant) {
         if (participant.currentTeam != null) throw DomainException("Participant ${participant.email} already is part of a team")
@@ -132,5 +136,8 @@ class Team : BasicEntity {
         this.invoice = null
         this.invitations.forEach { it.team = null }
         this.invitations.clear()
+
+        this.sponsoring.forEach { it.team = null }
+        this.sponsoring.clear()
     }
 }

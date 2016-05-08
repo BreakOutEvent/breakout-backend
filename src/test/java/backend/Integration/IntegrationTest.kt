@@ -17,6 +17,8 @@ import backend.model.media.MediaSizeRepository
 import backend.model.media.MediaSizeService
 import backend.model.payment.TeamEntryFeeService
 import backend.model.posting.*
+import backend.model.sponsoring.SponsoringRepository
+import backend.model.sponsoring.SponsoringService
 import backend.model.user.User
 import backend.model.user.UserRepository
 import backend.model.user.UserService
@@ -62,6 +64,7 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var mediaRepository: MediaRepository
     @Autowired lateinit protected var mediaSizeRepository: MediaSizeRepository
     @Autowired lateinit protected var locationRepository: LocationRepository
+    @Autowired lateinit protected var sponsoringRepository: SponsoringRepository
 
     // Services
     @Autowired lateinit protected var userService: UserService
@@ -74,6 +77,7 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var mediaSizeService: MediaSizeService
     @Autowired lateinit protected var teamEntryFeeService: TeamEntryFeeService
     @Autowired lateinit protected var locationService: LocationService
+    @Autowired lateinit protected var sponsoringService: SponsoringService
 
     lateinit protected var mockMvc: MockMvc
 
@@ -88,6 +92,7 @@ abstract class IntegrationTest {
         mediaSizeRepository.deleteAll()
         eventRepository.deleteAll()
         locationRepository.deleteAll()
+        sponsoringRepository.deleteAll()
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .addFilters<DefaultMockMvcBuilder>(springSecurityFilterChain)

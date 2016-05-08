@@ -4,11 +4,9 @@ package backend.model.user
 
 import backend.model.media.Media
 import backend.model.misc.Url
+import backend.model.sponsoring.Sponsoring
+import javax.persistence.*
 import javax.persistence.CascadeType.ALL
-import javax.persistence.DiscriminatorValue
-import javax.persistence.Embedded
-import javax.persistence.Entity
-import javax.persistence.OneToOne
 
 @Entity
 @DiscriminatorValue("S")
@@ -18,6 +16,9 @@ class Sponsor : UserRole {
 
     @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true)
     lateinit var logo: Media
+
+    @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "team")
+    var sponsorings: MutableList<Sponsoring> = arrayListOf()
 
     @Embedded
     var url: Url? = null
@@ -43,4 +44,10 @@ class Sponsor : UserRole {
     }
 
     override fun getAuthority(): String = "SPONSOR"
+
+    @PreRemove
+    fun preRemove() {
+        this.sponsorings.forEach { it.sponsor = null }
+        this.sponsorings.clear()
+    }
 }

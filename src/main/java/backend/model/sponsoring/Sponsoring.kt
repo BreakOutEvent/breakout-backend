@@ -20,13 +20,10 @@ class Sponsoring : BasicEntity {
         private set
 
     @ManyToOne
-    lateinit var team: Team
-        private set
+    var team: Team? = null
 
     @ManyToOne
-    lateinit var sponsor: Sponsor
-        private set
-
+    var sponsor: Sponsor? = null
 
     /**
      * private no-args constructor for JPA / Hibernate
@@ -50,7 +47,7 @@ class Sponsoring : BasicEntity {
     }
 
     private fun calculateAmount(): Money {
-        val kilometers = team.getMaximumLinearDistanceKM()
+        val kilometers = team!!.getMaximumLinearDistanceKM()
         val amountPerKmAsBigDecimal = amountPerKm.numberStripped
         val total = amountPerKmAsBigDecimal.multiply(BigDecimal.valueOf(kilometers))
 
