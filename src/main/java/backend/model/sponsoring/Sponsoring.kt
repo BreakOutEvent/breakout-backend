@@ -13,6 +13,7 @@ class Sponsoring : BasicEntity {
     lateinit var amountPerKm: Money
         private set
 
+    @Column(name = "sponsoring_limit")
     lateinit var limit: Money
         private set
 
