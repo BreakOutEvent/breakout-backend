@@ -57,7 +57,7 @@ class SponsoringTest {
         val limit = Money.parse("EUR 100")
         val sponsoring = Sponsoring(team, amountPerKm, limit)
 
-        PowerMockito.`when`(team.getLinearDistance()).thenReturn(63200.0)
+        PowerMockito.`when`(team.getLatestLinearDistanceKM()).thenReturn(63.2)
 
         assertEquals(Money.parse("EUR 0.632"), sponsoring.calculateRaisedAmount())
     }
@@ -69,7 +69,7 @@ class SponsoringTest {
         val limit = Money.parse("EUR 10")
         val sponsoring = Sponsoring(team, amountPerKm, limit)
 
-        PowerMockito.`when`(team.getLinearDistance()).thenReturn(20000.0)
+        PowerMockito.`when`(team.getLatestLinearDistanceKM()).thenReturn(63.2)
 
         assertEquals(limit, sponsoring.calculateRaisedAmount())
     }
@@ -81,7 +81,7 @@ class SponsoringTest {
         val limit = Money.parse("EUR 10")
         val sponsoring = Sponsoring(team, amountPerKm, limit)
 
-        PowerMockito.`when`(team.getLinearDistance()).thenReturn(20000.0)
+        PowerMockito.`when`(team.getLatestLinearDistanceKM()).thenReturn(20.0)
 
         assertTrue(sponsoring.reachedLimit())
     }

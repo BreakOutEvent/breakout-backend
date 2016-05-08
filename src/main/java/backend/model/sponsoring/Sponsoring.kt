@@ -42,7 +42,7 @@ class Sponsoring : BasicEntity {
     }
 
     private fun calculateAmount(): Money {
-        val kilometers = team.getLinearDistance() / 1000.0
+        val kilometers = team.getLatestLinearDistanceKM()
         val amountPerKmAsBigDecimal = amountPerKm.numberStripped
         val total = amountPerKmAsBigDecimal.multiply(BigDecimal.valueOf(kilometers))
 
