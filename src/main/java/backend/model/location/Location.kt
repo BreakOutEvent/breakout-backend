@@ -32,7 +32,7 @@ class Location : BasicEntity {
 
     lateinit var date: LocalDateTime
 
-    var distance: Double? = null
+    var distance: Double = 0.0
 
     private constructor() : super()
 
