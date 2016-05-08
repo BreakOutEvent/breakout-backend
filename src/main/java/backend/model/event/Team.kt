@@ -87,7 +87,13 @@ class Team : BasicEntity {
         return this.invitations.map { it.invitee }.contains(email)
     }
 
-    //TODO: Suppress warning as this is used by an @PreAuthorize statement
+    fun getLinearDistance(): Double {
+        throw NotImplementedError("This needs to be implemented!!!")
+    }
+
+    // This is used by a @PreAuthorize statement
+    // which does not get recognized by the compiler
+    @Suppress("UNUSED")
     fun isMember(username: String): Boolean {
         return this.members.map { participant -> participant.email }.contains(username)
     }
