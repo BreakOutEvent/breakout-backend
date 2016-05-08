@@ -5,6 +5,7 @@ import backend.model.event.Team
 import org.javamoney.moneta.Money
 import java.math.BigDecimal
 import javax.persistence.Entity
+import javax.persistence.ManyToOne
 
 @Entity
 class Sponsoring : BasicEntity {
@@ -15,6 +16,7 @@ class Sponsoring : BasicEntity {
     lateinit var limit: Money
         private set
 
+    @ManyToOne
     lateinit var team: Team
         private set
 
