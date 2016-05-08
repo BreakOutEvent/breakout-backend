@@ -77,6 +77,6 @@ class LocationTest {
     @Test
     fun testGetDistance() {
         val distance = distanceCoordsKM(from = Coord(100.0, 203.7), to = coord)
-        assertEquals(distance, location.distance)
+        assertEquals(distance, location.distance, 0.0)
     }
 }

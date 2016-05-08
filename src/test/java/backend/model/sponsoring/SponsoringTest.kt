@@ -9,6 +9,7 @@ import org.powermock.api.mockito.PowerMockito
 import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.PowerMockRunner
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @RunWith(PowerMockRunner::class)
@@ -75,7 +76,7 @@ class SponsoringTest {
     }
 
     @Test
-    fun testReachedLimit() {
+    fun testReachedLimitTrue() {
         val team = PowerMockito.mock(Team::class.java)
         val amountPerKm = Money.parse("EUR 1.0")
         val limit = Money.parse("EUR 10")
@@ -84,6 +85,18 @@ class SponsoringTest {
         PowerMockito.`when`(team.getLatestLinearDistanceKM()).thenReturn(20.0)
 
         assertTrue(sponsoring.reachedLimit())
+    }
+
+    @Test
+    fun testReachedLimitFalse() {
+        val team = PowerMockito.mock(Team::class.java)
+        val amountPerKm = Money.parse("EUR 1.0")
+        val limit = Money.parse("EUR 100")
+        val sponsoring = Sponsoring(team, amountPerKm, limit)
+
+        PowerMockito.`when`(team.getLatestLinearDistanceKM()).thenReturn(20.0)
+
+        assertFalse(sponsoring.reachedLimit())
     }
 }
 
