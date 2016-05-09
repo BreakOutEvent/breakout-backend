@@ -2,6 +2,7 @@ package backend.model.sponsoring
 
 import backend.model.BasicEntity
 import backend.model.event.Team
+import backend.model.sponsoring.SponsoringStatus.*
 import backend.model.user.Sponsor
 import org.javamoney.moneta.Money
 import java.math.BigDecimal
@@ -11,6 +12,9 @@ import javax.persistence.ManyToOne
 
 @Entity
 class Sponsoring : BasicEntity {
+
+    var status: SponsoringStatus = PROPOSED
+        private set
 
     lateinit var amountPerKm: Money
         private set
@@ -46,6 +50,14 @@ class Sponsoring : BasicEntity {
         return calculateAmount().isGreaterThan(limit)
     }
 
+    fun accept() {
+        this.status = ACCEPTED
+    }
+
+    fun reject() {
+        this.status = REJECTED
+    }
+
     private fun calculateAmount(): Money {
         val kilometers = team!!.getMaximumLinearDistanceKM()
         val amountPerKmAsBigDecimal = amountPerKm.numberStripped
@@ -53,4 +65,8 @@ class Sponsoring : BasicEntity {
 
         return Money.of(total, "EUR")
     }
+}
+
+enum class SponsoringStatus {
+    PROPOSED, ACCEPTED, REJECTED
 }
