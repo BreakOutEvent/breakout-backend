@@ -4,11 +4,11 @@ import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
 import backend.model.event.TeamService
-import backend.model.sponsoring.Sponsoring
 import backend.model.sponsoring.SponsoringService
 import backend.model.user.Participant
 import backend.model.user.Sponsor
 import backend.model.user.UserService
+import backend.view.SponsoringView
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RequestMethod.POST
 import javax.validation.Valid
-import javax.validation.constraints.NotNull
 
 @RestController
 @RequestMapping("/event/{eventId}/team/{teamId}/sponsoring")
@@ -73,24 +72,3 @@ open class SponsoringController {
     }
 }
 
-class SponsoringView() {
-
-    var teamId: Long? = null
-    var team: String? = null
-
-    @NotNull
-    var amountPerKm: Double? = null
-
-    @NotNull
-    var limit: Double? = null
-
-    var sponsorId: Long? = null
-
-    constructor(sponsoring: Sponsoring) : this() {
-        this.teamId = sponsoring.team?.id
-        this.team = sponsoring.team?.name
-        this.amountPerKm = sponsoring.amountPerKm.numberStripped.toDouble()
-        this.limit = sponsoring.limit.numberStripped.toDouble()
-        this.sponsorId = sponsoring.sponsor?.id
-    }
-}
