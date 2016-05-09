@@ -32,6 +32,9 @@ import org.springframework.boot.test.IntegrationTest
 import org.springframework.boot.test.SpringApplicationConfiguration
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 import org.springframework.test.context.web.WebAppConfiguration
 import org.springframework.test.web.servlet.MockMvc
@@ -82,6 +85,7 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var locationService: LocationService
     @Autowired lateinit protected var sponsoringService: SponsoringService
     @Autowired lateinit protected var groupMessageService: GroupMessageService
+    @Autowired lateinit protected var userDetailsService: UserDetailsService
 
     lateinit protected var mockMvc: MockMvc
 
@@ -116,7 +120,11 @@ abstract class IntegrationTest {
         return MockMvcRequestBuilders.get(path)
     }
 
-
+    fun setAuthenticatedUser(email: String) {
+        val details = userDetailsService.loadUserByUsername(email)!! // Not null because otherwise exception is thrown
+        val token = UsernamePasswordAuthenticationToken(details.username, details.password, details.authorities)
+        SecurityContextHolder.getContext().authentication = token
+    }
 }
 
 // Add .toJsonString() to class map

@@ -20,9 +20,6 @@ import kotlin.test.assertTrue
 
 class TeamServiceImplTest : IntegrationTest() {
 
-    @Autowired
-    private lateinit var userDetailsService: CustomUserDetailsService
-
     private lateinit var event: Event
 
     @Before

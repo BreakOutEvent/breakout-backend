@@ -3,7 +3,6 @@ package backend.controller
 import backend.Integration.IntegrationTest
 import backend.Integration.getTokens
 import backend.Integration.toJsonString
-import backend.configuration.CustomUserDetailsService
 import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.misc.Coord
@@ -12,9 +11,6 @@ import backend.model.user.Participant
 import org.hamcrest.Matchers.hasSize
 import org.junit.Before
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -33,8 +29,6 @@ class LocationControllerTest : IntegrationTest() {
     private lateinit var firstTeam: Team
     private lateinit var secondTeam: Team
     private lateinit var thirdTeam: Team
-
-    @Autowired lateinit var userDetailsService: CustomUserDetailsService
 
     private lateinit var firstUserToken: String
 
@@ -70,12 +64,6 @@ class LocationControllerTest : IntegrationTest() {
         teamService.join(sixthUser, thirdTeam)
 
         firstUserToken = getTokens(mockMvc, firstUser.email, "password").first
-    }
-
-    private fun setAuthenticatedUser(email: String) {
-        val details = userDetailsService.loadUserByUsername(email)!! // Not null because otherwise exception is thrown
-        val token = UsernamePasswordAuthenticationToken(details.username, details.password, details.authorities)
-        SecurityContextHolder.getContext().authentication = token
     }
 
     @Test
