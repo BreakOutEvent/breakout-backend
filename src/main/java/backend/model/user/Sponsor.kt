@@ -17,7 +17,7 @@ class Sponsor : UserRole {
     @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true)
     lateinit var logo: Media
 
-    @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "team")
+    @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "sponsor")
     var sponsorings: MutableList<Sponsoring> = arrayListOf()
 
     @Embedded
