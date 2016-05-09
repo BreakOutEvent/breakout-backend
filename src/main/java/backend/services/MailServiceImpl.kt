@@ -2,6 +2,7 @@ package backend.services
 
 import backend.model.misc.Email
 import backend.model.misc.EmailRepository
+import backend.util.Profiles.PRODUCTION
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,7 +15,7 @@ import org.springframework.web.client.RestOperations
 import org.springframework.web.util.UriComponentsBuilder
 
 @Service
-@Profile("!test")
+@Profile(PRODUCTION)
 class MailServiceImpl : MailService {
 
     private val url: String
