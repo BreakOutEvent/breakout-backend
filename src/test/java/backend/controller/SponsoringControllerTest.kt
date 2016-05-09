@@ -71,4 +71,36 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.team").exists())
                 .andExpect(jsonPath("$.sponsorId").exists())
     }
+
+    @Test
+    fun testGetAllSponsoringsForSponsor() {
+        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
+        val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val team = teamService.create(participant, "name", "description", event)
+
+        val sponsor1 = userService.create("sponsor1@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
+        sponsoringService.createSponsoring(sponsor1, team, Money.parse("EUR 1"), Money.parse("EUR 200"))
+
+        val sponsor2 = userService.create("sponsor2@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
+        sponsoringService.createSponsoring(sponsor2, team, Money.parse("EUR 1"), Money.parse("EUR 200"))
+
+        val tokens = getTokens(this.mockMvc, sponsor1.email, "password")
+
+        val request = get("/user/${sponsor1.core.id}/sponsor/sponsoring/")
+                .header("Authorization", "Bearer ${tokens.first}")
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$.[0]").exists())
+                .andExpect(jsonPath("$.[0].amountPerKm").exists())
+                .andExpect(jsonPath("$.[0].limit").exists())
+                .andExpect(jsonPath("$.[0].teamId").exists())
+                .andExpect(jsonPath("$.[0].team").exists())
+                .andExpect(jsonPath("$.[0].sponsorId").exists())
+                .andExpect(jsonPath("$.[1]").doesNotExist())
+
+        val unauthorized = get("/event/${event.id}/team/${team.id}/sponsoring/")
+        mockMvc.perform(unauthorized).andExpect(status().isUnauthorized)
+    }
 }

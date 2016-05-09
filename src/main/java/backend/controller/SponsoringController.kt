@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMethod.POST
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/event/{eventId}/team/{teamId}/sponsoring")
 open class SponsoringController {
 
     private var sponsoringService: SponsoringService
@@ -38,7 +37,7 @@ open class SponsoringController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/", method = arrayOf(GET))
+    @RequestMapping("/event/{eventId}/team/{teamId}/sponsoring/", method = arrayOf(GET))
     open fun getAllSponsorings(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
                                @PathVariable teamId: Long): Iterable<SponsoringView> {
 
@@ -55,7 +54,7 @@ open class SponsoringController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/", method = arrayOf(POST))
+    @RequestMapping("/event/{eventId}/team/{teamId}/sponsoring/", method = arrayOf(POST))
     @ResponseStatus(CREATED)
     open fun createSponsoring(@PathVariable teamId: Long,
                               @Valid @RequestBody sponsoringView: SponsoringView,
@@ -69,6 +68,18 @@ open class SponsoringController {
 
         val sponsoring = sponsoringService.createSponsoring(sponsor, team, amountPerKm, limit)
         return SponsoringView(sponsoring)
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping("/user/{userId}/sponsor/sponsoring/", method = arrayOf(GET))
+    open fun getAllSponsoringsForSponsor(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
+                                         @PathVariable userId: Long): Iterable<SponsoringView> {
+
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
+        if (user.core.id != userId) throw UnauthorizedException("A sponsor can only see it's own sponsorings")
+
+        val sponsorings = sponsoringService.findBySponsorId(userId)
+        return sponsorings.map { SponsoringView(it) }
     }
 }
 
