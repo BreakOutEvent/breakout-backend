@@ -38,7 +38,7 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
         var location: Location? = null
         if (postingLocation != null) {
             val uploader = user.getRole(Participant::class) ?: throw DomainException("user is no participant and can therefor not upload location")
-            location = Location(postingLocation, uploader, date, distance)
+            location = Location(postingLocation, uploader, date)
         }
 
         //Create Media-Objects for each media item requested to add

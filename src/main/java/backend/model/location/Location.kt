@@ -6,6 +6,7 @@ import backend.model.event.Team
 import backend.model.misc.Coord
 import backend.model.posting.Posting
 import backend.model.user.Participant
+import backend.util.distanceCoordsKM
 import java.time.LocalDateTime
 import javax.persistence.Embedded
 import javax.persistence.Entity
@@ -31,15 +32,15 @@ class Location : BasicEntity {
 
     lateinit var date: LocalDateTime
 
-    var distance: Double? = null
+    var distance: Double = 0.0
 
     private constructor() : super()
 
-    constructor(coord: Coord, uploader: Participant, date: LocalDateTime, distance: Double?) {
+    constructor(coord: Coord, uploader: Participant, date: LocalDateTime) {
         this.coord = coord
         this.team = uploader.currentTeam ?: throw DomainException("A user without a team can't upload locations")
         this.uploader = uploader
         this.date = date
-        this.distance = distance
+        this.distance = distanceCoordsKM(from = team!!.event.startingLocation, to = coord)
     }
 }

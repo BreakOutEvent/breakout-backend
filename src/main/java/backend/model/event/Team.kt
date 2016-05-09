@@ -6,6 +6,7 @@ import backend.model.location.Location
 import backend.model.media.Media
 import backend.model.misc.EmailAddress
 import backend.model.payment.TeamEntryFeeInvoice
+import backend.model.sponsoring.Sponsoring
 import backend.model.user.Participant
 import org.javamoney.moneta.Money
 import java.math.BigDecimal
@@ -53,6 +54,9 @@ class Team : BasicEntity {
     @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "team")
     var invoice: TeamEntryFeeInvoice? = null
 
+    @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "team")
+    var sponsoring: MutableList<Sponsoring> = ArrayList()
+
     private fun addMember(participant: Participant) {
         if (participant.currentTeam != null) throw DomainException("Participant ${participant.email} already is part of a team")
         if (this.isFull()) throw DomainException("This team already has two members")
@@ -87,7 +91,19 @@ class Team : BasicEntity {
         return this.invitations.map { it.invitee }.contains(email)
     }
 
-    //TODO: Suppress warning as this is used by an @PreAuthorize statement
+    fun getLatestLinearDistanceKM(): Double {
+        val locationWithMaxDistance = locations.maxBy { it.date }
+        return locationWithMaxDistance?.distance ?: 0.0
+    }
+
+    fun getMaximumLinearDistanceKM(): Double {
+        val locationWithMaxDistance = locations.maxBy { it.distance }
+        return locationWithMaxDistance?.distance ?: 0.0
+    }
+
+    // This is used by a @PreAuthorize statement
+    // which does not get recognized by the compiler
+    @Suppress("UNUSED")
     fun isMember(username: String): Boolean {
         return this.members.map { participant -> participant.email }.contains(username)
     }
@@ -120,5 +136,8 @@ class Team : BasicEntity {
         this.invoice = null
         this.invitations.forEach { it.team = null }
         this.invitations.clear()
+
+        this.sponsoring.forEach { it.team = null }
+        this.sponsoring.clear()
     }
 }
