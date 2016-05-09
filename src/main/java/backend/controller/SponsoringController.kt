@@ -36,6 +36,11 @@ open class SponsoringController {
         this.teamService = teamService
     }
 
+    /**
+     * GET /event/{eventId}/team/{teamId}/sponsoring/
+     * Get a list of all sponsorings for the team with teamId
+     * This can only be done if user is member of team
+     */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/event/{eventId}/team/{teamId}/sponsoring/", method = arrayOf(GET))
     open fun getAllSponsorings(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
@@ -53,6 +58,11 @@ open class SponsoringController {
         }
     }
 
+    /**
+     * POST /event/{eventId}/team/{teamId}/sponsoring/
+     * Create a new sponsoring for the team with teamId
+     * This can only done if user is a sponsor
+     */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/event/{eventId}/team/{teamId}/sponsoring/", method = arrayOf(POST))
     @ResponseStatus(CREATED)
@@ -70,6 +80,11 @@ open class SponsoringController {
         return SponsoringView(sponsoring)
     }
 
+    /**
+     * GET /user/{userId}/sponsor/sponsoring/
+     * Get a list of all sponsorings for the user with userId
+     * This can only be done if the user is a sponsor
+     */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/user/{userId}/sponsor/sponsoring/", method = arrayOf(GET))
     open fun getAllSponsoringsForSponsor(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
