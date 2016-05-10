@@ -58,7 +58,6 @@ open class MessagingController {
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/{id}/", method = arrayOf(PUT))
-    @ResponseStatus(CREATED)
     open fun editGroupMessage(@PathVariable("id") id: Long,
                               @Valid @RequestBody body: List<Long>,
                               @AuthenticationPrincipal customUserDetails: CustomUserDetails): GroupMessageView {
@@ -84,7 +83,7 @@ open class MessagingController {
     @ResponseStatus(CREATED)
     open fun addMessage(@PathVariable("id") id: Long,
                         @Valid @RequestBody body: MessageView,
-                        @AuthenticationPrincipal customUserDetails: CustomUserDetails): MessageView {
+                        @AuthenticationPrincipal customUserDetails: CustomUserDetails): GroupMessageView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val groupMessage = groupMessageService.getByID(id) ?: throw NotFoundException("groupmessage with id $id does not exist")
@@ -93,7 +92,7 @@ open class MessagingController {
         val message = Message(user.core, body.text!!, body.date!!.toLocalDateTime())
         groupMessageService.addMessage(message, groupMessage)
 
-        return MessageView(message)
+        return GroupMessageView(groupMessage)
     }
 
     /**
@@ -102,7 +101,6 @@ open class MessagingController {
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/{id}/", method = arrayOf(GET))
-    @ResponseStatus(CREATED)
     open fun getGroupMessage(@PathVariable("id") id: Long,
                              @AuthenticationPrincipal customUserDetails: CustomUserDetails): GroupMessageView {
 

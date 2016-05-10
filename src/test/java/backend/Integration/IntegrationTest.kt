@@ -15,6 +15,8 @@ import backend.model.media.MediaRepository
 import backend.model.media.MediaService
 import backend.model.media.MediaSizeRepository
 import backend.model.media.MediaSizeService
+import backend.model.messaging.GroupMessageRepository
+import backend.model.messaging.GroupMessageService
 import backend.model.payment.TeamEntryFeeService
 import backend.model.posting.*
 import backend.model.sponsoring.SponsoringRepository
@@ -65,6 +67,7 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var mediaSizeRepository: MediaSizeRepository
     @Autowired lateinit protected var locationRepository: LocationRepository
     @Autowired lateinit protected var sponsoringRepository: SponsoringRepository
+    @Autowired lateinit protected var groupMessageRepository: GroupMessageRepository
 
     // Services
     @Autowired lateinit protected var userService: UserService
@@ -78,6 +81,7 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var teamEntryFeeService: TeamEntryFeeService
     @Autowired lateinit protected var locationService: LocationService
     @Autowired lateinit protected var sponsoringService: SponsoringService
+    @Autowired lateinit protected var groupMessageService: GroupMessageService
 
     lateinit protected var mockMvc: MockMvc
 
@@ -87,6 +91,7 @@ abstract class IntegrationTest {
         likeRepository.deleteAll()
         postingRepository.deleteAll()
         commentRepository.deleteAll()
+        groupMessageRepository.deleteAll()
         userRepository.deleteAll()
         mediaRepository.deleteAll()
         mediaSizeRepository.deleteAll()
