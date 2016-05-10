@@ -1,7 +1,9 @@
 package backend.model.posting
 
+import backend.controller.exceptions.ConflictException
 import backend.model.user.UserCore
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -14,7 +16,11 @@ class LikeServiceImpl @Autowired constructor(val repository: LikeRepository) : L
     @Transactional
     override fun createLike(date: LocalDateTime, posting: Posting, user: UserCore): Like {
         val like: Like = Like(date, posting, user)
-        repository.save(like)
+        try {
+            repository.save(like)
+        } catch(e: DataIntegrityViolationException) {
+            throw ConflictException("like for posting ${posting.id} and user ${user.id} already exists")
+        }
         posting.likes.add(like)
         return like
     }

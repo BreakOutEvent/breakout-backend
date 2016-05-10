@@ -940,6 +940,45 @@ open class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
+    open fun createNewLikeFailDuplicate() {
+
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, 0.0, LocalDateTime.now())
+
+        val postData = mapOf(
+                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+        ).toJsonString()
+
+        val request = MockMvcRequestBuilders
+                .request(HttpMethod.POST, "/posting/${posting.id}/like/")
+                .header("Authorization", "Bearer ${userCredentials.accessToken}")
+                .contentType(APPLICATION_JSON)
+                .content(postData)
+
+        val response = mockMvc.perform(request)
+                .andExpect(status().isCreated)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.date").exists())
+                .andExpect(jsonPath("$.user").exists())
+                .andReturn().response.contentAsString
+
+        println(response)
+
+
+        val requestSecond = MockMvcRequestBuilders
+                .request(HttpMethod.POST, "/posting/${posting.id}/like/")
+                .header("Authorization", "Bearer ${userCredentials.accessToken}")
+                .contentType(APPLICATION_JSON)
+                .content(postData)
+
+        val responseSecond = mockMvc.perform (requestSecond)
+                .andExpect(status().isConflict)
+                .andReturn().response.contentAsString
+
+        println(responseSecond)
+    }
+
+    @Test
     open fun getLikesForPosting() {
         val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, 0.0, LocalDateTime.now())
         likeService.createLike(LocalDateTime.now(), posting, user.core)

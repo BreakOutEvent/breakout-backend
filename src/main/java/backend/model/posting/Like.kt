@@ -3,13 +3,16 @@ package backend.model.posting
 import backend.model.BasicEntity
 import backend.model.user.UserCore
 import java.time.LocalDateTime
-import javax.persistence.Entity
-import javax.persistence.ManyToOne
-import javax.persistence.PreRemove
-import javax.persistence.Table
+import javax.persistence.*
 
 @Entity
-@Table(name = "postinglike")
+
+@Table(
+        name = "postinglike",
+        uniqueConstraints = arrayOf(
+                UniqueConstraint(columnNames = arrayOf("posting_id", "user_id"))
+        )
+)
 class Like : BasicEntity {
 
     private constructor() : super()
