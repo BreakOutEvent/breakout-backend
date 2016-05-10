@@ -36,6 +36,8 @@ class UserView() {
 
     var roles: List<String> = arrayListOf()
 
+    var groupMessageIds: List<Long> = arrayListOf()
+
     constructor(user: User) : this() {
         this.user = user
         this.firstname = user.firstname
@@ -48,6 +50,7 @@ class UserView() {
         this.sponsor = if (user.hasRole(Sponsor::class)) SponsorView(user) else null
         this.profilePic = MediaView(user.profilePic)
         this.roles = user.core.getAuthorities().map { it.authority }
+        this.groupMessageIds = user.core.groupMessages.map { it.id!! }
     }
 
     class ParticipantViewModel() {
