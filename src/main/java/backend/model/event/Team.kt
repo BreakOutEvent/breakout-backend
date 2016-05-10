@@ -37,6 +37,7 @@ class Team : BasicEntity {
     @ManyToOne
     lateinit var event: Event
 
+    @Column(columnDefinition = "TEXT")
     lateinit var description: String
 
     @OneToMany(cascade = arrayOf(ALL), mappedBy = "team", orphanRemoval = true)

@@ -16,6 +16,7 @@ class Posting : BasicEntity {
 
     private constructor() : super()
 
+    @Column(columnDefinition = "TEXT")
     var text: String? = null
 
     @ElementCollection
