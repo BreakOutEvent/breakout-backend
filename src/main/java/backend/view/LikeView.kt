@@ -12,8 +12,6 @@ class LikeView() {
     @NotNull
     var date: Long? = null
 
-    var media: List<MediaView>? = null
-
     @Valid
     var user: BasicUserView? = null
 
