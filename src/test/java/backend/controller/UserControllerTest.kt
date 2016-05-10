@@ -7,8 +7,8 @@ import org.junit.Ignore
 import org.junit.Test
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 class UserControllerTest : IntegrationTest() {
 
@@ -58,7 +58,8 @@ class UserControllerTest : IntegrationTest() {
                                 "city" to "Dresden",
                                 "housenumber" to "79c",
                                 "country" to "Germany",
-                                "street" to "Würzburger Straße"
+                                "street" to "Würzburger Straße",
+                                "zipcode" to "01189"
                         )
                 )
         ).toJsonString()
@@ -86,6 +87,7 @@ class UserControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.sponsor.address.housenumber").value("79c"))
                 .andExpect(jsonPath("$.sponsor.address.country").value("Germany"))
                 .andExpect(jsonPath("$.sponsor.address.street").value("Würzburger Straße"))
+                .andExpect(jsonPath("$.sponsor.address.zipcode").value("01189"))
                 .andReturn().response.contentAsString
 
         println(result)

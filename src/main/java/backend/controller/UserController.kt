@@ -179,7 +179,7 @@ open class UserController {
     }
 
     fun UserView.AddressView.toAddress(): Address? {
-        return Address(this.street!!, this.housenumber!!, this.city!!, this.country!!)
+        return Address(this.street!!, this.housenumber!!, this.city!!, this.country!!, this.zipcode!!)
     }
 
     /**

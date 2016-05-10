@@ -125,11 +125,15 @@ class UserView() {
         @NotNull
         var country: String? = null
 
+        @NotNull
+        var zipcode: String? = null
+
         constructor(address: Address?) : this() {
             this.street = address?.street
             this.housenumber = address?.housenumber
             this.city = address?.city
             this.country = address?.country
+            this.zipcode = address?.zipcode
         }
     }
 }
