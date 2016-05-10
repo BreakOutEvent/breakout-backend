@@ -1,6 +1,7 @@
 package backend.controller
 
 import backend.configuration.CustomUserDetails
+import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
 import backend.model.event.TeamService
@@ -15,8 +16,7 @@ import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.GET
-import org.springframework.web.bind.annotation.RequestMethod.POST
+import org.springframework.web.bind.annotation.RequestMethod.*
 import javax.validation.Valid
 
 @RestController
@@ -95,6 +95,22 @@ open class SponsoringController {
 
         val sponsorings = sponsoringService.findBySponsorId(userId)
         return sponsorings.map { SponsoringView(it) }
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping("/event/{eventId}/team/{teamId}/sponsoring/{sponsoringId}/status/", method = arrayOf(PUT))
+    open fun acceptOrRejectSponsoring(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
+                                      @PathVariable sponsoringId: Long,
+                                      @RequestBody body: Map<String, String>): SponsoringView {
+
+        val sponsoring = sponsoringService.findOne(sponsoringId) ?: throw NotFoundException("No sponsoring with id $sponsoringId found")
+        val status = body["status"] ?: throw BadRequestException("Missing status in body")
+
+        when (status) {
+            "accepted" -> return SponsoringView(sponsoringService.acceptSponsoring(sponsoring))
+            "rejected" -> return SponsoringView(sponsoringService.rejectSponsoring(sponsoring))
+            else -> throw BadRequestException("Invalid status $status")
+        }
     }
 }
 

@@ -38,4 +38,7 @@ class SponsoringServiceImpl : SponsoringService {
     override fun findByTeamId(teamId: Long) = sponsoringRepository.findByTeamId(teamId)
 
     override fun findBySponsorId(sponsorId: Long) = sponsoringRepository.findBySponsorCoreId(sponsorId)
+
+    override fun findOne(id: Long): Sponsoring? = sponsoringRepository.findOne(id)
+
 }

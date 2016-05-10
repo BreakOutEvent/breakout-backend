@@ -103,4 +103,54 @@ class SponsoringControllerTest : IntegrationTest() {
         val unauthorized = get("/event/${event.id}/team/${team.id}/sponsoring/")
         mockMvc.perform(unauthorized).andExpect(status().isUnauthorized)
     }
+
+    @Test
+    fun testAcceptSponsoring() {
+        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
+        val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val sponsor = userService.create("sponsor@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
+        val team = teamService.create(participant, "name", "description", event)
+        val sponsoring = sponsoringService.createSponsoring(sponsor, team, Money.parse("EUR 1"), Money.parse("EUR 200"))
+
+        val tokens = getTokens(this.mockMvc, participant.email, "password")
+
+        val body = mapOf("status" to "accepted").toJsonString()
+        val request = this.put("/event/${event.id}/team/${team.id}/sponsoring/${sponsoring.id}/status/", body)
+                .header("Authorization", "Bearer ${tokens.first}")
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.amountPerKm").exists())
+                .andExpect(jsonPath("$.limit").exists())
+                .andExpect(jsonPath("$.teamId").exists())
+                .andExpect(jsonPath("$.team").exists())
+                .andExpect(jsonPath("$.sponsorId").exists())
+                .andExpect(jsonPath("$.status").value("accepted"))
+    }
+
+    @Test
+    fun testRejectSponsoring() {
+        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
+        val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val sponsor = userService.create("sponsor@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
+        val team = teamService.create(participant, "name", "description", event)
+        val sponsoring = sponsoringService.createSponsoring(sponsor, team, Money.parse("EUR 1"), Money.parse("EUR 200"))
+
+        val tokens = getTokens(this.mockMvc, participant.email, "password")
+
+        val body = mapOf("status" to "rejected").toJsonString()
+        val request = this.put("/event/${event.id}/team/${team.id}/sponsoring/${sponsoring.id}/status/", body)
+                .header("Authorization", "Bearer ${tokens.first}")
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.amountPerKm").exists())
+                .andExpect(jsonPath("$.limit").exists())
+                .andExpect(jsonPath("$.teamId").exists())
+                .andExpect(jsonPath("$.team").exists())
+                .andExpect(jsonPath("$.sponsorId").exists())
+                .andExpect(jsonPath("$.status").value("rejected"))
+    }
 }
