@@ -3,6 +3,8 @@ package backend.model.user
 import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.media.Media
+import backend.model.messaging.GroupMessage
+import backend.model.messaging.Message
 import backend.model.payment.Payment
 import backend.model.posting.Comment
 import backend.model.posting.Posting
@@ -48,6 +50,14 @@ open class UserCore : BasicEntity, User {
     @OrderColumn
     @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY, orphanRemoval = true)
     val comments: MutableList<Comment> = ArrayList()
+
+    @OrderColumn
+    @ManyToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY)
+    val groupMessages: MutableList<GroupMessage> = ArrayList()
+
+    @OrderColumn
+    @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY, orphanRemoval = true)
+    val messages: MutableList<Message> = ArrayList()
 
     @OneToMany
     val payments: MutableList<Payment> = ArrayList()
