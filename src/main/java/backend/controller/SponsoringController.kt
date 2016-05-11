@@ -4,12 +4,17 @@ import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
+import backend.model.event.Team
 import backend.model.event.TeamService
+import backend.model.misc.Url
+import backend.model.sponsoring.Sponsoring
 import backend.model.sponsoring.SponsoringService
+import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Participant
 import backend.model.user.Sponsor
 import backend.model.user.UserService
 import backend.view.SponsoringView
+import backend.view.UnregisteredSponsorView
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
@@ -71,14 +76,43 @@ open class SponsoringController {
                               @AuthenticationPrincipal customUserDetails: CustomUserDetails): SponsoringView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
-        val sponsor = user.getRole(Sponsor::class) ?: throw UnauthorizedException("User is no sponsor")
         val team = teamService.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")
         val amountPerKm = Money.of(sponsoringView.amountPerKm, "EUR")
         val limit = Money.of(sponsoringView.limit, "EUR")
 
-        val sponsoring = sponsoringService.createSponsoring(sponsor, team, amountPerKm, limit)
+        val sponsoring = if (user.hasRole(Sponsor::class)) {
+            val sponsor = user.getRole(Sponsor::class) ?: throw Exception("Can't get role sponsor")
+            createSponsoringWithAuthenticatedSponsor(team, amountPerKm, limit, sponsor)
+        } else if (user.hasRole(Participant::class)) {
+            val unregisteredSponsorView = sponsoringView.unregisteredSponsor ?:
+                    throw BadRequestException("User is no sponsor and no data for unregistered sponsor is provided")
+            createSponsoringWithUnregisteredSponsor(team, amountPerKm, limit, unregisteredSponsorView)
+        } else {
+            throw BadRequestException("User is neither participant nor sponsor")
+        }
+
         return SponsoringView(sponsoring)
     }
+
+    private fun createSponsoringWithAuthenticatedSponsor(team: Team, amount: Money, limit: Money, sponsor: Sponsor): Sponsoring {
+        return sponsoringService.createSponsoring(sponsor, team, amount, limit)
+    }
+
+    private fun createSponsoringWithUnregisteredSponsor(team: Team, amount: Money, limit: Money, sponsor: UnregisteredSponsorView): Sponsoring {
+
+        val unregisteredSponsor = UnregisteredSponsor(
+                firstname = sponsor.firstname!!,
+                lastname = sponsor.lastname!!,
+                company = sponsor.company!!,
+                gender = sponsor.gender!!,
+                url = Url(sponsor.url!!),
+                address = sponsor.address!!.toAddress()!!,
+                isHidden = sponsor.isHidden)
+
+        val sponsoring = sponsoringService.createSponsoringWithOfflineSponsor(team, amount, limit, unregisteredSponsor)
+        return sponsoring
+    }
+
 
     /**
      * GET /user/{userId}/sponsor/sponsoring/

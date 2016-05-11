@@ -24,6 +24,15 @@ class SponsoringServiceImpl : SponsoringService {
     }
 
     @Transactional
+    override fun createSponsoringWithOfflineSponsor(team: Team,
+                                                    amountPerKm: Money,
+                                                    limit: Money,
+                                                    unregisteredSponsor: UnregisteredSponsor): Sponsoring {
+        val sponsoring = Sponsoring(unregisteredSponsor, team, amountPerKm, limit)
+        return sponsoringRepository.save(sponsoring)
+    }
+
+    @Transactional
     override fun acceptSponsoring(sponsoring: Sponsoring): Sponsoring {
         sponsoring.accept()
         return sponsoringRepository.save(sponsoring)

@@ -15,7 +15,10 @@ interface SponsoringService {
     @PreAuthorize("#sponsoring.team.isMember(authentication.name)")
     fun acceptSponsoring(sponsoring: Sponsoring): Sponsoring
 
-    @PreAuthorize(("#sponsoring.team.isMember(authentication.name)"))
+    @PreAuthorize("#sponsoring.team.isMember(authentication.name)")
     fun rejectSponsoring(sponsoring: Sponsoring): Sponsoring
+
+    @PreAuthorize("#team.isMember(authentication.name)")
+    fun createSponsoringWithOfflineSponsor(team: Team, amountPerKm: Money, limit: Money, unregisteredSponsor: UnregisteredSponsor): Sponsoring
 }
 

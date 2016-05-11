@@ -2,13 +2,13 @@ package backend.model.sponsoring
 
 import backend.model.BasicEntity
 import backend.model.event.Team
+import backend.model.misc.Url
 import backend.model.sponsoring.SponsoringStatus.*
+import backend.model.user.Address
 import backend.model.user.Sponsor
 import org.javamoney.moneta.Money
 import java.math.BigDecimal
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.ManyToOne
+import javax.persistence.*
 
 @Entity
 class Sponsoring : BasicEntity {
@@ -29,6 +29,9 @@ class Sponsoring : BasicEntity {
     @ManyToOne
     var sponsor: Sponsor? = null
 
+    @Embedded
+    var unregisteredSponsor: UnregisteredSponsor? = null
+
     /**
      * private no-args constructor for JPA / Hibernate
      */
@@ -36,6 +39,13 @@ class Sponsoring : BasicEntity {
 
     constructor(sponsor: Sponsor, team: Team, amountPerKm: Money, limit: Money) {
         this.sponsor = sponsor
+        this.team = team
+        this.amountPerKm = amountPerKm
+        this.limit = limit
+    }
+
+    constructor(unregisteredSponsor: UnregisteredSponsor, team: Team, amountPerKm: Money, limit: Money) {
+        this.unregisteredSponsor = unregisteredSponsor
         this.team = team
         this.amountPerKm = amountPerKm
         this.limit = limit
@@ -70,3 +80,12 @@ class Sponsoring : BasicEntity {
 enum class SponsoringStatus {
     PROPOSED, ACCEPTED, REJECTED
 }
+
+@Embeddable
+class UnregisteredSponsor(var firstname: String,
+                          var lastname: String,
+                          var company: String,
+                          var gender: String,
+                          @Embedded var url: Url,
+                          @Embedded var address: Address,
+                          @Column(nullable = true) var isHidden: Boolean = false)

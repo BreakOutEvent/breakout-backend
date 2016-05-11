@@ -44,7 +44,7 @@ class SponsoringControllerTest : IntegrationTest() {
     }
 
     @Test
-    fun testCreateSponsoring() {
+    fun testCreateSponsoringWithRegisteredSponsor() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val sponsor = userService.create("sponsor@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
@@ -70,6 +70,60 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.teamId").exists())
                 .andExpect(jsonPath("$.team").exists())
                 .andExpect(jsonPath("$.sponsorId").exists())
+                .andExpect(jsonPath("$.status").value("proposed"))
+    }
+
+    fun testCreateSponsoringWithUnregisteredSponsor() {
+        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
+        val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val team = teamService.create(participant, "name", "description", event)
+
+        val body = mapOf(
+                "amountPerKm" to 1.0,
+                "limit" to 200,
+                "unregisteredSponsor" to mapOf(
+                        "firstname" to "Florian",
+                        "lastname" to "Schmidt",
+                        "url" to "www.florianschmidt.me",
+                        "gender" to "male",
+                        "hidden" to false,
+                        "company" to "awesome AG",
+                        "address" to mapOf(
+                                "street" to "test",
+                                "housenumber" to "01",
+                                "city" to "Dresden",
+                                "zipcode" to "01198",
+                                "country" to "Germany"
+                        )
+                )
+        ).toJsonString()
+
+        val tokens = getTokens(this.mockMvc, participant.email, "password")
+
+        val request = MockMvcRequestBuilders.post("/event/${event.id}/team/${team.id}/sponsoring/")
+                .header("Authorization", "Bearer $tokens.first}")
+
+        mockMvc.perform(request)
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.amountPerKm").exists())
+                .andExpect(jsonPath("$.limit").exists())
+                .andExpect(jsonPath("$.teamId").exists())
+                .andExpect(jsonPath("$.team").exists())
+                .andExpect(jsonPath("$.status").value("accepted"))
+                .andExpect(jsonPath("$.sponsorId").doesNotExist())
+                .andExpect(jsonPath("$.unregisteredSponsor.firstname").exists())
+                .andExpect(jsonPath("$.unregisteredSponsor.lastname").exists())
+                .andExpect(jsonPath("$.unregisteredSponsor.url").exists())
+                .andExpect(jsonPath("$.unregisteredSponsor.gender").exists())
+                .andExpect(jsonPath("$.unregisteredSponsor.hidden").exists())
+                .andExpect(jsonPath("$.unregisteredSponsor.company").exists())
+                .andExpect(jsonPath("$.unregisteredSponsor.address").exists())
+                .andExpect(jsonPath("$.unregisteredSponsor.address.street").exists())
+                .andExpect(jsonPath("$.unregisteredSponsor.address.housenumber").exists())
+                .andExpect(jsonPath("$.unregisteredSponsor.address.city").exists())
+                .andExpect(jsonPath("$.unregisteredSponsor.address.zipcode").exists())
+                .andExpect(jsonPath("$.unregisteredSponsor.address.country").exists())
     }
 
     @Test
