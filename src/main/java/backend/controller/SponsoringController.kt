@@ -105,7 +105,7 @@ open class SponsoringController {
                 lastname = sponsor.lastname!!,
                 company = sponsor.company!!,
                 gender = sponsor.gender!!,
-                url = Url(sponsor.url!!),
+                url = sponsor.url!!,
                 address = sponsor.address!!.toAddress()!!,
                 isHidden = sponsor.isHidden)
 

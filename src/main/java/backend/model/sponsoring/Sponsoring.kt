@@ -2,7 +2,6 @@ package backend.model.sponsoring
 
 import backend.model.BasicEntity
 import backend.model.event.Team
-import backend.model.misc.Url
 import backend.model.sponsoring.SponsoringStatus.*
 import backend.model.user.Address
 import backend.model.user.Sponsor
@@ -49,6 +48,7 @@ class Sponsoring : BasicEntity {
         this.team = team
         this.amountPerKm = amountPerKm
         this.limit = limit
+        this.status = ACCEPTED
     }
 
     fun calculateRaisedAmount(): Money {
@@ -82,10 +82,35 @@ enum class SponsoringStatus {
 }
 
 @Embeddable
-class UnregisteredSponsor(var firstname: String,
-                          var lastname: String,
-                          var company: String,
-                          var gender: String,
-                          @Embedded var url: Url,
-                          @Embedded var address: Address,
-                          @Column(nullable = true) var isHidden: Boolean = false)
+class UnregisteredSponsor {
+
+    lateinit var firstname: String
+    lateinit var lastname: String
+    lateinit var company: String
+    lateinit var gender: String
+    lateinit var url: String
+    @Embedded lateinit var address: Address
+    @Column(nullable = true) var isHidden: Boolean = false
+
+    /**
+     * private no-args constructor for JPA / Hibernate
+     */
+    private constructor()
+
+    constructor(firstname: String,
+                lastname: String,
+                company: String,
+                gender: String,
+                url: String,
+                address: Address,
+                isHidden: Boolean = false) {
+
+        this.firstname = firstname
+        this.lastname = lastname
+        this.company = company
+        this.gender = gender
+        this.url = url
+        this.address = address
+        this.isHidden = isHidden
+    }
+}

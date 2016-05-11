@@ -41,7 +41,7 @@ class SponsoringView() {
     }
 }
 
-class UnregisteredSponsorView {
+class UnregisteredSponsorView() {
 
     @Valid
     @NotNull
@@ -65,11 +65,11 @@ class UnregisteredSponsorView {
     @NotNull
     var isHidden = false
 
-    constructor(unregisteredSponsor: UnregisteredSponsor) {
+    constructor(unregisteredSponsor: UnregisteredSponsor): this() {
         this.address = UserView.AddressView(unregisteredSponsor.address)
         this.company = unregisteredSponsor.company
         this.url = unregisteredSponsor.url.toString()
-        this.gender = unregisteredSponsor.firstname
+        this.gender = unregisteredSponsor.gender
         this.firstname = unregisteredSponsor.firstname
         this.lastname = unregisteredSponsor.lastname
         this.isHidden = unregisteredSponsor.isHidden
