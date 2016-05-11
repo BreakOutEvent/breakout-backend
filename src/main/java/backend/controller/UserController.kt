@@ -178,9 +178,6 @@ open class UserController {
         return this
     }
 
-    fun UserView.AddressView.toAddress(): Address? {
-        return Address(this.street!!, this.housenumber!!, this.city!!, this.country!!, this.zipcode!!)
-    }
 
     /**
      * GET /user/invitation?token=lorem
@@ -191,4 +188,8 @@ open class UserController {
         val invitation = teamService.findInvitationsByInviteCode(token) ?: throw NotFoundException("No invitation for code $token")
         return DetailedInvitationView(invitation)
     }
+}
+
+fun UserView.AddressView.toAddress(): Address? {
+    return Address(this.street!!, this.housenumber!!, this.city!!, this.country!!, this.zipcode!!)
 }
