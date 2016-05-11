@@ -71,8 +71,10 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.team").exists())
                 .andExpect(jsonPath("$.sponsorId").exists())
                 .andExpect(jsonPath("$.status").value("proposed"))
+                .andExpect(jsonPath("$.unregisteredSponsor").doesNotExist())
     }
 
+    @Test
     fun testCreateSponsoringWithUnregisteredSponsor() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
@@ -101,9 +103,11 @@ class SponsoringControllerTest : IntegrationTest() {
         val tokens = getTokens(this.mockMvc, participant.email, "password")
 
         val request = MockMvcRequestBuilders.post("/event/${event.id}/team/${team.id}/sponsoring/")
-                .header("Authorization", "Bearer $tokens.first}")
+                .header("Authorization", "Bearer ${tokens.first}")
+                .contentType(APPLICATION_JSON_UTF_8)
+                .content(body)
 
-        mockMvc.perform(request)
+        val result = mockMvc.perform(request)
                 .andExpect(status().isCreated)
                 .andExpect(jsonPath("$").exists())
                 .andExpect(jsonPath("$.amountPerKm").exists())
@@ -112,18 +116,21 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.team").exists())
                 .andExpect(jsonPath("$.status").value("accepted"))
                 .andExpect(jsonPath("$.sponsorId").doesNotExist())
-                .andExpect(jsonPath("$.unregisteredSponsor.firstname").exists())
-                .andExpect(jsonPath("$.unregisteredSponsor.lastname").exists())
-                .andExpect(jsonPath("$.unregisteredSponsor.url").exists())
-                .andExpect(jsonPath("$.unregisteredSponsor.gender").exists())
-                .andExpect(jsonPath("$.unregisteredSponsor.hidden").exists())
-                .andExpect(jsonPath("$.unregisteredSponsor.company").exists())
+                .andExpect(jsonPath("$.unregisteredSponsor.firstname").value("Florian"))
+                .andExpect(jsonPath("$.unregisteredSponsor.lastname").value("Schmidt"))
+                .andExpect(jsonPath("$.unregisteredSponsor.url").value("www.florianschmidt.me"))
+                .andExpect(jsonPath("$.unregisteredSponsor.gender").value("male"))
+                .andExpect(jsonPath("$.unregisteredSponsor.hidden").value(false))
+                .andExpect(jsonPath("$.unregisteredSponsor.company").value("awesome AG"))
                 .andExpect(jsonPath("$.unregisteredSponsor.address").exists())
-                .andExpect(jsonPath("$.unregisteredSponsor.address.street").exists())
-                .andExpect(jsonPath("$.unregisteredSponsor.address.housenumber").exists())
-                .andExpect(jsonPath("$.unregisteredSponsor.address.city").exists())
-                .andExpect(jsonPath("$.unregisteredSponsor.address.zipcode").exists())
-                .andExpect(jsonPath("$.unregisteredSponsor.address.country").exists())
+                .andExpect(jsonPath("$.unregisteredSponsor.address.street").value("test"))
+                .andExpect(jsonPath("$.unregisteredSponsor.address.housenumber").value("01"))
+                .andExpect(jsonPath("$.unregisteredSponsor.address.city").value("Dresden"))
+                .andExpect(jsonPath("$.unregisteredSponsor.address.zipcode").value("01198"))
+                .andExpect(jsonPath("$.unregisteredSponsor.address.country").value("Germany"))
+                .andReturn().response.contentAsString
+
+        println(result)
     }
 
     @Test
