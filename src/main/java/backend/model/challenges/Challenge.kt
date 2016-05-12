@@ -111,6 +111,3 @@ class Challenge : BasicEntity {
 
 }
 
-enum class ChallengeStatus {
-    PROPOSED, ACCEPTED, REJECTED, WITH_PROOF, PROOF_ACCEPTED, PROOF_REJECTED
-}
