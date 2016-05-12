@@ -2,6 +2,7 @@
 
 package backend.model.user
 
+import backend.model.challenges.Challenge
 import backend.model.media.Media
 import backend.model.misc.Url
 import backend.model.sponsoring.Sponsoring
@@ -19,6 +20,9 @@ class Sponsor : UserRole {
 
     @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "sponsor")
     var sponsorings: MutableList<Sponsoring> = arrayListOf()
+
+    @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "sponsor")
+    var challenges: MutableList<Challenge> = arrayListOf()
 
     @Embedded
     var url: Url? = null
@@ -48,6 +52,9 @@ class Sponsor : UserRole {
     @PreRemove
     fun preRemove() {
         this.sponsorings.forEach { it.sponsor = null }
+        this.sponsorings.clear()
+
+        this.challenges.forEach { it.sponsor = null }
         this.sponsorings.clear()
     }
 }

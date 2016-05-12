@@ -1,6 +1,7 @@
 package backend.model.posting
 
 import backend.model.BasicEntity
+import backend.model.challenges.Challenge
 import backend.model.location.Location
 import backend.model.media.Media
 import backend.model.user.UserCore
@@ -26,6 +27,9 @@ class Posting : BasicEntity {
 
     @OneToOne(cascade = arrayOf(PERSIST))
     var location: Location? = null
+
+    @OneToOne(cascade = arrayOf(PERSIST))
+    var challenge: Challenge? = null
 
     @ManyToOne
     var user: UserCore? = null

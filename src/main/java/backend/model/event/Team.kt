@@ -2,6 +2,7 @@ package backend.model.event
 
 import backend.exceptions.DomainException
 import backend.model.BasicEntity
+import backend.model.challenges.Challenge
 import backend.model.location.Location
 import backend.model.media.Media
 import backend.model.misc.EmailAddress
@@ -57,6 +58,9 @@ class Team : BasicEntity {
 
     @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "team")
     var sponsoring: MutableList<Sponsoring> = ArrayList()
+
+    @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "team")
+    var challenges: MutableList<Challenge> = ArrayList()
 
     private fun addMember(participant: Participant) {
         if (participant.currentTeam != null) throw DomainException("Participant ${participant.email} already is part of a team")
@@ -131,14 +135,20 @@ class Team : BasicEntity {
     fun preRemove() {
         this.members.forEach { it.currentTeam = null }
         this.members.clear()
+
         this.locations.forEach { it.team = null }
         this.locations.clear()
+
         this.invoice?.team = null
         this.invoice = null
+
         this.invitations.forEach { it.team = null }
         this.invitations.clear()
 
         this.sponsoring.forEach { it.team = null }
         this.sponsoring.clear()
+
+        this.challenges.forEach { it.team = null }
+        this.challenges.clear()
     }
 }
