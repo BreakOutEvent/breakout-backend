@@ -3,11 +3,13 @@ package backend.model.sponsoring
 import backend.model.BasicEntity
 import backend.model.event.Team
 import backend.model.sponsoring.SponsoringStatus.*
-import backend.model.user.Address
 import backend.model.user.Sponsor
 import org.javamoney.moneta.Money
 import java.math.BigDecimal
-import javax.persistence.*
+import javax.persistence.Column
+import javax.persistence.Embedded
+import javax.persistence.Entity
+import javax.persistence.ManyToOne
 
 @Entity
 class Sponsoring : BasicEntity {
@@ -74,43 +76,5 @@ class Sponsoring : BasicEntity {
         val total = amountPerKmAsBigDecimal.multiply(BigDecimal.valueOf(kilometers))
 
         return Money.of(total, "EUR")
-    }
-}
-
-enum class SponsoringStatus {
-    PROPOSED, ACCEPTED, REJECTED
-}
-
-@Embeddable
-class UnregisteredSponsor {
-
-    lateinit var firstname: String
-    lateinit var lastname: String
-    lateinit var company: String
-    lateinit var gender: String
-    lateinit var url: String
-    @Embedded lateinit var address: Address
-    @Column(nullable = true) var isHidden: Boolean = false
-
-    /**
-     * private no-args constructor for JPA / Hibernate
-     */
-    private constructor()
-
-    constructor(firstname: String,
-                lastname: String,
-                company: String,
-                gender: String,
-                url: String,
-                address: Address,
-                isHidden: Boolean = false) {
-
-        this.firstname = firstname
-        this.lastname = lastname
-        this.company = company
-        this.gender = gender
-        this.url = url
-        this.address = address
-        this.isHidden = isHidden
     }
 }
