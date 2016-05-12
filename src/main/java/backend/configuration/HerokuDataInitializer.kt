@@ -10,6 +10,7 @@ import backend.model.user.Admin
 import backend.model.user.Participant
 import backend.model.user.Sponsor
 import backend.model.user.UserService
+import backend.util.Profiles.HEROKU
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
@@ -21,7 +22,7 @@ import java.time.LocalDateTime
 import javax.annotation.PostConstruct
 
 @Service
-@Profile("heroku")
+@Profile(HEROKU)
 class HerokuDataInitializer {
 
     // Services

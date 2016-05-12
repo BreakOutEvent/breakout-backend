@@ -81,8 +81,8 @@ class UserServiceImpl : UserService {
         return "$host/activation/$token?utm_source=backend&utm_medium=email&utm_campaign=confirm"
     }
 
-    private fun createResetUrl(token: String): String {
-        return "$host/reset/$token?utm_source=backend&utm_medium=email&utm_campaign=pwreset"
+    private fun createResetUrl(token: String, email: String): String {
+        return "$host/reset/$email/$token?utm_source=backend&utm_medium=email&utm_campaign=pwreset"
     }
 
     override fun save(user: User): User = userRepository.save(user.core)
@@ -96,6 +96,7 @@ class UserServiceImpl : UserService {
     override fun requestReset(emailString: String) {
         val user = this.getUserByEmail(emailString) ?: throw NotFoundException("No user found with email")
         val token = user.createActivationToken()
+        this.save(user)
 
         val email = Email(
                 to = listOf(EmailAddress(user.email)),
@@ -107,7 +108,7 @@ class UserServiceImpl : UserService {
                         "Liebe Grüße<br>" +
                         "Euer BreakOut-Team",
                 buttonText = "PASSWORT ZURÜCKSETZEN",
-                buttonUrl = createResetUrl(token),
+                buttonUrl = createResetUrl(token, user.email),
                 campaignCode = "pwreset"
         )
 

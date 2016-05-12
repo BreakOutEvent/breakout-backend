@@ -100,8 +100,9 @@ open class UserCore : BasicEntity, User {
     }
 
     override fun setNewPassword(password: String, token: String) {
-        if (!isActivationTokenCorrect(token)) throw DomainException("Provided token $token does not match the activation token")
 
+        //successful password reset is also email validation
+        this.activate(token)
         this.passwordHash = BCryptPasswordEncoder().encode(password)
     }
 
