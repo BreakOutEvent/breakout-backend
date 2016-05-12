@@ -16,6 +16,8 @@ import javax.persistence.OneToOne
 @Entity
 class Challenge : BasicEntity {
 
+    lateinit var description: String
+
     var status: ChallengeStatus = PROPOSED
         private set(value) {
             checkTransition(from = field, to = value)
@@ -56,16 +58,18 @@ class Challenge : BasicEntity {
      */
     private constructor() : super()
 
-    constructor(sponsor: Sponsor, team: Team, amount: Money) {
+    constructor(sponsor: Sponsor, team: Team, amount: Money, description: String) {
         this.sponsor = sponsor
         this.team = team
         this.amount = amount
+        this.description = description
     }
 
-    constructor(unregisteredSponsor: UnregisteredSponsor, team: Team, amount: Money) {
+    constructor(unregisteredSponsor: UnregisteredSponsor, team: Team, amount: Money, description: String) {
         this.unregisteredSponsor = unregisteredSponsor
         this.team = team
         this.amount = amount
+        this.description = description
         this.status = ACCEPTED
     }
 

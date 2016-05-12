@@ -6,7 +6,6 @@ import backend.model.event.Team
 import backend.model.posting.Posting
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
-import org.javamoney.moneta.Money
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,7 +24,7 @@ class ChallengeTest {
         val sponsor = PowerMockito.mock(Sponsor::class.java)
         val team = PowerMockito.mock(Team::class.java)
 
-        val challenge = Challenge(sponsor, team, Money.parse("EUR 50"))
+        val challenge = Challenge(sponsor, team, Euro(50), "description")
 
         assertEquals(sponsor, challenge.sponsor)
         assertNull(challenge.unregisteredSponsor)
@@ -37,7 +36,7 @@ class ChallengeTest {
         val unregistered = PowerMockito.mock(UnregisteredSponsor::class.java)
         val team = PowerMockito.mock(Team::class.java)
 
-        val challenge = Challenge(unregistered, team, Money.parse("EUR 50"))
+        val challenge = Challenge(unregistered, team, Euro(50), "description")
 
         assertFailsWith(DomainException::class, { challenge.sponsor = sponsor })
     }
@@ -47,7 +46,7 @@ class ChallengeTest {
         val unregistered = PowerMockito.mock(UnregisteredSponsor::class.java)
         val team = PowerMockito.mock(Team::class.java)
 
-        val challenge = Challenge(unregistered, team, Money.parse("EUR 50"))
+        val challenge = Challenge(unregistered, team, Euro(50), "description")
 
         assertEquals(unregistered, challenge.unregisteredSponsor)
         assertNull(challenge.sponsor)
@@ -58,7 +57,7 @@ class ChallengeTest {
         val sponsor = PowerMockito.mock(Sponsor::class.java)
         val team = PowerMockito.mock(Team::class.java)
 
-        val challenge = Challenge(sponsor, team, Money.parse("EUR 50"))
+        val challenge = Challenge(sponsor, team, Euro(50), "description")
 
         assertEquals(PROPOSED, challenge.status)
         challenge.accept()
@@ -70,7 +69,7 @@ class ChallengeTest {
         val sponsor = PowerMockito.mock(Sponsor::class.java)
         val team = PowerMockito.mock(Team::class.java)
 
-        val challenge = Challenge(sponsor, team, Money.parse("EUR 50"))
+        val challenge = Challenge(sponsor, team, Euro(50), "description")
 
         assertEquals(PROPOSED, challenge.status)
         challenge.reject()
@@ -83,7 +82,7 @@ class ChallengeTest {
         val team = PowerMockito.mock(Team::class.java)
         val proof = PowerMockito.mock(Posting::class.java)
 
-        val challenge = Challenge(sponsor, team, Money.parse("EUR 50"))
+        val challenge = Challenge(sponsor, team, Euro(50), "description")
         challenge.accept()
 
         challenge.addProof(proof)
@@ -97,7 +96,7 @@ class ChallengeTest {
         val team = PowerMockito.mock(Team::class.java)
         val proof = PowerMockito.mock(Posting::class.java)
 
-        val challenge = Challenge(sponsor, team, Money.parse("EUR 50"))
+        val challenge = Challenge(sponsor, team, Euro(50), "description")
         challenge.accept()
         challenge.addProof(proof)
         challenge.acceptProof()
@@ -110,7 +109,7 @@ class ChallengeTest {
         val team = PowerMockito.mock(Team::class.java)
         val proof = PowerMockito.mock(Posting::class.java)
 
-        val challenge = Challenge(sponsor, team, Money.parse("EUR 50"))
+        val challenge = Challenge(sponsor, team, Euro(50), "description")
         challenge.accept()
         challenge.addProof(proof)
         challenge.rejectProof()

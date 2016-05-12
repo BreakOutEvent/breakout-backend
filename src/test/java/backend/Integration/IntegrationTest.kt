@@ -5,6 +5,8 @@ import backend.TestBackendConfiguration
 import backend.configuration.AuthorizationServerConfiguration
 import backend.configuration.ResourceServerConfiguration
 import backend.configuration.WebSecurityConfiguration
+import backend.model.challenges.ChallengeRepository
+import backend.model.challenges.ChallengeService
 import backend.model.event.EventRepository
 import backend.model.event.EventService
 import backend.model.event.TeamRepository
@@ -71,6 +73,7 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var locationRepository: LocationRepository
     @Autowired lateinit protected var sponsoringRepository: SponsoringRepository
     @Autowired lateinit protected var groupMessageRepository: GroupMessageRepository
+    @Autowired lateinit protected var challengeRepository: ChallengeRepository
 
     // Services
     @Autowired lateinit protected var userService: UserService
@@ -86,6 +89,7 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var sponsoringService: SponsoringService
     @Autowired lateinit protected var groupMessageService: GroupMessageService
     @Autowired lateinit protected var userDetailsService: UserDetailsService
+    @Autowired lateinit protected var challengeService: ChallengeService
 
     lateinit protected var mockMvc: MockMvc
 
@@ -102,6 +106,7 @@ abstract class IntegrationTest {
         eventRepository.deleteAll()
         locationRepository.deleteAll()
         sponsoringRepository.deleteAll()
+        challengeRepository.deleteAll()
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .addFilters<DefaultMockMvcBuilder>(springSecurityFilterChain)
