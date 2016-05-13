@@ -49,7 +49,7 @@ class MediaController {
         verifyJwtClaim(JWT_SECRET, uploadToken, id.toString())
         val media = mediaService.getByID(id) ?: throw NotFoundException("No media with id $id")
 
-        val mediaSize = mediaSizeService.createOrUpdate(media, body.url!!, body.width!!, body.height!!, body.length!!, body.size!!, body.type!!)
+        val mediaSize = mediaSizeService.createOrUpdate(media.id!!, body.url!!, body.width!!, body.height!!, body.length!!, body.size!!, body.type!!)
         return MediaSizeView(mediaSize)
     }
 }
