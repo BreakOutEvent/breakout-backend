@@ -8,6 +8,7 @@ import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Address
 import backend.model.user.Participant
 import backend.model.user.Sponsor
+import backend.util.euroOf
 import org.javamoney.moneta.Money
 import org.junit.Before
 import org.junit.Test
@@ -43,7 +44,7 @@ class ChallengeServiceImplTest : IntegrationTest() {
     @Test
     fun testProposeChallengeRegisteredSponsor() {
         setAuthenticatedUser("sponsor@break-out.org")
-        val challenge = challengeService.proposeChallenge(sponsor, team, Euro(50.0), "description")
+        val challenge = challengeService.proposeChallenge(sponsor, team, euroOf(50.0), "description")
 
         val found = challengeRepository.findOne(challenge.id)
         assertNotNull(found)
@@ -53,14 +54,10 @@ class ChallengeServiceImplTest : IntegrationTest() {
     @Test
     fun testProposeChallenge1() {
         setAuthenticatedUser("participant@break-out.org")
-        val challenge = challengeService.proposeChallenge(unregisteredSponsor, team, Euro(50.0), "description")
+        val challenge = challengeService.proposeChallenge(unregisteredSponsor, team, euroOf(50.0), "description")
 
         val found = challengeRepository.findOne(challenge.id)
         assertNotNull(found)
         assertNotNull(found.unregisteredSponsor)
     }
-}
-
-fun Euro(value: Number): Money {
-    return Money.of(value, "EUR")
 }

@@ -7,10 +7,9 @@ import backend.model.misc.Coord
 import backend.model.user.Admin
 import backend.model.user.Participant
 import backend.model.user.User
-import org.javamoney.moneta.Money
+import backend.util.euroOf
 import org.junit.Before
 import org.junit.Test
-import java.math.BigDecimal
 import java.time.LocalDateTime
 import javax.transaction.Transactional
 import kotlin.test.assertEquals
@@ -43,9 +42,9 @@ open class TeamEntryFeeServiceImplTest : IntegrationTest() {
     @Transactional
     open fun testAddAdminPaymentToInvoice() {
         val invoice = team.invoice ?: throw Exception("Test failed because team has no invoice. Fix this first!")
-        teamEntryFeeService.addAdminPaymentToInvoice(admin, Money.of(BigDecimal.valueOf(30), "EUR"), invoice)
+        teamEntryFeeService.addAdminPaymentToInvoice(admin, euroOf(30), invoice)
         val foundTeam = teamService.findOne(team.id!!)
         assertEquals(1, foundTeam!!.invoice!!.getPayments().count())
-        assertEquals(Money.of(BigDecimal.valueOf(30), "EUR"), foundTeam.invoice!!.getPayments().first().amount)
+        assertEquals(euroOf(30), foundTeam.invoice!!.getPayments().first().amount)
     }
 }

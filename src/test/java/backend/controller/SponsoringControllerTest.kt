@@ -6,7 +6,7 @@ import backend.Integration.toJsonString
 import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.model.user.Sponsor
-import org.javamoney.moneta.Money
+import backend.util.euroOf
 import org.junit.Test
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -22,7 +22,7 @@ class SponsoringControllerTest : IntegrationTest() {
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val sponsor = userService.create("sponsor@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
         val team = teamService.create(participant, "name", "description", event)
-        sponsoringService.createSponsoring(sponsor, team, Money.parse("EUR 1"), Money.parse("EUR 200"))
+        sponsoringService.createSponsoring(sponsor, team, euroOf(1), euroOf(200))
 
         val tokens = getTokens(this.mockMvc, participant.email, "password")
 
@@ -140,10 +140,10 @@ class SponsoringControllerTest : IntegrationTest() {
         val team = teamService.create(participant, "name", "description", event)
 
         val sponsor1 = userService.create("sponsor1@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
-        sponsoringService.createSponsoring(sponsor1, team, Money.parse("EUR 1"), Money.parse("EUR 200"))
+        sponsoringService.createSponsoring(sponsor1, team, euroOf(1), euroOf(200))
 
         val sponsor2 = userService.create("sponsor2@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
-        sponsoringService.createSponsoring(sponsor2, team, Money.parse("EUR 1"), Money.parse("EUR 200"))
+        sponsoringService.createSponsoring(sponsor2, team, euroOf(1), euroOf(200))
 
         val tokens = getTokens(this.mockMvc, sponsor1.email, "password")
 
@@ -171,7 +171,7 @@ class SponsoringControllerTest : IntegrationTest() {
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val sponsor = userService.create("sponsor@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
         val team = teamService.create(participant, "name", "description", event)
-        val sponsoring = sponsoringService.createSponsoring(sponsor, team, Money.parse("EUR 1"), Money.parse("EUR 200"))
+        val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(1), euroOf(200))
 
         val tokens = getTokens(this.mockMvc, participant.email, "password")
 
@@ -196,7 +196,7 @@ class SponsoringControllerTest : IntegrationTest() {
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val sponsor = userService.create("sponsor@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
         val team = teamService.create(participant, "name", "description", event)
-        val sponsoring = sponsoringService.createSponsoring(sponsor, team, Money.parse("EUR 1"), Money.parse("EUR 200"))
+        val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(1), euroOf(200))
 
         val tokens = getTokens(this.mockMvc, participant.email, "password")
 
