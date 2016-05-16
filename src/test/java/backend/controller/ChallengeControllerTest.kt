@@ -3,6 +3,8 @@ package backend.controller
 import backend.Integration.IntegrationTest
 import backend.Integration.getTokens
 import backend.Integration.toJsonString
+import backend.model.event.Event
+import backend.model.event.Team
 import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.model.user.Sponsor
@@ -17,18 +19,23 @@ import java.time.ZoneOffset
 
 class ChallengeControllerTest : IntegrationTest() {
 
+    private lateinit var event: Event
+    private lateinit var participant: Participant
+    private lateinit var team: Team
+    private lateinit var sponsor: Sponsor
+
     @Before
     override fun setUp() {
         super.setUp()
+        this.event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
+        this.participant = userService.create("participant@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        this.team = teamService.create(participant, "name", "description", event)
+        this.sponsor = userService.create("sponsor@break-out.org", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
     }
 
     @Test
     fun testCreateChallengeWithRegisteredSponsor() {
 
-        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
-        val participant = userService.create("participant@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
-        val sponsor = userService.create("sponsor@break-out.org", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
-        val team = teamService.create(participant, "name", "description", event)
         val tokens = getTokens(this.mockMvc, sponsor.email, "password")
 
         val body = mapOf(
@@ -54,10 +61,7 @@ class ChallengeControllerTest : IntegrationTest() {
 
     @Test
     fun testCreateChallengeWithUnregisteredSponsor() {
-        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
-        val participant = userService.create("participant@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
-        userService.create("sponsor@break-out.org", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
-        val team = teamService.create(participant, "name", "description", event)
+
         val tokens = getTokens(this.mockMvc, participant.email, "password")
 
         val body = mapOf(
@@ -105,10 +109,6 @@ class ChallengeControllerTest : IntegrationTest() {
 
     @Test
     fun testAcceptChallenge() {
-        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
-        val participant = userService.create("participant@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
-        val team = teamService.create(participant, "name", "description", event)
-        val sponsor = userService.create("sponsor@break-out.org", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
 
         setAuthenticatedUser("sponsor@break-out.org")
         val challenge = challengeService.proposeChallenge(sponsor, team, euroOf(10.0), "An awesome challenge")
@@ -136,10 +136,6 @@ class ChallengeControllerTest : IntegrationTest() {
 
     @Test
     fun testRejectChallenge() {
-        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
-        val participant = userService.create("participant@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
-        val team = teamService.create(participant, "name", "description", event)
-        val sponsor = userService.create("sponsor@break-out.org", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
 
         setAuthenticatedUser("sponsor@break-out.org")
         val challenge = challengeService.proposeChallenge(sponsor, team, euroOf(10.0), "An awesome challenge")
@@ -167,12 +163,8 @@ class ChallengeControllerTest : IntegrationTest() {
 
     @Test
     fun testFulfillChallenge() {
-        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
-        val participant = userService.create("participant@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
-        val team = teamService.create(participant, "name", "description", event)
-        val sponsor = userService.create("sponsor@break-out.org", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
-        val posting = postingService.createPosting(participant, "text", null, null, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
 
+        val posting = postingService.createPosting(participant, "text", null, null, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
         setAuthenticatedUser("sponsor@break-out.org")
         val challenge = challengeService.proposeChallenge(sponsor, team, euroOf(10.0), "An awesome challenge")
         val tokens = getTokens(this.mockMvc, participant.email, "password")
