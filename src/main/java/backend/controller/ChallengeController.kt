@@ -93,14 +93,21 @@ open class ChallengeController {
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/event/{eventId}/team/{teamId}/challenge/{challengeId}/status/")
-    open fun changeStatus(@PathVariable challengeId: Long): ChallengeView {
+    open fun changeStatus(@PathVariable challengeId: Long,
+                          @Valid @RequestBody body: ChallengeStatusView): ChallengeView {
+
         val challenge = challengeService.findOne(challengeId) ?: throw NotFoundException("No challenge with id $challengeId found")
-        return challengeService.accept(challenge).let { ChallengeView(it) }
+
+        return when (body.status!!) {
+            "accepted" -> challengeService.accept(challenge)
+            "rejected" -> challengeService.reject(challenge)
+            else -> throw BadRequestException("Unknown status for challenge ${body.status}")
+        }.let { ChallengeView(it) }
     }
 }
 
 class ChallengeStatusView {
-    var status: String? = null
+    @NotNull var status: String? = null
     var postingId: Long? = null
 }
 
