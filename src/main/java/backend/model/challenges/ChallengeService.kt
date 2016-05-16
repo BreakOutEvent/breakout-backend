@@ -21,19 +21,19 @@ interface ChallengeService {
 
     fun findOne(challengeId: Long): Challenge?
 
-    @PreAuthorize("#team.isMember(authentication.name)")
+    @PreAuthorize("#challenge.team.isMember(authentication.name)")
     fun accept(challenge: Challenge): Challenge
 
-    @PreAuthorize("#team.isMember(authentication.name)")
+    @PreAuthorize("#challenge.team.isMember(authentication.name)")
     fun reject(challenge: Challenge): Challenge
 
-    @PreAuthorize("#team.isMember(authentication.name)")
+    @PreAuthorize("#challenge.team.isMember(authentication.name)")
     fun addProof(challenge: Challenge, proof: Posting): Challenge
 
-    @PreAuthorize("#team.isMember(authentication.name)")
+    @PreAuthorize("#challenge.team.isMember(authentication.name)")
     fun acceptProof(challenge: Challenge): Challenge
 
-    @PreAuthorize("#team.isMember(authentication.name)")
+    @PreAuthorize("#challenge.team.isMember(authentication.name)")
     fun rejectProof(challenge: Challenge): Challenge
 }
 
