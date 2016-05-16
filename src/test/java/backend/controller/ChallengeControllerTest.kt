@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 class ChallengeControllerTest : IntegrationTest() {
 
@@ -162,5 +163,38 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.team").value(team.name))
                 .andExpect(jsonPath("$.teamId").value(team.id!!.toInt()))
                 .andExpect(jsonPath("$.status").value("REJECTED"))
+    }
+
+    @Test
+    fun testFulfillChallenge() {
+        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
+        val participant = userService.create("participant@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val team = teamService.create(participant, "name", "description", event)
+        val sponsor = userService.create("sponsor@break-out.org", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
+        val posting = postingService.createPosting(participant, "text", null, null, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
+
+        setAuthenticatedUser("sponsor@break-out.org")
+        val challenge = challengeService.proposeChallenge(sponsor, team, euroOf(10.0), "An awesome challenge")
+        val tokens = getTokens(this.mockMvc, participant.email, "password")
+
+        val body = mapOf(
+                "status" to "with_proof",
+                "postingId" to posting.id
+        ).toJsonString()
+
+        val request = MockMvcRequestBuilders.put("/event/${event.id}/team/${team.id}/challenge/${challenge.id}/status/")
+                .header("Authorization", "Bearer ${tokens.first}")
+                .contentType(APPLICATION_JSON_UTF_8)
+                .content(body)
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.description").value(challenge.description))
+                .andExpect(jsonPath("$.sponsorId").value(sponsor.id!!.toInt()))
+                .andExpect(jsonPath("$.amount").value(challenge.amount.numberStripped.toDouble()))
+                .andExpect(jsonPath("$.unregisteredSponsor").doesNotExist())
+                .andExpect(jsonPath("$.team").value(team.name))
+                .andExpect(jsonPath("$.teamId").value(team.id!!.toInt()))
+                .andExpect(jsonPath("$.status").value("WITH_PROOF"))
     }
 }

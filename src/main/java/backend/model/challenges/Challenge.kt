@@ -78,6 +78,7 @@ class Challenge : BasicEntity {
         val allowedTransitions = setOf(
                 (PROPOSED to ACCEPTED),
                 (PROPOSED to REJECTED),
+                (PROPOSED to WITH_PROOF),
                 (ACCEPTED to WITH_PROOF),
                 (ACCEPTED to REJECTED),
                 (REJECTED to ACCEPTED),

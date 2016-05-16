@@ -97,10 +97,14 @@ open class ChallengeController {
                           @Valid @RequestBody body: ChallengeStatusView): ChallengeView {
 
         val challenge = challengeService.findOne(challengeId) ?: throw NotFoundException("No challenge with id $challengeId found")
-
         return when (body.status!!) {
             "accepted" -> challengeService.accept(challenge)
             "rejected" -> challengeService.reject(challenge)
+            "with_proof" -> {
+                val proof = postingService.getByID(body.postingId!!) ?: throw NotFoundException("No posting with id ${body.postingId} found")
+                challengeService.addProof(challenge, proof)
+            }
+
             else -> throw BadRequestException("Unknown status for challenge ${body.status}")
         }.let { ChallengeView(it) }
     }
