@@ -86,6 +86,17 @@ open class ChallengeController {
         val challenge = challengeService.proposeChallenge(sponsor, team, amount, description)
         return ChallengeView(challenge)
     }
+
+    /**
+     * PUT /event/{eventId}/team/{teamId}/challenge/{challengeId}/status/
+     * Accept, reject or add proof to a challenge
+     */
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping("/event/{eventId}/team/{teamId}/challenge/{challengeId}/status/")
+    open fun changeStatus(@PathVariable challengeId: Long): ChallengeView {
+        val challenge = challengeService.findOne(challengeId) ?: throw NotFoundException("No challenge with id $challengeId found")
+        return challengeService.accept(challenge).let { ChallengeView(it) }
+    }
 }
 
 class ChallengeStatusView {
