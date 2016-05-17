@@ -1,17 +1,19 @@
 package backend.controller
 
 import backend.Integration.IntegrationTest
-import backend.Integration.getTokens
 import backend.Integration.toJsonString
 import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.model.user.Sponsor
+import backend.testHelper.asUser
+import backend.testHelper.json
 import backend.util.euroOf
 import org.junit.Before
 import org.junit.Test
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
@@ -36,17 +38,14 @@ class ChallengeControllerTest : IntegrationTest() {
     @Test
     fun testCreateChallengeWithRegisteredSponsor() {
 
-        val tokens = getTokens(this.mockMvc, sponsor.email, "password")
-
         val body = mapOf(
                 "amount" to 100,
                 "description" to "Jump into lake titicaca naked"
         ).toJsonString()
 
-        val request = MockMvcRequestBuilders.post("/event/${event.id}/team/${team.id}/challenge/")
-                .header("Authorization", "Bearer ${tokens.first}")
-                .contentType(APPLICATION_JSON_UTF_8)
-                .content(body)
+        val request = post("/event/${event.id}/team/${team.id}/challenge/")
+                .json(body)
+                .asUser(this.mockMvc, sponsor.email, "password")
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated)
@@ -61,8 +60,6 @@ class ChallengeControllerTest : IntegrationTest() {
 
     @Test
     fun testCreateChallengeWithUnregisteredSponsor() {
-
-        val tokens = getTokens(this.mockMvc, participant.email, "password")
 
         val body = mapOf(
                 "amount" to 100,
@@ -82,12 +79,11 @@ class ChallengeControllerTest : IntegrationTest() {
                                 "country" to "Germany"
                         )
                 )
-        ).toJsonString()
+        )
 
-        val request = MockMvcRequestBuilders.post("/event/${event.id}/team/${team.id}/challenge/")
-                .header("Authorization", "Bearer ${tokens.first}")
-                .contentType(APPLICATION_JSON_UTF_8)
-                .content(body)
+        val request = post("/event/${event.id}/team/${team.id}/challenge/")
+                .json(body)
+                .asUser(this.mockMvc, participant.email, "password")
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated)
@@ -112,16 +108,12 @@ class ChallengeControllerTest : IntegrationTest() {
 
         setAuthenticatedUser("sponsor@break-out.org")
         val challenge = challengeService.proposeChallenge(sponsor, team, euroOf(10.0), "An awesome challenge")
-        val tokens = getTokens(this.mockMvc, participant.email, "password")
 
-        val body = mapOf(
-                "status" to "accepted"
-        ).toJsonString()
+        val body = mapOf("status" to "accepted")
 
-        val request = MockMvcRequestBuilders.put("/event/${event.id}/team/${team.id}/challenge/${challenge.id}/status/")
-                .header("Authorization", "Bearer ${tokens.first}")
-                .contentType(APPLICATION_JSON_UTF_8)
-                .content(body)
+        val request = put("/event/${event.id}/team/${team.id}/challenge/${challenge.id}/status/")
+                .json(body)
+                .asUser(this.mockMvc, participant.email, "password")
 
         mockMvc.perform(request)
                 .andExpect(status().isOk)
@@ -139,16 +131,12 @@ class ChallengeControllerTest : IntegrationTest() {
 
         setAuthenticatedUser("sponsor@break-out.org")
         val challenge = challengeService.proposeChallenge(sponsor, team, euroOf(10.0), "An awesome challenge")
-        val tokens = getTokens(this.mockMvc, participant.email, "password")
 
-        val body = mapOf(
-                "status" to "rejected"
-        ).toJsonString()
+        val body = mapOf("status" to "rejected")
 
-        val request = MockMvcRequestBuilders.put("/event/${event.id}/team/${team.id}/challenge/${challenge.id}/status/")
-                .header("Authorization", "Bearer ${tokens.first}")
-                .contentType(APPLICATION_JSON_UTF_8)
-                .content(body)
+        val request = put("/event/${event.id}/team/${team.id}/challenge/${challenge.id}/status/")
+                .json(body)
+                .asUser(this.mockMvc, participant.email, "password")
 
         mockMvc.perform(request)
                 .andExpect(status().isOk)
@@ -167,17 +155,15 @@ class ChallengeControllerTest : IntegrationTest() {
         val posting = postingService.createPosting(participant, "text", null, null, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
         setAuthenticatedUser("sponsor@break-out.org")
         val challenge = challengeService.proposeChallenge(sponsor, team, euroOf(10.0), "An awesome challenge")
-        val tokens = getTokens(this.mockMvc, participant.email, "password")
 
         val body = mapOf(
                 "status" to "with_proof",
                 "postingId" to posting.id
-        ).toJsonString()
+        )
 
-        val request = MockMvcRequestBuilders.put("/event/${event.id}/team/${team.id}/challenge/${challenge.id}/status/")
-                .header("Authorization", "Bearer ${tokens.first}")
-                .contentType(APPLICATION_JSON_UTF_8)
-                .content(body)
+        val request = put("/event/${event.id}/team/${team.id}/challenge/${challenge.id}/status/")
+                .json(body)
+                .asUser(this.mockMvc, participant.email, "password")
 
         mockMvc.perform(request)
                 .andExpect(status().isOk)

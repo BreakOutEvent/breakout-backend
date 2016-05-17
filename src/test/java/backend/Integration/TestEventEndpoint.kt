@@ -3,12 +3,11 @@ package backend.Integration
 import backend.model.event.Event
 import backend.model.misc.Coord
 import backend.model.user.Admin
+import backend.testHelper.asUser
+import backend.testHelper.json
 import org.junit.Before
 import org.junit.Test
-import org.springframework.http.HttpMethod
-import org.springframework.http.MediaType
-import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -42,15 +41,11 @@ class TestEventEndpoint : IntegrationTest() {
 
     @Test
     fun dontCreateEventIfPropertyMissing() {
-        val eventData = mapOf(
-                "title" to "BreakOut",
-                "city" to "München").toJsonString()
+        val eventData = mapOf("title" to "BreakOut", "city" to "München")
 
-        val request = MockMvcRequestBuilders
-                .post("/event/")
-                .header("Authorization", "Bearer $adminAccessToken")
-                .contentType(APPLICATION_JSON)
-                .content(eventData)
+        val request = post("/event/")
+                .asUser(mockMvc, "test_admin@break-out.org", "password")
+                .json(eventData)
 
         mockMvc.perform(request).andExpect(status().isBadRequest)
     }
@@ -67,13 +62,11 @@ class TestEventEndpoint : IntegrationTest() {
                         "longitude" to 0.0
                 ),
                 "duration" to 36
-        ).toJsonString()
+        )
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/event/")
-                .header("Authorization", "Bearer $adminAccessToken")
-                .contentType(APPLICATION_JSON)
-                .content(eventData)
+        val request = post("/event/")
+                .asUser(mockMvc, "test_admin@break-out.org", "password")
+                .json(eventData)
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
@@ -95,8 +88,7 @@ class TestEventEndpoint : IntegrationTest() {
         createNewEvent()
 
         // Get Events
-        var getEventsRequest = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/event/")
+        var getEventsRequest = get("/event/")
 
         mockMvc.perform(getEventsRequest)
                 .andExpect(status().isOk)
@@ -116,16 +108,12 @@ class TestEventEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.[1].startingLocation.latitude").exists())
                 .andExpect(jsonPath("$.[1].startingLocation.longitude").exists())
                 .andExpect(jsonPath("$.[1].duration").exists())
-
     }
 
 
     @Test
     fun testGetEventPostingsById() {
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/event/${event.id}/posting/")
-                .contentType(MediaType.APPLICATION_JSON)
-
+        val request = get("/event/${event.id}/posting/")
 
         //TODO create Users & Posts
         val response = mockMvc.perform (request)
@@ -142,9 +130,7 @@ class TestEventEndpoint : IntegrationTest() {
 
     @Test
     fun testGetEventDistanceById() {
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/event/${event.id}/distance/")
-                .contentType(MediaType.APPLICATION_JSON)
+        val request = get("/event/${event.id}/distance/")
 
         //TODO create Users & Posts
         val response = mockMvc.perform (request)

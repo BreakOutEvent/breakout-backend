@@ -2,13 +2,15 @@ package backend.controller
 
 import backend.Integration.IntegrationTest
 import backend.Integration.getTokens
-import backend.Integration.toJsonString
 import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.model.user.Sponsor
+import backend.testHelper.asUser
+import backend.testHelper.json
 import backend.util.euroOf
 import org.junit.Test
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
@@ -24,10 +26,8 @@ class SponsoringControllerTest : IntegrationTest() {
         val team = teamService.create(participant, "name", "description", event)
         sponsoringService.createSponsoring(sponsor, team, euroOf(1), euroOf(200))
 
-        val tokens = getTokens(this.mockMvc, participant.email, "password")
-
         val request = get("/event/${event.id}/team/${team.id}/sponsoring/")
-                .header("Authorization", "Bearer ${tokens.first}")
+                .asUser(mockMvc, participant.email, "password")
 
         mockMvc.perform(request)
                 .andExpect(status().isOk)
@@ -50,17 +50,11 @@ class SponsoringControllerTest : IntegrationTest() {
         val sponsor = userService.create("sponsor@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
         val team = teamService.create(participant, "name", "description", event)
 
-        val tokens = getTokens(this.mockMvc, sponsor.email, "password")
-
-        val body = mapOf(
-                "amountPerKm" to 1.0,
-                "limit" to 200
-        ).toJsonString()
+        val body = mapOf("amountPerKm" to 1.0, "limit" to 200)
 
         val request = MockMvcRequestBuilders.post("/event/${event.id}/team/${team.id}/sponsoring/")
-                .header("Authorization", "Bearer ${tokens.first}")
-                .contentType(APPLICATION_JSON_UTF_8)
-                .content(body)
+                .asUser(mockMvc, sponsor.email, "password")
+                .json(body)
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated)
@@ -98,14 +92,13 @@ class SponsoringControllerTest : IntegrationTest() {
                                 "country" to "Germany"
                         )
                 )
-        ).toJsonString()
+        )
 
         val tokens = getTokens(this.mockMvc, participant.email, "password")
 
         val request = MockMvcRequestBuilders.post("/event/${event.id}/team/${team.id}/sponsoring/")
-                .header("Authorization", "Bearer ${tokens.first}")
-                .contentType(APPLICATION_JSON_UTF_8)
-                .content(body)
+                .asUser(mockMvc, participant.email, "password")
+                .json(body)
 
         val result = mockMvc.perform(request)
                 .andExpect(status().isCreated)
@@ -145,10 +138,8 @@ class SponsoringControllerTest : IntegrationTest() {
         val sponsor2 = userService.create("sponsor2@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
         sponsoringService.createSponsoring(sponsor2, team, euroOf(1), euroOf(200))
 
-        val tokens = getTokens(this.mockMvc, sponsor1.email, "password")
-
         val request = get("/user/${sponsor1.core.id}/sponsor/sponsoring/")
-                .header("Authorization", "Bearer ${tokens.first}")
+                .asUser(mockMvc, sponsor1.email, "password")
 
         mockMvc.perform(request)
                 .andExpect(status().isOk)
@@ -173,11 +164,11 @@ class SponsoringControllerTest : IntegrationTest() {
         val team = teamService.create(participant, "name", "description", event)
         val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(1), euroOf(200))
 
-        val tokens = getTokens(this.mockMvc, participant.email, "password")
+        val body = mapOf("status" to "accepted")
 
-        val body = mapOf("status" to "accepted").toJsonString()
-        val request = this.put("/event/${event.id}/team/${team.id}/sponsoring/${sponsoring.id}/status/", body)
-                .header("Authorization", "Bearer ${tokens.first}")
+        val request = put("/event/${event.id}/team/${team.id}/sponsoring/${sponsoring.id}/status/")
+                .asUser(mockMvc, participant.email, "password")
+                .json(body)
 
         mockMvc.perform(request)
                 .andExpect(status().isOk)
@@ -198,11 +189,11 @@ class SponsoringControllerTest : IntegrationTest() {
         val team = teamService.create(participant, "name", "description", event)
         val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(1), euroOf(200))
 
-        val tokens = getTokens(this.mockMvc, participant.email, "password")
+        val body = mapOf("status" to "rejected")
 
-        val body = mapOf("status" to "rejected").toJsonString()
-        val request = this.put("/event/${event.id}/team/${team.id}/sponsoring/${sponsoring.id}/status/", body)
-                .header("Authorization", "Bearer ${tokens.first}")
+        val request = put("/event/${event.id}/team/${team.id}/sponsoring/${sponsoring.id}/status/")
+                .asUser(mockMvc, participant.email, "password")
+                .json(body)
 
         mockMvc.perform(request)
                 .andExpect(status().isOk)

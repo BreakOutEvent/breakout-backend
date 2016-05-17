@@ -1,12 +1,13 @@
 package backend.controller
 
 import backend.Integration.IntegrationTest
-import backend.Integration.createUser
-import backend.Integration.toJsonString
+import backend.testHelper.asUser
+import backend.testHelper.json
 import org.junit.Ignore
 import org.junit.Test
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -42,10 +43,10 @@ class UserControllerTest : IntegrationTest() {
     @Test
     fun testUpdateUserAndMakeHimSponsor() {
 
-        val credentials = createUser(this.mockMvc, userService = userService)
+        val user = userService.create("user@break-out.org", "password")
 
         // Update user with role sponsor
-        val json = mapOf(
+        val body = mapOf(
                 "firstname" to "Florian",
                 "lastname" to "Schmidt",
                 "gender" to "Male",
@@ -62,22 +63,20 @@ class UserControllerTest : IntegrationTest() {
                                 "zipcode" to "01189"
                         )
                 )
-        ).toJsonString()
+        )
 
-        val request = MockMvcRequestBuilders
-                .put("/user/${credentials.id}/")
-                .header("Authorization", "Bearer ${credentials.accessToken}")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json)
+        val request = put("/user/${user.core.id}/")
+                .asUser(mockMvc, user.email, "password")
+                .json(body)
 
         val result = mockMvc.perform(request)
                 .andExpect(status().isOk)
-                .andExpect(jsonPath("$.id").value(credentials.id))
-                .andExpect(jsonPath("$.email").value("a@x.de"))
+                .andExpect(jsonPath("$.id").value(user.core.id!!.toInt()))
+                .andExpect(jsonPath("$.email").value("user@break-out.org"))
                 .andExpect(jsonPath("$.firstname").value("Florian"))
                 .andExpect(jsonPath("$.lastname").value("Schmidt"))
                 .andExpect(jsonPath("$.gender").value("Male"))
-                .andExpect(jsonPath("$.blocked").value(false))
+                .andExpect(jsonPath("$.blocked").value(true))
                 .andExpect(jsonPath("$.sponsor").exists())
                 .andExpect(jsonPath("$.sponsor.company").value("ABC GmBH"))
                 .andExpect(jsonPath("$.sponsor.url").value("http://www.test.de"))

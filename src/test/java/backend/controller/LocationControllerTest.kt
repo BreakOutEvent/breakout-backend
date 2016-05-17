@@ -1,17 +1,17 @@
 package backend.controller
 
 import backend.Integration.IntegrationTest
-import backend.Integration.getTokens
-import backend.Integration.toJsonString
 import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.misc.Coord
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
+import backend.testHelper.asUser
+import backend.testHelper.json
 import org.hamcrest.Matchers.hasSize
 import org.junit.Before
 import org.junit.Test
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
@@ -29,8 +29,6 @@ class LocationControllerTest : IntegrationTest() {
     private lateinit var firstTeam: Team
     private lateinit var secondTeam: Team
     private lateinit var thirdTeam: Team
-
-    private lateinit var firstUserToken: String
 
     @Before
     override fun setUp() {
@@ -62,8 +60,6 @@ class LocationControllerTest : IntegrationTest() {
         setAuthenticatedUser(fifthUser.email)
         teamService.invite(EmailAddress(sixthUser.email), thirdTeam)
         teamService.join(sixthUser, thirdTeam)
-
-        firstUserToken = getTokens(mockMvc, firstUser.email, "password").first
     }
 
     @Test
@@ -72,7 +68,7 @@ class LocationControllerTest : IntegrationTest() {
         locationService.create(Coord(0.0, 1.1), thirdUser, LocalDateTime.now())
         locationService.create(Coord(0.0, 1.1), fifthUser, LocalDateTime.now()) // This one should not be found!
 
-        val request = MockMvcRequestBuilders.get("/event/${munichEvent.id}/location/")
+        val request = get("/event/${munichEvent.id}/location/")
 
         mockMvc.perform(request)
                 .andExpect(status().isOk)
@@ -96,7 +92,7 @@ class LocationControllerTest : IntegrationTest() {
         locationService.create(Coord(0.0, 1.1), thirdUser, LocalDateTime.now())
         locationService.create(Coord(0.0, 1.1), fifthUser, LocalDateTime.now()) // This one should not be found!
 
-        val request = MockMvcRequestBuilders.get("/event/${munichEvent.id}/team/${firstTeam.id}/location/")
+        val request = get("/event/${munichEvent.id}/team/${firstTeam.id}/location/")
 
         mockMvc.perform(request)
                 .andExpect(status().isOk)
@@ -117,12 +113,12 @@ class LocationControllerTest : IntegrationTest() {
         val data = mapOf(
                 "latitude" to 0.0,
                 "longitude" to 1.1,
-                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)).toJsonString()
+                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+        )
 
-        val request = MockMvcRequestBuilders.post("/event/${munichEvent.id}/team/${firstTeam.id}/location/")
-                .header("Authorization", "Bearer $firstUserToken")
-                .contentType(APPLICATION_JSON_UTF_8)
-                .content(data)
+        val request = post("/event/${munichEvent.id}/team/${firstTeam.id}/location/")
+                .asUser(mockMvc, firstUser.email, "password")
+                .json(data)
 
         val resp = mockMvc.perform(request)
                 .andExpect(status().isCreated)
@@ -149,14 +145,11 @@ class LocationControllerTest : IntegrationTest() {
                         "latitude" to 2.2,
                         "longitude" to 3.3,
                         "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
-        ).toJsonString()
+        )
 
-        println(data)
-
-        val request = MockMvcRequestBuilders.post("/event/${munichEvent.id}/team/${firstTeam.id}/location/multiple/")
-                .header("Authorization", "Bearer $firstUserToken")
-                .contentType(APPLICATION_JSON_UTF_8)
-                .content(data)
+        val request = post("/event/${munichEvent.id}/team/${firstTeam.id}/location/multiple/")
+                .asUser(mockMvc, firstUser.email, "password")
+                .json(data)
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated)

@@ -2,14 +2,16 @@
 
 package backend.Integration
 
+import backend.testHelper.asUser
+import backend.testHelper.json
 import org.junit.Before
 import org.junit.Test
 import org.springframework.http.HttpMethod
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.*
 
 class TestMessagingEndpoint : IntegrationTest() {
 
@@ -20,17 +22,12 @@ class TestMessagingEndpoint : IntegrationTest() {
 
     @Test
     fun createNewGroupMessage() {
-        val userCredentials = createUser(this.mockMvc, userService = userService)
-        val user = userRepository.findOne(userCredentials.id.toLong())
 
+        val user = userService.create("user@break-out.org", "password")
 
-        val postData = ArrayList<Long>().toJsonString()
-
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/messaging/")
-                .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(APPLICATION_JSON_UTF_8)
-                .content(postData)
+        val request = post("/messaging/")
+                .asUser(this.mockMvc, "user@break-out.org", "password")
+                .json(listOf<Long>())
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
@@ -46,18 +43,14 @@ class TestMessagingEndpoint : IntegrationTest() {
 
     @Test
     fun createNewGroupMessageWithAdditionalUser() {
-        val userCredentials = createUser(this.mockMvc, userService = userService)
-        val user = userRepository.findOne(userCredentials.id.toLong())
+        val user = userService.create("user@break-out.org", "password")
+        val user1 = userService.create("user1@mail.com", "password")
 
-        val userCredentials1 = createUser(this.mockMvc, email = "user1@mail.com", userService = userService)
-        val user1 = userRepository.findOne(userCredentials1.id.toLong())
+        val data = listOf(user1.core.id)
 
-        val postData = listOf(user1.id).toJsonString()
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/messaging/")
-                .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(APPLICATION_JSON_UTF_8)
-                .content(postData)
+        val request = post("/messaging/")
+                .asUser(mockMvc, "user@break-out.org", "password")
+                .json(data)
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
@@ -74,17 +67,12 @@ class TestMessagingEndpoint : IntegrationTest() {
 
     @Test
     fun getGroupMessage() {
-        val userCredentials = createUser(this.mockMvc, userService = userService)
-        val user = userRepository.findOne(userCredentials.id.toLong())
+        val user = userService.create("user@break-out.org", "password")
         val groupMessage = groupMessageService.createGroupMessage(user.core)
 
-        val postData = ArrayList<Long>().toJsonString()
-
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/messaging/${groupMessage.id}/")
-                .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(APPLICATION_JSON_UTF_8)
-                .content(postData)
+        val request = get("/messaging/${groupMessage.id}/")
+                .asUser(mockMvc, user.email, "password")
+                .json(listOf())
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isOk)
@@ -100,18 +88,15 @@ class TestMessagingEndpoint : IntegrationTest() {
 
     @Test
     fun getGroupMessageFailWrongUser() {
-        val userCredentials = createUser(this.mockMvc, userService = userService)
-        val user = userRepository.findOne(userCredentials.id.toLong())
-        val userCredentials1 = createUser(this.mockMvc, email = "user1@mail.com", userService = userService)
+
+        val user = userService.create("user@break-out.org", "password")
+        val user1 = userService.create("user1@mail.com", "password")
+
         val groupMessage = groupMessageService.createGroupMessage(user.core)
 
-        val postData = ArrayList<Long>().toJsonString()
-
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/messaging/${groupMessage.id}/")
-                .header("Authorization", "Bearer ${userCredentials1.accessToken}")
-                .contentType(APPLICATION_JSON_UTF_8)
-                .content(postData)
+        val request = get("/messaging/${groupMessage.id}/")
+                .asUser(mockMvc, user1.email, "password")
+                .json(listOf())
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isUnauthorized)
@@ -122,17 +107,14 @@ class TestMessagingEndpoint : IntegrationTest() {
 
     @Test
     fun getGroupMessageFailMessageNotFound() {
-        val userCredentials = createUser(this.mockMvc, userService = userService)
-        val user = userRepository.findOne(userCredentials.id.toLong())
+
+        val user = userService.create("user@break-out.org", "password")
         groupMessageService.createGroupMessage(user.core)
 
-        val postData = ArrayList<Long>().toJsonString()
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/messaging/0/")
-                .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(APPLICATION_JSON_UTF_8)
-                .content(postData)
+        val request = request(HttpMethod.GET, "/messaging/0/")
+                .asUser(mockMvc, user.email, "password")
+                .json(listOf())
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isNotFound)
@@ -143,20 +125,16 @@ class TestMessagingEndpoint : IntegrationTest() {
 
     @Test
     fun addUserToGroupMessage() {
-        val userCredentials = createUser(this.mockMvc, userService = userService)
-        val user = userRepository.findOne(userCredentials.id.toLong())
+
+        val user = userService.create("user@break-out.org", "password")
+        val user1 = userService.create("user1@mail.com", "password")
         val groupMessage = groupMessageService.createGroupMessage(user.core)
 
-        val userCredentials1 = createUser(this.mockMvc, email = "user1@mail.com", userService = userService)
-        val user1 = userRepository.findOne(userCredentials1.id.toLong())
+        val postData = listOf(user1.core.id).toJsonString()
 
-        val postData = listOf(user1.id).toJsonString()
-
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.PUT, "/messaging/${groupMessage.id}/")
-                .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(APPLICATION_JSON_UTF_8)
-                .content(postData)
+        val request = request(HttpMethod.PUT, "/messaging/${groupMessage.id}/")
+                .asUser(mockMvc, user.email, "password")
+                .json(postData)
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isOk)
@@ -173,20 +151,17 @@ class TestMessagingEndpoint : IntegrationTest() {
 
     @Test
     fun addUserToGroupMessageFailWrongUser() {
-        val userCredentials = createUser(this.mockMvc, userService = userService)
-        val user = userRepository.findOne(userCredentials.id.toLong())
+
+        val user = userService.create("user@break-out.org", "password")
+        val user1 = userService.create("user1@mail.com", "password")
+
         val groupMessage = groupMessageService.createGroupMessage(user.core)
 
-        val userCredentials1 = createUser(this.mockMvc, email = "user1@mail.com", userService = userService)
-        val user1 = userRepository.findOne(userCredentials1.id.toLong())
+        val postData = listOf(user1.core.id).toJsonString()
 
-        val postData = listOf(user1.id).toJsonString()
-
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.PUT, "/messaging/${groupMessage.id}/")
-                .header("Authorization", "Bearer ${userCredentials1.accessToken}")
-                .contentType(APPLICATION_JSON_UTF_8)
-                .content(postData)
+        val request = put("/messaging/${groupMessage.id}/")
+                .asUser(mockMvc, user1.email, "password")
+                .json(postData)
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isUnauthorized)
@@ -197,20 +172,14 @@ class TestMessagingEndpoint : IntegrationTest() {
 
     @Test
     fun addMessageToGroupMessage() {
-        val userCredentials = createUser(this.mockMvc, userService = userService)
-        val user = userRepository.findOne(userCredentials.id.toLong())
+        val user = userService.create("user@break-out.org", "password")
         val groupMessage = groupMessageService.createGroupMessage(user.core)
 
-        val postData = mapOf(
-                "text" to "message Text",
-                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-        ).toJsonString()
+        val postData = mapOf("text" to "message Text", "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/messaging/${groupMessage.id}/message/")
-                .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(APPLICATION_JSON_UTF_8)
-                .content(postData)
+        val request = request(HttpMethod.POST, "/messaging/${groupMessage.id}/message/")
+                .asUser(mockMvc, user.email, "password")
+                .json(postData)
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
@@ -225,20 +194,14 @@ class TestMessagingEndpoint : IntegrationTest() {
 
     @Test
     fun addMessageToGroupMessageFailMessageNotFound() {
-        val userCredentials = createUser(this.mockMvc, userService = userService)
-        val user = userRepository.findOne(userCredentials.id.toLong())
+        val user = userService.create("user@break-out.org", "password")
         groupMessageService.createGroupMessage(user.core)
 
-        val postData = mapOf(
-                "text" to "message Text",
-                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-        ).toJsonString()
+        val postData = mapOf("text" to "message Text", "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/messaging/0/message/")
-                .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(APPLICATION_JSON_UTF_8)
-                .content(postData)
+        val request = request(HttpMethod.POST, "/messaging/0/message/")
+                .asUser(mockMvc, user.email, "password")
+                .json(postData)
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isNotFound)
@@ -249,22 +212,16 @@ class TestMessagingEndpoint : IntegrationTest() {
 
     @Test
     fun addMessageToGroupMessageFailWrongUser() {
-        val userCredentials = createUser(this.mockMvc, userService = userService)
-        val user = userRepository.findOne(userCredentials.id.toLong())
+        val user = userService.create("user@break-out.org", "password")
+        val user1 = userService.create("user1@mail.com", "password")
+
         val groupMessage = groupMessageService.createGroupMessage(user.core)
 
-        val userCredentials1 = createUser(this.mockMvc, email = "user1@mail.com", userService = userService)
+        val postData = mapOf("text" to "message Text", "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
 
-        val postData = mapOf(
-                "text" to "message Text",
-                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-        ).toJsonString()
-
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/messaging/${groupMessage.id}/message/")
-                .header("Authorization", "Bearer ${userCredentials1.accessToken}")
-                .contentType(APPLICATION_JSON_UTF_8)
-                .content(postData)
+        val request = request(HttpMethod.POST, "/messaging/${groupMessage.id}/message/")
+                .asUser(mockMvc, user1.email, "password")
+                .json(postData)
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isUnauthorized)
