@@ -4,7 +4,6 @@ import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
-import backend.model.challenges.Challenge
 import backend.model.challenges.ChallengeService
 import backend.model.event.Team
 import backend.model.event.TeamService
@@ -17,17 +16,14 @@ import backend.model.user.UserService
 import backend.util.euroOf
 import backend.view.ChallengeStatusView
 import backend.view.ChallengeView
-import backend.view.UnregisteredSponsorView
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.POST
+import org.springframework.web.bind.annotation.RequestMethod.*
 import javax.validation.Valid
-import javax.validation.constraints.NotNull
-import javax.validation.constraints.Size
 
 @RestController
 open class ChallengeController {
@@ -94,7 +90,7 @@ open class ChallengeController {
      * Accept, reject or add proof to a challenge
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/event/{eventId}/team/{teamId}/challenge/{challengeId}/status/")
+    @RequestMapping("/event/{eventId}/team/{teamId}/challenge/{challengeId}/status/", method = arrayOf(PUT))
     open fun changeStatus(@PathVariable challengeId: Long,
                           @Valid @RequestBody body: ChallengeStatusView): ChallengeView {
 
@@ -109,6 +105,19 @@ open class ChallengeController {
 
             else -> throw BadRequestException("Unknown status for challenge ${body.status}")
         }.let { ChallengeView(it) }
+    }
+
+    /**
+     * GET /event/{eventId}/team/{teamId}/challenge/
+     * Get all challenges for a team
+     */
+    @RequestMapping("/event/{eventId}/team/{teamId}/challenge/", method = arrayOf(GET))
+    open fun getAllChallengesForTeam(@PathVariable teamId: Long): Iterable<ChallengeView> {
+        return challengeService.findByTeamId(teamId).map {
+            val view = ChallengeView(it)
+            view.unregisteredSponsor?.address = null // Set address to null to make it non public
+            return@map view
+        }
     }
 }
 

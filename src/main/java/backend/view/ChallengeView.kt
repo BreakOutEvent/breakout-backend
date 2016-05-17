@@ -15,6 +15,8 @@ class ChallengeView {
 
     var sponsorId: Long? = null
 
+    var sponsorIsHidden: Boolean = false
+
     @Valid
     var unregisteredSponsor: UnregisteredSponsorView? = null
 
@@ -33,10 +35,22 @@ class ChallengeView {
     constructor(challenge: Challenge) {
         this.description = challenge.description
         this.amount = challenge.amount.numberStripped.toDouble()
-        this.sponsorId = challenge.sponsor?.id
         this.teamId = challenge.team!!.id!!
         this.team = challenge.team!!.name
         this.status = challenge.status.toString()
-        this.unregisteredSponsor = challenge.unregisteredSponsor?.let { UnregisteredSponsorView(it) }
+
+        // Add information about registered sponsor
+        // if he exists and isHidden is false
+        challenge.sponsor?.isHidden?.let {
+            if (it) this.sponsorIsHidden = true
+            else this.sponsorId = challenge.sponsor?.id
+        }
+
+        // Add information about unregistered sponsor
+        // if he exists and isHidden is false
+        challenge.unregisteredSponsor?.isHidden?.let {
+            if (it) this.sponsorIsHidden = true
+            else this.unregisteredSponsor = UnregisteredSponsorView(challenge.unregisteredSponsor!!)
+        }
     }
 }

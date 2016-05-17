@@ -66,4 +66,9 @@ class ChallengeServiceImpl : ChallengeService {
         return challengeRepository.findOne(challengeId)
     }
 
+    @Transactional
+    override fun findByTeamId(teamId: Long): Iterable<Challenge> {
+        return challengeRepository.findByTeamId(teamId)
+    }
+
 }

@@ -21,6 +21,8 @@ interface ChallengeService {
 
     fun findOne(challengeId: Long): Challenge?
 
+    fun findByTeamId(teamId: Long): Iterable<Challenge>
+
     @PreAuthorize("#challenge.team.isMember(authentication.name)")
     fun accept(challenge: Challenge): Challenge
 

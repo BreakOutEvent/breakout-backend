@@ -5,6 +5,8 @@ import backend.Integration.toJsonString
 import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.misc.Coord
+import backend.model.sponsoring.UnregisteredSponsor
+import backend.model.user.Address
 import backend.model.user.Participant
 import backend.model.user.Sponsor
 import backend.testHelper.asUser
@@ -174,5 +176,112 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.team").value(team.name))
                 .andExpect(jsonPath("$.teamId").value(team.id!!.toInt()))
                 .andExpect(jsonPath("$.status").value("WITH_PROOF"))
+    }
+
+    @Test
+    fun testShowAllChallenges() {
+
+        setAuthenticatedUser("sponsor@break-out.org")
+        challengeService.proposeChallenge(sponsor, team, euroOf(10.0), "An awesome challenge")
+
+        val unregisteredSponsor = UnregisteredSponsor(
+                firstname = "Hans",
+                lastname = "Wurst",
+                company = "privat",
+                url = "test",
+                isHidden = false,
+                gender = "male",
+                address = Address(
+                        street = "Straße",
+                        housenumber = "4",
+                        city = "City",
+                        zipcode = "01111",
+                        country = "Germany"
+                )
+        )
+        setAuthenticatedUser(participant.email)
+        challengeService.proposeChallenge(unregisteredSponsor, team, euroOf(10.0), "An awesome challenge")
+
+        val request = get("/event/${event.id}/team/${team.id}/challenge/")
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$.[0]").exists())
+                .andExpect(jsonPath("$.[0].description").exists())
+                .andExpect(jsonPath("$.[0].amount").exists())
+                .andExpect(jsonPath("$.[0].sponsorId").exists())
+                .andExpect(jsonPath("$.[0].sponsorIsHidden").value(false))
+                .andExpect(jsonPath("$.[0].unregisteredSponsor").doesNotExist())
+                .andExpect(jsonPath("$.[0].team").exists())
+                .andExpect(jsonPath("$.[0].teamId").exists())
+                .andExpect(jsonPath("$.[0].status").exists())
+                .andExpect(jsonPath("$.[1].description").exists())
+                .andExpect(jsonPath("$.[1].amount").exists())
+                .andExpect(jsonPath("$.[1].sponsorId").doesNotExist())
+                .andExpect(jsonPath("$.[0].sponsorIsHidden").value(false))
+                .andExpect(jsonPath("$.[1].unregisteredSponsor").exists())
+                .andExpect(jsonPath("$.[1].unregisteredSponsor.firstname").exists())
+                .andExpect(jsonPath("$.[1].unregisteredSponsor.lastname").exists())
+                .andExpect(jsonPath("$.[1].unregisteredSponsor.company").exists())
+                .andExpect(jsonPath("$.[1].unregisteredSponsor.url").exists())
+                .andExpect(jsonPath("$.[1].unregisteredSponsor.gender").exists())
+                .andExpect(jsonPath("$.[1].unregisteredSponsor.address").doesNotExist())
+                .andExpect(jsonPath("$.[1].team").exists())
+                .andExpect(jsonPath("$.[1].teamId").exists())
+                .andExpect(jsonPath("$.[1].status").exists())
+    }
+
+    @Test
+    fun dontShowDataForHiddenSponsor() {
+
+        val sponsor1 = userService.create("sponsor1@break-out.org", "password", {
+            addRole(Sponsor::class).isHidden = true
+        }).getRole(Sponsor::class)!!
+
+        setAuthenticatedUser("sponsor1@break-out.org")
+
+        challengeService.proposeChallenge(sponsor1, team, euroOf(10.0), "An awesome challenge")
+
+        val unregisteredSponsor = UnregisteredSponsor(
+                firstname = "Hans",
+                lastname = "Wurst",
+                company = "privat",
+                url = "test",
+                isHidden = true,
+                gender = "male",
+                address = Address(
+                        street = "Straße",
+                        housenumber = "4",
+                        city = "City",
+                        zipcode = "01111",
+                        country = "Germany"
+                )
+        )
+        setAuthenticatedUser(participant.email)
+        challengeService.proposeChallenge(unregisteredSponsor, team, euroOf(10.0), "An awesome challenge")
+
+        val request = get("/event/${event.id}/team/${team.id}/challenge/")
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$.[0]").exists())
+                .andExpect(jsonPath("$.[0].description").exists())
+                .andExpect(jsonPath("$.[0].amount").exists())
+                .andExpect(jsonPath("$.[0].sponsorIsHidden").value(true))
+                .andExpect(jsonPath("$.[0].sponsorId").doesNotExist())
+                .andExpect(jsonPath("$.[0].unregisteredSponsor").doesNotExist())
+                .andExpect(jsonPath("$.[0].team").exists())
+                .andExpect(jsonPath("$.[0].teamId").exists())
+                .andExpect(jsonPath("$.[0].status").exists())
+                .andExpect(jsonPath("$.[1].description").exists())
+                .andExpect(jsonPath("$.[1].amount").exists())
+                .andExpect(jsonPath("$.[1].sponsorId").doesNotExist())
+                .andExpect(jsonPath("$.[1].unregisteredSponsor").doesNotExist())
+                .andExpect(jsonPath("$.[1].sponsorIsHidden").value(true))
+                .andExpect(jsonPath("$.[1].team").exists())
+                .andExpect(jsonPath("$.[1].teamId").exists())
+                .andExpect(jsonPath("$.[1].status").exists())
     }
 }
