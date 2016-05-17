@@ -64,6 +64,24 @@ class TeamTest {
     }
 
     @Test
+    fun testJoinWithEmailInDifferentCase1() {
+        val inviteeEmail = EmailAddress("invitee@mail.com")
+        val invitee = User.create("INVITEE@mail.com", "password").addRole(Participant::class)
+
+        team.invite(inviteeEmail)
+        team.join(invitee)
+    }
+
+    @Test
+    fun testJoinWithEmailInDifferentCase2() {
+        val inviteeEmail = EmailAddress("INVITEE@mail.com")
+        val invitee = User.create("invitee@mail.com", "password").addRole(Participant::class)
+
+        team.invite(inviteeEmail)
+        team.join(invitee)
+    }
+
+    @Test
     fun testFailToJoinIfTeamAlreadyFull() {
         val inviteeEmail = EmailAddress("invitee@mail.com")
         val secondInvitee = EmailAddress("secondInvitee@mail.com")

@@ -23,7 +23,9 @@ class EmailAddress() {
 
     override fun equals(other: Any?): Boolean {
         if ((other !is EmailAddress)) return false
-        return other.value == this.value
+        val o = other.value.toLowerCase()
+        val t = this.value.toLowerCase()
+        return o.equals(t)
     }
 
     override fun hashCode(): Int {
