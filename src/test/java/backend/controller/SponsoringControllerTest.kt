@@ -24,7 +24,7 @@ class SponsoringControllerTest : IntegrationTest() {
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val sponsor = userService.create("sponsor@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
         val team = teamService.create(participant, "name", "description", event)
-        sponsoringService.createSponsoring(sponsor, team, euroOf(1), euroOf(200))
+        val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(1), euroOf(200))
 
         val request = get("/event/${event.id}/team/${team.id}/sponsoring/")
                 .asUser(mockMvc, participant.email, "password")
@@ -38,6 +38,8 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[0].teamId").exists())
                 .andExpect(jsonPath("$.[0].team").exists())
                 .andExpect(jsonPath("$.[0].sponsorId").exists())
+                .andExpect(jsonPath("$.[0].id").value(sponsoring.id!!.toInt()))
+                .andExpect(jsonPath("$.[0].eventId").value(event.id!!.toInt()))
 
         val unauthorized = get("/event/${event.id}/team/${team.id}/sponsoring/")
         mockMvc.perform(unauthorized).andExpect(status().isUnauthorized)

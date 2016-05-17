@@ -7,7 +7,12 @@ import javax.validation.constraints.NotNull
 
 class SponsoringView() {
 
+    var id: Long? = null
+
+    var eventId: Long? = null
+
     var teamId: Long? = null
+
     var team: String? = null
 
     @NotNull
@@ -24,6 +29,8 @@ class SponsoringView() {
     var unregisteredSponsor: UnregisteredSponsorView? = null
 
     constructor(sponsoring: Sponsoring) : this() {
+        this.id = sponsoring.id
+        this.eventId = sponsoring.team?.event?.id
         this.teamId = sponsoring.team?.id
         this.team = sponsoring.team?.name
         this.amountPerKm = sponsoring.amountPerKm.numberStripped.toDouble()
