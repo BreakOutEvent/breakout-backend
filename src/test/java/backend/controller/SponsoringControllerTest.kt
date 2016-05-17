@@ -3,6 +3,8 @@ package backend.controller
 import backend.Integration.IntegrationTest
 import backend.Integration.getTokens
 import backend.model.misc.Coord
+import backend.model.sponsoring.UnregisteredSponsor
+import backend.model.user.Address
 import backend.model.user.Participant
 import backend.model.user.Sponsor
 import backend.testHelper.asUser
@@ -18,7 +20,7 @@ import java.time.LocalDateTime
 class SponsoringControllerTest : IntegrationTest() {
 
     @Test
-    fun testGetAllSponsorings() {
+    fun testGetAllSponsoringsAuthenticated() {
 
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
@@ -40,9 +42,132 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[0].sponsorId").exists())
                 .andExpect(jsonPath("$.[0].id").value(sponsoring.id!!.toInt()))
                 .andExpect(jsonPath("$.[0].eventId").value(event.id!!.toInt()))
+    }
 
-        val unauthorized = get("/event/${event.id}/team/${team.id}/sponsoring/")
-        mockMvc.perform(unauthorized).andExpect(status().isUnauthorized)
+    @Test
+    fun testGetAllSponsoringsUnauthenticated() {
+
+        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
+        val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val sponsor = userService.create("sponsor@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
+        val team = teamService.create(participant, "name", "description", event)
+        val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(1), euroOf(200))
+
+        val request = get("/event/${event.id}/team/${team.id}/sponsoring/")
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$.[0]").exists())
+                .andExpect(jsonPath("$.[0].amountPerKm").exists())
+                .andExpect(jsonPath("$.[0].limit").exists())
+                .andExpect(jsonPath("$.[0].teamId").exists())
+                .andExpect(jsonPath("$.[0].team").exists())
+                .andExpect(jsonPath("$.[0].sponsorId").exists())
+                .andExpect(jsonPath("$.[0].id").value(sponsoring.id!!.toInt()))
+                .andExpect(jsonPath("$.[0].eventId").value(event.id!!.toInt()))
+    }
+
+    @Test
+    fun testGetAllSponsoringsUnauthenticatedUnregisteredSponsor() {
+        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
+        val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val sponsor = UnregisteredSponsor(
+                firstname = "Hans",
+                lastname = "Wurst",
+                company = "privat",
+                url = "test",
+                isHidden = false,
+                gender = "male",
+                address = Address(
+                        street = "Straße",
+                        housenumber = "4",
+                        city = "City",
+                        zipcode = "01111",
+                        country = "Germany"
+                )
+        )
+        val team = teamService.create(participant, "name", "description", event)
+
+        setAuthenticatedUser(participant.email)
+        val sponsoring = sponsoringService.createSponsoringWithOfflineSponsor(team, euroOf(1), euroOf(200), sponsor)
+
+        val request = get("/event/${event.id}/team/${team.id}/sponsoring/")
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$.[0]").exists())
+                .andExpect(jsonPath("$.[0].amountPerKm").exists())
+                .andExpect(jsonPath("$.[0].limit").exists())
+                .andExpect(jsonPath("$.[0].teamId").exists())
+                .andExpect(jsonPath("$.[0].team").exists())
+                .andExpect(jsonPath("$.[0].sponsorId").doesNotExist())
+                .andExpect(jsonPath("$.[0].id").value(sponsoring.id!!.toInt()))
+                .andExpect(jsonPath("$.[0].eventId").value(event.id!!.toInt()))
+                .andExpect(jsonPath("$.[0].unregisteredSponsor").exists())
+                .andExpect(jsonPath("$.[0].unregisteredSponsor.address").doesNotExist())
+    }
+
+    @Test
+    fun testCreateSponsoringWithHiddenSponsor() {
+
+        //Set-Up
+        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
+        val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val unregisteredSponsor = UnregisteredSponsor(
+                firstname = "Hans",
+                lastname = "Wurst",
+                company = "privat",
+                url = "test",
+                isHidden = true,
+                gender = "male",
+                address = Address(
+                        street = "Straße",
+                        housenumber = "4",
+                        city = "City",
+                        zipcode = "01111",
+                        country = "Germany"
+                )
+        )
+
+        val registeredSponsor = userService.create("sponsor@mail.de", "password", {
+            addRole(Sponsor::class).isHidden = true
+        }).getRole(Sponsor::class)!!
+
+        setAuthenticatedUser(registeredSponsor.email)
+        val team = teamService.create(participant, "name", "description", event)
+
+        val sponsoring1 = sponsoringService.createSponsoring(registeredSponsor, team, euroOf(1), euroOf(200))
+        setAuthenticatedUser(participant.email)
+        val sponsoring2 = sponsoringService.createSponsoringWithOfflineSponsor(team, euroOf(1), euroOf(200), unregisteredSponsor)
+
+        // Test & Assertions
+        val request = get("/event/${event.id}/team/${team.id}/sponsoring/")
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$.[0]").exists())
+                .andExpect(jsonPath("$.[0].sponsorIsHidden").value(true))
+                .andExpect(jsonPath("$.[0].amountPerKm").exists())
+                .andExpect(jsonPath("$.[0].limit").exists())
+                .andExpect(jsonPath("$.[0].teamId").exists())
+                .andExpect(jsonPath("$.[0].team").exists())
+                .andExpect(jsonPath("$.[0].sponsoring").doesNotExist())
+                .andExpect(jsonPath("$.[0].id").value(sponsoring1.id!!.toInt()))
+                .andExpect(jsonPath("$.[0].eventId").value(event.id!!.toInt()))
+                .andExpect(jsonPath("$.[0].unregisteredSponsor").doesNotExist())
+                .andExpect(jsonPath("$.[1].amountPerKm").exists())
+                .andExpect(jsonPath("$.[1].sponsorIsHidden").value(true))
+                .andExpect(jsonPath("$.[1].limit").exists())
+                .andExpect(jsonPath("$.[1].teamId").exists())
+                .andExpect(jsonPath("$.[1].team").exists())
+                .andExpect(jsonPath("$.[1].sponsorId").doesNotExist())
+                .andExpect(jsonPath("$.[1].id").value(sponsoring2.id!!.toInt()))
+                .andExpect(jsonPath("$.[1].eventId").value(event.id!!.toInt()))
+                .andExpect(jsonPath("$.[1].unregisteredSponsor").doesNotExist())
+
     }
 
     @Test
@@ -153,9 +278,6 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[0].team").exists())
                 .andExpect(jsonPath("$.[0].sponsorId").exists())
                 .andExpect(jsonPath("$.[1]").doesNotExist())
-
-        val unauthorized = get("/event/${event.id}/team/${team.id}/sponsoring/")
-        mockMvc.perform(unauthorized).andExpect(status().isUnauthorized)
     }
 
     @Test

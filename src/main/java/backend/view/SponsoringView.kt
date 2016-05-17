@@ -28,6 +28,8 @@ class SponsoringView() {
     @Valid
     var unregisteredSponsor: UnregisteredSponsorView? = null
 
+    var sponsorIsHidden: Boolean = false
+
     constructor(sponsoring: Sponsoring) : this() {
         this.id = sponsoring.id
         this.eventId = sponsoring.team?.event?.id

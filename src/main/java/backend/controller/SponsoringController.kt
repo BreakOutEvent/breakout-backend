@@ -6,7 +6,6 @@ import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
 import backend.model.event.Team
 import backend.model.event.TeamService
-import backend.model.misc.Url
 import backend.model.sponsoring.Sponsoring
 import backend.model.sponsoring.SponsoringService
 import backend.model.sponsoring.UnregisteredSponsor
@@ -44,22 +43,48 @@ open class SponsoringController {
     /**
      * GET /event/{eventId}/team/{teamId}/sponsoring/
      * Get a list of all sponsorings for the team with teamId
-     * This can only be done if user is member of team
      */
-    @PreAuthorize("isAuthenticated()")
     @RequestMapping("/event/{eventId}/team/{teamId}/sponsoring/", method = arrayOf(GET))
-    open fun getAllSponsorings(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
+    open fun getAllSponsorings(@AuthenticationPrincipal customUserDetails: CustomUserDetails?,
                                @PathVariable teamId: Long): Iterable<SponsoringView> {
 
-        val user = userService.getUserFromCustomUserDetails(customUserDetails)
-
-        val participant = user.getRole(Participant::class)
         val team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId found")
+        if(customUserDetails != null) return getAllSponsoringsAuthenticated(customUserDetails, team)
+        else return getAllSponsoringsUnauthenticated(team)
+    }
+
+    private fun getAllSponsoringsAuthenticated(customUserDetails: CustomUserDetails, team: Team): Iterable<SponsoringView> {
+
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
+        val participant = user.getRole(Participant::class)
 
         if (participant != null && team.isMember(participant)) {
-            return sponsoringService.findByTeamId(teamId).map { SponsoringView(it) }
+            return sponsoringService.findByTeamId(team.id!!).map { SponsoringView(it) }
         } else {
-            throw UnauthorizedException("Only members of the team $teamId can view its sponsorings")
+            throw UnauthorizedException("Only members of the team ${team.id} can view its sponsorings")
+        }
+    }
+
+    private fun getAllSponsoringsUnauthenticated(team: Team) : Iterable<SponsoringView> {
+        return sponsoringService.findByTeamId(team.id!!).map { sponsoring ->
+            val view = SponsoringView(sponsoring)
+
+            sponsoring.unregisteredSponsor?.let {
+                if(it.isHidden) {
+                    view.unregisteredSponsor = null
+                    view.sponsorIsHidden = true
+                }
+                view.unregisteredSponsor?.address = null
+            }
+
+            sponsoring.sponsor?.let {
+                if(it.isHidden) {
+                    view.sponsorId = null
+                    view.sponsorIsHidden = true
+                }
+            }
+
+            return@map view
         }
     }
 
@@ -119,7 +144,6 @@ open class SponsoringController {
      * Get a list of all sponsorings for the user with userId
      * This can only be done if the user is a sponsor
      */
-    @PreAuthorize("isAuthenticated()")
     @RequestMapping("/user/{userId}/sponsor/sponsoring/", method = arrayOf(GET))
     open fun getAllSponsoringsForSponsor(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
                                          @PathVariable userId: Long): Iterable<SponsoringView> {
