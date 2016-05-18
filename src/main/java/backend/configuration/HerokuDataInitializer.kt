@@ -72,12 +72,12 @@ class HerokuDataInitializer {
         sponsoringService.createSponsoring(sponsor2, team2, Money.parse("EUR 0.2"), Money.parse("EUR 200"))
 
         // ---- Locations for team1 ----
-        locationService.create(Coord(100.0, 0.0), participant1, date.plusHours(1))
-        locationService.create(Coord(150.0, 0.0), participant1, date.plusHours(2))
+        locationService.create(Coord(51.0505, 13.7372), participant1, date.plusHours(1))
+        locationService.create(Coord(48.8534100, 2.3488000), participant1, date.plusHours(2))
 
         // ---- Locations for team2 ----
-        locationService.create(Coord(0.0, 20.0), participant3, date.plusHours(2))
-        locationService.create(Coord(0.0, 220.0), participant3, date.plusHours(2))
+        locationService.create(Coord(53.5753200, 10.0153400), participant3, date.plusHours(2))
+        locationService.create(Coord(52.3740300, 4.8896900), participant3, date.plusHours(2))
 
     }
 
