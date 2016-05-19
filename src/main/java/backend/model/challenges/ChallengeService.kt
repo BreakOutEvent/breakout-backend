@@ -5,11 +5,7 @@ import backend.model.posting.Posting
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
 import org.javamoney.moneta.Money
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.repository.CrudRepository
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.stereotype.Service
-import javax.transaction.Transactional
 
 interface ChallengeService {
 

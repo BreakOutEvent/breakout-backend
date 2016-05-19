@@ -233,6 +233,47 @@ class ChallengeControllerTest : IntegrationTest() {
     }
 
     @Test
+    fun createChallengePreferUnregisteredSponsorOverRoleSponsor() {
+
+        participant.addRole(Sponsor::class)
+        userService.save(participant)
+
+        val body = mapOf(
+                "amount" to 100,
+                "description" to "Do something really awesome, because you know you are awesome!",
+                "unregisteredSponsor" to mapOf(
+                        "firstname" to "Hans",
+                        "lastname" to "Meier",
+                        "company" to "privat",
+                        "url" to "",
+                        "gender" to "male",
+                        "isHidden" to "false",
+                        "address" to mapOf(
+                                "street" to "street",
+                                "housenumber" to "123",
+                                "zipcode" to "0000",
+                                "city" to "City",
+                                "country" to "Germany"
+                        )
+                )
+        )
+
+        val request = post("/event/${event.id}/team/${team.id}/challenge/")
+                .json(body)
+                .asUser(this.mockMvc, participant.email, "password")
+
+        mockMvc.perform(request)
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.description").value("Do something really awesome, because you know you are awesome!"))
+                .andExpect(jsonPath("$.sponsorId").doesNotExist())
+                .andExpect(jsonPath("$.amount").value(100.0))
+                .andExpect(jsonPath("$.team").value(team.name))
+                .andExpect(jsonPath("$.teamId").value(team.id!!.toInt()))
+                .andExpect(jsonPath("$.status").value("ACCEPTED"))
+                .andExpect(jsonPath("$.unregisteredSponsor").exists())
+    }
+
+    @Test
     fun dontShowDataForHiddenSponsor() {
 
         val sponsor1 = userService.create("sponsor1@break-out.org", "password", {

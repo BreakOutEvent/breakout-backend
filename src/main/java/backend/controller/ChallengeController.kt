@@ -16,6 +16,7 @@ import backend.model.user.UserService
 import backend.util.euroOf
 import backend.view.ChallengeStatusView
 import backend.view.ChallengeView
+import backend.view.SponsoringView
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
@@ -58,9 +59,13 @@ open class ChallengeController {
         val amount = euroOf(body.amount!!)
         val description = body.description!!
 
-        if (user.hasRole(Sponsor::class)) return challengeWithRegisteredSponsor(user, team, amount, description)
-        else if (user.hasRole(Participant::class)) return challengeUnregisteredSponsor(body, team, amount, description)
-        else throw UnauthorizedException("User in neither Participant nor sponsor")
+        val challenge = if(body.unregisteredSponsor != null) {
+            challengeUnregisteredSponsor(body, team, amount, description)
+        } else {
+            challengeWithRegisteredSponsor(user, team, amount, description)
+        }
+        
+        return challenge
     }
 
     private fun challengeWithRegisteredSponsor(user: User, team: Team, amount: Money, description: String): ChallengeView {
