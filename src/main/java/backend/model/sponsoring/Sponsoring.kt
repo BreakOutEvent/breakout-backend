@@ -1,5 +1,6 @@
 package backend.model.sponsoring
 
+import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.event.Team
 import backend.model.sponsoring.SponsoringStatus.*
@@ -15,7 +16,26 @@ import javax.persistence.ManyToOne
 class Sponsoring : BasicEntity {
 
     var status: SponsoringStatus = PROPOSED
-        private set
+        private set (value) {
+            checkTransition(from = field, to = value)
+            field = value
+        }
+
+    private fun checkTransition(from: SponsoringStatus, to: SponsoringStatus) {
+
+        val transitions = listOf(
+                PROPOSED to ACCEPTED,
+                PROPOSED to REJECTED,
+                PROPOSED to WITHDRAWN,
+                ACCEPTED to REJECTED,
+                REJECTED to ACCEPTED)
+
+        if (from == to) {
+            return
+        } else if (!transitions.contains(from to to)) {
+            throw DomainException("Changing the status of a sponsoring from $from to $to is not allowed")
+        }
+    }
 
     lateinit var amountPerKm: Money
         private set
@@ -68,6 +88,14 @@ class Sponsoring : BasicEntity {
 
     fun reject() {
         this.status = REJECTED
+    }
+
+    fun withdraw() {
+        if (this.status == PROPOSED) {
+            this.status = WITHDRAWN
+        } else {
+            throw DomainException("A challenge can only be withdrawn when its current status is proposed")
+        }
     }
 
     private fun calculateAmount(): Money {

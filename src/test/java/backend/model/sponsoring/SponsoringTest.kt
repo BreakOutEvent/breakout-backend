@@ -11,6 +11,7 @@ import org.powermock.api.mockito.PowerMockito
 import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.PowerMockRunner
 import kotlin.test.assertEquals
+import kotlin.test.assertFails
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -132,6 +133,21 @@ class SponsoringTest {
         assertEquals(PROPOSED, sponsoring.status)
         sponsoring.reject()
         assertEquals(REJECTED, sponsoring.status)
+    }
+
+    @Test
+    fun testWithdraw() {
+        val team = PowerMockito.mock(Team::class.java)
+        val amountPerKm = euroOf(1.0)
+        val limit = euroOf(100)
+        val sponsor = PowerMockito.mock(Sponsor::class.java)
+        val sponsoring = Sponsoring(sponsor, team, amountPerKm, limit)
+
+        sponsoring.withdraw()
+
+        assertEquals(WITHDRAWN, sponsoring.status)
+        assertFails { sponsoring.accept() }
+        assertFails { sponsoring.reject() }
     }
 }
 
