@@ -54,6 +54,16 @@ open class EventController {
     }
 
     /**
+     * GET /event/{id}/
+     * Gets Event by ID
+     */
+    @RequestMapping("/{id}/", method = arrayOf(GET))
+    open fun getEventById(@PathVariable("id") id: Long): EventView {
+        val event = eventService.findById(id) ?: throw NotFoundException("event with id $id does not exist")
+        return EventView(event)
+    }
+
+    /**
      * GET /event/{id}/posting/
      * Gets all Postings for given event
      */

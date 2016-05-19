@@ -88,7 +88,7 @@ class TestEventEndpoint : IntegrationTest() {
         createNewEvent()
 
         // Get Events
-        var getEventsRequest = get("/event/")
+        val getEventsRequest = get("/event/")
 
         mockMvc.perform(getEventsRequest)
                 .andExpect(status().isOk)
@@ -108,6 +108,24 @@ class TestEventEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.[1].startingLocation.latitude").exists())
                 .andExpect(jsonPath("$.[1].startingLocation.longitude").exists())
                 .andExpect(jsonPath("$.[1].duration").exists())
+    }
+
+    @Test
+    fun getEventById() {
+
+        val event = eventService.createEvent("title", LocalDateTime.now(), "Munich", Coord(0.0, 0.0), 36)
+
+        // Get Events
+        val getEventsRequest = get("/event/${event.id}/")
+
+        mockMvc.perform(getEventsRequest)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.title").value("title"))
+                .andExpect(jsonPath("$.city").value("Munich"))
+                .andExpect(jsonPath("$.startingLocation.latitude").exists())
+                .andExpect(jsonPath("$.startingLocation.longitude").exists())
+                .andExpect(jsonPath("$.duration").exists())
     }
 
 
