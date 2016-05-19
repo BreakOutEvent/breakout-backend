@@ -12,6 +12,7 @@ import backend.testHelper.json
 import backend.util.euroOf
 import org.junit.Test
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -179,7 +180,7 @@ class SponsoringControllerTest : IntegrationTest() {
 
         val body = mapOf("amountPerKm" to 1.0, "limit" to 200)
 
-        val request = MockMvcRequestBuilders.post("/event/${event.id}/team/${team.id}/sponsoring/")
+        val request = post("/event/${event.id}/team/${team.id}/sponsoring/")
                 .asUser(mockMvc, sponsor.email, "password")
                 .json(body)
 
@@ -223,7 +224,7 @@ class SponsoringControllerTest : IntegrationTest() {
 
         val tokens = getTokens(this.mockMvc, participant.email, "password")
 
-        val request = MockMvcRequestBuilders.post("/event/${event.id}/team/${team.id}/sponsoring/")
+        val request = post("/event/${event.id}/team/${team.id}/sponsoring/")
                 .asUser(mockMvc, participant.email, "password")
                 .json(body)
 
@@ -251,6 +252,52 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andReturn().response.contentAsString
 
         println(result)
+    }
+
+    /**
+     * Whenever a user is both an sponsor and a participant and wants to add
+     * a sponsoring for it's current team by providing data for unregisteredSponsor,
+     * this data should be preferred instead of using the users role sponsor for the sponsoring
+     *
+     * See: https://github.com/BreakOutEvent/breakout-backend/issues/134
+     */
+    @Test
+    fun testCreateSponsoringAsUserWhoIsBothSponsorAndParticipant() {
+        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
+        val user = userService.create("participant@mail.de", "password", {
+            addRole(Participant::class)
+            addRole(Sponsor::class)
+        })
+        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+
+        val body = mapOf(
+                "amountPerKm" to 1.0,
+                "limit" to 200,
+                "unregisteredSponsor" to mapOf(
+                        "firstname" to "Florian",
+                        "lastname" to "Schmidt",
+                        "url" to "www.florianschmidt.me",
+                        "gender" to "male",
+                        "hidden" to false,
+                        "company" to "awesome AG",
+                        "address" to mapOf(
+                                "street" to "test",
+                                "housenumber" to "01",
+                                "city" to "Dresden",
+                                "zipcode" to "01198",
+                                "country" to "Germany"
+                        )
+                )
+        )
+
+        val request = post("/event/${event.id}/team/${team.id}/sponsoring/")
+                .asUser(mockMvc, user.email, "password")
+                .json(body)
+
+        mockMvc.perform(request)
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.unregisteredSponsor").exists())
+                .andExpect(jsonPath("$.sponsorId").doesNotExist())
     }
 
     @Test

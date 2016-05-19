@@ -49,7 +49,7 @@ open class SponsoringController {
                                @PathVariable teamId: Long): Iterable<SponsoringView> {
 
         val team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId found")
-        if(customUserDetails != null) return getAllSponsoringsAuthenticated(customUserDetails, team)
+        if (customUserDetails != null) return getAllSponsoringsAuthenticated(customUserDetails, team)
         else return getAllSponsoringsUnauthenticated(team)
     }
 
@@ -65,12 +65,12 @@ open class SponsoringController {
         }
     }
 
-    private fun getAllSponsoringsUnauthenticated(team: Team) : Iterable<SponsoringView> {
+    private fun getAllSponsoringsUnauthenticated(team: Team): Iterable<SponsoringView> {
         return sponsoringService.findByTeamId(team.id!!).map { sponsoring ->
             val view = SponsoringView(sponsoring)
 
             sponsoring.unregisteredSponsor?.let {
-                if(it.isHidden) {
+                if (it.isHidden) {
                     view.unregisteredSponsor = null
                     view.sponsorIsHidden = true
                 }
@@ -78,7 +78,7 @@ open class SponsoringController {
             }
 
             sponsoring.sponsor?.let {
-                if(it.isHidden) {
+                if (it.isHidden) {
                     view.sponsorId = null
                     view.sponsorIsHidden = true
                 }
@@ -97,23 +97,20 @@ open class SponsoringController {
     @RequestMapping("/event/{eventId}/team/{teamId}/sponsoring/", method = arrayOf(POST))
     @ResponseStatus(CREATED)
     open fun createSponsoring(@PathVariable teamId: Long,
-                              @Valid @RequestBody sponsoringView: SponsoringView,
+                              @Valid @RequestBody body: SponsoringView,
                               @AuthenticationPrincipal customUserDetails: CustomUserDetails): SponsoringView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val team = teamService.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")
-        val amountPerKm = Money.of(sponsoringView.amountPerKm, "EUR")
-        val limit = Money.of(sponsoringView.limit, "EUR")
+        val amountPerKm = Money.of(body.amountPerKm, "EUR")
+        val limit = Money.of(body.limit, "EUR")
 
-        val sponsoring = if (user.hasRole(Sponsor::class)) {
-            val sponsor = user.getRole(Sponsor::class) ?: throw Exception("Can't get role sponsor")
-            createSponsoringWithAuthenticatedSponsor(team, amountPerKm, limit, sponsor)
-        } else if (user.hasRole(Participant::class)) {
-            val unregisteredSponsorView = sponsoringView.unregisteredSponsor ?:
-                    throw BadRequestException("User is no sponsor and no data for unregistered sponsor is provided")
-            createSponsoringWithUnregisteredSponsor(team, amountPerKm, limit, unregisteredSponsorView)
+        val sponsoring = if (body.unregisteredSponsor != null) {
+            user.getRole(Participant::class) ?: throw UnauthorizedException("Cannot add unregistered sponsor if user is no participant")
+            createSponsoringWithUnregisteredSponsor(team, amountPerKm, limit, body.unregisteredSponsor!!)
         } else {
-            throw BadRequestException("User is neither participant nor sponsor")
+            val sponsor = user.getRole(Sponsor::class) ?: throw UnauthorizedException("Cannot add user as sponsor. Missing role sponsor")
+            createSponsoringWithAuthenticatedSponsor(team, amountPerKm, limit, sponsor)
         }
 
         return SponsoringView(sponsoring)
