@@ -207,7 +207,7 @@ class TestTeamEndpoint : IntegrationTest() {
                 .content(body)
 
         val response = mockMvc.perform(request)
-                .andExpect(status().isCreated)
+                .andExpect(status().isOk)
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.profilePic.type").exists())
                 .andExpect(jsonPath("$.profilePic.id").exists())

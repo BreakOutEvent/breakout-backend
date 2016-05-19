@@ -33,6 +33,8 @@ class Team : BasicEntity {
         this.invoice = TeamEntryFeeInvoice(this, Money.of(BigDecimal.valueOf(60), "EUR"))
     }
 
+    var hasStarted: Boolean = false
+
     lateinit var name: String
 
     @ManyToOne

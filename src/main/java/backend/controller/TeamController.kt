@@ -5,9 +5,12 @@ import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
 import backend.model.event.EventService
+import backend.model.event.Team
 import backend.model.event.TeamService
 import backend.model.misc.EmailAddress
+import backend.model.user.Admin
 import backend.model.user.Participant
+import backend.model.user.User
 import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.util.getSignedJwtToken
@@ -86,7 +89,10 @@ open class TeamController {
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val event = eventService.findById(eventId) ?: throw NotFoundException("No event with id $eventId")
         val creator = user.getRole(Participant::class) ?: throw UnauthorizedException("User is no participant")
-        var team = teamService.create(creator, body.name!!, body.description, event)
+        val description = body.description ?: ""
+        val name = body.name ?: throw BadRequestException("Team must have a name. Missing in body")
+        if (name.isEmpty()) throw BadRequestException("Team name cannot be empty")
+        val team = teamService.create(creator, name, description, event)
 
         team.profilePic.uploadToken = getSignedJwtToken(JWT_SECRET, team.profilePic.id.toString())
 
@@ -97,7 +103,6 @@ open class TeamController {
      * PUT /event/{id}/team/{teamId}/
      * allows teammembers to edit teamname and description
      */
-    @ResponseStatus(CREATED)
     @RequestMapping("/{teamId}/", method = arrayOf(PUT))
     @PreAuthorize("isAuthenticated()")
     open fun editTeam(@PathVariable eventId: Long,
@@ -106,18 +111,28 @@ open class TeamController {
                       @Valid @RequestBody body: TeamView): TeamView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
-        val participant = user.getRole(Participant::class) ?: throw RuntimeException("User is no participant")
-        var team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId")
-        if (team.members.contains(participant) == false) throw UnauthorizedException("User is not part of team")
+        val team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId")
 
-        team.description = body.description
-        if (body.name != null) team.name = body.name!!
+        checkAuthenticationForEditTeam(team, user)
+
+        team.hasStarted = body.hasStarted ?: false
+        team.description = body.description ?: team.description
+        team.name = body.name ?: team.name
 
         teamService.save(team)
 
         team.profilePic.uploadToken = getSignedJwtToken(JWT_SECRET, team.profilePic.id.toString())
 
         return TeamView(team)
+    }
+
+    private fun checkAuthenticationForEditTeam(team: Team, user: User) {
+        val role = user.getRole(Participant::class)
+                ?: user.getRole(Admin::class)
+
+        if (role is Participant) {
+            if (!team.members.contains(role)) throw UnauthorizedException("User is not part of team")
+        }
     }
 
 
