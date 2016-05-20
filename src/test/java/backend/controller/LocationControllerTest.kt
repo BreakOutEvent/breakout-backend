@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 
 class LocationControllerTest : IntegrationTest() {
@@ -139,7 +140,7 @@ class LocationControllerTest : IntegrationTest() {
     fun testCreateLocationDuringEvent() {
 
         val timeEvent = LocalDateTime.of(2016, 6, 3, 9, 0, 0)
-        val timeLocation = LocalDateTime.of(2016, 6, 3, 7, 1, 0) //UTC
+        val timeLocation = LocalDateTime.of(2016, 6, 3, 9, 1, 0)
 
         val thisEvent = eventService.createEvent("Event", timeEvent, "Test", Coord(0.0, 1.1), 36)
         val thisUser = userService.create("testduring@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
@@ -149,7 +150,7 @@ class LocationControllerTest : IntegrationTest() {
         val data = mapOf(
                 "latitude" to 0.0,
                 "longitude" to 1.1,
-                "date" to timeLocation.toEpochSecond(ZoneOffset.UTC) * 1000
+                "date" to timeLocation.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
         )
 
         val request = post("/event/${thisEvent.id}/team/${thisTeam.id}/location/")
@@ -174,7 +175,7 @@ class LocationControllerTest : IntegrationTest() {
     fun testCreateLocationNotDuringEventInFront() {
 
         val timeEvent = LocalDateTime.of(2016, 6, 3, 9, 0, 0)
-        val timeLocation = LocalDateTime.of(2016, 6, 3, 6, 59, 0) //UTC
+        val timeLocation = LocalDateTime.of(2016, 6, 3, 8, 59, 0)
 
         val thisEvent = eventService.createEvent("Event", timeEvent, "Test", Coord(0.0, 1.1), 36)
         val thisUser = userService.create("testduring@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
@@ -184,7 +185,7 @@ class LocationControllerTest : IntegrationTest() {
         val data = mapOf(
                 "latitude" to 0.0,
                 "longitude" to 1.1,
-                "date" to timeLocation.toEpochSecond(ZoneOffset.UTC) * 1000
+                "date" to timeLocation.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
         )
 
         val request = post("/event/${thisEvent.id}/team/${thisTeam.id}/location/")
@@ -209,7 +210,7 @@ class LocationControllerTest : IntegrationTest() {
     fun testCreateLocationNotDuringEventAfter() {
 
         val timeEvent = LocalDateTime.of(2016, 6, 3, 9, 0, 0)
-        val timeLocation = LocalDateTime.of(2016, 6, 4, 19, 1, 0) //UTC
+        val timeLocation = LocalDateTime.of(2016, 6, 4, 21, 1, 0)
 
         val thisEvent = eventService.createEvent("Event", timeEvent, "Test", Coord(0.0, 1.1), 36)
         val thisUser = userService.create("testduring@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
@@ -219,7 +220,7 @@ class LocationControllerTest : IntegrationTest() {
         val data = mapOf(
                 "latitude" to 0.0,
                 "longitude" to 1.1,
-                "date" to timeLocation.toEpochSecond(ZoneOffset.UTC) * 1000
+                "date" to timeLocation.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
         )
 
         val request = post("/event/${thisEvent.id}/team/${thisTeam.id}/location/")
