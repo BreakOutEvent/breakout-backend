@@ -9,14 +9,12 @@ import backend.model.event.Team
 import backend.model.event.TeamService
 import backend.model.posting.PostingService
 import backend.model.sponsoring.UnregisteredSponsor
-import backend.model.user.Participant
 import backend.model.user.Sponsor
 import backend.model.user.User
 import backend.model.user.UserService
 import backend.util.euroOf
 import backend.view.ChallengeStatusView
 import backend.view.ChallengeView
-import backend.view.SponsoringView
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
@@ -59,12 +57,12 @@ open class ChallengeController {
         val amount = euroOf(body.amount!!)
         val description = body.description!!
 
-        val challenge = if(body.unregisteredSponsor != null) {
+        val challenge = if (body.unregisteredSponsor != null) {
             challengeUnregisteredSponsor(body, team, amount, description)
         } else {
             challengeWithRegisteredSponsor(user, team, amount, description)
         }
-        
+
         return challenge
     }
 
@@ -100,7 +98,7 @@ open class ChallengeController {
                           @Valid @RequestBody body: ChallengeStatusView): ChallengeView {
 
         val challenge = challengeService.findOne(challengeId) ?: throw NotFoundException("No challenge with id $challengeId found")
-        return when (body.status!!) {
+        return when (body.status!!.toLowerCase()) {
             "accepted" -> challengeService.accept(challenge)
             "rejected" -> challengeService.reject(challenge)
             "with_proof" -> {

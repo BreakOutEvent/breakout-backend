@@ -138,7 +138,7 @@ class ChallengeControllerTest : IntegrationTest() {
         setAuthenticatedUser("sponsor@break-out.org")
         val challenge = challengeService.proposeChallenge(sponsor, team, euroOf(10.0), "An awesome challenge")
 
-        val body = mapOf("status" to "rejected")
+        val body = mapOf("status" to "REJECTED")
 
         val request = put("/event/${event.id}/team/${team.id}/challenge/${challenge.id}/status/")
                 .json(body)
