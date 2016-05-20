@@ -43,7 +43,7 @@ class ChallengeView {
         this.amount = challenge.amount.numberStripped.toDouble()
         this.teamId = challenge.team!!.id!!
         this.team = challenge.team!!.name
-        this.status = challenge.status.toString()
+        this.status = challenge.status.toString().toUpperCase()
 
         // Add information about registered sponsor
         // if he exists and isHidden is false

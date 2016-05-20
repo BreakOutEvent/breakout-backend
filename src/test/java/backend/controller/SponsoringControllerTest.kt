@@ -192,7 +192,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.teamId").exists())
                 .andExpect(jsonPath("$.team").exists())
                 .andExpect(jsonPath("$.sponsorId").exists())
-                .andExpect(jsonPath("$.status").value("proposed"))
+                .andExpect(jsonPath("$.status").value("PROPOSED"))
                 .andExpect(jsonPath("$.unregisteredSponsor").doesNotExist())
     }
 
@@ -235,7 +235,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.limit").exists())
                 .andExpect(jsonPath("$.teamId").exists())
                 .andExpect(jsonPath("$.team").exists())
-                .andExpect(jsonPath("$.status").value("accepted"))
+                .andExpect(jsonPath("$.status").value("ACCEPTED"))
                 .andExpect(jsonPath("$.sponsorId").doesNotExist())
                 .andExpect(jsonPath("$.unregisteredSponsor.firstname").value("Florian"))
                 .andExpect(jsonPath("$.unregisteredSponsor.lastname").value("Schmidt"))
@@ -335,7 +335,7 @@ class SponsoringControllerTest : IntegrationTest() {
         val team = teamService.create(participant, "name", "description", event)
         val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(1), euroOf(200))
 
-        val body = mapOf("status" to "accepted")
+        val body = mapOf("status" to "ACCEPTED")
 
         val request = put("/event/${event.id}/team/${team.id}/sponsoring/${sponsoring.id}/status/")
                 .asUser(mockMvc, participant.email, "password")
@@ -349,7 +349,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.teamId").exists())
                 .andExpect(jsonPath("$.team").exists())
                 .andExpect(jsonPath("$.sponsorId").exists())
-                .andExpect(jsonPath("$.status").value("accepted"))
+                .andExpect(jsonPath("$.status").value("ACCEPTED"))
     }
 
     @Test
@@ -374,6 +374,6 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.teamId").exists())
                 .andExpect(jsonPath("$.team").exists())
                 .andExpect(jsonPath("$.sponsorId").exists())
-                .andExpect(jsonPath("$.status").value("rejected"))
+                .andExpect(jsonPath("$.status").value("REJECTED"))
     }
 }

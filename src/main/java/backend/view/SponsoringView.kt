@@ -1,7 +1,6 @@
 package backend.view
 
 import backend.model.sponsoring.Sponsoring
-import backend.model.sponsoring.SponsoringStatus.*
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
@@ -38,12 +37,7 @@ class SponsoringView() {
         this.amountPerKm = sponsoring.amountPerKm.numberStripped.toDouble()
         this.limit = sponsoring.limit.numberStripped.toDouble()
         this.sponsorId = sponsoring.sponsor?.id
-
-        this.status = when (sponsoring.status) {
-            ACCEPTED -> "accepted"
-            REJECTED -> "rejected"
-            PROPOSED -> "proposed"
-        }
+        this.status = sponsoring.status.toString().toUpperCase()
 
         sponsoring.unregisteredSponsor?.let { this.unregisteredSponsor = UnregisteredSponsorView(it) }
     }

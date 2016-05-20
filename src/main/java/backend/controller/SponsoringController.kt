@@ -161,7 +161,7 @@ open class SponsoringController {
         val sponsoring = sponsoringService.findOne(sponsoringId) ?: throw NotFoundException("No sponsoring with id $sponsoringId found")
         val status = body["status"] ?: throw BadRequestException("Missing status in body")
 
-        when (status) {
+        when (status.toLowerCase()) {
             "accepted" -> return SponsoringView(sponsoringService.acceptSponsoring(sponsoring))
             "rejected" -> return SponsoringView(sponsoringService.rejectSponsoring(sponsoring))
             else -> throw BadRequestException("Invalid status $status")
