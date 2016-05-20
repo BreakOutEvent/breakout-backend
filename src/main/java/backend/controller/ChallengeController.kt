@@ -41,6 +41,23 @@ open class ChallengeController {
     }
 
     /**
+     * GET /user/{userId}/sponsor/challenge/
+     * Get a list of all sponsorings for the user with userId
+     * This can only be done if the user is a sponsor
+     */
+    @PreAuthorize("hasRole('SPONSOR')")
+    @RequestMapping("/user/{userId}/sponsor/challenge/", method = arrayOf(GET))
+    open fun getAllChallengesForSponsor(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
+                                        @PathVariable userId: Long): Iterable<ChallengeView> {
+
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
+        if (user.core.id != userId) throw UnauthorizedException("A sponsor can only see it's own challenges")
+
+        val challenges = challengeService.findBySponsorId(userId)
+        return challenges.map { ChallengeView(it) }
+    }
+
+    /**
      * POST /event/{eventId}/team/{teamId}/challenge/
      * Propose a challenge to a team. This can only be done
      * when being a sponsor or when providing data for an unregistered sponsor

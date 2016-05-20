@@ -71,4 +71,8 @@ class ChallengeServiceImpl : ChallengeService {
         return challengeRepository.findByTeamId(teamId)
     }
 
+    @Transactional
+    override fun findBySponsorId(userId: Long): Iterable<Challenge> {
+        return challengeRepository.findBySponsorCoreId(userId)
+    }
 }

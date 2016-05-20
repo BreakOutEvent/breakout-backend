@@ -245,6 +245,27 @@ class ChallengeControllerTest : IntegrationTest() {
     }
 
     @Test
+    fun getAllChallengesForSponsor() {
+        val participant2 = userService.create("participant2@break-out.org", "password", { addRole(Participant::class) })
+        val team2 = teamService.create(participant2.getRole(Participant::class)!!, "", "", event)
+
+        setAuthenticatedUser(sponsor.email)
+        challengeService.proposeChallenge(sponsor, team, euroOf(10.0), "description")
+        challengeService.proposeChallenge(sponsor, team2, euroOf(10.0), "description")
+
+        val unauthRequest = get("/user/${sponsor.core.id}/sponsor/challenge/")
+        val authRequest = get("/user/${sponsor.core.id}/sponsor/challenge/").asUser(this.mockMvc, sponsor.email, "password")
+
+        mockMvc.perform(unauthRequest).andExpect(status().isUnauthorized)
+
+        mockMvc.perform(authRequest)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$.[0]").exists())
+                .andExpect(jsonPath("$.[1]").exists())
+    }
+
+    @Test
     fun createChallengePreferUnregisteredSponsorOverRoleSponsor() {
 
         participant.addRole(Sponsor::class)
