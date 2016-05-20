@@ -3,6 +3,7 @@ package backend.model.sponsoring
 import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.event.Team
+import backend.model.misc.EmailAddress
 import backend.model.sponsoring.SponsoringStatus.*
 import backend.model.user.Sponsor
 import org.javamoney.moneta.Money
@@ -22,18 +23,28 @@ class Sponsoring : BasicEntity {
         }
 
     private fun checkTransition(from: SponsoringStatus, to: SponsoringStatus) {
+        if (unregisteredSponsor != null) checkTransitionForUnregisteredSponsor(from, to)
+        else if (sponsor != null) checkTransitionForRegisteredSponsor(from, to)
+        else throw Exception("Sponsoring has neither ")
+    }
 
+    private fun checkTransitionForUnregisteredSponsor(from: SponsoringStatus, to: SponsoringStatus) {
+        val transitions = listOf(PROPOSED to ACCEPTED, ACCEPTED to WITHDRAWN, ACCEPTED to PAYED)
+        if (!transitions.contains(from to to)) {
+            throw DomainException("Transition from $from to $to for status not allowed")
+        }
+    }
+
+    private fun checkTransitionForRegisteredSponsor(from: SponsoringStatus, to: SponsoringStatus) {
         val transitions = listOf(
                 PROPOSED to ACCEPTED,
                 PROPOSED to REJECTED,
                 PROPOSED to WITHDRAWN,
-                ACCEPTED to REJECTED,
-                REJECTED to ACCEPTED)
+                ACCEPTED to WITHDRAWN,
+                ACCEPTED to PAYED)
 
-        if (from == to) {
-            return
-        } else if (!transitions.contains(from to to)) {
-            throw DomainException("Changing the status of a sponsoring from $from to $to is not allowed")
+        if (!transitions.contains(from to to)) {
+            throw DomainException("Transition from $from to $to for status not allowed")
         }
     }
 
@@ -91,11 +102,16 @@ class Sponsoring : BasicEntity {
     }
 
     fun withdraw() {
-        if (this.status == PROPOSED) {
-            this.status = WITHDRAWN
-        } else {
-            throw DomainException("A challenge can only be withdrawn when its current status is proposed")
-        }
+        this.status = WITHDRAWN
+    }
+
+    @Suppress("UNUSED") //Used by Spring @PreAuthorize
+    fun checkWithdrawPermissions(username: String): Boolean {
+        if (this.unregisteredSponsor != null) {
+            return this.team!!.isMember(username)
+        } else if (this.sponsor != null) {
+            return EmailAddress(this.sponsor!!.email) == EmailAddress(username)
+        } else throw Exception("Error checking withdrawal permissions")
     }
 
     private fun calculateAmount(): Money {

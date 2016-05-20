@@ -44,6 +44,12 @@ class SponsoringServiceImpl : SponsoringService {
         return sponsoringRepository.save(sponsoring)
     }
 
+    @Transactional
+    override fun withdrawSponsoring(sponsoring: Sponsoring): Sponsoring {
+        sponsoring.withdraw()
+        return sponsoringRepository.save(sponsoring)
+    }
+
     override fun findByTeamId(teamId: Long) = sponsoringRepository.findByTeamId(teamId)
 
     override fun findBySponsorId(sponsorId: Long) = sponsoringRepository.findBySponsorCoreId(sponsorId)

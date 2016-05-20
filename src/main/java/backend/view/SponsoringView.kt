@@ -45,6 +45,7 @@ class SponsoringView() {
             REJECTED -> "rejected"
             PROPOSED -> "proposed"
             WITHDRAWN -> "withdrawn"
+            PAYED -> "payed"
         }
         sponsoring.unregisteredSponsor?.let { this.unregisteredSponsor = UnregisteredSponsorView(it) }
     }

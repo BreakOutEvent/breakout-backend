@@ -1,7 +1,7 @@
 package backend.model.sponsoring
 
 enum class SponsoringStatus {
-    PROPOSED, ACCEPTED, REJECTED, WITHDRAWN
+    PROPOSED, ACCEPTED, REJECTED, WITHDRAWN, PAYED
 }
 
 
