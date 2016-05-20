@@ -164,6 +164,7 @@ open class SponsoringController {
         when (status.toLowerCase()) {
             "accepted" -> return SponsoringView(sponsoringService.acceptSponsoring(sponsoring))
             "rejected" -> return SponsoringView(sponsoringService.rejectSponsoring(sponsoring))
+            "withdrawn" -> return SponsoringView(sponsoringService.withdrawSponsoring(sponsoring))
             else -> throw BadRequestException("Invalid status $status")
         }
     }

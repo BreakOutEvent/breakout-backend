@@ -39,14 +39,6 @@ class SponsoringView() {
         this.limit = sponsoring.limit.numberStripped.toDouble()
         this.sponsorId = sponsoring.sponsor?.id
         this.status = sponsoring.status.toString().toUpperCase()
-
-        this.status = when (sponsoring.status) {
-            ACCEPTED -> "accepted"
-            REJECTED -> "rejected"
-            PROPOSED -> "proposed"
-            WITHDRAWN -> "withdrawn"
-            PAYED -> "payed"
-        }
         sponsoring.unregisteredSponsor?.let { this.unregisteredSponsor = UnregisteredSponsorView(it) }
     }
 }

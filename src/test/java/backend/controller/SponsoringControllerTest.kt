@@ -11,7 +11,6 @@ import backend.testHelper.asUser
 import backend.testHelper.json
 import backend.util.euroOf
 import org.junit.Test
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -375,5 +374,62 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.team").exists())
                 .andExpect(jsonPath("$.sponsorId").exists())
                 .andExpect(jsonPath("$.status").value("REJECTED"))
+    }
+
+    @Test
+    fun testWithdrawSponsoringForUnregisteredSponsor() {
+        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
+        val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val team = teamService.create(participant, "name", "description", event)
+        val sponsor = UnregisteredSponsor("", "", "", "", "", address = Address("", "", "", "", ""))
+        setAuthenticatedUser(participant.email)
+        val sponsoring = sponsoringService.createSponsoringWithOfflineSponsor(team, euroOf(1), euroOf(200), sponsor)
+
+        val body = mapOf("status" to "withdrawn")
+
+        val request = put("/event/${event.id}/team/${team.id}/sponsoring/${sponsoring.id}/status/")
+                .asUser(mockMvc, participant.email, "password")
+                .json(body)
+
+        val unauthRequest = put("/event/${event.id}/team/${team.id}/sponsoring/${sponsoring.id}/status/")
+                .json(body)
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.status").value("WITHDRAWN"))
+
+        mockMvc.perform(unauthRequest)
+                .andExpect(status().isUnauthorized)
+    }
+
+    @Test
+    fun testWithdrawSponsoringForRegisteredSponsor() {
+
+        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
+        val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val team = teamService.create(participant, "name", "description", event)
+        val sponsor = userService.create("sponsor@break-out.org", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
+
+        setAuthenticatedUser(sponsor.email)
+        val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(1), euroOf(200))
+
+        val body = mapOf("status" to "withdrawn")
+
+        val request = put("/event/${event.id}/team/${team.id}/sponsoring/${sponsoring.id}/status/")
+                .asUser(mockMvc, sponsor.email, "password")
+                .json(body)
+
+        val unauthRequest = put("/event/${event.id}/team/${team.id}/sponsoring/${sponsoring.id}/status/")
+                .asUser(mockMvc, participant.email, "password")
+                .json(body)
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.status").value("WITHDRAWN"))
+
+        mockMvc.perform(unauthRequest)
+                .andExpect(status().isForbidden) //TODO: Check why forbidden / unauthorized difference
     }
 }
