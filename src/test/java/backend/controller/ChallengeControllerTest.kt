@@ -89,6 +89,8 @@ class ChallengeControllerTest : IntegrationTest() {
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.eventId").value(team.event.id!!.toInt()))
                 .andExpect(jsonPath("$.description").value("Do something really awesome, because you know you are awesome!"))
                 .andExpect(jsonPath("$.sponsorId").doesNotExist())
                 .andExpect(jsonPath("$.amount").value(100.0))
@@ -119,6 +121,8 @@ class ChallengeControllerTest : IntegrationTest() {
 
         mockMvc.perform(request)
                 .andExpect(status().isOk)
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.eventId").value(team.event.id!!.toInt()))
                 .andExpect(jsonPath("$.description").value(challenge.description))
                 .andExpect(jsonPath("$.sponsorId").value(sponsor.id!!.toInt()))
                 .andExpect(jsonPath("$.amount").value(challenge.amount.numberStripped.toDouble()))
@@ -142,6 +146,8 @@ class ChallengeControllerTest : IntegrationTest() {
 
         mockMvc.perform(request)
                 .andExpect(status().isOk)
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.eventId").value(team.event.id!!.toInt()))
                 .andExpect(jsonPath("$.description").value(challenge.description))
                 .andExpect(jsonPath("$.sponsorId").value(sponsor.id!!.toInt()))
                 .andExpect(jsonPath("$.amount").value(challenge.amount.numberStripped.toDouble()))
@@ -169,6 +175,8 @@ class ChallengeControllerTest : IntegrationTest() {
 
         mockMvc.perform(request)
                 .andExpect(status().isOk)
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.eventId").value(team.event.id!!.toInt()))
                 .andExpect(jsonPath("$.description").value(challenge.description))
                 .andExpect(jsonPath("$.sponsorId").value(sponsor.id!!.toInt()))
                 .andExpect(jsonPath("$.amount").value(challenge.amount.numberStripped.toDouble()))
@@ -208,6 +216,8 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$").isArray)
                 .andExpect(jsonPath("$.[0]").exists())
+                .andExpect(jsonPath("$.[0].id").exists())
+                .andExpect(jsonPath("$.[0].eventId").exists())
                 .andExpect(jsonPath("$.[0].description").exists())
                 .andExpect(jsonPath("$.[0].amount").exists())
                 .andExpect(jsonPath("$.[0].sponsorId").exists())
@@ -230,6 +240,8 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[1].team").exists())
                 .andExpect(jsonPath("$.[1].teamId").exists())
                 .andExpect(jsonPath("$.[1].status").exists())
+                .andExpect(jsonPath("$.[1].id").exists())
+                .andExpect(jsonPath("$.[1].eventId").exists())
     }
 
     @Test
@@ -264,6 +276,8 @@ class ChallengeControllerTest : IntegrationTest() {
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.eventId").value(team.event.id!!.toInt()))
                 .andExpect(jsonPath("$.description").value("Do something really awesome, because you know you are awesome!"))
                 .andExpect(jsonPath("$.sponsorId").doesNotExist())
                 .andExpect(jsonPath("$.amount").value(100.0))

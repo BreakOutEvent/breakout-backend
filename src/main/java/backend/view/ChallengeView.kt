@@ -7,6 +7,10 @@ import javax.validation.constraints.Size
 
 class ChallengeView {
 
+    var id: Long? = null
+
+    var eventId: Long? = null
+
     var status: String? = null
 
     var teamId: Long? = null
@@ -33,6 +37,8 @@ class ChallengeView {
     constructor()
 
     constructor(challenge: Challenge) {
+        this.id = challenge.id!!
+        this.eventId = challenge.team!!.event.id!!
         this.description = challenge.description
         this.amount = challenge.amount.numberStripped.toDouble()
         this.teamId = challenge.team!!.id!!
