@@ -4,6 +4,7 @@ import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.UnauthorizedException
 import backend.exceptions.DomainException
 import backend.model.location.Location
+import backend.model.location.LocationService
 import backend.model.media.Media
 import backend.model.misc.Coord
 import backend.model.user.Participant
@@ -18,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
-class PostingServiceImpl @Autowired constructor(val repository: PostingRepository) : PostingService {
+class PostingServiceImpl @Autowired constructor(val repository: PostingRepository, val locationService: LocationService) : PostingService {
     override fun findAllSince(id: Long): Iterable<Posting> = repository.findAllSince(id)
 
     override fun findAllByIds(body: List<Long>): Iterable<Posting> = repository.findAll(body)
@@ -38,14 +39,14 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
         var location: Location? = null
         if (postingLocation != null) {
             val uploader = user.getRole(Participant::class) ?: throw DomainException("user is no participant and can therefor not upload location")
-            location = Location(postingLocation, uploader, date)
+            location = locationService.create(postingLocation, uploader, date)
         }
 
         //Create Media-Objects for each media item requested to add
-        var media: MutableList<Media>?
+        val media: MutableList<Media>
         media = arrayListOf()
         mediaTypes?.forEach {
-            media!!.add(Media(it))
+            media.add(Media(it))
         }
 
         return repository.save(Posting(text, date, location, user, media))

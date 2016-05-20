@@ -24,6 +24,8 @@ class LocationView {
 
     var eventId: Long? = null
 
+    var isDuringEvent: Boolean? = null
+
     @NotNull
     val date: Long
 
@@ -38,6 +40,7 @@ class LocationView {
 
         this.event = location.team?.event?.title
         this.eventId = location.team?.event?.id
+        this.isDuringEvent = location.isDuringEvent()
     }
 
     @JsonCreator

@@ -113,7 +113,7 @@ class LocationControllerTest : IntegrationTest() {
         val data = mapOf(
                 "latitude" to 0.0,
                 "longitude" to 1.1,
-                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) * 1000
         )
 
         val request = post("/event/${munichEvent.id}/team/${firstTeam.id}/location/")
@@ -128,6 +128,113 @@ class LocationControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.teamId").exists())
                 .andExpect(jsonPath("$.eventId").exists())
                 .andExpect(jsonPath("$.event").exists())
+                .andExpect(jsonPath("$.duringEvent").exists())
+                .andReturn().response.contentAsString
+
+        println(resp)
+    }
+
+
+    @Test
+    fun testCreateLocationDuringEvent() {
+
+        val timeEvent = LocalDateTime.of(2016, 6, 3, 9, 0, 0)
+        val timeLocation = LocalDateTime.of(2016, 6, 3, 7, 1, 0) //UTC
+
+        val thisEvent = eventService.createEvent("Event", timeEvent, "Test", Coord(0.0, 1.1), 36)
+        val thisUser = userService.create("testduring@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val thisTeam = teamService.create(thisUser, "team awesome", "description", thisEvent)
+        setAuthenticatedUser(thisUser.email)
+
+        val data = mapOf(
+                "latitude" to 0.0,
+                "longitude" to 1.1,
+                "date" to timeLocation.toEpochSecond(ZoneOffset.UTC) * 1000
+        )
+
+        val request = post("/event/${thisEvent.id}/team/${thisTeam.id}/location/")
+                .asUser(mockMvc, thisUser.email, "password")
+                .json(data)
+
+        val resp = mockMvc.perform(request)
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.latitude").exists())
+                .andExpect(jsonPath("$.longitude").exists())
+                .andExpect(jsonPath("$.team").exists())
+                .andExpect(jsonPath("$.teamId").exists())
+                .andExpect(jsonPath("$.eventId").exists())
+                .andExpect(jsonPath("$.event").exists())
+                .andExpect(jsonPath("$.duringEvent").value(true))
+                .andReturn().response.contentAsString
+
+        println("RESP: $resp")
+    }
+
+    @Test
+    fun testCreateLocationNotDuringEventInFront() {
+
+        val timeEvent = LocalDateTime.of(2016, 6, 3, 9, 0, 0)
+        val timeLocation = LocalDateTime.of(2016, 6, 3, 6, 59, 0) //UTC
+
+        val thisEvent = eventService.createEvent("Event", timeEvent, "Test", Coord(0.0, 1.1), 36)
+        val thisUser = userService.create("testduring@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val thisTeam = teamService.create(thisUser, "team awesome", "description", thisEvent)
+        setAuthenticatedUser(thisUser.email)
+
+        val data = mapOf(
+                "latitude" to 0.0,
+                "longitude" to 1.1,
+                "date" to timeLocation.toEpochSecond(ZoneOffset.UTC) * 1000
+        )
+
+        val request = post("/event/${thisEvent.id}/team/${thisTeam.id}/location/")
+                .asUser(mockMvc, thisUser.email, "password")
+                .json(data)
+
+        val resp = mockMvc.perform(request)
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.latitude").exists())
+                .andExpect(jsonPath("$.longitude").exists())
+                .andExpect(jsonPath("$.team").exists())
+                .andExpect(jsonPath("$.teamId").exists())
+                .andExpect(jsonPath("$.eventId").exists())
+                .andExpect(jsonPath("$.event").exists())
+                .andExpect(jsonPath("$.duringEvent").value(false))
+                .andReturn().response.contentAsString
+
+        println(resp)
+    }
+
+    @Test
+    fun testCreateLocationNotDuringEventAfter() {
+
+        val timeEvent = LocalDateTime.of(2016, 6, 3, 9, 0, 0)
+        val timeLocation = LocalDateTime.of(2016, 6, 4, 19, 1, 0) //UTC
+
+        val thisEvent = eventService.createEvent("Event", timeEvent, "Test", Coord(0.0, 1.1), 36)
+        val thisUser = userService.create("testduring@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val thisTeam = teamService.create(thisUser, "team awesome", "description", thisEvent)
+        setAuthenticatedUser(thisUser.email)
+
+        val data = mapOf(
+                "latitude" to 0.0,
+                "longitude" to 1.1,
+                "date" to timeLocation.toEpochSecond(ZoneOffset.UTC) * 1000
+        )
+
+        val request = post("/event/${thisEvent.id}/team/${thisTeam.id}/location/")
+                .asUser(mockMvc, thisUser.email, "password")
+                .json(data)
+
+        val resp = mockMvc.perform(request)
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.latitude").exists())
+                .andExpect(jsonPath("$.longitude").exists())
+                .andExpect(jsonPath("$.team").exists())
+                .andExpect(jsonPath("$.teamId").exists())
+                .andExpect(jsonPath("$.eventId").exists())
+                .andExpect(jsonPath("$.event").exists())
+                .andExpect(jsonPath("$.duringEvent").value(false))
                 .andReturn().response.contentAsString
 
         println(resp)
