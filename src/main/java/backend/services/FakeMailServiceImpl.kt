@@ -18,6 +18,7 @@ class FakeMailServiceImpl @Autowired constructor(restTemplate: RestOperations, c
 
     override fun send(email: Email, saveToDb: Boolean) {
         logger.info("Email to ${email.to} with subject \"${email.subject}\" would be sent now")
+        logger.info("Email Body ${email.body}")
         if (email.buttonUrl != null) logger.info("Email Button ${email.buttonUrl}")
     }
 }

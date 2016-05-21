@@ -95,7 +95,7 @@ class TeamServiceImpl : TeamService {
 
     override fun getLinearDistanceForTeamFromPostings(teamId: Long): Double {
         val postingDistance = this.getLocationMaxDistanceById(teamId)
-        var distance = postingDistance?.distance ?: 0.0
+        val distance = postingDistance?.distance ?: 0.0
 
         return distance
     }

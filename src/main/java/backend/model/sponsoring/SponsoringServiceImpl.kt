@@ -1,7 +1,10 @@
 package backend.model.sponsoring
 
 import backend.model.event.Team
+import backend.model.misc.Email
+import backend.model.misc.EmailAddress
 import backend.model.user.Sponsor
+import backend.services.MailService
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -11,15 +14,34 @@ import javax.transaction.Transactional
 class SponsoringServiceImpl : SponsoringService {
 
     private val sponsoringRepository: SponsoringRepository
+    private val mailService: MailService
+
 
     @Autowired
-    constructor(sponsoringRepository: SponsoringRepository) {
+    constructor(sponsoringRepository: SponsoringRepository, mailService: MailService) {
         this.sponsoringRepository = sponsoringRepository
+        this.mailService = mailService
     }
 
     @Transactional
     override fun createSponsoring(sponsor: Sponsor, team: Team, amountPerKm: Money, limit: Money): Sponsoring {
         val sponsoring = Sponsoring(sponsor, team, amountPerKm, limit)
+
+
+        val email = Email(
+                to = team.members.map { EmailAddress(it.email) },
+                subject = "BreakOut 2016 - Euch wurde ein Sponsoring hinzugefügt!",
+                body = "Hallo Team \"${team.name}\" Ruch wurde ein Sponsoring hinzugefügt!<br><br>" +
+                        "Je Kilometer den Ihr zurücklegt erhaltet Ihr ${amountPerKm.numberStripped.toPlainString()}€ an " +
+                        "zusätzlichen Sponsorengeldern, mit einem Limit von maximal ${limit.numberStripped.toPlainString()}€.<br>" +
+                        "Du hast Fragen oder benötigst Unterstützung? Schreib uns eine E-Mail an <a href=\"event@break-out.org\">event@break-out.org</a>.<br><br>" +
+                        "Liebe Grüße<br>" +
+                        "Euer BreakOut-Team",
+                campaignCode = "sponsoring_added"
+        )
+
+        mailService.send(email)
+
         return sponsoringRepository.save(sponsoring)
     }
 

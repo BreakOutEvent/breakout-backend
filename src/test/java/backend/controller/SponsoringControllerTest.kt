@@ -196,6 +196,31 @@ class SponsoringControllerTest : IntegrationTest() {
     }
 
     @Test
+    fun testCreateSponsoringWithRegisteredSponsorDoubleAmount() {
+        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
+        val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val sponsor = userService.create("sponsor@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
+        val team = teamService.create(participant, "name", "description", event)
+
+        val body = mapOf("amountPerKm" to 0.35, "limit" to 200)
+
+        val request = post("/event/${event.id}/team/${team.id}/sponsoring/")
+                .asUser(mockMvc, sponsor.email, "password")
+                .json(body)
+
+        mockMvc.perform(request)
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.amountPerKm").exists())
+                .andExpect(jsonPath("$.limit").exists())
+                .andExpect(jsonPath("$.teamId").exists())
+                .andExpect(jsonPath("$.team").exists())
+                .andExpect(jsonPath("$.sponsorId").exists())
+                .andExpect(jsonPath("$.status").value("PROPOSED"))
+                .andExpect(jsonPath("$.unregisteredSponsor").doesNotExist())
+    }
+
+    @Test
     fun testCreateSponsoringWithUnregisteredSponsor() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!

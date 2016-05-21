@@ -1,9 +1,12 @@
 package backend.model.challenges
 
 import backend.model.event.Team
+import backend.model.misc.Email
+import backend.model.misc.EmailAddress
 import backend.model.posting.Posting
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
+import backend.services.MailService
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -13,10 +16,13 @@ import javax.transaction.Transactional
 class ChallengeServiceImpl : ChallengeService {
 
     private lateinit var challengeRepository: ChallengeRepository
+    private val mailService: MailService
+
 
     @Autowired
-    constructor(challengeRepository: ChallengeRepository) {
+    constructor(challengeRepository: ChallengeRepository, mailService: MailService) {
         this.challengeRepository = challengeRepository
+        this.mailService = mailService
     }
 
     @Transactional
@@ -52,6 +58,22 @@ class ChallengeServiceImpl : ChallengeService {
     @Transactional
     override fun proposeChallenge(sponsor: Sponsor, team: Team, amount: Money, description: String): Challenge {
         val challenge = Challenge(sponsor, team, amount, description)
+
+        val email = Email(
+                to = team.members.map { EmailAddress(it.email) },
+                subject = "BreakOut 2016 - Euch wurde eine Challenge gestellt!",
+                body = "Hallo Team \"${team.name}\" Euch wurde eine Challenge gestellt!<br><br>" +
+                        "\"$description\", bei Erfüllung sammelt Ihr ${amount.numberStripped.toPlainString()}€ an zusätzlichen Sponsorengeldern.<br>" +
+                        "Du hast Fragen oder benötigst Unterstützung? Schreib uns eine E-Mail an <a href=\"event@break-out.org\">event@break-out.org</a>.<br><br>" +
+                        "Liebe Grüße<br>" +
+                        "Euer BreakOut-Team",
+                buttonText = "CHALLENGE ANNEHMEN",
+                buttonUrl = "https://anmeldung.break-out.org/settings/sponsoring?utm_source=backend&utm_medium=email&utm_content=intial&utm_campaign=accept_challenge",
+                campaignCode = "accept_challenge"
+        )
+
+        mailService.send(email)
+
         return challengeRepository.save(challenge)
     }
 
