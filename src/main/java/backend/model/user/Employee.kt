@@ -2,7 +2,10 @@
 
 package backend.model.user
 
-import javax.persistence.*
+import javax.persistence.Column
+import javax.persistence.DiscriminatorValue
+import javax.persistence.Embedded
+import javax.persistence.Entity
 
 @Entity
 @DiscriminatorValue("EMPLOYEE")

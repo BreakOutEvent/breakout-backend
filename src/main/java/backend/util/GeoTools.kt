@@ -21,7 +21,7 @@ fun distanceCoordsKM(from: Coord, to: Coord): Double {
 }
 
 fun distanceCoordsListKMfromStart(startingPoint: Coord, list: List<Coord>): Double {
-    var coordsList = arrayListOf(startingPoint)
+    val coordsList = arrayListOf(startingPoint)
     coordsList.addAll(list)
     return distanceCoordsListKM(coordsList)
 }

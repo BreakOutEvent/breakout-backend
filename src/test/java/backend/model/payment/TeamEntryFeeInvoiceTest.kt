@@ -3,14 +3,12 @@ package backend.model.payment
 import backend.model.event.Team
 import backend.model.user.Admin
 import backend.util.euroOf
-import org.javamoney.moneta.Money
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.powermock.api.mockito.PowerMockito
 import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.PowerMockRunner
-import java.math.BigDecimal
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
 import kotlin.test.assertTrue

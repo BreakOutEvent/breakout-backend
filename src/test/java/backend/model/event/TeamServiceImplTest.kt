@@ -1,7 +1,6 @@
 package backend.model.event
 
 import backend.Integration.IntegrationTest
-import backend.configuration.CustomUserDetailsService
 import backend.model.misc.Coord
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
@@ -9,7 +8,6 @@ import backend.model.user.User
 import backend.model.user.UserRole
 import org.junit.Before
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import java.time.LocalDateTime

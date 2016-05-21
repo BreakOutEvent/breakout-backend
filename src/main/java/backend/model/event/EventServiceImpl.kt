@@ -38,7 +38,7 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository) :
         val actualDistance = distanceCoordsListKMfromStart(event.startingLocation, locations.map { it.coord })
 
         val postingDistances = this.getLocationMaxDistanceByIdEachTeam(id)
-        var linearDistance = postingDistances.sumByDouble { it.distance ?: 0.0 }
+        val linearDistance = postingDistances.sumByDouble { it.distance }
         return mapOf("actual_distance" to actualDistance, "linear_distance" to linearDistance)
     }
 

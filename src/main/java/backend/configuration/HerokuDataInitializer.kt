@@ -26,12 +26,12 @@ import javax.annotation.PostConstruct
 class HerokuDataInitializer {
 
     // Services
-    @Autowired lateinit protected var userService: UserService
-    @Autowired lateinit protected var teamService: TeamService
-    @Autowired lateinit protected var eventService: EventService
-    @Autowired lateinit protected var locationService: LocationService
-    @Autowired lateinit protected var sponsoringService: SponsoringService
-    @Autowired lateinit protected var userDetailsService: UserDetailsService
+    @Autowired lateinit private var userService: UserService
+    @Autowired lateinit private var teamService: TeamService
+    @Autowired lateinit private var eventService: EventService
+    @Autowired lateinit private var locationService: LocationService
+    @Autowired lateinit private var sponsoringService: SponsoringService
+    @Autowired lateinit private var userDetailsService: UserDetailsService
 
     @PostConstruct
     fun initialize() {

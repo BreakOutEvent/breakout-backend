@@ -425,7 +425,7 @@ class TestUserEndpoint : IntegrationTest() {
     fun getUserId() {
 
         // Create user
-        var json = mapOf(
+        val json = mapOf(
                 "email" to "a@x.de",
                 "password" to "password",
                 "firstname" to "Florian",
@@ -462,7 +462,7 @@ class TestUserEndpoint : IntegrationTest() {
             gender = "Male"
         })
 
-        var json = mapOf(
+        val json = mapOf(
                 "email" to "test@break-out.org"
         ).toJsonString()
 
@@ -490,7 +490,7 @@ class TestUserEndpoint : IntegrationTest() {
         val token = user.createActivationToken()
         userService.save(user)
 
-        var json = mapOf(
+        val json = mapOf(
                 "email" to "test@break-out.org",
                 "token" to token,
                 "password" to "otherPassword"

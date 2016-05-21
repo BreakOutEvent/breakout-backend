@@ -48,7 +48,7 @@ class MediaSizeServiceImpl : MediaSizeService {
     override fun createOrUpdate(mediaId: Long, url: String, width: Int, height: Int, length: Int, size: Long, type: String): MediaSize {
         val media = mediaRepository.findById(mediaId)
 
-        var mediaSizeFound: MediaSize?
+        val mediaSizeFound: MediaSize?
         if (width > height) {
             mediaSizeFound = this.findByWidthAndMediaAndMediaType(width, media, MediaType.valueOf(type.toUpperCase()));
         } else {
