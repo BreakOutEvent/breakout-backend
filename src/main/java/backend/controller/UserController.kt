@@ -12,6 +12,7 @@ import backend.services.ConfigurationService
 import backend.util.getSignedJwtToken
 import backend.view.BasicUserView
 import backend.view.DetailedInvitationView
+import backend.view.SimpleUserView
 import backend.view.UserView
 import io.swagger.annotations.Api
 import org.springframework.beans.factory.annotation.Autowired
@@ -104,7 +105,19 @@ open class UserController {
      */
     @RequestMapping("/", method = arrayOf(GET))
     open fun showUsers(): Iterable<BasicUserView> {
-        return userService.getAllUsers()!!.map { BasicUserView(it) };
+        return userService.getAllUsers().map { BasicUserView(it) };
+    }
+
+
+    /**
+     * GET /user/search/{search}/
+     * Searches for User by String greater 2 chars
+     */
+    @RequestMapping("/search/{search}/", method = arrayOf(GET))
+    open fun getPostingsByHashtag(@PathVariable("search") search: String): List<SimpleUserView> {
+        if (search.length < 3) return listOf()
+        val users = userService.searchByString(search)
+        return users.map { SimpleUserView(it) }
     }
 
     /**

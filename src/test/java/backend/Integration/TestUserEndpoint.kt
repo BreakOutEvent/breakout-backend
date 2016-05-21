@@ -1,5 +1,7 @@
 package backend.Integration
 
+import backend.model.misc.Coord
+import backend.model.user.Participant
 import backend.services.ConfigurationService
 import com.auth0.jwt.Algorithm
 import com.auth0.jwt.JWTSigner
@@ -14,6 +16,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDate
+import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -451,6 +454,69 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.email").doesNotExist())
                 .andExpect(jsonPath("$.gender").doesNotExist())
                 .andExpect(jsonPath("$.passwordHash").doesNotExist())
+    }
+
+    @Test
+    fun getUserBySearch() {
+        val creator = userService.create("test@break-out.org", "password", {
+            firstname = "Florian"
+            lastname = "Schmidt"
+            gender = "Male"
+            addRole(Participant::class)
+        }).getRole(Participant::class)!!
+
+        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
+        val team = teamService.create(creator, "team-name", "description", event)
+
+
+        userService.create("secondTest@break-out.org", "password", {
+            firstname = "Leo"
+            lastname = "Theo"
+            gender = "Male"
+        })
+
+        mockMvc.perform(get("/user/search/sch/"))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$[0].id").exists())
+                .andExpect(jsonPath("$[0].firstname").value("Florian"))
+                .andExpect(jsonPath("$[0].lastname").value("Schmidt"))
+                .andExpect(jsonPath("$[0].teamname").value("team-name"))
+                .andExpect(jsonPath("$[0].email").doesNotExist())
+                .andExpect(jsonPath("$[1]").doesNotExist())
+
+        mockMvc.perform(get("/user/search/break/"))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$[0].id").exists())
+                .andExpect(jsonPath("$[0].firstname").exists())
+                .andExpect(jsonPath("$[0].lastname").exists())
+                .andExpect(jsonPath("$[0].email").doesNotExist())
+                .andExpect(jsonPath("$[1].id").exists())
+                .andExpect(jsonPath("$[1].firstname").exists())
+                .andExpect(jsonPath("$[1].lastname").exists())
+                .andExpect(jsonPath("$[1].email").doesNotExist())
+    }
+
+    @Test
+    fun getUserBySearchEmpty() {
+        userService.create("test@break-out.org", "password", {
+            firstname = "Florian"
+            lastname = "Schmidt"
+            gender = "Male"
+        })
+
+        userService.create("secondTest@break-out.org", "password", {
+            firstname = "Leo"
+            lastname = "Theo"
+            gender = "Male"
+        })
+
+        mockMvc.perform(get("/user/search/br/"))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$[0]").doesNotExist())
+                .andExpect(jsonPath("$[1]").doesNotExist())
     }
 
     @Test

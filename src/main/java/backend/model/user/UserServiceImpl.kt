@@ -36,7 +36,7 @@ class UserServiceImpl : UserService {
 
     override fun getUserByEmail(email: String): User? = userRepository.findByEmail(email);
 
-    override fun getAllUsers(): MutableIterable<UserCore>? = userRepository.findAll()
+    override fun getAllUsers(): Iterable<UserCore> = userRepository.findAll()
 
     override fun exists(id: Long) = userRepository.exists(id)
 
@@ -119,6 +119,10 @@ class UserServiceImpl : UserService {
         val user = this.getUserByEmail(emailString) ?: throw NotFoundException("No user found with email")
         user.setNewPassword(password, token)
         this.save(user)
+    }
+
+    override fun searchByString(search: String): Iterable<UserCore> {
+        return userRepository.searchByString(search)
     }
 }
 

@@ -4,6 +4,7 @@ package backend.model.user
 
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
+import org.springframework.data.repository.query.Param
 
 interface UserRepository : CrudRepository<UserCore, Long> {
     fun findByEmail(email: String): User
@@ -12,4 +13,7 @@ interface UserRepository : CrudRepository<UserCore, Long> {
 
     @Query("select case when count(e) > 0 then true else false end from UserCore e where e.email = ?1")
     fun existsByEmail(email: String): Boolean
+
+    @Query("from UserCore u where u.firstname like concat('%',:search,'%') or u.lastname like concat('%',:search,'%') or u.email like concat('%',:search,'%')")
+    fun searchByString(@Param("search") search: String): Iterable<UserCore>
 }
