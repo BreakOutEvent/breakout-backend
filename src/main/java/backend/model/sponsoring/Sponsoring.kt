@@ -105,6 +105,10 @@ class Sponsoring : BasicEntity {
         this.status = WITHDRAWN
     }
 
+    fun hasRegisteredSponsor(): Boolean {
+        return sponsor != null
+    }
+
     @Suppress("UNUSED") //Used by Spring @PreAuthorize
     fun checkWithdrawPermissions(username: String): Boolean {
         if (this.unregisteredSponsor != null) {

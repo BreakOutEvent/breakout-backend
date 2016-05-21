@@ -38,10 +38,25 @@ class SponsoringView() {
         this.team = sponsoring.team?.name
         this.amountPerKm = sponsoring.amountPerKm.numberStripped.toDouble()
         this.limit = sponsoring.limit.numberStripped.toDouble()
-        this.sponsorId = sponsoring.sponsor?.id
-        this.userId = sponsoring.sponsor?.core?.id
         this.status = sponsoring.status.toString().toUpperCase()
-        sponsoring.unregisteredSponsor?.let { this.unregisteredSponsor = UnregisteredSponsorView(it) }
+
+        // Add information about registered sponsor
+        // if he exists and isHidden is false
+        sponsoring.sponsor?.isHidden?.let {
+            if (it) {
+                this.sponsorIsHidden = true
+            } else {
+                this.userId = sponsoring.sponsor?.core?.id
+                this.sponsorId = sponsoring.sponsor?.id
+            }
+        }
+
+        // Add information about unregistered sponsor
+        // if he exists and isHidden is false
+        sponsoring.unregisteredSponsor?.isHidden?.let {
+            if (it) this.sponsorIsHidden = true
+            else this.unregisteredSponsor = UnregisteredSponsorView(sponsoring.unregisteredSponsor!!)
+        }
     }
 }
 

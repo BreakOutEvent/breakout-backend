@@ -113,6 +113,8 @@ class Challenge : BasicEntity {
         this.status = PROOF_REJECTED
     }
 
-
+    fun hasRegisteredSponsor(): Boolean {
+        return sponsor != null
+    }
 }
 

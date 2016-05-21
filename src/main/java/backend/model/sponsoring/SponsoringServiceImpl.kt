@@ -31,7 +31,7 @@ class SponsoringServiceImpl : SponsoringService {
         val email = Email(
                 to = team.members.map { EmailAddress(it.email) },
                 subject = "BreakOut 2016 - Euch wurde ein Sponsoring hinzugefügt!",
-                body = "Hallo Team \"${team.name}\" Ruch wurde ein Sponsoring hinzugefügt!<br><br>" +
+                body = "Hallo Team \"${team.name}\" Euch wurde ein Sponsoring hinzugefügt!<br><br>" +
                         "Je Kilometer den Ihr zurücklegt erhaltet Ihr ${amountPerKm.numberStripped.toPlainString()}€ an " +
                         "zusätzlichen Sponsorengeldern, mit einem Limit von maximal ${limit.numberStripped.toPlainString()}€.<br>" +
                         "Du hast Fragen oder benötigst Unterstützung? Schreib uns eine E-Mail an <a href=\"event@break-out.org\">event@break-out.org</a>.<br><br>" +
@@ -69,6 +69,21 @@ class SponsoringServiceImpl : SponsoringService {
     @Transactional
     override fun withdrawSponsoring(sponsoring: Sponsoring): Sponsoring {
         sponsoring.withdraw()
+
+        if (sponsoring.hasRegisteredSponsor()) {
+            val email = Email(
+                    to = sponsoring.team!!.members.map { EmailAddress(it.email) },
+                    subject = "BreakOut 2016 - Ein Sponsoring wurde zurückgezogen!",
+                    body = "Hallo Team \"${sponsoring.team!!.name}\" ein Sponsoring wurde zurückgezogen, vielleicht wollt ihr mit dem Sponsor noch einmal darüber reden.<br>" +
+                            "Du hast Fragen oder benötigst Unterstützung? Schreib uns eine E-Mail an <a href=\"event@break-out.org\">event@break-out.org</a>.<br><br>" +
+                            "Liebe Grüße<br>" +
+                            "Euer BreakOut-Team",
+                    campaignCode = "sponsoring_withdrawn"
+            )
+
+            mailService.send(email)
+        }
+
         return sponsoringRepository.save(sponsoring)
     }
 
