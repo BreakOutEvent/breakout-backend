@@ -118,6 +118,7 @@ open class ChallengeController {
         return when (body.status!!.toLowerCase()) {
             "accepted" -> challengeService.accept(challenge)
             "rejected" -> challengeService.reject(challenge)
+            "withdrawn" -> challengeService.withdraw(challenge)
             "with_proof" -> {
                 val proof = postingService.getByID(body.postingId!!) ?: throw NotFoundException("No posting with id ${body.postingId} found")
                 challengeService.addProof(challenge, proof)

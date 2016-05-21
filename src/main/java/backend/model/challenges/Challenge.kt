@@ -4,6 +4,7 @@ import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.challenges.ChallengeStatus.*
 import backend.model.event.Team
+import backend.model.misc.EmailAddress
 import backend.model.posting.Posting
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
@@ -19,10 +20,53 @@ class Challenge : BasicEntity {
     lateinit var description: String
 
     var status: ChallengeStatus = PROPOSED
-        private set(value) {
+        private set (value) {
             checkTransition(from = field, to = value)
             field = value
         }
+
+    private fun checkTransition(from: ChallengeStatus, to: ChallengeStatus) {
+        if (unregisteredSponsor != null) checkTransitionForUnregisteredSponsor(from, to)
+        else if (sponsor != null) checkTransitionForRegisteredSponsor(from, to)
+        else throw Exception("Sponsoring has neither Sponsor")
+    }
+
+    private fun checkTransitionForUnregisteredSponsor(from: ChallengeStatus, to: ChallengeStatus) {
+        val transitions = listOf(
+                (PROPOSED to ACCEPTED),
+                (PROPOSED to REJECTED),
+                (PROPOSED to WITH_PROOF),
+                (ACCEPTED to REJECTED),
+                (ACCEPTED to WITHDRAWN),
+                (REJECTED to ACCEPTED),
+                (ACCEPTED to WITH_PROOF),
+                (WITH_PROOF to PROOF_ACCEPTED),
+                (WITH_PROOF to PROOF_REJECTED),
+                (PROOF_REJECTED to PROOF_ACCEPTED))
+
+        if (!transitions.contains(from to to)) {
+            throw DomainException("Transition from $from to $to for status not allowed")
+        }
+    }
+
+    private fun checkTransitionForRegisteredSponsor(from: ChallengeStatus, to: ChallengeStatus) {
+        val transitions = listOf(
+                (PROPOSED to ACCEPTED),
+                (PROPOSED to REJECTED),
+                (PROPOSED to WITH_PROOF),
+                (PROPOSED to WITHDRAWN),
+                (ACCEPTED to REJECTED),
+                (ACCEPTED to WITHDRAWN),
+                (REJECTED to ACCEPTED),
+                (ACCEPTED to WITH_PROOF),
+                (WITH_PROOF to PROOF_ACCEPTED),
+                (WITH_PROOF to PROOF_REJECTED),
+                (PROOF_REJECTED to PROOF_ACCEPTED))
+
+        if (!transitions.contains(from to to)) {
+            throw DomainException("Transition from $from to $to for status not allowed")
+        }
+    }
 
     lateinit var amount: Money
         private set
@@ -73,25 +117,6 @@ class Challenge : BasicEntity {
         this.status = ACCEPTED
     }
 
-    @Throws
-    private fun checkTransition(from: ChallengeStatus, to: ChallengeStatus) {
-        val allowedTransitions = setOf(
-                (PROPOSED to ACCEPTED),
-                (PROPOSED to REJECTED),
-                (PROPOSED to WITH_PROOF),
-                (ACCEPTED to WITH_PROOF),
-                (ACCEPTED to REJECTED),
-                (REJECTED to ACCEPTED),
-                (ACCEPTED to WITH_PROOF),
-                (WITH_PROOF to PROOF_ACCEPTED),
-                (WITH_PROOF to PROOF_REJECTED),
-                (PROOF_REJECTED to PROOF_ACCEPTED))
-
-        if (!allowedTransitions.contains((from to to))) {
-            throw DomainException("Transition from $from to $to not allowed")
-        }
-    }
-
     fun accept() {
         this.status = ACCEPTED
     }
@@ -111,6 +136,20 @@ class Challenge : BasicEntity {
 
     fun rejectProof() {
         this.status = PROOF_REJECTED
+    }
+
+    fun withdraw() {
+        this.status = WITHDRAWN
+    }
+
+
+    @Suppress("UNUSED") //Used by Spring @PreAuthorize
+    fun checkWithdrawPermissions(username: String): Boolean {
+        if (this.unregisteredSponsor != null) {
+            return this.team!!.isMember(username)
+        } else if (this.sponsor != null) {
+            return EmailAddress(this.sponsor!!.email) == EmailAddress(username)
+        } else throw Exception("Error checking withdrawal permissions")
     }
 
     fun hasRegisteredSponsor(): Boolean {

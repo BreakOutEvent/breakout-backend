@@ -370,4 +370,61 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[1].teamId").exists())
                 .andExpect(jsonPath("$.[1].status").exists())
     }
+
+    @Test
+    fun testWithdrawChallengeForUnregisteredSponsor() {
+        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
+        val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val team = teamService.create(participant, "name", "description", event)
+        val sponsor = UnregisteredSponsor("", "", "", "", "", address = Address("", "", "", "", ""))
+        setAuthenticatedUser(participant.email)
+        val challenge = challengeService.proposeChallenge(sponsor, team, euroOf(200), "desc")
+
+        val body = mapOf("status" to "withdrawn")
+
+        val request = put("/event/${event.id}/team/${team.id}/challenge/${challenge.id}/status/")
+                .asUser(mockMvc, participant.email, "password")
+                .json(body)
+
+        val unauthRequest = put("/event/${event.id}/team/${team.id}/challenge/${challenge.id}/status/")
+                .json(body)
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.status").value("WITHDRAWN"))
+
+        mockMvc.perform(unauthRequest)
+                .andExpect(status().isUnauthorized)
+    }
+
+    @Test
+    fun testWithdrawChallengeForRegisteredSponsor() {
+
+        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
+        val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val team = teamService.create(participant, "name", "description", event)
+        val sponsor = userService.create("challenger@break-out.org", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
+
+        setAuthenticatedUser(sponsor.email)
+        val challenge = challengeService.proposeChallenge(sponsor, team, euroOf(200), "desc")
+
+        val body = mapOf("status" to "withdrawn")
+
+        val request = put("/event/${event.id}/team/${team.id}/challenge/${challenge.id}/status/")
+                .asUser(mockMvc, sponsor.email, "password")
+                .json(body)
+
+        val unauthRequest = put("/event/${event.id}/team/${team.id}/challenge/${challenge.id}/status/")
+                .asUser(mockMvc, participant.email, "password")
+                .json(body)
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.status").value("WITHDRAWN"))
+
+        mockMvc.perform(unauthRequest)
+                .andExpect(status().isForbidden) //TODO: Check why forbidden / unauthorized difference
+    }
 }

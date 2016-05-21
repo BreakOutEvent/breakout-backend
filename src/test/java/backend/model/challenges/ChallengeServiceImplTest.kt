@@ -9,11 +9,11 @@ import backend.model.user.Address
 import backend.model.user.Participant
 import backend.model.user.Sponsor
 import backend.util.euroOf
-import org.javamoney.moneta.Money
 import org.junit.Before
 import org.junit.Test
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
+import kotlin.test.assertFails
 import kotlin.test.assertNotNull
 
 class ChallengeServiceImplTest : IntegrationTest() {
@@ -59,5 +59,51 @@ class ChallengeServiceImplTest : IntegrationTest() {
         val found = challengeRepository.findOne(challenge.id)
         assertNotNull(found)
         assertNotNull(found.unregisteredSponsor)
+    }
+
+    @Test
+    fun testWithdrawChallengeWithUnregisteredSponsorAsTeamMember() {
+
+        setAuthenticatedUser("participant@break-out.org")
+        val challenge = challengeService.proposeChallenge(unregisteredSponsor, team, euroOf(100), "desc")
+        challengeService.withdraw(challenge)
+    }
+
+    @Test
+    fun testWithdrawChallengeWithUnregisteredSponsorAsSponsorFails() {
+        setAuthenticatedUser("participant@break-out.org")
+
+        val challenge = challengeService.proposeChallenge(unregisteredSponsor, team, euroOf(100), "desc")
+
+        setAuthenticatedUser(sponsor.email)
+        assertFails { challengeService.withdraw(challenge) }
+    }
+
+    @Test
+    fun testWithdrawChallengeWithRegisteredSponsorAsSponsor() {
+
+        setAuthenticatedUser("sponsor@break-out.org")
+
+        val challenge = challengeService.proposeChallenge(sponsor, team, euroOf(20), "desc")
+
+        challengeService.withdraw(challenge)
+
+        val found = challengeService.findOne(challenge.id!!)
+        assertEquals(ChallengeStatus.WITHDRAWN, found!!.status)
+    }
+
+    @Test
+    fun testWithdrawChallengeWithRegisteredSponsorAsTeamMemberFails() {
+
+        setAuthenticatedUser("sponsor@break-out.org")
+
+        val challenge = challengeService.proposeChallenge(sponsor, team, euroOf(20), "desc")
+
+        setAuthenticatedUser("participant@break-out.org")
+
+        assertFails { challengeService.withdraw(challenge) }
+
+        val found = challengeService.findOne(challenge.id!!)
+        assertEquals(ChallengeStatus.PROPOSED, found!!.status)
     }
 }

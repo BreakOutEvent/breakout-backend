@@ -34,6 +34,9 @@ interface ChallengeService {
     @PreAuthorize("#challenge.team.isMember(authentication.name)")
     fun rejectProof(challenge: Challenge): Challenge
 
+    @PreAuthorize("#challenge.checkWithdrawPermissions(authentication.name)")
+    fun withdraw(challenge: Challenge): Challenge
+
     @PreAuthorize("hasRole('SPONSOR')")
     fun findBySponsorId(userId: Long): Iterable<Challenge>
 }

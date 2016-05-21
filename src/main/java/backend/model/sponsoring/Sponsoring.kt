@@ -25,11 +25,14 @@ class Sponsoring : BasicEntity {
     private fun checkTransition(from: SponsoringStatus, to: SponsoringStatus) {
         if (unregisteredSponsor != null) checkTransitionForUnregisteredSponsor(from, to)
         else if (sponsor != null) checkTransitionForRegisteredSponsor(from, to)
-        else throw Exception("Sponsoring has neither ")
+        else throw Exception("Sponsoring has neither Sponsor")
     }
 
     private fun checkTransitionForUnregisteredSponsor(from: SponsoringStatus, to: SponsoringStatus) {
-        val transitions = listOf(PROPOSED to ACCEPTED, ACCEPTED to WITHDRAWN, ACCEPTED to PAYED)
+        val transitions = listOf(
+                PROPOSED to ACCEPTED,
+                ACCEPTED to WITHDRAWN,
+                ACCEPTED to PAYED)
         if (!transitions.contains(from to to)) {
             throw DomainException("Transition from $from to $to for status not allowed")
         }

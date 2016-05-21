@@ -13,6 +13,7 @@ import org.junit.runner.RunWith
 import org.powermock.api.mockito.PowerMockito
 import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.PowerMockRunner
+import kotlin.test.assertFails
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 
@@ -116,4 +117,18 @@ class ChallengeTest {
         challenge.rejectProof()
         assertEquals(PROOF_REJECTED, challenge.status)
     }
+
+    @Test
+    fun testWithdraw() {
+        val team = PowerMockito.mock(Team::class.java)
+        val sponsor = PowerMockito.mock(Sponsor::class.java)
+        val challenge = Challenge(sponsor, team, euroOf(50), "description")
+
+        challenge.withdraw()
+
+        assertEquals(WITHDRAWN, challenge.status)
+        assertFails { challenge.accept() }
+        assertFails { challenge.reject() }
+    }
+
 }

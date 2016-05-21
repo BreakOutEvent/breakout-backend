@@ -83,6 +83,28 @@ class ChallengeServiceImpl : ChallengeService {
         return challengeRepository.save(challenge)
     }
 
+
+    @Transactional
+    override fun withdraw(challenge: Challenge): Challenge {
+        challenge.withdraw()
+
+        if (challenge.hasRegisteredSponsor()) {
+            val email = Email(
+                    to = challenge.team!!.members.map { EmailAddress(it.email) },
+                    subject = "BreakOut 2016 - Eine Challenge wurde zurückgezogen!",
+                    body = "Hallo Team \"${challenge.team!!.name}\" eine Challenge wurde zurückgezogen, vielleicht wollt ihr mit dem Sponsor noch einmal darüber reden.<br>" +
+                            "Du hast Fragen oder benötigst Unterstützung? Schreib uns eine E-Mail an <a href=\"event@break-out.org\">event@break-out.org</a>.<br><br>" +
+                            "Liebe Grüße<br>" +
+                            "Euer BreakOut-Team",
+                    campaignCode = "challenge_withdrawn"
+            )
+
+            mailService.send(email)
+        }
+
+        return challengeRepository.save(challenge)
+    }
+
     @Transactional
     override fun findOne(challengeId: Long): Challenge? {
         return challengeRepository.findOne(challengeId)
