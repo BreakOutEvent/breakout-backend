@@ -19,6 +19,8 @@ class ChallengeView {
 
     var sponsorId: Long? = null
 
+    var userId: Long? = null
+
     var sponsorIsHidden: Boolean = false
 
     @Valid
@@ -48,8 +50,12 @@ class ChallengeView {
         // Add information about registered sponsor
         // if he exists and isHidden is false
         challenge.sponsor?.isHidden?.let {
-            if (it) this.sponsorIsHidden = true
-            else this.sponsorId = challenge.sponsor?.id
+            if (it) {
+                this.sponsorIsHidden = true
+            } else {
+                this.userId = challenge.sponsor?.core?.id
+                this.sponsorId = challenge.sponsor?.id
+            }
         }
 
         // Add information about unregistered sponsor

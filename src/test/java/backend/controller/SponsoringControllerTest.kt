@@ -40,6 +40,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[0].teamId").exists())
                 .andExpect(jsonPath("$.[0].team").exists())
                 .andExpect(jsonPath("$.[0].sponsorId").exists())
+                .andExpect(jsonPath("$.[0].userId").exists())
                 .andExpect(jsonPath("$.[0].id").value(sponsoring.id!!.toInt()))
                 .andExpect(jsonPath("$.[0].eventId").value(event.id!!.toInt()))
     }
@@ -64,6 +65,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[0].teamId").exists())
                 .andExpect(jsonPath("$.[0].team").exists())
                 .andExpect(jsonPath("$.[0].sponsorId").exists())
+                .andExpect(jsonPath("$.[0].userId").exists())
                 .andExpect(jsonPath("$.[0].id").value(sponsoring.id!!.toInt()))
                 .andExpect(jsonPath("$.[0].eventId").value(event.id!!.toInt()))
     }
@@ -103,6 +105,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[0].teamId").exists())
                 .andExpect(jsonPath("$.[0].team").exists())
                 .andExpect(jsonPath("$.[0].sponsorId").doesNotExist())
+                .andExpect(jsonPath("$.[0].userId").doesNotExist())
                 .andExpect(jsonPath("$.[0].id").value(sponsoring.id!!.toInt()))
                 .andExpect(jsonPath("$.[0].eventId").value(event.id!!.toInt()))
                 .andExpect(jsonPath("$.[0].unregisteredSponsor").exists())
@@ -164,6 +167,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[1].teamId").exists())
                 .andExpect(jsonPath("$.[1].team").exists())
                 .andExpect(jsonPath("$.[1].sponsorId").doesNotExist())
+                .andExpect(jsonPath("$.[1].userId").doesNotExist())
                 .andExpect(jsonPath("$.[1].id").value(sponsoring2.id!!.toInt()))
                 .andExpect(jsonPath("$.[1].eventId").value(event.id!!.toInt()))
                 .andExpect(jsonPath("$.[1].unregisteredSponsor").doesNotExist())
@@ -191,6 +195,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.teamId").exists())
                 .andExpect(jsonPath("$.team").exists())
                 .andExpect(jsonPath("$.sponsorId").exists())
+                .andExpect(jsonPath("$.userId").exists())
                 .andExpect(jsonPath("$.status").value("PROPOSED"))
                 .andExpect(jsonPath("$.unregisteredSponsor").doesNotExist())
     }
@@ -216,6 +221,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.teamId").exists())
                 .andExpect(jsonPath("$.team").exists())
                 .andExpect(jsonPath("$.sponsorId").exists())
+                .andExpect(jsonPath("$.userId").exists())
                 .andExpect(jsonPath("$.status").value("PROPOSED"))
                 .andExpect(jsonPath("$.unregisteredSponsor").doesNotExist())
     }
@@ -261,6 +267,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.team").exists())
                 .andExpect(jsonPath("$.status").value("ACCEPTED"))
                 .andExpect(jsonPath("$.sponsorId").doesNotExist())
+                .andExpect(jsonPath("$.userId").doesNotExist())
                 .andExpect(jsonPath("$.unregisteredSponsor.firstname").value("Florian"))
                 .andExpect(jsonPath("$.unregisteredSponsor.lastname").value("Schmidt"))
                 .andExpect(jsonPath("$.unregisteredSponsor.url").value("www.florianschmidt.me"))
@@ -348,6 +355,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[0].teamId").exists())
                 .andExpect(jsonPath("$.[0].team").exists())
                 .andExpect(jsonPath("$.[0].sponsorId").exists())
+                .andExpect(jsonPath("$.[0].userId").exists())
                 .andExpect(jsonPath("$.[1]").doesNotExist())
     }
 
@@ -373,6 +381,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.teamId").exists())
                 .andExpect(jsonPath("$.team").exists())
                 .andExpect(jsonPath("$.sponsorId").exists())
+                .andExpect(jsonPath("$.userId").exists())
                 .andExpect(jsonPath("$.status").value("ACCEPTED"))
     }
 
@@ -398,6 +407,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.teamId").exists())
                 .andExpect(jsonPath("$.team").exists())
                 .andExpect(jsonPath("$.sponsorId").exists())
+                .andExpect(jsonPath("$.userId").exists())
                 .andExpect(jsonPath("$.status").value("REJECTED"))
     }
 

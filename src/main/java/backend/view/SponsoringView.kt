@@ -1,7 +1,6 @@
 package backend.view
 
 import backend.model.sponsoring.Sponsoring
-import backend.model.sponsoring.SponsoringStatus.*
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
@@ -23,6 +22,8 @@ class SponsoringView() {
 
     var sponsorId: Long? = null
 
+    var userId: Long? = null
+
     var status: String? = null
 
     @Valid
@@ -38,6 +39,7 @@ class SponsoringView() {
         this.amountPerKm = sponsoring.amountPerKm.numberStripped.toDouble()
         this.limit = sponsoring.limit.numberStripped.toDouble()
         this.sponsorId = sponsoring.sponsor?.id
+        this.userId = sponsoring.sponsor?.core?.id
         this.status = sponsoring.status.toString().toUpperCase()
         sponsoring.unregisteredSponsor?.let { this.unregisteredSponsor = UnregisteredSponsorView(it) }
     }
