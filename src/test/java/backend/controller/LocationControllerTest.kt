@@ -116,7 +116,7 @@ class LocationControllerTest : IntegrationTest() {
         val data = mapOf(
                 "latitude" to 0.0,
                 "longitude" to 1.1,
-                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) * 1000
+                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
         )
 
         val request = post("/event/${munichEvent.id}/team/${firstTeam.id}/location/")
@@ -153,7 +153,7 @@ class LocationControllerTest : IntegrationTest() {
         val data = mapOf(
                 "latitude" to 0.0,
                 "longitude" to 1.1,
-                "date" to timeLocation.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                "date" to timeLocation.atZone(ZoneId.systemDefault()).toInstant().epochSecond
         )
 
         val request = post("/event/${thisEvent.id}/team/${thisTeam.id}/location/")
@@ -188,7 +188,7 @@ class LocationControllerTest : IntegrationTest() {
         val data = mapOf(
                 "latitude" to 0.0,
                 "longitude" to 1.1,
-                "date" to timeLocation.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                "date" to timeLocation.atZone(ZoneId.systemDefault()).toInstant().epochSecond
         )
 
         val request = post("/event/${thisEvent.id}/team/${thisTeam.id}/location/")
@@ -223,7 +223,7 @@ class LocationControllerTest : IntegrationTest() {
         val data = mapOf(
                 "latitude" to 0.0,
                 "longitude" to 1.1,
-                "date" to timeLocation.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                "date" to timeLocation.atZone(ZoneId.systemDefault()).toInstant().epochSecond
         )
 
         val request = post("/event/${thisEvent.id}/team/${thisTeam.id}/location/")

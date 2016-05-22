@@ -6,7 +6,7 @@ import backend.controller.exceptions.UnauthorizedException
 import backend.model.messaging.GroupMessageService
 import backend.model.messaging.Message
 import backend.model.user.UserService
-import backend.util.toLocalDateTime
+import backend.util.localDateTimeOf
 import backend.view.GroupMessageView
 import backend.view.MessageView
 import org.springframework.beans.factory.annotation.Autowired
@@ -89,7 +89,7 @@ open class MessagingController {
         val groupMessage = groupMessageService.getByID(id) ?: throw NotFoundException("groupmessage with id $id does not exist")
         if (!groupMessage.users.contains(user.core)) throw UnauthorizedException("authenticated user and requested resource mismatch")
 
-        val message = Message(user.core, body.text!!, body.date!!.toLocalDateTime())
+        val message = Message(user.core, body.text!!, localDateTimeOf(body.date!!))
         groupMessageService.addMessage(message, groupMessage)
 
         return GroupMessageView(groupMessage)

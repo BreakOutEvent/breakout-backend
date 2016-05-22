@@ -5,9 +5,9 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 /**
- * Convert milliseconds to LocalDateTime
+ * Convert epochSeconds to LocalDateTime
  */
-fun Long.toLocalDateTime(): LocalDateTime {
-    val instant = Instant.ofEpochMilli(this)
+fun localDateTimeOf(epochSeconds: Long): LocalDateTime {
+    val instant = Instant.ofEpochSecond(epochSeconds)
     return LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
 }

@@ -11,7 +11,7 @@ import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserCore
 import backend.util.distanceCoordsKM
-import backend.util.toLocalDateTime
+import backend.util.localDateTimeOf
 import backend.view.LocationView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -52,6 +52,7 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
         return repository.save(Posting(text, date, location, user, media))
     }
 
+    //TODO: Move views and datetime stuff to controller layer
     override fun createPosting(user: User,
                                text: String?,
                                uploadMediaTypes: List<String>?,
@@ -75,7 +76,7 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
             distance = distanceCoordsKM(team.event.startingLocation, location)
         }
 
-        val clientDate = date!!.toLocalDateTime()
+        val clientDate = localDateTimeOf(date!!)
         return this.savePostingWithLocationAndMedia(text = text, postingLocation = location, user = user.core, mediaTypes = uploadMediaTypes, distance = distance, date = clientDate)
     }
 

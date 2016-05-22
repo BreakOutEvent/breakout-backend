@@ -9,7 +9,7 @@ import backend.model.posting.PostingService
 import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.util.getSignedJwtToken
-import backend.util.toLocalDateTime
+import backend.util.localDateTimeOf
 import backend.view.CommentView
 import backend.view.LikeView
 import backend.view.PostingView
@@ -124,7 +124,7 @@ open class PostingController {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
-        val comment = commentService.createComment(body.text, body.date!!.toLocalDateTime(), posting, user.core)
+        val comment = commentService.createComment(body.text, localDateTimeOf(epochSeconds = body.date!!), posting, user.core)
 
         return CommentView(comment)
     }
@@ -143,7 +143,7 @@ open class PostingController {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
-        val like = likeService.createLike(body.date!!.toLocalDateTime(), posting, user.core)
+        val like = likeService.createLike(localDateTimeOf(body.date!!), posting, user.core)
 
         return LikeView(like)
     }

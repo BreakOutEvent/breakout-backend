@@ -9,7 +9,7 @@ import backend.model.location.LocationService
 import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.model.user.UserService
-import backend.util.toLocalDateTime
+import backend.util.localDateTimeOf
 import backend.view.LocationView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
@@ -81,7 +81,7 @@ open class LocationController {
         if (!team.isMember(participant)) throw UnauthorizedException("user is not part of team $teamId are therefor cannot upload locations on it's behalf")
 
         val coord = Coord(locationView.latitude, locationView.longitude)
-        val location = locationService.create(coord, participant, locationView.date.toLocalDateTime())
+        val location = locationService.create(coord, participant, localDateTimeOf(epochSeconds = locationView.date))
 
         return LocationView(location)
     }
@@ -105,7 +105,7 @@ open class LocationController {
 
         val savedLocationsAsLocationViews = locationViews.map {
             val coord = Coord(it.latitude, it.longitude)
-            val savedLocation = locationService.create(coord, participant, it.date.toLocalDateTime())
+            val savedLocation = locationService.create(coord, participant, localDateTimeOf(epochSeconds = it.date))
             LocationView(savedLocation)
         }
 
