@@ -75,6 +75,7 @@ class LocationControllerTest : IntegrationTest() {
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$").isArray)
                 .andExpect(jsonPath<MutableCollection<out Any>>("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].id").exists())
                 .andExpect(jsonPath("$[0].latitude").exists())
                 .andExpect(jsonPath("$[0].longitude").exists())
                 .andExpect(jsonPath("$[0].team").exists())
@@ -99,6 +100,7 @@ class LocationControllerTest : IntegrationTest() {
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$").isArray)
                 .andExpect(jsonPath<MutableCollection<out Any>>("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").exists())
                 .andExpect(jsonPath("$[0].latitude").exists())
                 .andExpect(jsonPath("$[0].longitude").exists())
                 .andExpect(jsonPath("$[0].team").exists())
@@ -123,6 +125,7 @@ class LocationControllerTest : IntegrationTest() {
 
         val resp = mockMvc.perform(request)
                 .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.latitude").exists()) //TODO: Check equality, not only existence
                 .andExpect(jsonPath("$.longitude").exists())
                 .andExpect(jsonPath("$.team").exists())

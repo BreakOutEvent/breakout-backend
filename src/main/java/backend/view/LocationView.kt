@@ -8,6 +8,8 @@ import javax.validation.constraints.NotNull
 
 class LocationView {
 
+    var id: Long? = null
+
     @NotNull
     val latitude: Double
 
@@ -30,6 +32,8 @@ class LocationView {
     val date: Long
 
     constructor(location: Location) {
+        this.id = location.id
+
         this.latitude = location.coord.latitude
         this.longitude = location.coord.longitude
         this.distance = location.distance
