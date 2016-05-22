@@ -21,6 +21,10 @@ class TeamView() {
 
     var invoiceId: Long? = null
 
+    var hasFullyPaid: Boolean? = null
+
+    var isFull: Boolean? = null
+
     constructor(team: Team) : this() {
         this.id = team.id
         this.name = team.name
@@ -31,5 +35,7 @@ class TeamView() {
         this.profilePic = MediaView(team.profilePic)
         this.invoiceId = team.invoice?.id
         this.hasStarted = team.hasStarted
+        this.hasFullyPaid = team.invoice?.isFullyPaid()
+        this.isFull = team.isFull()
     }
 }
