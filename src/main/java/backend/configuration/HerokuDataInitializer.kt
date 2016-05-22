@@ -1,5 +1,6 @@
 package backend.configuration
 
+import backend.model.challenges.ChallengeService
 import backend.model.event.EventService
 import backend.model.event.TeamService
 import backend.model.location.LocationService
@@ -10,7 +11,9 @@ import backend.model.user.Admin
 import backend.model.user.Participant
 import backend.model.user.Sponsor
 import backend.model.user.UserService
+import backend.util.Profiles
 import backend.util.Profiles.HEROKU
+import backend.util.euroOf
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
@@ -31,6 +34,7 @@ class HerokuDataInitializer {
     @Autowired lateinit private var eventService: EventService
     @Autowired lateinit private var locationService: LocationService
     @Autowired lateinit private var sponsoringService: SponsoringService
+    @Autowired lateinit private var challengeService: ChallengeService
     @Autowired lateinit private var userDetailsService: UserDetailsService
 
     @PostConstruct
@@ -41,6 +45,26 @@ class HerokuDataInitializer {
         // ---- Events ----
         val eventMunich = eventService.createEvent("Breakout München 2016", date, "München", Coord(48.1374300, 11.5754900), 36)
         val eventBerlin = eventService.createEvent("Breakout Berlin 2016", date, "Berlin", Coord(52.5243700, 13.4105300), 36)
+
+        // --- iOS Devs Test Accounts ---
+        val leo = userService.create("leokaessner@me.com", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val david = userService.create("david.symhoven@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val keno = userService.create("keno@break-out.org", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
+        val teamiOS = teamService.create(leo, "Team Leo + Elo", "Die fleißigen iOS Tester", eventMunich)
+
+        setAuthenticatedUser(leo.email)
+        teamService.invite(EmailAddress(david.email), teamiOS)
+
+        setAuthenticatedUser(david.email)
+        teamService.join(david, teamiOS)
+
+        setAuthenticatedUser(keno.email)
+        sponsoringService.createSponsoring(keno, teamiOS, euroOf(5), euroOf(10000000))
+        locationService.create(Coord(51.0505, 13.7372), leo, date.plusHours(1))
+        locationService.create(Coord(48.8534100, 2.3488000), leo, date.plusHours(2))
+
+        setAuthenticatedUser(keno.email)
+        challengeService.proposeChallenge(keno, teamiOS, euroOf(10), "Bade nackt in der Spree")
 
         // ---- Team 1 ----
         val participant1 = userService.create("participant1@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
