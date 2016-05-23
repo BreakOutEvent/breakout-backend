@@ -120,7 +120,7 @@ open class SponsoringController {
             createSponsoringWithAuthenticatedSponsor(team, amountPerKm, limit, sponsor)
         }
 
-        sponsoring.contract.uploadToken = getSignedJwtToken(jwtSecret, sponsoring.id!!.toString())
+        sponsoring.contract.uploadToken = getSignedJwtToken(jwtSecret, sponsoring.contract.id.toString())
         return SponsoringView(sponsoring)
     }
 
