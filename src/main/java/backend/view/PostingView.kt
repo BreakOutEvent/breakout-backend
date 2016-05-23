@@ -32,6 +32,8 @@ class PostingView() {
 
     var likes: Int? = null
 
+    var hasLiked: Boolean = false
+
     var hashtags: List<String> = ArrayList()
 
     constructor(posting: Posting) : this() {
@@ -44,5 +46,6 @@ class PostingView() {
         this.media = posting.media?.map { MediaView(it) }
         this.comments = posting.comments.map { CommentView(it) }
         this.likes = posting.likes.count()
+        this.hasLiked = posting.hasLiked
     }
 }

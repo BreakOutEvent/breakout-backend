@@ -853,6 +853,49 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.user").exists())
                 .andExpect(jsonPath("$.likes").exists())
                 .andExpect(jsonPath("$.likes").value(1))
+                .andExpect(jsonPath("$.hasLiked").value(false))
+                .andReturn().response.contentAsString
+
+        println(responsePosting)
+    }
+
+    @Test
+    open fun createLikeHasLikedFlag() {
+
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, 0.0, LocalDateTime.now())
+
+        val postData = mapOf(
+                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+        )
+
+        val request = post("/posting/${posting.id}/like/")
+                .asUser(mockMvc, user.email, "password")
+                .json(postData)
+
+        val response = mockMvc.perform(request)
+                .andExpect(status().isCreated)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.date").exists())
+                .andExpect(jsonPath("$.user").exists())
+                .andReturn().response.contentAsString
+
+        println(response)
+
+
+        val requestPosting = get("/posting/${posting.id}/")
+                .asUser(mockMvc, user.email, "password")
+
+        val responsePosting = mockMvc.perform (requestPosting)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.text").exists())
+                .andExpect(jsonPath("$.date").exists())
+                .andExpect(jsonPath("$.user").exists())
+                .andExpect(jsonPath("$.likes").exists())
+                .andExpect(jsonPath("$.likes").value(1))
+                .andExpect(jsonPath("$.hasLiked").value(true))
                 .andReturn().response.contentAsString
 
         println(responsePosting)

@@ -1,5 +1,6 @@
 package backend.model.posting
 
+import backend.configuration.CustomUserDetails
 import backend.model.BasicEntity
 import backend.model.challenges.Challenge
 import backend.model.location.Location
@@ -44,6 +45,9 @@ class Posting : BasicEntity {
     @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
     var likes: MutableList<Like> = ArrayList()
 
+    @Transient
+    var hasLiked = false
+
     constructor(text: String?, date: LocalDateTime, location: Location?, user: UserCore, media: MutableList<Media>?) : this() {
         this.text = text
         this.date = date
@@ -74,5 +78,10 @@ class Posting : BasicEntity {
         this.comments.clear()
         this.media?.clear()
         this.user = null
+    }
+
+    fun hasLikesBy(customUserDetails: CustomUserDetails?): Posting {
+        this.hasLiked = this.likes.any { it.user?.id == customUserDetails?.id }
+        return this
     }
 }

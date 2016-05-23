@@ -79,9 +79,9 @@ open class PostingController {
      * Gets posting by id
      */
     @RequestMapping("/{id}/", method = arrayOf(GET))
-    open fun getPosting(@PathVariable("id") id: Long): PostingView {
+    open fun getPosting(@PathVariable("id") id: Long, @AuthenticationPrincipal customUserDetails: CustomUserDetails?): PostingView {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
-        return PostingView(posting)
+        return PostingView(posting.hasLikesBy(customUserDetails))
     }
 
     /**
@@ -89,8 +89,8 @@ open class PostingController {
      * Gets all postings
      */
     @RequestMapping("/", method = arrayOf(GET))
-    open fun getAllPostings(): Iterable<PostingView> {
-        return postingService.findAll().map { PostingView(it) }
+    open fun getAllPostings(@AuthenticationPrincipal customUserDetails: CustomUserDetails?): Iterable<PostingView> {
+        return postingService.findAll().map { PostingView(it.hasLikesBy(customUserDetails)) }
     }
 
     /**
@@ -98,8 +98,8 @@ open class PostingController {
      * Gets postings with given ids
      */
     @RequestMapping("/get/ids", method = arrayOf(POST))
-    open fun getPostingsById(@Valid @RequestBody body: List<Long>): Iterable<PostingView> {
-        return postingService.findAllByIds(body).map { PostingView(it) }
+    open fun getPostingsById(@Valid @RequestBody body: List<Long>, @AuthenticationPrincipal customUserDetails: CustomUserDetails?): Iterable<PostingView> {
+        return postingService.findAllByIds(body).map { PostingView(it.hasLikesBy(customUserDetails)) }
     }
 
     /**
@@ -164,8 +164,8 @@ open class PostingController {
      * Gets Likes for Posting
      */
     @RequestMapping("/hashtag/{hashtag}/", method = arrayOf(GET))
-    open fun getPostingsByHashtag(@PathVariable("hashtag") hashtag: String): List<PostingView> {
+    open fun getPostingsByHashtag(@PathVariable("hashtag") hashtag: String, @AuthenticationPrincipal customUserDetails: CustomUserDetails?): List<PostingView> {
         val posting = postingService.findByHashtag(hashtag)
-        return posting.map { PostingView(it) }
+        return posting.map { PostingView(it.hasLikesBy(customUserDetails)) }
     }
 }
