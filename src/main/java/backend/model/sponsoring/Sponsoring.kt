@@ -4,6 +4,7 @@ import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.event.Team
 import backend.model.media.Media
+import backend.model.media.MediaType.DOCUMENT
 import backend.model.misc.EmailAddress
 import backend.model.sponsoring.SponsoringStatus.*
 import backend.model.user.Sponsor
@@ -78,7 +79,7 @@ class Sponsoring : BasicEntity {
         this.team = team
         this.amountPerKm = amountPerKm
         this.limit = limit
-        this.contract = Media("IMAGE")
+        this.contract = Media(DOCUMENT)
     }
 
     constructor(unregisteredSponsor: UnregisteredSponsor, team: Team, amountPerKm: Money, limit: Money) {
@@ -87,7 +88,7 @@ class Sponsoring : BasicEntity {
         this.amountPerKm = amountPerKm
         this.limit = limit
         this.status = ACCEPTED
-        this.contract = Media("IMAGE")
+        this.contract = Media(DOCUMENT)
     }
 
     fun calculateRaisedAmount(): Money {
