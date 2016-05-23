@@ -8,4 +8,5 @@ interface MediaSizeService {
     fun save(mediaSize: MediaSize): MediaSize?
     fun findByWidthAndMediaAndMediaType(width: Int, media: Media, type: MediaType): MediaSize?
     fun findByHeightAndMediaAndMediaType(height: Int, media: Media, type: MediaType): MediaSize?
+    fun deleteOlderOneMinute(mediaId: Long)
 }

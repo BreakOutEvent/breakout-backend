@@ -44,8 +44,17 @@ class MediaSizeServiceImpl : MediaSizeService {
         return repository.findByHeightAndMediaAndMediaType(height, media, type)
     }
 
+    override fun deleteOlderOneMinute(mediaId: Long) {
+        repository.deleteOlderOneMinute(mediaId)
+    }
+
     @Transactional
     override fun createOrUpdate(mediaId: Long, url: String, width: Int, height: Int, length: Int, size: Long, type: String): MediaSize {
+
+        if (MediaType.valueOf(type.toUpperCase()).equals(MediaType.IMAGE)) {
+            this.deleteOlderOneMinute(mediaId);
+        }
+
         val media = mediaRepository.findById(mediaId)
 
         val mediaSizeFound: MediaSize?
