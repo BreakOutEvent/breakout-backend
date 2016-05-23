@@ -11,7 +11,6 @@ import backend.model.user.Admin
 import backend.model.user.Participant
 import backend.model.user.Sponsor
 import backend.model.user.UserService
-import backend.util.Profiles
 import backend.util.Profiles.HEROKU
 import backend.util.euroOf
 import org.javamoney.moneta.Money

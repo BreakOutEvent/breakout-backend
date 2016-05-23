@@ -2,23 +2,25 @@
 
 package backend.Integration
 
+import backend.model.event.Event
+import backend.model.event.Team
 import backend.model.media.Media
 import backend.model.misc.Coord
 import backend.model.user.Admin
 import backend.model.user.Participant
 import backend.model.user.User
 import backend.services.ConfigurationService
+import backend.testHelper.asUser
+import backend.testHelper.json
 import com.auth0.jwt.Algorithm
 import com.auth0.jwt.JWTSigner
 import org.hamcrest.Matchers.hasSize
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpMethod
-import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -27,38 +29,20 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Autowired
     private lateinit var configurationService: ConfigurationService
     private lateinit var JWT_SECRET: String
-    private lateinit var userCredentials: Credentials
     private lateinit var user: User
-
+    private lateinit var event: Event
+    private lateinit var team: Team
 
     @Before
     override fun setUp() {
         super.setUp()
-        val event = eventService.createEvent(
-                title = "Breakout München",
-                date = LocalDateTime.now(),
-                city = "Munich",
-                startingLocation = Coord(0.0, 0.0),
-                duration = 36)
 
         this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
-        userCredentials = createUser(this.mockMvc, userService = userService)
 
-        makeUserParticipant(userCredentials)
-        val creator = userRepository.findOne(userCredentials.id.toLong()).getRole(Participant::class)!!
-        teamService.create(creator, "name", "description", event)
-
-        getTokens(mockMvc, creator.email, "password").first
-        getTokens(mockMvc, creator.email, "password").second
-
-        userService.create("test_admin@break-out.org", "password", {
-            addRole(Admin::class)
-            isBlocked = false
-        })
-
-        user = userService.create("test@mail.com", "password", {
-            addRole(Participant::class)
-        })
+        event = eventService.createEvent("Breakout München", LocalDateTime.now(), "Munich", Coord(0.0, 0.0), 36)
+        userService.create("test_admin@break-out.org", "password", { addRole(Admin::class); isBlocked = false })
+        user = userService.create("test@mail.com", "password", { addRole(Participant::class) })
+        team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
     }
 
     @Test
@@ -75,13 +59,11 @@ open class TestPostingEndpoint : IntegrationTest() {
                         "image",
                         "audio"
                 )
-        ).toJsonString()
+        )
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/")
-                .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(APPLICATION_JSON)
-                .content(postData)
+        val request = post("/posting/")
+                .asUser(mockMvc, user.email, "password")
+                .json(postData)
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
@@ -110,16 +92,14 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun createNewPostingWithText() {
-        val postData = mapOf(
+        val data = mapOf(
                 "text" to "TestPost",
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-        ).toJsonString()
+        )
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/")
-                .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(APPLICATION_JSON)
-                .content(postData)
+        val request = post("/posting/")
+                .asUser(mockMvc, user.email, "password")
+                .json(data)
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
@@ -138,13 +118,11 @@ open class TestPostingEndpoint : IntegrationTest() {
         val postData = mapOf(
                 "text" to "hello #breakout bla blub #awsome",
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-        ).toJsonString()
+        )
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/")
-                .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(APPLICATION_JSON)
-                .content(postData)
+        val request = post("/posting/")
+                .asUser(mockMvc, user.email, "password")
+                .json(postData)
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
@@ -167,8 +145,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         postingService.savePostingWithLocationAndMedia("hello #awsome", null, user.core, null, 0.0, LocalDateTime.now())
 
         val request = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/posting/hashtag/breakout/")
-                .contentType(APPLICATION_JSON)
+                .get("/posting/hashtag/breakout/")
 
         val response = mockMvc.perform (request)
                 .andExpect(status().isOk)
@@ -195,13 +172,11 @@ open class TestPostingEndpoint : IntegrationTest() {
                         "audio"
                 ),
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-        ).toJsonString()
+        )
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/")
-                .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(APPLICATION_JSON)
-                .content(postData)
+        val request = post("/posting/")
+                .asUser(mockMvc, user.email, "password")
+                .json(postData)
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
@@ -231,13 +206,11 @@ open class TestPostingEndpoint : IntegrationTest() {
                         "longitude" to 0.0
                 ),
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-        ).toJsonString()
+        )
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/")
-                .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(APPLICATION_JSON)
-                .content(postData)
+        val request = post("/posting/")
+                .asUser(mockMvc, user.email, "password")
+                .json(postData)
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
@@ -258,13 +231,11 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun dontCreatePostingForInvalidJSON() {
         val postData = mapOf(
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-        ).toJsonString()
+        )
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/")
-                .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(APPLICATION_JSON)
-                .content(postData)
+        val request = post("/posting/")
+                .asUser(mockMvc, user.email, "password")
+                .json(postData)
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isBadRequest)
@@ -282,13 +253,11 @@ open class TestPostingEndpoint : IntegrationTest() {
                         "latitude" to 0.0,
                         "longitude" to 0.0
                 )
-        ).toJsonString()
+        )
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/")
+        val request = post("/posting/")
                 .header("Authorization", "Bearer invalidToken")
-                .contentType(APPLICATION_JSON)
-                .content(postData)
+                .json(postData)
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isUnauthorized)
@@ -299,14 +268,13 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun getPostingById() {
-        val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
-        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+        //given
         val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/posting/${posting.id}/")
-                .contentType(APPLICATION_JSON)
+        //when
+        val request = get("/posting/${posting.id}/")
 
+        //then
         val response = mockMvc.perform (request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
@@ -326,8 +294,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun getPostingsByIds() {
-        val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
-        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+        //given
 
         val postingZero = postingService.savePostingWithLocationAndMedia("Test0", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
         postingService.savePostingWithLocationAndMedia("Test1", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
@@ -335,11 +302,11 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val postingsIds: List<Long> = listOf(postingZero.id!!, postingTwo.id!!)
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/get/ids")
-                .content(postingsIds.toJsonString())
-                .contentType(APPLICATION_JSON)
+        //when
+        val request = post("/posting/get/ids")
+                .json(postingsIds)
 
+        //then
         val response = mockMvc.perform (request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
@@ -356,17 +323,16 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun getPostingIdsSince() {
-        val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
-        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+        //given
 
         val postingZero = postingService.savePostingWithLocationAndMedia("Test0", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
         postingService.savePostingWithLocationAndMedia("Test1", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
         postingService.savePostingWithLocationAndMedia("Test2", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/posting/get/since/${postingZero.id}/")
-                .contentType(APPLICATION_JSON)
+        //when
+        val request = get("/posting/get/since/${postingZero.id}/")
 
+        //then
         val response = mockMvc.perform (request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
@@ -382,9 +348,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun createNewPostingWithMediaAndAddMediaSizesWithoutToken() {
-
-        val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
-        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+        //given
 
         val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
         val media = mediaService.createMedia("image")
@@ -398,13 +362,13 @@ open class TestPostingEndpoint : IntegrationTest() {
                 "length" to 0.0,
                 "size" to 0.0,
                 "type" to "image"
-        ).toJsonString()
+        )
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/media/${savedposting!!.media!!.first().id}/")
-                .contentType(APPLICATION_JSON)
-                .content(postData)
+        //when
+        val request = post("/media/${savedposting!!.media!!.first().id}/")
+                .json(postData)
 
+        //then
         val response = mockMvc.perform (request)
                 .andExpect(status().isBadRequest)
                 .andReturn().response.contentAsString
@@ -415,8 +379,6 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewPostingWithMediaAndAddMediaSizesWithWrongToken() {
 
-        val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
-        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
         val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
         val media = mediaService.createMedia("image")
@@ -430,13 +392,11 @@ open class TestPostingEndpoint : IntegrationTest() {
                 "length" to 0.0,
                 "size" to 0.0,
                 "type" to "image"
-        ).toJsonString()
+        )
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/media/${savedposting!!.media!!.first().id}/")
-                .contentType(APPLICATION_JSON)
+        val request = post("/media/${savedposting!!.media!!.first().id}/")
                 .header("X-UPLOAD-TOKEN", "87654321")
-                .content(postData)
+                .json(postData)
 
         val response = mockMvc.perform (request)
                 .andExpect(status().isUnauthorized)
@@ -448,8 +408,6 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewPostingWithMediaAndAddMediaSizesWithValidToken() {
 
-        val event = eventService.createEvent("title", LocalDateTime.now(), "location", Coord(0.0, 0.0), 36)
-        teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
         val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
         val media = mediaService.createMedia("image")
@@ -463,15 +421,13 @@ open class TestPostingEndpoint : IntegrationTest() {
                 "length" to 0.0,
                 "size" to 0.0,
                 "type" to "image"
-        ).toJsonString()
+        )
 
         println(posting.media)
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/media/${savedposting!!.media!!.first().id}/")
-                .contentType(APPLICATION_JSON)
+        val request = post("/media/${savedposting!!.media!!.first().id}/")
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
-                .content(postData)
+                .json(postData)
 
         val response = mockMvc.perform (request)
                 .andExpect(status().isCreated)
@@ -488,9 +444,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         println(response)
 
-        val requestMedia = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/posting/${savedposting.id}/")
-                .contentType(APPLICATION_JSON)
+        val requestMedia = get("/posting/${savedposting.id}/")
 
         val responseMedia = mockMvc.perform (requestMedia)
                 .andExpect(status().isOk)
@@ -518,8 +472,6 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewPostingWithMediaAndAddMediaSizesUpdateMediaSizes() {
 
-        val event = eventService.createEvent("title", LocalDateTime.now(), "location", Coord(0.0, 0.0), 36)
-        teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
         val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
         val media = mediaService.createMedia("image")
@@ -533,15 +485,13 @@ open class TestPostingEndpoint : IntegrationTest() {
                 "length" to 0.0,
                 "size" to 0.0,
                 "type" to "image"
-        ).toJsonString()
+        )
 
         println(posting.media)
 
-        var request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/media/${savedposting!!.media!!.first().id}/")
-                .contentType(APPLICATION_JSON)
+        var request = post("/media/${savedposting!!.media!!.first().id}/")
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
-                .content(postData)
+                .json(postData)
 
         var response = mockMvc.perform (request)
                 .andExpect(status().isCreated)
@@ -565,15 +515,13 @@ open class TestPostingEndpoint : IntegrationTest() {
                 "length" to 0.0,
                 "size" to 0.0,
                 "type" to "image"
-        ).toJsonString()
+        )
 
         println(posting.media)
 
-        request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/media/${savedposting.media!!.first().id}/")
-                .contentType(APPLICATION_JSON)
+        request = post("/media/${savedposting.media!!.first().id}/")
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
-                .content(postData)
+                .json(postData)
 
         response = mockMvc.perform (request)
                 .andExpect(status().isCreated)
@@ -591,8 +539,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         println(response)
 
         val requestMedia = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/posting/${savedposting.id}/")
-                .contentType(APPLICATION_JSON)
+                .get("/posting/${savedposting.id}/")
 
         val responseMedia = mockMvc.perform (requestMedia)
                 .andExpect(status().isOk)
@@ -622,8 +569,6 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewPostingWithMediaAndAddMediaSizesUpdateMediaSizesWithVariationWidth() {
 
-        val event = eventService.createEvent("title", LocalDateTime.now(), "location", Coord(0.0, 0.0), 36)
-        teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
         val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
         val media = mediaService.createMedia("image")
@@ -637,15 +582,13 @@ open class TestPostingEndpoint : IntegrationTest() {
                 "length" to 0.0,
                 "size" to 0.0,
                 "type" to "image"
-        ).toJsonString()
+        )
 
         println(posting.media)
 
-        var request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/media/${savedposting!!.media!!.first().id}/")
-                .contentType(APPLICATION_JSON)
+        var request = post("/media/${savedposting!!.media!!.first().id}/")
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
-                .content(postData)
+                .json(postData)
 
         var response = mockMvc.perform (request)
                 .andExpect(status().isCreated)
@@ -669,15 +612,13 @@ open class TestPostingEndpoint : IntegrationTest() {
                 "length" to 0.0,
                 "size" to 0.0,
                 "type" to "image"
-        ).toJsonString()
+        )
 
         println(posting.media)
 
-        request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/media/${savedposting.media!!.first().id}/")
-                .contentType(APPLICATION_JSON)
+        request = post("/media/${savedposting.media!!.first().id}/")
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
-                .content(postData)
+                .json(postData)
 
         response = mockMvc.perform (request)
                 .andExpect(status().isCreated)
@@ -694,9 +635,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         println(response)
 
-        val requestMedia = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/posting/${savedposting.id}/")
-                .contentType(APPLICATION_JSON)
+        val requestMedia = get("/posting/${savedposting.id}/")
 
         val responseMedia = mockMvc.perform (requestMedia)
                 .andExpect(status().isOk)
@@ -726,8 +665,6 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewPostingWithMediaAndAddMediaSizesUpdateMediaSizesWithVariationHeight() {
 
-        val event = eventService.createEvent("title", LocalDateTime.now(), "location", Coord(0.0, 0.0), 36)
-        teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
 
         val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
         val media = mediaService.createMedia("image")
@@ -741,15 +678,13 @@ open class TestPostingEndpoint : IntegrationTest() {
                 "length" to 0.0,
                 "size" to 0.0,
                 "type" to "image"
-        ).toJsonString()
+        )
 
         println(posting.media)
 
-        var request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/media/${savedposting!!.media!!.first().id}/")
-                .contentType(APPLICATION_JSON)
+        var request = post("/media/${savedposting!!.media!!.first().id}/")
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
-                .content(postData)
+                .json(postData)
 
         var response = mockMvc.perform (request)
                 .andExpect(status().isCreated)
@@ -773,15 +708,13 @@ open class TestPostingEndpoint : IntegrationTest() {
                 "length" to 0.0,
                 "size" to 0.0,
                 "type" to "image"
-        ).toJsonString()
+        )
 
         println(posting.media)
 
-        request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/media/${savedposting.media!!.first().id}/")
-                .contentType(APPLICATION_JSON)
+        request = post("/media/${savedposting.media!!.first().id}/")
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
-                .content(postData)
+                .json(postData)
 
         response = mockMvc.perform (request)
                 .andExpect(status().isCreated)
@@ -798,9 +731,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         println(response)
 
-        val requestMedia = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/posting/${savedposting.id}/")
-                .contentType(APPLICATION_JSON)
+        val requestMedia = get("/posting/${savedposting.id}/")
 
         val responseMedia = mockMvc.perform (requestMedia)
                 .andExpect(status().isOk)
@@ -830,14 +761,10 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun getAllPostings() {
 
-        val event = eventService.createEvent("name", LocalDateTime.now(), "City", Coord(0.0, 0.0), 36)
-        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
         postingService.savePostingWithLocationAndMedia("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
         postingService.savePostingWithLocationAndMedia("Test 2", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/posting/")
-                .contentType(APPLICATION_JSON)
+        val request = get("/posting/")
 
         mockMvc.perform(request)
                 .andExpect(status().isOk)
@@ -857,13 +784,11 @@ open class TestPostingEndpoint : IntegrationTest() {
         val postData = mapOf(
                 "text" to "TestComment",
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-        ).toJsonString()
+        )
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/${posting.id}/comment/")
-                .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(APPLICATION_JSON)
-                .content(postData)
+        val request = post("/posting/${posting.id}/comment/")
+                .asUser(mockMvc, user.email, "password")
+                .json(postData)
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
@@ -877,9 +802,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         println(response)
 
 
-        val requestPosting = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/posting/${posting.id}/")
-                .contentType(APPLICATION_JSON)
+        val requestPosting = get("/posting/${posting.id}/")
 
         val responsePosting = mockMvc.perform (requestPosting)
                 .andExpect(status().isOk)
@@ -902,13 +825,11 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val postData = mapOf(
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-        ).toJsonString()
+        )
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/${posting.id}/like/")
-                .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(APPLICATION_JSON)
-                .content(postData)
+        val request = post("/posting/${posting.id}/like/")
+                .asUser(mockMvc, user.email, "password")
+                .json(postData)
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
@@ -921,9 +842,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         println(response)
 
 
-        val requestPosting = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/posting/${posting.id}/")
-                .contentType(APPLICATION_JSON)
+        val requestPosting = get("/posting/${posting.id}/")
 
         val responsePosting = mockMvc.perform (requestPosting)
                 .andExpect(status().isOk)
@@ -946,13 +865,11 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val postData = mapOf(
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-        ).toJsonString()
+        )
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/${posting.id}/like/")
-                .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(APPLICATION_JSON)
-                .content(postData)
+        val request = post("/posting/${posting.id}/like/")
+                .asUser(mockMvc, user.email, "password")
+                .json(postData)
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
@@ -965,11 +882,9 @@ open class TestPostingEndpoint : IntegrationTest() {
         println(response)
 
 
-        val requestSecond = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/posting/${posting.id}/like/")
-                .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(APPLICATION_JSON)
-                .content(postData)
+        val requestSecond = post("/posting/${posting.id}/like/")
+                .asUser(mockMvc, user.email, "password")
+                .json(postData)
 
         val responseSecond = mockMvc.perform (requestSecond)
                 .andExpect(status().isConflict)
@@ -983,10 +898,8 @@ open class TestPostingEndpoint : IntegrationTest() {
         val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, 0.0, LocalDateTime.now())
         likeService.createLike(LocalDateTime.now(), posting, user.core)
 
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/posting/${posting.id}/like/")
-                .header("Authorization", "Bearer ${userCredentials.accessToken}")
-                .contentType(APPLICATION_JSON)
+        val request = get("/posting/${posting.id}/like/")
+                .asUser(mockMvc, user.email, "password")
 
         val response = mockMvc.perform(request)
                 .andExpect(status().isOk)
@@ -999,49 +912,4 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         println(response)
     }
-
-    private fun makeUserParticipant(credentials: Credentials) {
-
-        val date = LocalDate.now().toString()
-
-        // Update user with role participant
-        val json = mapOf(
-                "firstname" to "Florian",
-                "lastname" to "Schmidt",
-                "gender" to "Male",
-                "blocked" to false,
-                "participant" to mapOf(
-                        "tshirtsize" to "XL",
-                        "hometown" to "Dresden",
-                        "phonenumber" to "01234567890",
-                        "birthdate" to date,
-                        "emergencynumber" to "0987654321"
-                )
-        ).toJsonString()
-
-        println(json);
-
-        val request = MockMvcRequestBuilders.put("/user/${credentials.id}/")
-                .header("Authorization", "Bearer ${credentials.accessToken}")
-                .contentType(APPLICATION_JSON)
-                .content(json)
-
-        val response = mockMvc.perform(request)
-                .andExpect(status().isOk)
-                .andExpect(jsonPath("$.id").value(credentials.id))
-                .andExpect(jsonPath("$.firstname").value("Florian"))
-                .andExpect(jsonPath("$.lastname").value("Schmidt"))
-                .andExpect(jsonPath("$.gender").value("Male"))
-                .andExpect(jsonPath("$.blocked").value(false))
-                .andExpect(jsonPath("$.participant").exists())
-                .andExpect(jsonPath("$.participant.tshirtsize").value("XL"))
-                .andExpect(jsonPath("$.participant.hometown").value("Dresden"))
-                .andExpect(jsonPath("$.participant.birthdate").value(date))
-                .andExpect(jsonPath("$.participant.phonenumber").value("01234567890"))
-                .andExpect(jsonPath("$.participant.emergencynumber").value("0987654321"))
-                .andReturn().response.contentAsString
-
-        println(response)
-    }
-
 }
