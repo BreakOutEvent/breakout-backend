@@ -49,8 +49,6 @@ open class MessagingController {
             if (!groupMessage.users.contains(userToAdd.core)) groupMessageService.addUser(userToAdd.core, groupMessage)
         }
 
-        groupMessageService.save(groupMessage)
-
         return GroupMessageView(groupMessage)
     }
 
@@ -73,8 +71,6 @@ open class MessagingController {
             if (!groupMessage.users.contains(userToAdd.core)) groupMessageService.addUser(userToAdd.core, groupMessage)
         }
 
-        groupMessageService.save(groupMessage)
-
         return GroupMessageView(groupMessage)
     }
 
@@ -96,8 +92,6 @@ open class MessagingController {
         val message = Message(user.core, body.text!!, localDateTimeOf(body.date!!))
         groupMessageService.addMessage(message, groupMessage)
 
-        groupMessageService.save(groupMessage)
-
         return GroupMessageView(groupMessage)
     }
 
@@ -113,8 +107,6 @@ open class MessagingController {
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val groupMessage = groupMessageService.getByID(id) ?: throw NotFoundException("groupmessage with id $id does not exist")
         if (!groupMessage.users.contains(user.core)) throw UnauthorizedException("authenticated user and requested resource mismatch")
-
-        groupMessageService.save(groupMessage)
 
         return GroupMessageView(groupMessage)
     }

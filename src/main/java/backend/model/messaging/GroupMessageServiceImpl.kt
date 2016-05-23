@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class GroupMessageServiceImpl @Autowired constructor(val repository: GroupMessageRepository) : GroupMessageService {
 
+    @Transactional
     override fun createGroupMessage(creator: UserCore): GroupMessage {
         val groupMessage = GroupMessage(creator)
         return repository.save(groupMessage)
@@ -20,6 +21,7 @@ class GroupMessageServiceImpl @Autowired constructor(val repository: GroupMessag
     @Transactional
     override fun addUser(user: UserCore, groupMessage: GroupMessage): GroupMessage {
         groupMessage.addUser(user)
+
         return repository.save(groupMessage)
     }
 

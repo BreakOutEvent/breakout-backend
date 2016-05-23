@@ -38,6 +38,18 @@ class TestMessagingEndpoint : IntegrationTest() {
                 .andReturn().response.contentAsString
 
         println(response)
+
+        val requestMe = get("/me/")
+                .asUser(this.mockMvc, "user@break-out.org", "password")
+                .json(listOf<Long>())
+
+        mockMvc.perform(requestMe)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.groupMessageIds[0]").exists())
+                .andExpect(jsonPath("$.groupMessageIds[1]").doesNotExist())
+                .andReturn().response.contentAsString
     }
 
     @Test
@@ -146,6 +158,21 @@ class TestMessagingEndpoint : IntegrationTest() {
                 .andReturn().response.contentAsString
 
         println(response)
+
+
+        val requestGet = get("/messaging/${groupMessage.id}/")
+                .asUser(mockMvc, user.email, "password")
+                .json(listOf())
+
+        mockMvc.perform(requestGet)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.messages").isArray)
+                .andExpect(jsonPath("$.users").isArray)
+                .andExpect(jsonPath("$.users[0].id").value(user.core.id!!.toInt()))
+                .andExpect(jsonPath("$.users[1].id").value(user1.core.id!!.toInt()))
+                .andReturn().response.contentAsString
     }
 
     @Test
@@ -189,6 +216,19 @@ class TestMessagingEndpoint : IntegrationTest() {
                 .andReturn().response.contentAsString
 
         println(response)
+
+        val requestGet = get("/messaging/${groupMessage.id}/")
+                .asUser(mockMvc, user.email, "password")
+                .json(listOf())
+
+        mockMvc.perform(requestGet)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.messages[0].creator.id").value(user.core.id!!.toInt()))
+                .andExpect(jsonPath("$.messages[0].date").exists())
+                .andExpect(jsonPath("$.messages[0].text").value("message Text"))
+                .andReturn().response.contentAsString
     }
 
     @Test

@@ -13,7 +13,6 @@ class GroupMessage : BasicEntity {
     @ManyToMany
     var users: MutableList<UserCore> = ArrayList()
 
-    @OrderColumn
     @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
     var messages: MutableList<Message> = ArrayList()
 

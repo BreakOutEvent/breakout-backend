@@ -51,11 +51,9 @@ open class UserCore : BasicEntity, User {
     @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY, orphanRemoval = true)
     val comments: MutableList<Comment> = ArrayList()
 
-    @OrderColumn
-    @ManyToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "users", cascade = arrayOf(CascadeType.ALL))
     val groupMessages: MutableList<GroupMessage> = ArrayList()
 
-    @OrderColumn
     @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY, orphanRemoval = true)
     val messages: MutableList<Message> = ArrayList()
 
