@@ -2,6 +2,7 @@ package backend.model.event
 
 import backend.controller.exceptions.NotFoundException
 import backend.exceptions.DomainException
+import backend.model.challenges.ChallengeStatus
 import backend.model.location.Location
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
@@ -14,6 +15,7 @@ import backend.util.distanceCoordsListKMfromStart
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.math.BigDecimal
 
 @Service
 class TeamServiceImpl : TeamService {
@@ -170,5 +172,58 @@ class TeamServiceImpl : TeamService {
 
     override fun findByEventId(eventId: Long): List<Team> {
         return repository.findByEventId(eventId)
+    }
+
+    fun getSponsoringSum(team: Team): BigDecimal {
+        val distanceKm = this.getLinearDistanceForTeamFromPostings(team.id!!)
+        val sponsorSum = BigDecimal.ZERO
+
+        team.sponsoring.forEach { sponsoring ->
+            val amount = sponsoring.amountPerKm.numberStripped.multiply(BigDecimal(distanceKm))
+            if (amount.compareTo(sponsoring.limit.numberStripped) == -1) {
+                sponsorSum.add(sponsoring.limit.numberStripped)
+            } else {
+                sponsorSum.add(amount)
+            }
+        }
+
+        return sponsorSum
+    }
+
+    fun getChallengeSum(team: Team): Map<String, BigDecimal> {
+        val withProofSum = BigDecimal.ZERO
+        val acceptedProofSum = BigDecimal.ZERO
+
+        team.challenges.forEach { challenge ->
+            if (challenge.status == ChallengeStatus.WITH_PROOF) {
+                withProofSum.add(challenge.amount.numberStripped)
+            }
+
+            if (challenge.status == ChallengeStatus.PROOF_ACCEPTED) {
+                acceptedProofSum.add(challenge.amount.numberStripped)
+            }
+        }
+
+        return mapOf(
+                "challenges_with_proof_sum" to withProofSum,
+                "challenges_accepted_proof_sum" to acceptedProofSum)
+    }
+
+    override fun getDonateSum(teamId: Long): Map<String, BigDecimal> {
+        val team: Team = this.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")
+
+        val sponsorSum = getSponsoringSum(team)
+
+        val challengesSum = getChallengeSum(team)
+
+        val fullSum = BigDecimal.ZERO
+        fullSum.add(sponsorSum)
+        fullSum.add(challengesSum["challenges_with_proof_sum"]!!)
+
+        return mapOf(
+                "sponsoring_sum" to sponsorSum,
+                "challenges_with_proof_sum" to challengesSum["challenges_with_proof_sum"]!!,
+                "challenges_accepted_proof_sum" to challengesSum["challenges_accepted_proof_sum"]!!,
+                "full_sum" to fullSum)
     }
 }

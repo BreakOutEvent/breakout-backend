@@ -150,12 +150,29 @@ class TestEventEndpoint : IntegrationTest() {
     fun testGetEventDistanceById() {
         val request = get("/event/${event.id}/distance/")
 
-        //TODO create Users & Posts
+        //TODO check actual values with dummy data
         val response = mockMvc.perform (request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.linear_distance").exists())
                 .andExpect(jsonPath("$.actual_distance").exists())
+                .andReturn().response.contentAsString
+
+        println(response)
+    }
+
+    @Test
+    fun testGetEventDonateSumById() {
+        val request = get("/event/${event.id}/donatesum/")
+
+        //TODO check actual values with dummy data
+        val response = mockMvc.perform (request)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.sponsoring_sum").exists())
+                .andExpect(jsonPath("$.challenges_with_proof_sum").exists())
+                .andExpect(jsonPath("$.challenges_accepted_proof_sum").exists())
+                .andExpect(jsonPath("$.full_sum").exists())
                 .andReturn().response.contentAsString
 
         println(response)

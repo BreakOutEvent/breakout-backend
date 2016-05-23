@@ -22,6 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.*
+import java.math.BigDecimal
 import javax.validation.Valid
 
 @RestController
@@ -225,5 +226,14 @@ open class TeamController {
     @RequestMapping("/{id}/distance/", method = arrayOf(GET))
     open fun getTeamDistance(@PathVariable("id") teamId: Long): Map<String, Double> {
         return teamService.getDistance(teamId)
+    }
+
+    /**
+     * GET /event/{eventId}/team/{id}/donatesum/
+     * Get the sponsored sums per team
+     */
+    @RequestMapping("/{id}/donatesum/", method = arrayOf(GET))
+    open fun getTeamDonateSum(@PathVariable("id") teamId: Long): Map<String, BigDecimal> {
+        return teamService.getDonateSum(teamId)
     }
 }

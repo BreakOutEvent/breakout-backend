@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RequestMethod.POST
+import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import javax.validation.Valid
@@ -80,5 +81,14 @@ open class EventController {
     @RequestMapping("/{id}/distance/", method = arrayOf(GET))
     open fun getEventDistance(@PathVariable("id") id: Long): Map<String, Double> {
         return eventService.getDistance(id)
+    }
+
+    /**
+     * GET /event/{id}/donatesum/
+     * Returns the sum of the distance of all teams of the event with {id}
+     */
+    @RequestMapping("/{id}/donatesum/", method = arrayOf(GET))
+    open fun getEventDonateSum(@PathVariable("id") id: Long): Map<String, BigDecimal> {
+        return eventService.getDonateSum(id)
     }
 }

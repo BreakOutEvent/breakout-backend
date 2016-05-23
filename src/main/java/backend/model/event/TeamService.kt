@@ -6,6 +6,7 @@ import backend.model.misc.EmailAddress
 import backend.model.user.Participant
 import backend.model.user.User
 import org.springframework.security.access.prepost.PreAuthorize
+import java.math.BigDecimal
 
 interface TeamService {
 
@@ -97,4 +98,6 @@ interface TeamService {
     fun getFullTeamMailForMember(participants: Set<Participant>): List<Email>
 
     fun findByEventId(eventId: Long): List<Team>
+
+    fun getDonateSum(teamId: Long): Map<String, BigDecimal>
 }

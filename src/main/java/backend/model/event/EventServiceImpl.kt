@@ -7,10 +7,11 @@ import backend.util.distanceCoordsListKMfromStart
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.math.BigDecimal
 import java.time.LocalDateTime
 
 @Service
-class EventServiceImpl @Autowired constructor(val repository: EventRepository) : EventService {
+class EventServiceImpl @Autowired constructor(val repository: EventRepository, val teamService: TeamService) : EventService {
 
     override fun exists(id: Long) = this.repository.exists(id)
 
@@ -42,4 +43,26 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository) :
         return mapOf("actual_distance" to actualDistance, "linear_distance" to linearDistance)
     }
 
+    override fun getDonateSum(id: Long): Map<String, BigDecimal> {
+        val event = this.findById(id) ?: throw NotFoundException("event with id $id does not exist")
+
+        val sponsorSum = BigDecimal.ZERO
+        val withProofSum = BigDecimal.ZERO
+        val acceptedProofSum = BigDecimal.ZERO
+        val fullSum = BigDecimal.ZERO
+
+        event.teams.forEach { team ->
+            val donateSum = teamService.getDonateSum(team.id!!)
+            sponsorSum.add(donateSum["sponsoring_sum"]!!)
+            withProofSum.add(donateSum["challenges_with_proof_sum"]!!)
+            acceptedProofSum.add(donateSum["challenges_accepted_proof_sum"]!!)
+            fullSum.add(donateSum["full_sum"]!!)
+        }
+
+        return mapOf(
+                "sponsoring_sum" to sponsorSum,
+                "challenges_with_proof_sum" to withProofSum,
+                "challenges_accepted_proof_sum" to acceptedProofSum,
+                "full_sum" to fullSum)
+    }
 }
