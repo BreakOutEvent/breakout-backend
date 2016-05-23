@@ -4,20 +4,23 @@ import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.challenges.ChallengeStatus.*
 import backend.model.event.Team
+import backend.model.media.Media
+import backend.model.media.MediaType.DOCUMENT
 import backend.model.misc.EmailAddress
 import backend.model.posting.Posting
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
 import org.javamoney.moneta.Money
-import javax.persistence.Embedded
-import javax.persistence.Entity
-import javax.persistence.ManyToOne
-import javax.persistence.OneToOne
+import javax.persistence.*
+import javax.persistence.CascadeType.ALL
 
 @Entity
 class Challenge : BasicEntity {
 
     lateinit var description: String
+
+    @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true)
+    lateinit var contract: Media
 
     var status: ChallengeStatus = PROPOSED
         private set (value) {
@@ -107,6 +110,7 @@ class Challenge : BasicEntity {
         this.team = team
         this.amount = amount
         this.description = description
+        this.contract = Media(DOCUMENT)
     }
 
     constructor(unregisteredSponsor: UnregisteredSponsor, team: Team, amount: Money, description: String) {
@@ -115,6 +119,7 @@ class Challenge : BasicEntity {
         this.amount = amount
         this.description = description
         this.status = ACCEPTED
+        this.contract = Media(DOCUMENT)
     }
 
     fun accept() {

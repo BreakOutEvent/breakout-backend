@@ -33,6 +33,8 @@ class ChallengeView {
     @Size(max = 1000)
     var description: String? = null
 
+    var contract: MediaView? = null
+
     /**
      * no-args constructor for Jackson
      */
@@ -46,12 +48,14 @@ class ChallengeView {
         this.teamId = challenge.team!!.id!!
         this.team = challenge.team!!.name
         this.status = challenge.status.toString().toUpperCase()
+        this.contract = MediaView(challenge.contract)
 
         // Add information about registered sponsor
         // if he exists and isHidden is false
         challenge.sponsor?.isHidden?.let {
             if (it) {
                 this.sponsorIsHidden = true
+                this.contract = null
             } else {
                 this.userId = challenge.sponsor?.core?.id
                 this.sponsorId = challenge.sponsor?.id
@@ -61,8 +65,12 @@ class ChallengeView {
         // Add information about unregistered sponsor
         // if he exists and isHidden is false
         challenge.unregisteredSponsor?.isHidden?.let {
-            if (it) this.sponsorIsHidden = true
-            else this.unregisteredSponsor = UnregisteredSponsorView(challenge.unregisteredSponsor!!)
+            if (it) {
+                this.sponsorIsHidden = true
+                this.contract = null
+            } else {
+                this.unregisteredSponsor = UnregisteredSponsorView(challenge.unregisteredSponsor!!)
+            }
         }
     }
 }

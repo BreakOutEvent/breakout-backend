@@ -59,6 +59,8 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.team").value(team.name))
                 .andExpect(jsonPath("$.teamId").value(team.id!!.toInt()))
                 .andExpect(jsonPath("$.status").value("PROPOSED"))
+                .andExpect(jsonPath("$.contract").exists())
+                .andExpect(jsonPath("$.contract.uploadToken").exists())
     }
 
     @Test
@@ -107,6 +109,8 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.unregisteredSponsor.gender").exists())
                 .andExpect(jsonPath("$.unregisteredSponsor.hidden").exists())
                 .andExpect(jsonPath("$.unregisteredSponsor.address").exists())
+                .andExpect(jsonPath("$.contract").exists())
+                .andExpect(jsonPath("$.contract.uploadToken").exists())
     }
 
     @Test
@@ -232,6 +236,7 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[0].team").exists())
                 .andExpect(jsonPath("$.[0].teamId").exists())
                 .andExpect(jsonPath("$.[0].status").exists())
+                .andExpect(jsonPath("$.[0].contract.uploadToken").doesNotExist())
                 .andExpect(jsonPath("$.[1].description").exists())
                 .andExpect(jsonPath("$.[1].amount").exists())
                 .andExpect(jsonPath("$.[1].sponsorId").doesNotExist())
@@ -249,6 +254,7 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[1].status").exists())
                 .andExpect(jsonPath("$.[1].id").exists())
                 .andExpect(jsonPath("$.[1].eventId").exists())
+                .andExpect(jsonPath("$.[1].contract.uploadToken").doesNotExist())
     }
 
     @Test
@@ -360,6 +366,7 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[0].team").exists())
                 .andExpect(jsonPath("$.[0].teamId").exists())
                 .andExpect(jsonPath("$.[0].status").exists())
+                .andExpect(jsonPath("$.[0].contract").doesNotExist())
                 .andExpect(jsonPath("$.[1].description").exists())
                 .andExpect(jsonPath("$.[1].amount").exists())
                 .andExpect(jsonPath("$.[1].sponsorId").doesNotExist())
@@ -369,6 +376,7 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[1].team").exists())
                 .andExpect(jsonPath("$.[1].teamId").exists())
                 .andExpect(jsonPath("$.[1].status").exists())
+                .andExpect(jsonPath("$.[1].contract").doesNotExist())
     }
 
     @Test

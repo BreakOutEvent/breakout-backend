@@ -12,6 +12,7 @@ import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
 import backend.model.user.User
 import backend.model.user.UserService
+import backend.services.ConfigurationService
 import backend.util.euroOf
 import backend.view.ChallengeStatusView
 import backend.view.ChallengeView
@@ -31,13 +32,22 @@ open class ChallengeController {
     private var postingService: PostingService
     private var teamService: TeamService
     private var userService: UserService
+    private var configurationService: ConfigurationService
+    private var jwtSecret: String
 
     @Autowired
-    constructor(challengeService: ChallengeService, userService: UserService, teamService: TeamService, postingService: PostingService) {
+    constructor(challengeService: ChallengeService,
+                userService: UserService,
+                teamService: TeamService,
+                postingService: PostingService,
+                configurationService: ConfigurationService) {
+
         this.challengeService = challengeService
         this.userService = userService
         this.teamService = teamService
         this.postingService = postingService
+        this.configurationService = configurationService
+        this.jwtSecret = configurationService.getRequired("org.breakout.api.jwt_secret")
     }
 
     /**
@@ -86,6 +96,7 @@ open class ChallengeController {
     private fun challengeWithRegisteredSponsor(user: User, team: Team, amount: Money, description: String): ChallengeView {
         val sponsor = user.getRole(Sponsor::class) ?: throw UnauthorizedException("User is no sponsor")
         val challenge = challengeService.proposeChallenge(sponsor, team, amount, description)
+        challenge.contract.generateSignedUploadToken(jwtSecret)
         return ChallengeView(challenge)
     }
 
@@ -102,6 +113,7 @@ open class ChallengeController {
                 isHidden = unregisteredSponsor.isHidden)
 
         val challenge = challengeService.proposeChallenge(sponsor, team, amount, description)
+        challenge.contract.generateSignedUploadToken(jwtSecret)
         return ChallengeView(challenge)
     }
 
