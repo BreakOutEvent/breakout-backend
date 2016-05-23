@@ -26,6 +26,8 @@ class SponsoringView() {
 
     var status: String? = null
 
+    var contract: MediaView? = null
+
     @Valid
     var unregisteredSponsor: UnregisteredSponsorView? = null
 
@@ -40,11 +42,14 @@ class SponsoringView() {
         this.limit = sponsoring.limit.numberStripped.toDouble()
         this.status = sponsoring.status.toString().toUpperCase()
 
+        this.contract = sponsoring.contract.let { MediaView(it) }
+
         // Add information about registered sponsor
         // if he exists and isHidden is false
         sponsoring.sponsor?.isHidden?.let {
             if (it) {
                 this.sponsorIsHidden = true
+                this.contract = null
             } else {
                 this.userId = sponsoring.sponsor?.core?.id
                 this.sponsorId = sponsoring.sponsor?.id
@@ -54,8 +59,12 @@ class SponsoringView() {
         // Add information about unregistered sponsor
         // if he exists and isHidden is false
         sponsoring.unregisteredSponsor?.isHidden?.let {
-            if (it) this.sponsorIsHidden = true
-            else this.unregisteredSponsor = UnregisteredSponsorView(sponsoring.unregisteredSponsor!!)
+            if (it) {
+                this.sponsorIsHidden = true
+                this.contract = null
+            } else {
+                this.unregisteredSponsor = UnregisteredSponsorView(sponsoring.unregisteredSponsor!!)
+            }
         }
     }
 }

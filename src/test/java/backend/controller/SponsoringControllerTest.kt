@@ -161,6 +161,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[0].id").value(sponsoring1.id!!.toInt()))
                 .andExpect(jsonPath("$.[0].eventId").value(event.id!!.toInt()))
                 .andExpect(jsonPath("$.[0].unregisteredSponsor").doesNotExist())
+                .andExpect(jsonPath("$.[0].contract").doesNotExist())
                 .andExpect(jsonPath("$.[1].amountPerKm").exists())
                 .andExpect(jsonPath("$.[1].sponsorIsHidden").value(true))
                 .andExpect(jsonPath("$.[1].limit").exists())
@@ -171,7 +172,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[1].id").value(sponsoring2.id!!.toInt()))
                 .andExpect(jsonPath("$.[1].eventId").value(event.id!!.toInt()))
                 .andExpect(jsonPath("$.[1].unregisteredSponsor").doesNotExist())
-
+                .andExpect(jsonPath("$.[1].contract").doesNotExist())
     }
 
     @Test
@@ -198,6 +199,9 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.userId").exists())
                 .andExpect(jsonPath("$.status").value("PROPOSED"))
                 .andExpect(jsonPath("$.unregisteredSponsor").doesNotExist())
+                .andExpect(jsonPath("$.contract.type").exists())
+                .andExpect(jsonPath("$.contract.id").exists())
+                .andExpect(jsonPath("$.contract.uploadToken").exists())
     }
 
     @Test
@@ -268,6 +272,9 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.status").value("ACCEPTED"))
                 .andExpect(jsonPath("$.sponsorId").doesNotExist())
                 .andExpect(jsonPath("$.userId").doesNotExist())
+                .andExpect(jsonPath("$.contract.type").exists())
+                .andExpect(jsonPath("$.contract.id").exists())
+                .andExpect(jsonPath("$.contract.uploadToken").exists())
                 .andExpect(jsonPath("$.unregisteredSponsor.firstname").value("Florian"))
                 .andExpect(jsonPath("$.unregisteredSponsor.lastname").value("Schmidt"))
                 .andExpect(jsonPath("$.unregisteredSponsor.url").value("www.florianschmidt.me"))

@@ -12,6 +12,8 @@ import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Participant
 import backend.model.user.Sponsor
 import backend.model.user.UserService
+import backend.services.ConfigurationService
+import backend.util.getSignedJwtToken
 import backend.view.SponsoringView
 import backend.view.UnregisteredSponsorView
 import org.javamoney.moneta.Money
@@ -29,15 +31,20 @@ open class SponsoringController {
     private var sponsoringService: SponsoringService
     private var userService: UserService
     private var teamService: TeamService
+    private var configurationService: ConfigurationService
+    private var jwtSecret: String
 
     @Autowired
     constructor(sponsoringService: SponsoringService,
                 userService: UserService,
-                teamService: TeamService) {
+                teamService: TeamService,
+                configurationService: ConfigurationService) {
 
+        this.configurationService = configurationService
         this.sponsoringService = sponsoringService
         this.userService = userService
         this.teamService = teamService
+        this.jwtSecret = configurationService.getRequired("org.breakout.api.jwt_secret")
     }
 
     /**
@@ -113,6 +120,7 @@ open class SponsoringController {
             createSponsoringWithAuthenticatedSponsor(team, amountPerKm, limit, sponsor)
         }
 
+        sponsoring.contract.uploadToken = getSignedJwtToken(jwtSecret, sponsoring.id!!.toString())
         return SponsoringView(sponsoring)
     }
 
