@@ -1,7 +1,10 @@
-package backend.services
+package backend.services.fakeservices
 
 import backend.model.misc.Email
 import backend.model.misc.EmailRepository
+import backend.services.ConfigurationService
+import backend.services.MailService
+import backend.services.MailServiceImpl
 import backend.util.Profiles.DEVELOPMENT
 import backend.util.Profiles.TEST
 import org.slf4j.LoggerFactory

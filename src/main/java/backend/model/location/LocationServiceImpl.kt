@@ -2,6 +2,7 @@ package backend.model.location
 
 import backend.model.misc.Coord
 import backend.model.user.Participant
+import backend.services.GeoCodingService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -11,10 +12,12 @@ import javax.transaction.Transactional
 class LocationServiceImpl : LocationService {
 
     private val locationRepository: LocationRepository
+    private val geoCodingService: GeoCodingService
 
     @Autowired
-    constructor(locationRepository: LocationRepository) {
+    constructor(locationRepository: LocationRepository, geoCodingService: GeoCodingService) {
         this.locationRepository = locationRepository
+        this.geoCodingService = geoCodingService
     }
 
     override fun findAll(): Iterable<Location> {
@@ -27,7 +30,9 @@ class LocationServiceImpl : LocationService {
 
     @Transactional
     override fun create(coord: Coord, participant: Participant, date: LocalDateTime): Location {
-        val location = Location(coord, participant, date)
+
+        val locationData = geoCodingService.getGeoCoded(coord)
+        val location = Location(coord, participant, date, locationData)
         return locationRepository.save(location)
     }
 

@@ -28,6 +28,8 @@ class LocationView {
 
     var isDuringEvent: Boolean? = null
 
+    var locationData: Map<String, String> = mapOf()
+
     @NotNull
     val date: Long
 
@@ -45,6 +47,7 @@ class LocationView {
         this.event = location.team?.event?.title
         this.eventId = location.team?.event?.id
         this.isDuringEvent = location.isDuringEvent()
+        this.locationData = location.locationData
     }
 
     @JsonCreator
