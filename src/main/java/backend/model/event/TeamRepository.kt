@@ -12,9 +12,9 @@ interface TeamRepository : CrudRepository<Team, Long> {
     fun findPostingsById(@Param("id") id: Long): List<Long>
 
     @Query("Select l from Location l inner join l.team t where t.id = :id order by l.date asc")
-    fun findLocationPostingsById(@Param("id") id: Long): List<Location>
+    fun findLocationByTeamId(@Param("id") id: Long): List<Location>
 
-    @Query("Select l from Location l inner join l.team t where t.id = :id order by l.distance asc")
+    @Query("Select l from Location l inner join l.team t where t.id = :id order by l.distance desc")
     fun getLocationMaxDistanceById(@Param("id") id: Long): List<Location>
 
     @Query("Select i from Invitation i where i.invitee.value = :email")

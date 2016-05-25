@@ -76,14 +76,14 @@ class TeamServiceImpl : TeamService {
 
     override fun findPostingsById(id: Long) = repository.findPostingsById(id)
 
-    override fun findLocationPostingsById(id: Long) = repository.findLocationPostingsById(id)
+    override fun findLocationPostingsById(id: Long) = repository.findLocationByTeamId(id)
 
     override fun getLocationMaxDistanceById(id: Long): Location? {
-        val postingList = repository.getLocationMaxDistanceById(id)
-        if (postingList.size <= 0) {
+        val locationList = repository.getLocationMaxDistanceById(id)
+        if (locationList.size <= 0) {
             return null
         } else {
-            return postingList.first()
+            return locationList.first()
         }
     }
 
@@ -95,14 +95,14 @@ class TeamServiceImpl : TeamService {
         return repository.findInvitationsWithEmailAndEventId(user.email, eventId)
     }
 
-    override fun getLinearDistanceForTeamFromPostings(teamId: Long): Double {
-        val postingDistance = this.getLocationMaxDistanceById(teamId)
-        val distance = postingDistance?.distance ?: 0.0
+    override fun getLinearDistanceForTeam(teamId: Long): Double {
+        val locationDistance = this.getLocationMaxDistanceById(teamId)
+        val distance = locationDistance?.distance ?: 0.0
 
         return distance
     }
 
-    override fun getActualDistanceForTeamFromPostings(teamId: Long): Double {
+    override fun getActualDistanceForTeam(teamId: Long): Double {
 
         val team: Team = this.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")
         val startingCoordinates = team.event.startingLocation
@@ -133,8 +133,8 @@ class TeamServiceImpl : TeamService {
     }
 
     override fun getDistance(teamId: Long): Map<String, Double> {
-        val linearDistance = this.getLinearDistanceForTeamFromPostings(teamId)
-        val actualDistance = this.getActualDistanceForTeamFromPostings(teamId)
+        val linearDistance = this.getLinearDistanceForTeam(teamId)
+        val actualDistance = this.getActualDistanceForTeam(teamId)
 
         return mapOf("actual_distance" to actualDistance, "linear_distance" to linearDistance)
     }
@@ -175,7 +175,7 @@ class TeamServiceImpl : TeamService {
     }
 
     fun getSponsoringSum(team: Team): BigDecimal {
-        val distanceKm = this.getLinearDistanceForTeamFromPostings(team.id!!)
+        val distanceKm = this.getLinearDistanceForTeam(team.id!!)
         val sponsorSum = BigDecimal.ZERO
 
         team.sponsoring.forEach { sponsoring ->
