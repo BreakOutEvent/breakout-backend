@@ -1,11 +1,13 @@
 package backend.model.challenges
 
+import backend.exceptions.DomainException
 import backend.model.event.Team
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.posting.Posting
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
+import backend.services.FeatureFlagService
 import backend.services.MailService
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,14 +17,19 @@ import javax.transaction.Transactional
 @Service
 class ChallengeServiceImpl : ChallengeService {
 
-    private lateinit var challengeRepository: ChallengeRepository
+    private val challengeRepository: ChallengeRepository
     private val mailService: MailService
+    private val featureFlagService: FeatureFlagService
 
 
     @Autowired
-    constructor(challengeRepository: ChallengeRepository, mailService: MailService) {
+    constructor(challengeRepository: ChallengeRepository,
+                mailService: MailService,
+                featureFlagService: FeatureFlagService) {
+
         this.challengeRepository = challengeRepository
         this.mailService = mailService
+        this.featureFlagService = featureFlagService
     }
 
     @Transactional
@@ -39,8 +46,12 @@ class ChallengeServiceImpl : ChallengeService {
 
     @Transactional
     override fun addProof(challenge: Challenge, proof: Posting): Challenge {
-        challenge.addProof(proof)
-        return challengeRepository.save(challenge)
+        if (featureFlagService.isEnabled("challenge.addProof")) {
+            challenge.addProof(proof)
+            return challengeRepository.save(challenge)
+        } else {
+            throw DomainException("Can't add proof to challenge. Feature disabled")
+        }
     }
 
     @Transactional

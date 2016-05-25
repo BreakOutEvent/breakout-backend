@@ -26,6 +26,8 @@ import backend.model.sponsoring.SponsoringService
 import backend.model.user.User
 import backend.model.user.UserRepository
 import backend.model.user.UserService
+import backend.services.FeatureFlagService
+import backend.services.FeatureRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.Before
 import org.junit.runner.RunWith
@@ -74,6 +76,7 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var sponsoringRepository: SponsoringRepository
     @Autowired lateinit protected var groupMessageRepository: GroupMessageRepository
     @Autowired lateinit protected var challengeRepository: ChallengeRepository
+    @Autowired lateinit protected var featureReposity: FeatureRepository
 
     // Services
     @Autowired lateinit protected var userService: UserService
@@ -90,6 +93,7 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var groupMessageService: GroupMessageService
     @Autowired lateinit protected var userDetailsService: UserDetailsService
     @Autowired lateinit protected var challengeService: ChallengeService
+    @Autowired lateinit protected var featureService: FeatureFlagService
 
     lateinit protected var mockMvc: MockMvc
 
