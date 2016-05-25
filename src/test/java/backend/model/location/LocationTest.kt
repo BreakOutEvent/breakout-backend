@@ -41,7 +41,7 @@ class LocationTest {
         Mockito.`when`(team.event).thenReturn(event)
         Mockito.`when`(event.startingLocation).thenReturn(Coord(100.0, 203.7))
 
-        location = Location(coord, participant, date)
+        location = Location(coord, participant, date, mapOf("COUNTRY" to "Germany"))
     }
 
     @Test

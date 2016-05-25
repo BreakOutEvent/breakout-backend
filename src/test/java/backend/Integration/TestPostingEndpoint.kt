@@ -76,6 +76,8 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.postingLocation.longitude").exists())
                 .andExpect(jsonPath("$.postingLocation.date").exists())
                 .andExpect(jsonPath("$.postingLocation.distance").exists())
+                .andExpect(jsonPath("$.postingLocation.locationData").exists())
+                .andExpect(jsonPath("$.postingLocation.locationData.COUNTRY").value("Germany"))
                 .andExpect(jsonPath("$.media[0].type").exists())
                 .andExpect(jsonPath("$.media[0].id").exists())
                 .andExpect(jsonPath("$.media[0].uploadToken").exists())
@@ -218,6 +220,8 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.postingLocation.latitude").exists())
                 .andExpect(jsonPath("$.postingLocation.longitude").exists())
+                .andExpect(jsonPath("$.postingLocation.locationData").exists())
+                .andExpect(jsonPath("$.postingLocation.locationData.COUNTRY").value("Germany"))
                 .andExpect(jsonPath("$.postingLocation.date").exists())
                 .andExpect(jsonPath("$.postingLocation.distance").exists())
                 .andExpect(jsonPath("$.date").exists())
@@ -286,6 +290,8 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.postingLocation.longitude").exists())
                 .andExpect(jsonPath("$.postingLocation.date").exists())
                 .andExpect(jsonPath("$.postingLocation.distance").exists())
+                .andExpect(jsonPath("$.postingLocation.locationData").exists())
+                .andExpect(jsonPath("$.postingLocation.locationData.COUNTRY").value("Germany"))
                 .andReturn().response.contentAsString
 
         println(response)

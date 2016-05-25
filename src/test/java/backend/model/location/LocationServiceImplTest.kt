@@ -42,7 +42,7 @@ class LocationServiceImplTest : IntegrationTest() {
 
     @Test
     fun testSave() {
-        val location = Location(Coord(0.0, 0.0), user.getRole(Participant::class)!!, LocalDateTime.now())
+        val location = Location(Coord(0.0, 0.0), user.getRole(Participant::class)!!, LocalDateTime.now(), mapOf())
         locationService.save(location)
 
         val foundLocations = locationService.findAll()

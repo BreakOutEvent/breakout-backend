@@ -56,8 +56,10 @@ class TestTeamEndpoint : IntegrationTest() {
         invitee = userRepository.findOne(inviteeCredentials.id.toLong())
         team = teamService.create(creator as Participant, "name", "description", event)
 
-        val firstLocation = Location(Coord(1.0, 1.0), creator.getRole(Participant::class)!!, LocalDateTime.now())
-        val secondLocation = Location(Coord(1.2, 2.0), creator.getRole(Participant::class)!!, LocalDateTime.now())
+        val fakeLocationData = mapOf("COUNTRY" to "Germany")
+
+        val firstLocation = Location(Coord(1.0, 1.0), creator.getRole(Participant::class)!!, LocalDateTime.now(), fakeLocationData)
+        val secondLocation = Location(Coord(1.2, 2.0), creator.getRole(Participant::class)!!, LocalDateTime.now(), fakeLocationData)
 
         postingService.save(Posting("test", LocalDateTime.now(), firstLocation, creator.core, null))
         postingService.save(Posting("test", LocalDateTime.now(), secondLocation, creator.core, null))

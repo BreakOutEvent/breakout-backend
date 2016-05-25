@@ -82,10 +82,14 @@ class LocationControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$[0].teamId").exists())
                 .andExpect(jsonPath("$[0].eventId").exists())
                 .andExpect(jsonPath("$[0].event").exists())
+                .andExpect(jsonPath("$[0].locationData").exists())
+                .andExpect(jsonPath("$[0].locationData.COUNTRY").value("Germany"))
                 .andExpect(jsonPath("$[1].team").exists())
                 .andExpect(jsonPath("$[1].teamId").exists())
                 .andExpect(jsonPath("$[1].eventId").exists())
                 .andExpect(jsonPath("$[1].event").exists())
+                .andExpect(jsonPath("$[1].locationData").exists())
+                .andExpect(jsonPath("$[1].locationData.COUNTRY").value("Germany"))
     }
 
     @Test
@@ -107,6 +111,9 @@ class LocationControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$[0].teamId").exists())
                 .andExpect(jsonPath("$[0].eventId").exists())
                 .andExpect(jsonPath("$[0].event").exists())
+                .andExpect(jsonPath("$[0].locationData").exists())
+                .andExpect(jsonPath("$[0].locationData.COUNTRY").value("Germany"))
+
     }
 
 
@@ -133,6 +140,8 @@ class LocationControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.eventId").exists())
                 .andExpect(jsonPath("$.event").exists())
                 .andExpect(jsonPath("$.duringEvent").exists())
+                .andExpect(jsonPath("$.locationData").exists())
+                .andExpect(jsonPath("$.locationData.COUNTRY").value("Germany"))
                 .andReturn().response.contentAsString
 
         println(resp)
@@ -168,6 +177,8 @@ class LocationControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.teamId").exists())
                 .andExpect(jsonPath("$.eventId").exists())
                 .andExpect(jsonPath("$.event").exists())
+                .andExpect(jsonPath("$.locationData").exists())
+                .andExpect(jsonPath("$.locationData.COUNTRY").value("Germany"))
                 .andExpect(jsonPath("$.duringEvent").value(true))
                 .andReturn().response.contentAsString
 
@@ -203,6 +214,8 @@ class LocationControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.teamId").exists())
                 .andExpect(jsonPath("$.eventId").exists())
                 .andExpect(jsonPath("$.event").exists())
+                .andExpect(jsonPath("$.locationData").exists())
+                .andExpect(jsonPath("$.locationData.COUNTRY").value("Germany"))
                 .andExpect(jsonPath("$.duringEvent").value(false))
                 .andReturn().response.contentAsString
 
@@ -238,6 +251,8 @@ class LocationControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.teamId").exists())
                 .andExpect(jsonPath("$.eventId").exists())
                 .andExpect(jsonPath("$.event").exists())
+                .andExpect(jsonPath("$.locationData").exists())
+                .andExpect(jsonPath("$.locationData.COUNTRY").value("Germany"))
                 .andExpect(jsonPath("$.duringEvent").value(false))
                 .andReturn().response.contentAsString
 
@@ -272,9 +287,14 @@ class LocationControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$[0].teamId").exists())
                 .andExpect(jsonPath("$[0].eventId").exists())
                 .andExpect(jsonPath("$[0].event").exists())
+                .andExpect(jsonPath("$[0].locationData").exists())
+                .andExpect(jsonPath("$[0].locationData.COUNTRY").value("Germany"))
                 .andExpect(jsonPath("$[1].team").exists())
                 .andExpect(jsonPath("$[1].teamId").exists())
                 .andExpect(jsonPath("$[1].eventId").exists())
                 .andExpect(jsonPath("$[1].event").exists())
+                .andExpect(jsonPath("$[1].locationData").exists())
+                .andExpect(jsonPath("$[1].locationData.COUNTRY").value("Germany"))
+
     }
 }
