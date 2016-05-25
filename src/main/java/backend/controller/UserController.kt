@@ -16,6 +16,7 @@ import backend.view.SimpleUserView
 import backend.view.UserView
 import io.swagger.annotations.Api
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
@@ -103,6 +104,7 @@ open class UserController {
      * GET /user/
      * Gets all users
      */
+    @Cacheable("showUsers")
     @RequestMapping("/", method = arrayOf(GET))
     open fun showUsers(): Iterable<BasicUserView> {
         return userService.getAllUsers().map { BasicUserView(it) };
