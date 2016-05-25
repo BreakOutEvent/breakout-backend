@@ -46,6 +46,11 @@ class Feature : BasicEntity {
 
     var isEnabled: Boolean = false
 
+    /**
+     * private no-args constructor for hibernate / jpa
+     * */
+    private constructor()
+
     constructor(name: String, isEnabled: Boolean) : super() {
         this.name = name
         this.isEnabled = isEnabled
