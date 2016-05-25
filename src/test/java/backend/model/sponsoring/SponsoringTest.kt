@@ -123,6 +123,19 @@ class SponsoringTest {
     }
 
     @Test
+    fun testMulipleAccept() {
+        val team = PowerMockito.mock(Team::class.java)
+        val amountPerKm = euroOf(1.0)
+        val limit = euroOf(100)
+        val sponsor = PowerMockito.mock(Sponsor::class.java)
+        val sponsoring = Sponsoring(sponsor, team, amountPerKm, limit)
+
+        assertEquals(PROPOSED, sponsoring.status)
+        sponsoring.accept()
+        assertEquals(ACCEPTED, sponsoring.status)
+    }
+
+    @Test
     fun testReject() {
         val team = PowerMockito.mock(Team::class.java)
         val amountPerKm = euroOf(1.0)

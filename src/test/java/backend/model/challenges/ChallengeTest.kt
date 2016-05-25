@@ -67,6 +67,19 @@ class ChallengeTest {
     }
 
     @Test
+    fun testMutipleAccept() {
+        val sponsor = PowerMockito.mock(Sponsor::class.java)
+        val team = PowerMockito.mock(Team::class.java)
+
+        val challenge = Challenge(sponsor, team, euroOf(50), "description")
+
+        assertEquals(PROPOSED, challenge.status)
+        challenge.accept()
+        challenge.accept()
+        assertEquals(ACCEPTED, challenge.status)
+    }
+
+    @Test
     fun testReject() {
         val sponsor = PowerMockito.mock(Sponsor::class.java)
         val team = PowerMockito.mock(Team::class.java)

@@ -25,7 +25,8 @@ class Sponsoring : BasicEntity {
         }
 
     private fun checkTransition(from: SponsoringStatus, to: SponsoringStatus) {
-        if (unregisteredSponsor != null) checkTransitionForUnregisteredSponsor(from, to)
+        if (from == to) return
+        else if (unregisteredSponsor != null) checkTransitionForUnregisteredSponsor(from, to)
         else if (sponsor != null) checkTransitionForRegisteredSponsor(from, to)
         else throw Exception("Sponsoring has neither Sponsor")
     }
