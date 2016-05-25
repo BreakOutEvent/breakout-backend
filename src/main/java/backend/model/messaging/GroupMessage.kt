@@ -14,6 +14,7 @@ class GroupMessage : BasicEntity {
     var users: MutableList<UserCore> = ArrayList()
 
     @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+    @OrderBy("date ASC")
     var messages: MutableList<Message> = ArrayList()
 
     constructor(creator: UserCore) : this() {
