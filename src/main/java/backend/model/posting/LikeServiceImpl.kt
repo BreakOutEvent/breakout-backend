@@ -30,4 +30,13 @@ class LikeServiceImpl @Autowired constructor(val repository: LikeRepository) : L
     override fun findAll(): Iterable<Like> = repository.findAll()
 
     override fun getByID(id: Long): Like? = repository.findById(id)
+
+    @Transactional
+    override fun deleteLike(posting: Posting, user: UserCore) {
+        val like = posting.likes.filter { it.user!!.core.id == user.id }.firstOrNull()
+        if (like != null) {
+            repository.delete(like)
+        }
+        posting.likes.remove(like)
+    }
 }

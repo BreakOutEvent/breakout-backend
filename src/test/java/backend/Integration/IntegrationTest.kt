@@ -129,6 +129,10 @@ abstract class IntegrationTest {
         return MockMvcRequestBuilders.get(path)
     }
 
+    fun delete(path: String): MockHttpServletRequestBuilder {
+        return MockMvcRequestBuilders.delete(path)
+    }
+
     fun setAuthenticatedUser(email: String) {
         val details = userDetailsService.loadUserByUsername(email)!! // Not null because otherwise exception is thrown
         val token = UsernamePasswordAuthenticationToken(details.username, details.password, details.authorities)

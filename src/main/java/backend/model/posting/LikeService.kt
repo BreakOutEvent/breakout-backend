@@ -15,4 +15,6 @@ interface LikeService {
 
     fun save(like: Like): Like?
 
+    fun deleteLike(posting: Posting, user: UserCore)
+
 }

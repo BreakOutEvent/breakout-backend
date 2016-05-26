@@ -20,8 +20,7 @@ import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.GET
-import org.springframework.web.bind.annotation.RequestMethod.POST
+import org.springframework.web.bind.annotation.RequestMethod.*
 import javax.validation.Valid
 
 @RestController
@@ -153,6 +152,23 @@ open class PostingController {
         val like = likeService.createLike(localDateTimeOf(body.date!!), posting, user.core)
 
         return LikeView(like)
+    }
+
+
+    /**
+     * DELETE /posting/{id}/like/
+     * creates Like for Posting
+     */
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping("/{id}/like/", method = arrayOf(DELETE))
+    open fun deleteLike(@PathVariable("id") id: Long,
+                        @AuthenticationPrincipal customUserDetails: CustomUserDetails): Map<String, String> {
+
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
+        val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
+        likeService.deleteLike(posting, user.core)
+
+        return mapOf("message" to "success")
     }
 
     /**
