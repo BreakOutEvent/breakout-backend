@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.*
 import java.time.LocalDate
@@ -104,9 +104,10 @@ open class UserController {
      * GET /user/
      * Gets all users
      */
-    @Cacheable(cacheManager = "allCache", value = "allUsers")
+    @Cacheable(cacheNames = arrayOf("allCache"), key = "'allUsers'")
     @RequestMapping("/", method = arrayOf(GET))
     open fun showUsers(): Iterable<BasicUserView> {
+        println("Getting Users without Cache")
         return userService.getAllUsers().map { BasicUserView(it) };
     }
 

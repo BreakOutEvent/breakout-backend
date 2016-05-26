@@ -143,7 +143,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun getPostingsByHashTag() {
-        val posting = postingService.savePostingWithLocationAndMedia("hello #breakout", null, user.core, null, 0.0, LocalDateTime.now())
+        postingService.savePostingWithLocationAndMedia("hello #breakout", null, user.core, null, 0.0, LocalDateTime.now())
         postingService.savePostingWithLocationAndMedia("hello #awsome", null, user.core, null, 0.0, LocalDateTime.now())
 
         val request = MockMvcRequestBuilders

@@ -14,5 +14,5 @@ class Admin : UserRole {
 
     constructor(core: UserCore) : super(core)
 
-    override fun getAuthority(): String? = "ADMIN"
+    override fun getAuthority(): String = "ADMIN"
 }

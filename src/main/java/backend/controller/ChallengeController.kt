@@ -20,7 +20,7 @@ import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.*
 import javax.validation.Valid
@@ -55,12 +55,13 @@ open class ChallengeController {
      * Get a list of all sponsorings for the user with userId
      * This can only be done if the user is a sponsor
      */
-    @PreAuthorize("hasRole('SPONSOR')")
+    @PreAuthorize("hasAuthority('SPONSOR')")
     @RequestMapping("/user/{userId}/sponsor/challenge/", method = arrayOf(GET))
     open fun getAllChallengesForSponsor(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
                                         @PathVariable userId: Long): Iterable<ChallengeView> {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
+
         if (user.core.id != userId) throw UnauthorizedException("A sponsor can only see it's own challenges")
 
         val challenges = challengeService.findBySponsorId(userId)
