@@ -15,6 +15,8 @@ import backend.view.DetailedInvitationView
 import backend.view.SimpleUserView
 import backend.view.UserView
 import io.swagger.annotations.Api
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpStatus.CREATED
@@ -34,11 +36,13 @@ open class UserController {
     private val JWT_SECRET: String
     private val configurationService: ConfigurationService
     private val teamService: TeamService
+    private val logger: Logger
 
     @Autowired
     constructor(userService: UserService, teamService: TeamService, configurationService: ConfigurationService) {
         this.userService = userService
         this.configurationService = configurationService
+        this.logger = LoggerFactory.getLogger(UserController::class.java)
         this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
         this.teamService = teamService
     }
@@ -107,7 +111,7 @@ open class UserController {
     @Cacheable(cacheNames = arrayOf("allCache"), key = "'allUsers'")
     @RequestMapping("/", method = arrayOf(GET))
     open fun showUsers(): Iterable<BasicUserView> {
-        println("Getting Users without Cache")
+        logger.info("Getting all users without cache")
         return userService.getAllUsers().map { BasicUserView(it) };
     }
 

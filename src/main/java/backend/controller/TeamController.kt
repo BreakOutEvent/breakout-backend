@@ -16,6 +16,8 @@ import backend.services.ConfigurationService
 import backend.util.getSignedJwtToken
 import backend.view.InvitationView
 import backend.view.TeamView
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpStatus.CREATED
@@ -35,6 +37,7 @@ open class TeamController {
     private val JWT_SECRET: String
     private val configurationService: ConfigurationService
     private val userService: UserService
+    private val logger: Logger
 
     @Autowired
     constructor(teamService: TeamService,
@@ -47,6 +50,7 @@ open class TeamController {
         this.configurationService = configurationService
         this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
         this.userService = userService
+        this.logger = LoggerFactory.getLogger(TeamController::class.java)
     }
 
 
@@ -205,7 +209,7 @@ open class TeamController {
     @Cacheable(cacheNames = arrayOf("allCache"), key = "'allTeams'.concat(#eventId)")
     @RequestMapping("/", method = arrayOf(GET))
     open fun showTeamsByEvent(@PathVariable eventId: Long): Iterable<TeamView> {
-        println("Getting Team By Event without Cache")
+        logger.info("Getting team by event $eventId without cache")
         val teams = teamService.findByEventId(eventId)
         return teams.map {
             val teamDonateSum = teamService.getDonateSum(it)
