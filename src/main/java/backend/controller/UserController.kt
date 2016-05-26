@@ -104,7 +104,7 @@ open class UserController {
      * GET /user/
      * Gets all users
      */
-    @Cacheable("showUsers")
+    @Cacheable(cacheManager = "allCache", key = "allUsers")
     @RequestMapping("/", method = arrayOf(GET))
     open fun showUsers(): Iterable<BasicUserView> {
         return userService.getAllUsers().map { BasicUserView(it) };
