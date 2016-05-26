@@ -30,7 +30,7 @@ open class EventController {
      * POST /event/
      * Allows admin to create new event
      */
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(CREATED)
     @RequestMapping("/", method = arrayOf(POST))
     open fun createEvent(@Valid @RequestBody body: EventView): EventView {

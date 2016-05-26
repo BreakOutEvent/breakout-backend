@@ -43,11 +43,13 @@ before_install:
 after_success:
   - if [ ! -z "$TRAVIS_TAG" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
       echo "This will deploy!";
+      gradle clean;
       openssl aes-256-cbc -K $encrypted_a6989f7c6f70_key -iv $encrypted_a6989f7c6f70_iv -in application-production.properties.enc -out src/main/resources/application-production.properties -d;
       docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS $DOCKER_URL;
       docker build -f Dockerfile -t $DOCKER_REPO .;
       docker tag $DOCKER_REPO $DOCKER_URL/$DOCKER_REPO:$TRAVIS_TAG;
       docker push $DOCKER_URL/$DOCKER_REPO:$TRAVIS_TAG;
+      rm "/home/${USER}/.docker/config.json";
     else
-      echo "This will not deploy (no tag on master)!";
+      echo "This will not deploy (no tag)!";
     fi;

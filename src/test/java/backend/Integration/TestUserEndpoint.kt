@@ -466,7 +466,7 @@ class TestUserEndpoint : IntegrationTest() {
         }).getRole(Participant::class)!!
 
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
-        val team = teamService.create(creator, "team-name", "description", event)
+        teamService.create(creator, "team-name", "description", event)
 
 
         userService.create("secondTest@break-out.org", "password", {

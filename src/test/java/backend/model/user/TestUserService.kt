@@ -37,7 +37,7 @@ class TestUserService : IntegrationTest() {
         userService.create("second_test@mail.com", "password")
 
         assertNotNull(userService.getAllUsers())
-        assertEquals(userService.getAllUsers()!!.count(), 2)
+        assertEquals(userService.getAllUsers().count(), 2)
     }
 
     @Test
@@ -53,7 +53,7 @@ class TestUserService : IntegrationTest() {
         user.addRole(Participant::class)
         userService.save(user)
 
-        val foundUser = userService.getAllUsers()!!.first()
+        val foundUser = userService.getAllUsers().first()
         val foundParticipant = foundUser.getRole(Participant::class)
 
         assertNotNull(foundParticipant)

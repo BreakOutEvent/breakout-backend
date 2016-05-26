@@ -13,7 +13,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -42,7 +42,7 @@ open class InvoiceController {
      * POST /invoice/{id}/payment/
      * Allows admin to add payment to given invoice
      */
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping("/{invoiceId}/payment/", method = arrayOf(POST))
     open fun createPayment(@PathVariable invoiceId: Long,
                            @Valid @RequestBody paymentView: PaymentView,
@@ -63,7 +63,7 @@ open class InvoiceController {
      * GET /invoice/{id}/
      * Allows admin to get given invoice
      */
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping("/{invoiceId}/", method = arrayOf(GET))
     open fun getInvoice(@PathVariable invoiceId: Long,
                         @AuthenticationPrincipal customUserDetails: CustomUserDetails): TeamEntryFeeInvoiceView {

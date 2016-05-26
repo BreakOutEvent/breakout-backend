@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RequestMethod.POST

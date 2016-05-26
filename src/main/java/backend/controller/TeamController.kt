@@ -17,9 +17,10 @@ import backend.util.getSignedJwtToken
 import backend.view.InvitationView
 import backend.view.TeamView
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.*
 import java.math.BigDecimal
@@ -199,8 +200,10 @@ open class TeamController {
      * GET /event/{eventId}/team/
      * gets all Teams for Event
      */
+    @Cacheable(cacheNames = arrayOf("allCache"), key = "'allTeams'.concat(#eventId)")
     @RequestMapping("/", method = arrayOf(GET))
     open fun showTeamsByEvent(@PathVariable eventId: Long): Iterable<TeamView> {
+        println("Getting Team By Event without Cache")
         val teams = teamService.findByEventId(eventId)
         return teams.map { TeamView(it) }
     }

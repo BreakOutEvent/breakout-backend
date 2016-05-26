@@ -1,7 +1,6 @@
 package backend.controller
 
 import backend.Integration.IntegrationTest
-import backend.Integration.getTokens
 import backend.model.misc.Coord
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Address
@@ -255,8 +254,6 @@ class SponsoringControllerTest : IntegrationTest() {
                         )
                 )
         )
-
-        val tokens = getTokens(this.mockMvc, participant.email, "password")
 
         val request = post("/event/${event.id}/team/${team.id}/sponsoring/")
                 .asUser(mockMvc, participant.email, "password")
