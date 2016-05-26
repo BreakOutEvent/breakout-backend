@@ -8,7 +8,9 @@ import org.springframework.context.annotation.Profile;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-@Profile("heroku")
+import static backend.util.Profiles.HEROKU;
+
+@Profile(HEROKU)
 @Configuration
 public class HerokuConfiguration {
 
