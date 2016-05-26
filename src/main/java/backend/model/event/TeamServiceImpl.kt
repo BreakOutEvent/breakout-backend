@@ -132,6 +132,7 @@ class TeamServiceImpl : TeamService {
         }
     }
 
+    //TODO add caching
     override fun getDistance(teamId: Long): Map<String, Double> {
         val linearDistance = this.getLinearDistanceForTeam(teamId)
         val actualDistance = this.getActualDistanceForTeam(teamId)
@@ -209,9 +210,8 @@ class TeamServiceImpl : TeamService {
                 "challenges_accepted_proof_sum" to acceptedProofSum)
     }
 
-    override fun getDonateSum(teamId: Long): Map<String, BigDecimal> {
-        val team: Team = this.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")
-
+    //TODO add caching
+    override fun getDonateSum(team: Team): Map<String, BigDecimal> {
         val sponsorSum = getSponsoringSum(team)
 
         val challengesSum = getChallengeSum(team)
@@ -225,5 +225,12 @@ class TeamServiceImpl : TeamService {
                 "challenges_with_proof_sum" to challengesSum["challenges_with_proof_sum"]!!,
                 "challenges_accepted_proof_sum" to challengesSum["challenges_accepted_proof_sum"]!!,
                 "full_sum" to fullSum)
+    }
+
+
+    //TODO add caching
+    override fun getDonateSum(teamId: Long): Map<String, BigDecimal> {
+        val team: Team = this.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")
+        return getDonateSum(team)
     }
 }

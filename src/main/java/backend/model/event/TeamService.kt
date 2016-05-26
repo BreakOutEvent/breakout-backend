@@ -100,4 +100,6 @@ interface TeamService {
     fun findByEventId(eventId: Long): List<Team>
 
     fun getDonateSum(teamId: Long): Map<String, BigDecimal>
+
+    fun getDonateSum(team: Team): Map<String, BigDecimal>
 }

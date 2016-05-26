@@ -192,7 +192,9 @@ open class TeamController {
     @RequestMapping("/{teamId}/", method = arrayOf(GET))
     open fun showTeam(@PathVariable teamId: Long): TeamView {
         val team = teamService.findOne(teamId) ?: throw NotFoundException("team with id $teamId does not exist")
-        return TeamView(team)
+        val teamDonateSum = teamService.getDonateSum(teamId)
+        val teamDistance = teamService.getDistance(teamId)
+        return TeamView(team, teamDistance, teamDonateSum)
     }
 
     /**
@@ -202,7 +204,12 @@ open class TeamController {
     @RequestMapping("/", method = arrayOf(GET))
     open fun showTeamsByEvent(@PathVariable eventId: Long): Iterable<TeamView> {
         val teams = teamService.findByEventId(eventId)
-        return teams.map { TeamView(it) }
+        return teams.map {
+            val teamDonateSum = teamService.getDonateSum(it)
+            val teamDistance = teamService.getDistance(it.id!!)
+
+            TeamView(it, teamDistance, teamDonateSum)
+        }
     }
 
     /**
