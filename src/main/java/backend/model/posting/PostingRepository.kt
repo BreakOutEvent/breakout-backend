@@ -1,5 +1,6 @@
 package backend.model.posting
 
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
@@ -12,4 +13,6 @@ interface PostingRepository : CrudRepository<Posting, Long> {
 
     @Query("select p from Posting p inner join p.hashtags h where h.value = :hashtag")
     fun findByHashtag(@Param("hashtag") hashtag: String): Iterable<Posting>
+
+    fun findAll(pageable: Pageable): Iterable<Posting>
 }

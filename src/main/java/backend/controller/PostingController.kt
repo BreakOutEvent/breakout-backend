@@ -89,8 +89,15 @@ open class PostingController {
      * Gets all postings
      */
     @RequestMapping("/", method = arrayOf(GET))
-    open fun getAllPostings(@AuthenticationPrincipal customUserDetails: CustomUserDetails?): Iterable<PostingView> {
-        return postingService.findAll().map { PostingView(it.hasLikesBy(customUserDetails)) }
+    open fun getAllPostings(@RequestParam(value = "offset", required = false) offset: Int?,
+                            @RequestParam(value = "limit", required = false) limit: Int?,
+                            @AuthenticationPrincipal customUserDetails: CustomUserDetails?): Iterable<PostingView> {
+        if (limit == null) {
+            return postingService.findAll().map { PostingView(it.hasLikesBy(customUserDetails)) }
+        } else {
+            val off = offset ?: 0
+            return postingService.findAll(off, limit).map { PostingView(it.hasLikesBy(customUserDetails)) }
+        }
     }
 
     /**

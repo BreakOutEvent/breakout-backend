@@ -12,6 +12,8 @@ interface PostingService {
 
     fun createPosting(user: User, text: String?, uploadMediaTypes: List<String>?, postingLocation: LocationView?, date: Long?): Posting
 
+    fun findAll(offset: Int, limit: Int): Iterable<Posting>
+
     fun findAll(): Iterable<Posting>
 
     fun getByID(id: Long): Posting?

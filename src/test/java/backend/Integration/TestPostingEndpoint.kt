@@ -767,8 +767,9 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun getAllPostings() {
 
-        postingService.savePostingWithLocationAndMedia("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
-        postingService.savePostingWithLocationAndMedia("Test 2", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
+        for (i in 1..200) {
+            postingService.savePostingWithLocationAndMedia("Text $i", null, user.core, null, 0.0, LocalDateTime.now())
+        }
 
         val request = get("/posting/")
 
@@ -777,7 +778,27 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$").isArray)
                 .andExpect(jsonPath("$[0]").exists())
-                .andExpect(jsonPath("$[1]").exists())
+                .andExpect(jsonPath("$[199]").exists())
+                .andExpect(jsonPath("$[200]").doesNotExist())
+                .andReturn().response.contentAsString
+    }
+
+    @Test
+    open fun getAllPostingsLimit() {
+
+        for (i in 1..200) {
+            postingService.savePostingWithLocationAndMedia("Text $i", null, user.core, null, 0.0, LocalDateTime.now())
+        }
+
+        val request = get("/posting/?limit=100&offset=0")
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$[0]").exists())
+                .andExpect(jsonPath("$[99]").exists())
+                .andExpect(jsonPath("$[100]").doesNotExist())
                 .andReturn().response.contentAsString
     }
 

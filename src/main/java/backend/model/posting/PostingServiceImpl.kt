@@ -14,6 +14,7 @@ import backend.util.distanceCoordsKM
 import backend.util.localDateTimeOf
 import backend.view.LocationView
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -25,6 +26,8 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
     override fun findAllByIds(body: List<Long>): Iterable<Posting> = repository.findAll(body)
 
     override fun save(posting: Posting): Posting = repository.save(posting)!!
+
+    override fun findAll(offset: Int, limit: Int): Iterable<Posting> = repository.findAll(PageRequest(offset, limit))
 
     override fun findAll(): Iterable<Posting> = repository.findAll()
 
