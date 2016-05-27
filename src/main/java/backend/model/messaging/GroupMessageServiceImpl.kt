@@ -3,13 +3,14 @@ package backend.model.messaging
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.user.UserCore
+import backend.model.user.UserRepository
 import backend.services.MailService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class GroupMessageServiceImpl @Autowired constructor(val repository: GroupMessageRepository, val mailService: MailService) : GroupMessageService {
+class GroupMessageServiceImpl @Autowired constructor(val repository: GroupMessageRepository, val userRepository: UserRepository, val mailService: MailService) : GroupMessageService {
 
     @Transactional
     override fun createGroupMessage(creator: UserCore): GroupMessage {
@@ -44,6 +45,7 @@ class GroupMessageServiceImpl @Autowired constructor(val repository: GroupMessag
 
     @Transactional
     override fun addMessage(message: Message, groupMessage: GroupMessage): GroupMessage {
+        userRepository.save(message.creator)
         groupMessage.addMessage(message)
         return repository.save(groupMessage)
     }

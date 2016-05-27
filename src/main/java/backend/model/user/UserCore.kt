@@ -43,21 +43,19 @@ open class UserCore : BasicEntity, User {
     @OneToOne(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
     override var profilePic: Media
 
-    @OrderColumn
-    @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = arrayOf(CascadeType.ALL))
     val postings: MutableList<Posting> = ArrayList()
 
-    @OrderColumn
-    @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = arrayOf(CascadeType.ALL))
     val comments: MutableList<Comment> = ArrayList()
 
     @ManyToMany(mappedBy = "users", cascade = arrayOf(CascadeType.ALL))
     val groupMessages: MutableList<GroupMessage> = ArrayList()
 
-    @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "creator", cascade = arrayOf(CascadeType.ALL))
     val messages: MutableList<Message> = ArrayList()
 
-    @OneToMany
+    @OneToMany(mappedBy = "user", cascade = arrayOf(CascadeType.ALL))
     val payments: MutableList<Payment> = ArrayList()
 
     /*
