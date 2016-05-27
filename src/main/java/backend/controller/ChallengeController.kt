@@ -76,9 +76,9 @@ open class ChallengeController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/event/{eventId}/team/{teamId}/challenge/", method = arrayOf(POST))
     @ResponseStatus(CREATED)
-    open fun createChallengeS(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
-                              @PathVariable teamId: Long,
-                              @Valid @RequestBody body: ChallengeView): ChallengeView {
+    open fun createChallenge(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
+                             @PathVariable teamId: Long,
+                             @Valid @RequestBody body: ChallengeView): ChallengeView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId found")

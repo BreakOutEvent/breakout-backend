@@ -36,6 +36,9 @@ class PostingView() {
 
     var hashtags: List<String> = ArrayList()
 
+    var proves: ChallengeView? = null
+
+
     constructor(posting: Posting) : this() {
         this.id = posting.id
         this.text = posting.text
@@ -47,5 +50,6 @@ class PostingView() {
         this.comments = posting.comments.map { CommentView(it) }
         this.likes = posting.likes.count()
         this.hasLiked = posting.hasLiked
+        this.proves = if (posting.challenge != null) ChallengeView(posting.challenge!!) else null
     }
 }

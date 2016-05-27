@@ -89,7 +89,7 @@ class Challenge : BasicEntity {
             }
         }
 
-    @OneToOne
+    @OneToOne(mappedBy = "challenge")
     var proof: Posting? = null
 
     @Embedded

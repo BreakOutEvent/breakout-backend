@@ -47,6 +47,7 @@ class ChallengeServiceImpl : ChallengeService {
     @Transactional
     override fun addProof(challenge: Challenge, proof: Posting): Challenge {
         if (featureFlagService.isEnabled("challenge.addProof")) {
+            proof.challenge = challenge
             challenge.addProof(proof)
             return challengeRepository.save(challenge)
         } else {

@@ -77,6 +77,7 @@ class Posting : BasicEntity {
         this.likes.clear()
         this.comments.clear()
         this.media?.clear()
+        this.challenge = null
         this.user = null
     }
 

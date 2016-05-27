@@ -193,6 +193,25 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.team").value(team.name))
                 .andExpect(jsonPath("$.teamId").value(team.id!!.toInt()))
                 .andExpect(jsonPath("$.status").value("WITH_PROOF"))
+
+        val requestPosting = get("/posting/${posting.id}/")
+
+        mockMvc.perform(requestPosting)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.text").exists())
+                .andExpect(jsonPath("$.date").exists())
+                .andExpect(jsonPath("$.user").exists())
+                .andExpect(jsonPath("$.proves.id").exists())
+                .andExpect(jsonPath("$.proves.eventId").value(team.event.id!!.toInt()))
+                .andExpect(jsonPath("$.proves.description").value(challenge.description))
+                .andExpect(jsonPath("$.proves.sponsorId").value(sponsor.id!!.toInt()))
+                .andExpect(jsonPath("$.proves.userId").value(sponsor.core.id!!.toInt()))
+                .andExpect(jsonPath("$.proves.amount").value(challenge.amount.numberStripped.toDouble()))
+                .andExpect(jsonPath("$.proves.unregisteredSponsor").doesNotExist())
+                .andExpect(jsonPath("$.proves.team").value(team.name))
+                .andExpect(jsonPath("$.proves.teamId").value(team.id!!.toInt()))
+                .andExpect(jsonPath("$.proves.status").value("WITH_PROOF"))
     }
 
     @Test
