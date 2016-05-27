@@ -139,7 +139,6 @@ class TeamServiceImpl : TeamService {
 
     @Cacheable(cacheNames = arrayOf("singleCache"), key = "'functionDistanceTeam'.concat(#teamId)")
     override fun getDistance(teamId: Long): Map<String, Double> {
-        logger.info("Getting team $teamId distance function without cache")
         val linearDistance = this.getLinearDistanceForTeam(teamId)
         val actualDistance = this.getActualDistanceForTeam(teamId)
 
@@ -218,8 +217,6 @@ class TeamServiceImpl : TeamService {
 
     @Cacheable(cacheNames = arrayOf("singleCache"), key = "'functionDonateSumTeam'.concat(#team.id)")
     override fun getDonateSum(team: Team): Map<String, BigDecimal> {
-        logger.info("Getting team ${team.id} distance function without cache")
-
         val sponsorSum = getSponsoringSum(team)
 
         val challengesSum = getChallengeSum(team)
