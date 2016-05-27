@@ -194,8 +194,10 @@ open class TeamController {
      * GET /event/{eventId}/team/{teamId}/
      * gets a specific Team
      */
+    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'team'.concat(#teamId)")
     @RequestMapping("/{teamId}/", method = arrayOf(GET))
     open fun showTeam(@PathVariable teamId: Long): TeamView {
+        logger.info("Getting team $teamId without cache")
         val team = teamService.findOne(teamId) ?: throw NotFoundException("team with id $teamId does not exist")
         val teamDonateSum = teamService.getDonateSum(teamId)
         val teamDistance = teamService.getDistance(teamId)
@@ -223,8 +225,10 @@ open class TeamController {
      * GET /event/{eventId}/team/{teamId}/posting/
      * gets all Postings for Team
      */
+    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'teamPostings'.concat(#teamId)")
     @RequestMapping("/{teamId}/posting/", method = arrayOf(GET))
     open fun getTeamPostingIds(@PathVariable teamId: Long): List<Long> {
+        logger.info("Getting team $teamId postings without cache")
         val postingIds = teamService.findPostingsById(teamId)
         return postingIds
     }
@@ -237,8 +241,10 @@ open class TeamController {
      * Actual distance = |A -> B| + |B -> C|
      * Linear distance = |A -> C|
      */
+    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'teamDistance'.concat(#teamId)")
     @RequestMapping("/{id}/distance/", method = arrayOf(GET))
     open fun getTeamDistance(@PathVariable("id") teamId: Long): Map<String, Double> {
+        logger.info("Getting team $teamId distance without cache")
         return teamService.getDistance(teamId)
     }
 
@@ -246,8 +252,10 @@ open class TeamController {
      * GET /event/{eventId}/team/{id}/donatesum/
      * Get the sponsored sums per team
      */
+    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'teamDonateSum'.concat(#teamId)")
     @RequestMapping("/{id}/donatesum/", method = arrayOf(GET))
     open fun getTeamDonateSum(@PathVariable("id") teamId: Long): Map<String, BigDecimal> {
+        logger.info("Getting team $teamId donate sum without cache")
         return teamService.getDonateSum(teamId)
     }
 }

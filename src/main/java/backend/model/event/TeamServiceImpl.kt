@@ -12,7 +12,10 @@ import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.services.MailService
 import backend.util.distanceCoordsListKMfromStart
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
@@ -24,6 +27,7 @@ class TeamServiceImpl : TeamService {
     private val userService: UserService
     private val mailService: MailService
     private val configurationService: ConfigurationService
+    private val logger: Logger
 
     @Autowired
     constructor(teamRepository: TeamRepository, userService: UserService, mailService: MailService, configurationService: ConfigurationService) {
@@ -31,6 +35,7 @@ class TeamServiceImpl : TeamService {
         this.userService = userService
         this.mailService = mailService
         this.configurationService = configurationService
+        this.logger = LoggerFactory.getLogger(TeamServiceImpl::class.java)
     }
 
     // TODO: Maybe make this transactional
@@ -132,8 +137,9 @@ class TeamServiceImpl : TeamService {
         }
     }
 
-    //TODO add caching
+    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'functionDistanceTeam'.concat(#teamId)")
     override fun getDistance(teamId: Long): Map<String, Double> {
+        logger.info("Getting team $teamId distance function without cache")
         val linearDistance = this.getLinearDistanceForTeam(teamId)
         val actualDistance = this.getActualDistanceForTeam(teamId)
 
@@ -210,8 +216,10 @@ class TeamServiceImpl : TeamService {
                 "challenges_accepted_proof_sum" to acceptedProofSum)
     }
 
-    //TODO add caching
+    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'functionDonateSumTeam'.concat(#team.id)")
     override fun getDonateSum(team: Team): Map<String, BigDecimal> {
+        logger.info("Getting team ${team.id} distance function without cache")
+
         val sponsorSum = getSponsoringSum(team)
 
         val challengesSum = getChallengeSum(team)
@@ -227,8 +235,6 @@ class TeamServiceImpl : TeamService {
                 "full_sum" to fullSum)
     }
 
-
-    //TODO add caching
     override fun getDonateSum(teamId: Long): Map<String, BigDecimal> {
         val team: Team = this.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")
         return getDonateSum(team)

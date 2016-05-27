@@ -16,6 +16,7 @@ import backend.view.PostingView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -87,11 +88,13 @@ open class PostingController {
      * GET /posting/
      * Gets all postings
      */
+    @Cacheable(cacheNames = arrayOf("allCache"), key = "'allPostings'", unless = "#limit != null")
     @RequestMapping("/", method = arrayOf(GET))
     open fun getAllPostings(@RequestParam(value = "offset", required = false) offset: Int?,
                             @RequestParam(value = "limit", required = false) limit: Int?,
                             @AuthenticationPrincipal customUserDetails: CustomUserDetails?): Iterable<PostingView> {
         if (limit == null) {
+            logger.info("Getting all postings without cache")
             return postingService.findAll().map { PostingView(it.hasLikesBy(customUserDetails)) }
         } else {
             val off = offset ?: 0

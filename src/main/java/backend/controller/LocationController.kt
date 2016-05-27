@@ -11,7 +11,10 @@ import backend.model.user.Participant
 import backend.model.user.UserService
 import backend.util.localDateTimeOf
 import backend.view.LocationView
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -28,6 +31,7 @@ open class LocationController {
     private val teamService: TeamService
     private val eventService: EventService
     private val userService: UserService
+    private val logger: Logger
 
     @Autowired
     constructor(locationService: LocationService,
@@ -39,14 +43,17 @@ open class LocationController {
         this.teamService = teamService
         this.eventService = eventService
         this.userService = userService
+        this.logger = LoggerFactory.getLogger(LocationController::class.java)
     }
 
     /**
      * GET /event/{eventId}/location/
      * Return a list of all locations for a specific event
      */
+    @Cacheable(cacheNames = arrayOf("allCache"), key = "'eventLocation'.concat(#eventId)")
     @RequestMapping("/location/", method = arrayOf(GET))
     open fun getAllLocationsForEvent(@PathVariable eventId: Long): Iterable<LocationView> {
+        logger.info("Getting event $eventId location without cache")
         return locationService.findByEventId(eventId).map { LocationView(it) }
     }
 
@@ -54,12 +61,11 @@ open class LocationController {
      * GET /event/{eventId}/team/{teamId}/location/
      * Return a list of all locations for a certain team at a certain event
      */
+    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'teamLocation'.concat(#teamId)")
     @RequestMapping("/team/{teamId}/location/", method = arrayOf(GET))
     open fun getAllLocationsForEventAndTeam(@PathVariable("eventId") eventId: Long,
                                             @PathVariable("teamId") teamId: Long): Iterable<LocationView> {
-
-        //TODO: Is it necessary to check if the team is part of the event or do we just suppress this case
-        //TODO: and assume the client is satisfied with getting all locations for a certain teamId
+        logger.info("Getting team $teamId location without cache")
         return locationService.findByTeamId(teamId).map { LocationView(it) }
     }
 
