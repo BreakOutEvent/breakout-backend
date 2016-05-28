@@ -28,7 +28,7 @@ class GroupMessageServiceImpl @Autowired constructor(val repository: GroupMessag
 
         val email = Email(
                 to = listOf(EmailAddress(user.email)),
-                subject = "BreakOut 2016 - Euch wurde eine Challenge gestellt!",
+                subject = "BreakOut 2016 - Du wurdest einer Gruppennachricht hinzugefügt!",
                 body = "Hallo ${user.firstname ?: ""},<br><br>" +
                         "Du wurdest einer neuen Gruppennachricht hinzugefügt. Sieh nach was man Dir mitteilen mag!<br><br>" +
                         "Liebe Grüße<br>" +
