@@ -910,8 +910,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         println(response)
 
 
-        val requestPosting = get("/posting/${posting.id}/")
-                .asUser(mockMvc, user.email, "password")
+        val requestPosting = get("/posting/${posting.id}/?userid=${user.core.id}")
 
         val responsePosting = mockMvc.perform (requestPosting)
                 .andExpect(status().isOk)
@@ -952,8 +951,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         println(response)
 
 
-        val requestPosting = get("/posting/${posting.id}/")
-                .asUser(mockMvc, user.email, "password")
+        val requestPosting = get("/posting/${posting.id}/?userid=${user.core.id}")
 
         val responsePosting = mockMvc.perform (requestPosting)
                 .andExpect(status().isOk)
@@ -979,7 +977,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         println(responseDelete)
 
-        val responsePostingAfter = mockMvc.perform (requestPosting)
+        mockMvc.perform (requestPosting)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -990,8 +988,6 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.likes").value(0))
                 .andExpect(jsonPath("$.hasLiked").value(false))
                 .andReturn().response.contentAsString
-
-        println(responsePostingAfter)
     }
 
     @Test

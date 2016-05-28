@@ -79,26 +79,26 @@ open class PostingController {
      * Gets posting by id
      */
     @RequestMapping("/{id}/", method = arrayOf(GET))
-    open fun getPosting(@PathVariable("id") id: Long, @AuthenticationPrincipal customUserDetails: CustomUserDetails?): PostingView {
+    open fun getPosting(@PathVariable("id") id: Long, @RequestParam(value = "userid", required = false) userId: Long?): PostingView {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
-        return PostingView(posting.hasLikesBy(customUserDetails))
+        return PostingView(posting.hasLikesBy(userId))
     }
 
     /**
      * GET /posting/
      * Gets all postings
      */
-    @Cacheable(cacheNames = arrayOf("allCache"), key = "'allPostings'", unless = "#limit != null")
+    @Cacheable(cacheNames = arrayOf("allCache"), key = "'allPostings'", unless = "#limit != null || #userId != null")
     @RequestMapping("/", method = arrayOf(GET))
     open fun getAllPostings(@RequestParam(value = "offset", required = false) offset: Int?,
                             @RequestParam(value = "limit", required = false) limit: Int?,
-                            @AuthenticationPrincipal customUserDetails: CustomUserDetails?): Iterable<PostingView> {
+                            @RequestParam(value = "userid", required = false) userId: Long?): Iterable<PostingView> {
         if (limit == null) {
             logger.info("Getting all postings without cache")
-            return postingService.findAll().map { PostingView(it.hasLikesBy(customUserDetails)) }
+            return postingService.findAll().map { PostingView(it.hasLikesBy(userId)) }
         } else {
             val off = offset ?: 0
-            return postingService.findAll(off, limit).map { PostingView(it.hasLikesBy(customUserDetails)) }
+            return postingService.findAll(off, limit).map { PostingView(it.hasLikesBy(userId)) }
         }
     }
 
@@ -107,8 +107,8 @@ open class PostingController {
      * Gets postings with given ids
      */
     @RequestMapping("/get/ids", method = arrayOf(POST))
-    open fun getPostingsById(@Valid @RequestBody body: List<Long>, @AuthenticationPrincipal customUserDetails: CustomUserDetails?): Iterable<PostingView> {
-        return postingService.findAllByIds(body).map { PostingView(it.hasLikesBy(customUserDetails)) }
+    open fun getPostingsById(@Valid @RequestBody body: List<Long>, @RequestParam(value = "userid", required = false) userId: Long?): Iterable<PostingView> {
+        return postingService.findAllByIds(body).map { PostingView(it.hasLikesBy(userId)) }
     }
 
     /**
@@ -189,9 +189,11 @@ open class PostingController {
      * GET /posting/hashtag/{hashtag}/
      * Gets Likes for Posting
      */
+    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'hashtagPostings'.concat(#hashtag)", unless = "#userId != null")
     @RequestMapping("/hashtag/{hashtag}/", method = arrayOf(GET))
-    open fun getPostingsByHashtag(@PathVariable("hashtag") hashtag: String, @AuthenticationPrincipal customUserDetails: CustomUserDetails?): List<PostingView> {
+    open fun getPostingsByHashtag(@PathVariable("hashtag") hashtag: String,
+                                  @RequestParam(value = "userid", required = false) userId: Long?): List<PostingView> {
         val posting = postingService.findByHashtag(hashtag)
-        return posting.map { PostingView(it.hasLikesBy(customUserDetails)) }
+        return posting.map { PostingView(it.hasLikesBy(userId)) }
     }
 }

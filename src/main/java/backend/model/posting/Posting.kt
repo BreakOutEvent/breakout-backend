@@ -1,6 +1,5 @@
 package backend.model.posting
 
-import backend.configuration.CustomUserDetails
 import backend.model.BasicEntity
 import backend.model.challenges.Challenge
 import backend.model.location.Location
@@ -81,8 +80,10 @@ class Posting : BasicEntity {
         this.user = null
     }
 
-    fun hasLikesBy(customUserDetails: CustomUserDetails?): Posting {
-        this.hasLiked = this.likes.any { it.user?.id == customUserDetails?.id }
+    fun hasLikesBy(userId: Long?): Posting {
+        if (userId != null) {
+            this.hasLiked = this.likes.any { it.user?.id == userId }
+        }
         return this
     }
 }
