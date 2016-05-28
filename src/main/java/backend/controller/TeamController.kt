@@ -225,7 +225,6 @@ open class TeamController {
      * GET /event/{eventId}/team/{teamId}/posting/
      * gets all Postings for Team
      */
-    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'teamPostings'.concat(#teamId)")
     @RequestMapping("/{teamId}/posting/", method = arrayOf(GET))
     open fun getTeamPostingIds(@PathVariable teamId: Long): List<Long> {
         logger.info("Getting team $teamId postings without cache")
