@@ -12,9 +12,9 @@ interface PostingService {
 
     fun createPosting(user: User, text: String?, uploadMediaTypes: List<String>?, postingLocation: LocationView?, date: Long?): Posting
 
-    fun findAll(offset: Int, limit: Int): Iterable<Posting>
+    fun findAll(offset: Int, limit: Int): List<Posting>
 
-    fun findAll(): Iterable<Posting>
+    fun findAll(): List<Posting>
 
     fun getByID(id: Long): Posting?
 
@@ -22,8 +22,8 @@ interface PostingService {
 
     fun findAllByIds(body: List<Long>): Iterable<Posting>
 
-    fun findAllSince(id: Long): Iterable<Posting>
+    fun findAllSince(id: Long): List<Posting>
 
-    fun findByHashtag(hashtag: String): Iterable<Posting>
+    fun findByHashtag(hashtag: String): List<Posting>
 
 }

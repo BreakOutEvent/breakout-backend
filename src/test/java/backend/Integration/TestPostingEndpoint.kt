@@ -300,7 +300,6 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun getPostingsByIds() {
-        //given
 
         val postingZero = postingService.savePostingWithLocationAndMedia("Test0", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
         postingService.savePostingWithLocationAndMedia("Test1", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now())
@@ -308,20 +307,18 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val postingsIds: List<Long> = listOf(postingZero.id!!, postingTwo.id!!)
 
-        //when
         val request = post("/posting/get/ids")
                 .json(postingsIds)
 
-        //then
         val response = mockMvc.perform (request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$").isArray)
                 .andExpect(jsonPath<MutableCollection<out Any>>("$", hasSize(2)))
-                .andExpect(jsonPath("$[0]").exists())
-                .andExpect(jsonPath("$[0].text").value("Test0"))
                 .andExpect(jsonPath("$[1]").exists())
-                .andExpect(jsonPath("$[1].text").value("Test2"))
+                .andExpect(jsonPath("$[1].text").value("Test0"))
+                .andExpect(jsonPath("$[0]").exists())
+                .andExpect(jsonPath("$[0].text").value("Test2"))
                 .andReturn().response.contentAsString
 
         println(response)

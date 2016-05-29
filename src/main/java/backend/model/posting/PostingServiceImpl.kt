@@ -21,15 +21,16 @@ import java.time.LocalDateTime
 
 @Service
 class PostingServiceImpl @Autowired constructor(val repository: PostingRepository, val locationService: LocationService) : PostingService {
-    override fun findAllSince(id: Long): Iterable<Posting> = repository.findAllSince(id)
 
-    override fun findAllByIds(body: List<Long>): Iterable<Posting> = repository.findAll(body)
+    override fun findAllSince(id: Long): List<Posting> = repository.findAllSince(id)
+
+    override fun findAllByIds(body: List<Long>): Iterable<Posting> = repository.findAllByIds(body)
 
     override fun save(posting: Posting): Posting = repository.save(posting)!!
 
-    override fun findAll(offset: Int, limit: Int): Iterable<Posting> = repository.findAll(PageRequest(offset, limit))
+    override fun findAll(offset: Int, limit: Int): List<Posting> = repository.findAllByOrderByIdDesc(PageRequest(offset, limit))
 
-    override fun findAll(): Iterable<Posting> = repository.findAll()
+    override fun findAll(): List<Posting> = repository.findAllByOrderByIdDesc()
 
     @Transactional
     override fun savePostingWithLocationAndMedia(text: String?,
@@ -85,6 +86,6 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
 
     override fun getByID(id: Long): Posting? = repository.findById(id)
 
-    override fun findByHashtag(hashtag: String): Iterable<Posting> = repository.findByHashtag(hashtag)
+    override fun findByHashtag(hashtag: String): List<Posting> = repository.findByHashtag(hashtag)
 
 }

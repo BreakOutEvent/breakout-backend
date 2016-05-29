@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param
 interface TeamRepository : CrudRepository<Team, Long> {
     fun findById(id: Long): Team?
 
-    @Query("Select p.id from Posting p inner join p.user u inner join u.userRoles r where r.currentTeam.id = :id order by p.date asc")
+    @Query("Select p.id from Posting p inner join p.user u inner join u.userRoles r where r.currentTeam.id = :id order by p.id desc")
     fun findPostingsById(@Param("id") id: Long): List<Long>
 
     @Query("Select l from Location l inner join l.team t where t.id = :id order by l.date asc")

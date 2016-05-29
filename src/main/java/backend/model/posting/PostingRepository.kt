@@ -9,10 +9,15 @@ interface PostingRepository : CrudRepository<Posting, Long> {
     fun findById(id: Long): Posting
 
     @Query("from Posting where id > :id order by id desc")
-    fun findAllSince(@Param("id") id: Long): Iterable<Posting>
+    fun findAllSince(@Param("id") id: Long): List<Posting>
 
     @Query("select p from Posting p inner join p.hashtags h where h.value = :hashtag order by p.id desc")
-    fun findByHashtag(@Param("hashtag") hashtag: String): Iterable<Posting>
+    fun findByHashtag(@Param("hashtag") hashtag: String): List<Posting>
 
-    fun findAll(pageable: Pageable): Iterable<Posting>
+    fun findAllByOrderByIdDesc(pageable: Pageable): List<Posting>
+
+    fun findAllByOrderByIdDesc(): List<Posting>
+
+    @Query("from Posting where id in :ids order by id desc")
+    fun findAllByIds(@Param("ids") ids: List<Long>): Iterable<Posting>
 }
