@@ -88,7 +88,7 @@ open class PostingController {
      * GET /posting/
      * Gets all postings
      */
-    @Cacheable(cacheNames = arrayOf("allCache"), key = "'allPostings'", unless = "#limit != null || #userId != null")
+    @Cacheable(cacheNames = arrayOf("allCache"), key = "'allPostings'", condition = "#limit == null && #userId == null")
     @RequestMapping("/", method = arrayOf(GET))
     open fun getAllPostings(@RequestParam(value = "offset", required = false) offset: Int?,
                             @RequestParam(value = "limit", required = false) limit: Int?,
@@ -194,7 +194,7 @@ open class PostingController {
      * GET /posting/hashtag/{hashtag}/
      * Gets Likes for Posting
      */
-    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'hashtagPostings'.concat(#hashtag)", unless = "#userId != null")
+    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'hashtagPostings'.concat(#hashtag)", condition = "#userId == null")
     @RequestMapping("/hashtag/{hashtag}/", method = arrayOf(GET))
     open fun getPostingsByHashtag(@PathVariable("hashtag") hashtag: String,
                                   @RequestParam(value = "userid", required = false) userId: Long?): List<PostingView> {
