@@ -325,6 +325,23 @@ open class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
+    open fun getPostingsByIdsEmpty() {
+        val postingsIds: List<Long> = listOf()
+
+        val request = post("/posting/get/ids")
+                .json(postingsIds)
+
+        val response = mockMvc.perform (request)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath<MutableCollection<out Any>>("$", hasSize(0)))
+                .andReturn().response.contentAsString
+
+        println(response)
+    }
+
+    @Test
     open fun getPostingIdsSince() {
         //given
 

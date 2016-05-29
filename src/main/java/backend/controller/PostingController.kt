@@ -108,6 +108,11 @@ open class PostingController {
      */
     @RequestMapping("/get/ids", method = arrayOf(POST))
     open fun getPostingsById(@Valid @RequestBody body: List<Long>, @RequestParam(value = "userid", required = false) userId: Long?): Iterable<PostingView> {
+
+        if (body.count() <= 0) {
+            return listOf()
+        }
+
         return postingService.findAllByIds(body).map { PostingView(it.hasLikesBy(userId)) }
     }
 
