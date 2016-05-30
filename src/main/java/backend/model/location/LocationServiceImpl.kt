@@ -31,7 +31,14 @@ class LocationServiceImpl : LocationService {
     @Transactional
     override fun create(coord: Coord, participant: Participant, date: LocalDateTime): Location {
 
-        val locationData = geoCodingService.getGeoCoded(coord)
+        val location = Location(coord, participant, date, mapOf())
+        return locationRepository.save(location)
+    }
+
+    @Transactional
+    override fun create(coord: Coord, participant: Participant, date: LocalDateTime, doGeoCode: Boolean): Location {
+
+        val locationData = if (doGeoCode) geoCodingService.getGeoCoded(coord) else mapOf()
         val location = Location(coord, participant, date, locationData)
         return locationRepository.save(location)
     }
