@@ -111,7 +111,7 @@ class TeamServiceImpl : TeamService {
 
         val team: Team = this.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")
         val startingCoordinates = team.event.startingLocation
-        val postingCoordinates = this.findLocationPostingsById(teamId).map { it.coord }
+        val postingCoordinates = this.findLocationPostingsById(teamId).dropWhile { !it.isDuringEvent() }.map { it.coord }
         val distance = distanceCoordsListKMfromStart(startingCoordinates, postingCoordinates)
 
         return distance

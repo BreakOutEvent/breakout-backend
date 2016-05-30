@@ -3,7 +3,6 @@ package backend.model.event
 import backend.controller.exceptions.NotFoundException
 import backend.model.location.Location
 import backend.model.misc.Coord
-import backend.util.distanceCoordsListKMfromStart
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -33,14 +32,15 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository, v
 
     override fun getDistance(id: Long): Map<String, Double> {
         val event = this.findById(id) ?: throw NotFoundException("event with id $id does not exist")
-        val locations = this.findLocationPostingsById(id)
 
-        // Distance calculated with from all uploaded calculations, including steps in between (e.g A -> B -> C)
-        val actualDistance = distanceCoordsListKMfromStart(event.startingLocation, locations.map { it.coord })
+        val teamDistances = event.teams.map { teamService.getDistance(it.id!!) }
+        val actualDistance = teamDistances.sumByDouble { it["actual_distance"]!! }
+        val linearDistance = teamDistances.sumByDouble { it["linear_distance"]!! }
 
-        val postingDistances = this.getLocationMaxDistanceByIdEachTeam(id)
-        val linearDistance = postingDistances.sumByDouble { it.distance }
-        return mapOf("actual_distance" to actualDistance, "linear_distance" to linearDistance)
+        return mapOf(
+                "actual_distance" to actualDistance,
+                "linear_distance" to linearDistance)
+
     }
 
     override fun getDonateSum(id: Long): Map<String, BigDecimal> {
