@@ -98,16 +98,6 @@ class Team : BasicEntity {
         return this.invitations.map { it.invitee }.contains(email)
     }
 
-    fun getLatestLinearDistanceKM(): Double {
-        val locationWithMaxDistance = locations.maxBy { it.date }
-        return locationWithMaxDistance?.distance ?: 0.0
-    }
-
-    fun getMaximumLinearDistanceKM(): Double {
-        val locationWithMaxDistance = locations.maxBy { it.distance }
-        return locationWithMaxDistance?.distance ?: 0.0
-    }
-
     // This is used by a @PreAuthorize statement
     // which does not get recognized by the compiler
     @Suppress("UNUSED")

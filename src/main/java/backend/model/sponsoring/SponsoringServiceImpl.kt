@@ -1,6 +1,7 @@
 package backend.model.sponsoring
 
 import backend.model.event.Team
+import backend.model.event.TeamService
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.user.Sponsor
@@ -8,6 +9,7 @@ import backend.services.MailService
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.math.BigDecimal
 import javax.transaction.Transactional
 
 @Service
@@ -15,12 +17,14 @@ class SponsoringServiceImpl : SponsoringService {
 
     private val sponsoringRepository: SponsoringRepository
     private val mailService: MailService
+    private val teamService: TeamService
 
 
     @Autowired
-    constructor(sponsoringRepository: SponsoringRepository, mailService: MailService) {
+    constructor(sponsoringRepository: SponsoringRepository, mailService: MailService, teamService: TeamService) {
         this.sponsoringRepository = sponsoringRepository
         this.mailService = mailService
+        this.teamService = teamService
     }
 
     @Transactional
@@ -93,4 +97,23 @@ class SponsoringServiceImpl : SponsoringService {
 
     override fun findOne(id: Long): Sponsoring? = sponsoringRepository.findOne(id)
 
+    fun getAmountRaised(sponsoring: Sponsoring): Money {
+        if (reachedLimit(sponsoring)) {
+            return sponsoring.limit
+        } else {
+            return calculateAmount(sponsoring)
+        }
+    }
+
+    fun reachedLimit(sponsoring: Sponsoring): Boolean {
+        return calculateAmount(sponsoring).isGreaterThan(sponsoring.limit)
+    }
+
+    fun calculateAmount(sponsoring: Sponsoring): Money {
+        val kilometers = teamService.getLinearDistanceForTeam(sponsoring.team!!.id!!)
+        val amountPerKmAsBigDecimal = sponsoring.amountPerKm.numberStripped
+        val total = amountPerKmAsBigDecimal.multiply(BigDecimal.valueOf(kilometers))
+
+        return Money.of(total, "EUR")
+    }
 }

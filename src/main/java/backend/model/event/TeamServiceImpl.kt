@@ -100,6 +100,7 @@ class TeamServiceImpl : TeamService {
         return repository.findInvitationsWithEmailAndEventId(user.email, eventId)
     }
 
+    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'functionLinearDistanceTeam'.concat(#teamId)")
     override fun getLinearDistanceForTeam(teamId: Long): Double {
         val locationDistance = this.getLocationMaxDistanceById(teamId)
         val distance = locationDistance?.distance ?: 0.0
@@ -185,7 +186,7 @@ class TeamServiceImpl : TeamService {
         val sponsorSum = BigDecimal.ZERO
 
         team.sponsoring.forEach { sponsoring ->
-            val amount = sponsoring.amountPerKm.numberStripped.multiply(BigDecimal(distanceKm))
+            val amount = sponsoring.amountPerKm.numberStripped.multiply(BigDecimal.valueOf(distanceKm))
             if (amount.compareTo(sponsoring.limit.numberStripped) == -1) {
                 sponsorSum.add(sponsoring.limit.numberStripped)
             } else {

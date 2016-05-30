@@ -9,7 +9,6 @@ import backend.model.misc.EmailAddress
 import backend.model.sponsoring.SponsoringStatus.*
 import backend.model.user.Sponsor
 import org.javamoney.moneta.Money
-import java.math.BigDecimal
 import javax.persistence.*
 
 @Entity
@@ -92,15 +91,6 @@ class Sponsoring : BasicEntity {
         this.contract = Media(DOCUMENT)
     }
 
-    fun calculateRaisedAmount(): Money {
-        if (reachedLimit()) return limit
-        else return calculateAmount()
-    }
-
-    fun reachedLimit(): Boolean {
-        return calculateAmount().isGreaterThan(limit)
-    }
-
     fun accept() {
         this.status = ACCEPTED
     }
@@ -124,13 +114,5 @@ class Sponsoring : BasicEntity {
         } else if (this.sponsor != null) {
             return EmailAddress(this.sponsor!!.email) == EmailAddress(username)
         } else throw Exception("Error checking withdrawal permissions")
-    }
-
-    private fun calculateAmount(): Money {
-        val kilometers = team!!.getMaximumLinearDistanceKM()
-        val amountPerKmAsBigDecimal = amountPerKm.numberStripped
-        val total = amountPerKmAsBigDecimal.multiply(BigDecimal.valueOf(kilometers))
-
-        return Money.of(total, "EUR")
     }
 }

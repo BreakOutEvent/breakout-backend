@@ -12,8 +12,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.PowerMockRunner
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 @RunWith(PowerMockRunner::class)
 @PrepareForTest(Team::class, Sponsor::class)
@@ -55,58 +53,6 @@ class SponsoringTest {
         val sponsoring = Sponsoring(sponsor, team, amountPerKm, limit)
 
         //        assertEquals(team, sponsoring.team)
-    }
-
-    @Test
-    fun testCalculateRaisedAmount() {
-        val team = PowerMockito.mock(Team::class.java)
-        val amountPerKm = euroOf(0.01)
-        val limit = euroOf(100)
-        val sponsor = PowerMockito.mock(Sponsor::class.java)
-        val sponsoring = Sponsoring(sponsor, team, amountPerKm, limit)
-
-        PowerMockito.`when`(team.getMaximumLinearDistanceKM()).thenReturn(63.2)
-
-        assertEquals(euroOf(0.632), sponsoring.calculateRaisedAmount())
-    }
-
-    @Test
-    fun testCalculateRaisedAmountWhenExceedingLimit() {
-        val team = PowerMockito.mock(Team::class.java)
-        val amountPerKm = euroOf(1.0)
-        val limit = euroOf(10)
-        val sponsor = PowerMockito.mock(Sponsor::class.java)
-        val sponsoring = Sponsoring(sponsor, team, amountPerKm, limit)
-
-        PowerMockito.`when`(team.getMaximumLinearDistanceKM()).thenReturn(63.2)
-
-        assertEquals(limit, sponsoring.calculateRaisedAmount())
-    }
-
-    @Test
-    fun testReachedLimitTrue() {
-        val team = PowerMockito.mock(Team::class.java)
-        val amountPerKm = euroOf(1.0)
-        val limit = euroOf(10)
-        val sponsor = PowerMockito.mock(Sponsor::class.java)
-        val sponsoring = Sponsoring(sponsor, team, amountPerKm, limit)
-
-        PowerMockito.`when`(team.getMaximumLinearDistanceKM()).thenReturn(20.0)
-
-        assertTrue(sponsoring.reachedLimit())
-    }
-
-    @Test
-    fun testReachedLimitFalse() {
-        val team = PowerMockito.mock(Team::class.java)
-        val amountPerKm = euroOf(1.0)
-        val limit = euroOf(100)
-        val sponsor = PowerMockito.mock(Sponsor::class.java)
-        val sponsoring = Sponsoring(sponsor, team, amountPerKm, limit)
-
-        PowerMockito.`when`(team.getMaximumLinearDistanceKM()).thenReturn(20.0)
-
-        assertFalse(sponsoring.reachedLimit())
     }
 
     @Test

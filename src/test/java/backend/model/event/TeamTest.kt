@@ -1,11 +1,9 @@
 package backend.model.event
 
-import backend.model.location.Location
 import backend.model.misc.Coord
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
 import backend.model.user.User
-import backend.util.distanceCoordsKM
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -136,29 +134,5 @@ class TeamTest {
         team.join(invitee)
 
         assertTrue(team.isFull())
-    }
-
-    @Test
-    fun testGetMaximumLinearDistance() {
-        val location1 = Location(Coord(0.0, 0.0), creator, LocalDateTime.now(), mapOf())
-        val location2 = Location(Coord(20.0, 20.0), creator, LocalDateTime.now(), mapOf())
-        val location3 = Location(Coord(10.0, 10.0), creator, LocalDateTime.now(), mapOf())
-        team.locations.clear()
-        team.locations.addAll(0, listOf(location1, location2, location3))
-
-        val maxDistance = distanceCoordsKM(from = event.startingLocation, to = Coord(20.0, 20.0))
-        assertEquals(maxDistance, team.getMaximumLinearDistanceKM(), 0.0)
-    }
-
-    @Test
-    fun testGetLatestLinearDistance() {
-        val location1 = Location(Coord(0.0, 0.0), creator, LocalDateTime.now().minusMinutes(30), mapOf())
-        val location2 = Location(Coord(20.0, 20.0), creator, LocalDateTime.now().minusMinutes(20), mapOf())
-        val location3 = Location(Coord(10.0, 10.0), creator, LocalDateTime.now().minusMinutes(10), mapOf())
-        team.locations.clear()
-        team.locations.addAll(0, listOf(location1, location2, location3))
-
-        val maxDistance = distanceCoordsKM(from = event.startingLocation, to = Coord(10.0, 10.0))
-        assertEquals(maxDistance, team.getLatestLinearDistanceKM(), 0.0)
     }
 }
