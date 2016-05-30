@@ -17,7 +17,7 @@ class Media : BasicEntity {
     var mediaType: MediaType? = null
 
     @OneToMany(cascade = arrayOf(CascadeType.ALL), mappedBy = "media", fetch = FetchType.EAGER, orphanRemoval = true)
-    var sizes: MutableList<MediaSize>? = ArrayList()
+    var sizes: MutableList<MediaSize> = ArrayList()
 
     @Transient
     var uploadToken: String? = null
@@ -37,6 +37,6 @@ class Media : BasicEntity {
 
     @PreRemove
     fun preRemove() {
-        this.sizes?.clear()
+        this.sizes.clear()
     }
 }

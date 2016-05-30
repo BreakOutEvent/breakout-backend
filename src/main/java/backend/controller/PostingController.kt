@@ -69,7 +69,7 @@ open class PostingController {
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
 
         val posting = postingService.createPosting(user, body.text, body.uploadMediaTypes, body.postingLocation, body.date)
-        posting.media?.forEach { it.uploadToken = getSignedJwtToken(JWT_SECRET, it.id.toString()) }
+        posting.media.forEach { it.uploadToken = getSignedJwtToken(JWT_SECRET, it.id.toString()) }
 
         return PostingView(posting)
     }

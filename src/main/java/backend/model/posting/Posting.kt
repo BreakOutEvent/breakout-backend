@@ -34,20 +34,19 @@ class Posting : BasicEntity {
     @ManyToOne
     var user: UserCore? = null
 
-    @OrderColumn
     @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
-    var media: MutableList<Media>? = ArrayList()
+    var media: MutableList<Media> = arrayListOf()
 
-    @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
-    var comments: MutableList<Comment> = ArrayList()
+    @OneToMany(cascade = arrayOf(CascadeType.ALL), mappedBy = "posting", orphanRemoval = true)
+    var comments: MutableList<Comment> = arrayListOf()
 
-    @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
-    var likes: MutableList<Like> = ArrayList()
+    @OneToMany(cascade = arrayOf(CascadeType.ALL), mappedBy = "posting", orphanRemoval = true)
+    var likes: MutableList<Like> = arrayListOf()
 
     @Transient
     var hasLiked = false
 
-    constructor(text: String?, date: LocalDateTime, location: Location?, user: UserCore, media: MutableList<Media>?) : this() {
+    constructor(text: String?, date: LocalDateTime, location: Location?, user: UserCore, media: MutableList<Media>) : this() {
         this.text = text
         this.date = date
         this.location = location
@@ -75,7 +74,7 @@ class Posting : BasicEntity {
     fun preRemove() {
         this.likes.clear()
         this.comments.clear()
-        this.media?.clear()
+        this.media.clear()
         this.challenge = null
         this.user = null
     }

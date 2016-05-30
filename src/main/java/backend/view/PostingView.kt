@@ -4,7 +4,6 @@ import backend.model.posting.Posting
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import java.time.ZoneOffset
-import java.util.*
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
@@ -34,7 +33,7 @@ class PostingView() {
 
     var hasLiked: Boolean = false
 
-    var hashtags: List<String> = ArrayList()
+    var hashtags: List<String> = arrayListOf()
 
     var proves: ChallengeView? = null
 
@@ -46,7 +45,7 @@ class PostingView() {
         this.date = posting.date.toEpochSecond(ZoneOffset.UTC)
         this.postingLocation = if (posting.location != null) LocationView(posting.location!!) else null
         this.user = BasicUserView(posting.user!!.core)
-        this.media = posting.media?.map { MediaView(it) }
+        this.media = posting.media.map { MediaView(it) }
         this.comments = posting.comments.map { CommentView(it) }
         this.likes = posting.likes.count()
         this.hasLiked = posting.hasLiked

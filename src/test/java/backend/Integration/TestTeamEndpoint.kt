@@ -61,8 +61,8 @@ class TestTeamEndpoint : IntegrationTest() {
         val firstLocation = Location(Coord(1.0, 1.0), creator.getRole(Participant::class)!!, LocalDateTime.now(), fakeLocationData)
         val secondLocation = Location(Coord(1.2, 2.0), creator.getRole(Participant::class)!!, LocalDateTime.now(), fakeLocationData)
 
-        postingService.save(Posting("test", LocalDateTime.now(), firstLocation, creator.core, null))
-        postingService.save(Posting("test", LocalDateTime.now(), secondLocation, creator.core, null))
+        postingService.save(Posting("test", LocalDateTime.now(), firstLocation, creator.core, arrayListOf()))
+        postingService.save(Posting("test", LocalDateTime.now(), secondLocation, creator.core, arrayListOf()))
 
     }
 

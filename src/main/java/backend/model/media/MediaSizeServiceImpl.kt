@@ -21,25 +21,20 @@ class MediaSizeServiceImpl : MediaSizeService {
 
     override fun findAll(): Iterable<MediaSize> = repository.findAll()
 
-    @Transactional
-    override fun createAndSaveMediaSize(mediaId: Long, url: String, width: Int, height: Int, length: Int, size: Long, type: String): MediaSize {
-
-        val media = mediaRepository.findById(mediaId)
+    fun createAndSaveMediaSize(media: Media, url: String, width: Int, height: Int, length: Int, size: Long, type: String): MediaSize {
         val mediaSize = MediaSize(media, url, width, height, length, size, type)
-        media.sizes!!.add(mediaSize)
-        return mediaSize
+        val savedMediaSize = repository.save(mediaSize)
+        return savedMediaSize
     }
 
     override fun getByID(id: Long): MediaSize? {
         return repository.findById(id)
     }
 
-    @Transactional
     override fun findByWidthAndMediaAndMediaType(width: Int, media: Media, type: MediaType): MediaSize? {
         return repository.findByWidthAndMediaAndMediaType(width, media, type)
     }
 
-    @Transactional
     override fun findByHeightAndMediaAndMediaType(height: Int, media: Media, type: MediaType): MediaSize? {
         return repository.findByHeightAndMediaAndMediaType(height, media, type)
     }
@@ -65,7 +60,7 @@ class MediaSizeServiceImpl : MediaSizeService {
         }
 
         if (mediaSizeFound == null) {
-            return this.createAndSaveMediaSize(mediaId, url, width, height, length, size, type)
+            return this.createAndSaveMediaSize(media, url, width, height, length, size, type)
         } else {
             mediaSizeFound.url = url
             mediaSizeFound.width = width

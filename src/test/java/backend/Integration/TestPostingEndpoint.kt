@@ -166,7 +166,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
-    open fun createNewPostingWithMedia() {
+    open fun createNewPostingWithMediaApi() {
         val postData = mapOf(
                 "uploadMediaTypes" to arrayOf(
                         "image",
@@ -385,7 +385,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         )
 
         //when
-        val request = post("/media/${savedposting!!.media!!.first().id}/")
+        val request = post("/media/${savedposting!!.media.first().id}/")
                 .json(postData)
 
         //then
@@ -414,7 +414,7 @@ open class TestPostingEndpoint : IntegrationTest() {
                 "type" to "image"
         )
 
-        val request = post("/media/${savedposting!!.media!!.first().id}/")
+        val request = post("/media/${savedposting!!.media.first().id}/")
                 .header("X-UPLOAD-TOKEN", "87654321")
                 .json(postData)
 
@@ -424,6 +424,29 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         println(response)
     }
+
+    @Test
+    open fun createNewPostingWithMedia() {
+
+        val posting = postingService.createPosting(user.core, "Test", arrayListOf("VIDEO"), null, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
+
+        val requestMedia = get("/posting/${posting.id}/")
+
+        val responseMedia = mockMvc.perform (requestMedia)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.media").exists())
+                .andExpect(jsonPath("$.media").isArray)
+                .andExpect(jsonPath("$.media[0]").exists())
+                .andExpect(jsonPath("$.media[0].id").exists())
+                .andExpect(jsonPath("$.media[0].type").exists())
+                .andExpect(jsonPath("$.media[0].sizes").exists())
+                .andExpect(jsonPath("$.media[0].sizes").isArray)
+                .andReturn().response.contentAsString
+
+        println(responseMedia)
+    }
+
 
     @Test
     open fun createNewPostingWithMediaAndAddMediaSizesWithValidToken() {
@@ -445,8 +468,8 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         println(posting.media)
 
-        val request = post("/media/${savedposting!!.media!!.first().id}/")
-                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
+        val request = post("/media/${savedposting!!.media.first().id}/")
+                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .json(postData)
 
         val response = mockMvc.perform (request)
@@ -489,6 +512,62 @@ open class TestPostingEndpoint : IntegrationTest() {
         println(responseMedia)
     }
 
+
+    @Test
+    open fun createNewPostingWithMediaAndAddManyMediaSizes() {
+
+
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(0.0, 0.0), user.core, null, 0.0, LocalDateTime.now());
+        val media = mediaService.createMedia("image")
+        posting.media = listOf(media) as MutableList<Media>
+        val savedposting = postingService.save(posting)
+
+        for (i in 0..100) {
+
+            val postData = mapOf(
+                    "url" to "https://aws.amazon.com/bla$i.jpg",
+                    "width" to i * 100 + 100,
+                    "height" to 200,
+                    "length" to 0.0,
+                    "size" to 0.0,
+                    "type" to "image"
+            )
+
+            val request = post("/media/${savedposting!!.media.first().id}/")
+                    .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
+                    .json(postData)
+
+            mockMvc.perform (request)
+        }
+
+
+        val requestMedia = get("/posting/${savedposting!!.id}/")
+
+        val responseMedia = mockMvc.perform (requestMedia)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.media").exists())
+                .andExpect(jsonPath("$.media").isArray)
+                .andExpect(jsonPath("$.media[0]").exists())
+                .andExpect(jsonPath("$.media[0].id").exists())
+                .andExpect(jsonPath("$.media[0].type").exists())
+                .andExpect(jsonPath("$.media[0].sizes").exists())
+                .andExpect(jsonPath("$.media[0].sizes").isArray)
+                .andExpect(jsonPath("$.media[0].sizes[0]").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].id").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].url").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].width").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].height").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].length").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].size").exists())
+                .andExpect(jsonPath("$.media[0].sizes[0].type").exists())
+                .andExpect(jsonPath("$.media[0].sizes[99]").exists())
+                .andExpect(jsonPath("$.media[0].sizes[100]").doesNotExist())
+                .andReturn().response.contentAsString
+
+        println(responseMedia)
+    }
+
     @Test
     open fun createNewPostingWithMediaAndAddMediaSizesUpdateMediaSizes() {
 
@@ -509,8 +588,8 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         println(posting.media)
 
-        var request = post("/media/${savedposting!!.media!!.first().id}/")
-                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
+        var request = post("/media/${savedposting!!.media.first().id}/")
+                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .json(postData)
 
         var response = mockMvc.perform (request)
@@ -539,8 +618,8 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         println(posting.media)
 
-        request = post("/media/${savedposting.media!!.first().id}/")
-                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
+        request = post("/media/${savedposting.media.first().id}/")
+                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .json(postData)
 
         response = mockMvc.perform (request)
@@ -606,8 +685,8 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         println(posting.media)
 
-        var request = post("/media/${savedposting!!.media!!.first().id}/")
-                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
+        var request = post("/media/${savedposting!!.media.first().id}/")
+                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .json(postData)
 
         var response = mockMvc.perform (request)
@@ -636,8 +715,8 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         println(posting.media)
 
-        request = post("/media/${savedposting.media!!.first().id}/")
-                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
+        request = post("/media/${savedposting.media.first().id}/")
+                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .json(postData)
 
         response = mockMvc.perform (request)
@@ -702,8 +781,8 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         println(posting.media)
 
-        var request = post("/media/${savedposting!!.media!!.first().id}/")
-                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
+        var request = post("/media/${savedposting!!.media.first().id}/")
+                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .json(postData)
 
         var response = mockMvc.perform (request)
@@ -732,8 +811,8 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         println(posting.media)
 
-        request = post("/media/${savedposting.media!!.first().id}/")
-                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media!!.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
+        request = post("/media/${savedposting.media.first().id}/")
+                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .json(postData)
 
         response = mockMvc.perform (request)

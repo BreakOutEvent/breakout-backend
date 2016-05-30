@@ -1,7 +1,6 @@
 package backend.model.media
 
 interface MediaSizeService {
-    fun createAndSaveMediaSize(mediaId: Long, url: String, width: Int, height: Int, length: Int, size: Long, type: String): MediaSize
     fun createOrUpdate(mediaId: Long, url: String, width: Int, height: Int, length: Int, size: Long, type: String): MediaSize
     fun findAll(): Iterable<MediaSize>
     fun getByID(id: Long): MediaSize?

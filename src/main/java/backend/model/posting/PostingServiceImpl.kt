@@ -6,6 +6,7 @@ import backend.exceptions.DomainException
 import backend.model.location.Location
 import backend.model.location.LocationService
 import backend.model.media.Media
+import backend.model.media.MediaRepository
 import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.model.user.User
@@ -20,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
-class PostingServiceImpl @Autowired constructor(val repository: PostingRepository, val locationService: LocationService) : PostingService {
+class PostingServiceImpl @Autowired constructor(val repository: PostingRepository, val locationService: LocationService, val mediaRepository: MediaRepository) : PostingService {
 
     override fun findAllSince(id: Long): List<Posting> = repository.findAllSince(id)
 
@@ -47,8 +48,7 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
         }
 
         //Create Media-Objects for each media item requested to add
-        val media: MutableList<Media>
-        media = arrayListOf()
+        val media: MutableList<Media> = arrayListOf()
         mediaTypes?.forEach {
             media.add(Media(it))
         }
