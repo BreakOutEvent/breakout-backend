@@ -6,6 +6,7 @@ import backend.model.event.Team
 import backend.model.misc.Coord
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
+import backend.services.Feature
 import backend.testHelper.asUser
 import backend.testHelper.json
 import org.hamcrest.Matchers.hasSize
@@ -159,6 +160,9 @@ class LocationControllerTest : IntegrationTest() {
         val thisTeam = teamService.create(thisUser, "team awesome", "description", thisEvent)
         setAuthenticatedUser(thisUser.email)
 
+        val feature = Feature("event.isNow", true)
+        featureReposity.save(feature)
+
         val data = mapOf(
                 "latitude" to 0.0,
                 "longitude" to 1.1,
@@ -196,6 +200,9 @@ class LocationControllerTest : IntegrationTest() {
         val thisTeam = teamService.create(thisUser, "team awesome", "description", thisEvent)
         setAuthenticatedUser(thisUser.email)
 
+        val feature = Feature("event.isNow", false)
+        featureReposity.save(feature)
+
         val data = mapOf(
                 "latitude" to 0.0,
                 "longitude" to 1.1,
@@ -231,6 +238,10 @@ class LocationControllerTest : IntegrationTest() {
         val thisEvent = eventService.createEvent("Event", timeEvent, "Test", Coord(0.0, 1.1), 36)
         val thisUser = userService.create("testduring@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val thisTeam = teamService.create(thisUser, "team awesome", "description", thisEvent)
+
+        val feature = Feature("event.isNow", false)
+        featureReposity.save(feature)
+
         setAuthenticatedUser(thisUser.email)
 
         val data = mapOf(

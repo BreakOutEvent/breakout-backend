@@ -46,7 +46,7 @@ class LocationView {
 
         this.event = location.team?.event?.title
         this.eventId = location.team?.event?.id
-        this.isDuringEvent = location.isDuringEvent()
+        this.isDuringEvent = location.isDuringEvent
         this.locationData = location.locationData
     }
 

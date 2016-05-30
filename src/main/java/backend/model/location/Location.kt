@@ -28,6 +28,8 @@ class Location : BasicEntity {
     @ManyToOne
     var team: Team? = null
 
+    var isDuringEvent: Boolean = false
+
     lateinit var date: LocalDateTime
 
     var distance: Double = 0.0
@@ -48,11 +50,4 @@ class Location : BasicEntity {
         this.locationData = locationData
     }
 
-    fun isDuringEvent(): Boolean {
-        val minutes = ChronoUnit.MINUTES.between(this.team!!.event.date, this.date)
-        if (minutes > 0 && minutes <= (this.team!!.event.duration * 60)) {
-            return true
-        }
-        return false
-    }
 }

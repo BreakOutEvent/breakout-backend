@@ -113,6 +113,7 @@ abstract class IntegrationTest {
         locationRepository.deleteAll()
         challengeRepository.deleteAll()
         sponsoringRepository.deleteAll()
+        featureReposity.deleteAll()
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .addFilters<DefaultMockMvcBuilder>(springSecurityFilterChain)

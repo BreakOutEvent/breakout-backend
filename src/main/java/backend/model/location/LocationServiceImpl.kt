@@ -2,6 +2,7 @@ package backend.model.location
 
 import backend.model.misc.Coord
 import backend.model.user.Participant
+import backend.services.FeatureFlagService
 import backend.services.GeoCodingService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -13,11 +14,16 @@ class LocationServiceImpl : LocationService {
 
     private val locationRepository: LocationRepository
     private val geoCodingService: GeoCodingService
+    private val featureFlagService: FeatureFlagService
 
     @Autowired
-    constructor(locationRepository: LocationRepository, geoCodingService: GeoCodingService) {
+    constructor(locationRepository: LocationRepository,
+                geoCodingService: GeoCodingService,
+                featureFlagService: FeatureFlagService) {
+
         this.locationRepository = locationRepository
         this.geoCodingService = geoCodingService
+        this.featureFlagService = featureFlagService
     }
 
     override fun findAll(): Iterable<Location> {
@@ -32,6 +38,9 @@ class LocationServiceImpl : LocationService {
     override fun create(coord: Coord, participant: Participant, date: LocalDateTime): Location {
 
         val location = Location(coord, participant, date, mapOf())
+        if (featureFlagService.isEnabled("event.isNow")) {
+            location.isDuringEvent = true
+        }
         return locationRepository.save(location)
     }
 
@@ -40,6 +49,9 @@ class LocationServiceImpl : LocationService {
 
         val locationData = if (doGeoCode) geoCodingService.getGeoCoded(coord) else mapOf()
         val location = Location(coord, participant, date, locationData)
+        if (featureFlagService.isEnabled("event.isNow")) {
+            location.isDuringEvent = true
+        }
         return locationRepository.save(location)
     }
 
