@@ -88,7 +88,7 @@ class TeamServiceImpl : TeamService {
         if (locationList.size <= 0) {
             return null
         } else {
-            return locationList.first()
+            return locationList.dropWhile { !it.isDuringEvent() }.firstOrNull()
         }
     }
 
