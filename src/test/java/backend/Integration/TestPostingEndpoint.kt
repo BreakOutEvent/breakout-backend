@@ -116,6 +116,24 @@ open class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
+    open fun createNewPostingWithEmptyTextFail() {
+        val data = mapOf(
+                "text" to "",
+                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+        )
+
+        val request = post("/posting/")
+                .asUser(mockMvc, user.email, "password")
+                .json(data)
+
+        val response = mockMvc.perform(request)
+                .andExpect(status().isBadRequest)
+                .andReturn().response.contentAsString
+
+        println(response)
+    }
+
+    @Test
     open fun createNewPostingWithTextAndHashtags() {
         val postData = mapOf(
                 "text" to "hello #breakout bla blub #awsome",
@@ -937,6 +955,28 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         println(responsePosting)
     }
+
+    @Test
+    open fun createEmptyCommentFail() {
+
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, 0.0, LocalDateTime.now())
+
+        val postData = mapOf(
+                "text" to "",
+                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+        )
+
+        val request = post("/posting/${posting.id}/comment/")
+                .asUser(mockMvc, user.email, "password")
+                .json(postData)
+
+        val response = mockMvc.perform(request)
+                .andExpect(status().isBadRequest)
+                .andReturn().response.contentAsString
+
+        println(response)
+    }
+
 
     @Test
     open fun createNewLike() {

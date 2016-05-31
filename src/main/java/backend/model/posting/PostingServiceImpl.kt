@@ -64,7 +64,7 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
                                date: Long?): Posting {
 
         //check if any of the optional posting types is available
-        if (uploadMediaTypes == null && text == null && postingLocation == null)
+        if (uploadMediaTypes == null && (text == null || text.trim() == "") && postingLocation == null)
             throw BadRequestException("empty postings not allowed")
 
         var location: Coord? = null

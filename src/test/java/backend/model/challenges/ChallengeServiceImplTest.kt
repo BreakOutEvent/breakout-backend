@@ -37,7 +37,7 @@ class ChallengeServiceImplTest : IntegrationTest() {
         participant = userService.create("participant@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         sponsor = userService.create("sponsor@break-out.org", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
         team = teamService.create(participant, "name", "description", event)
-        posting = postingService.createPosting(participant, "", null, null, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
+        posting = postingService.createPosting(participant, "Test", null, null, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
         unregisteredSponsor = UnregisteredSponsor(
                 firstname = "firstname",
                 lastname = "lastname",

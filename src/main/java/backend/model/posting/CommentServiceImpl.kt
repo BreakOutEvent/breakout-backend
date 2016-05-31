@@ -1,5 +1,6 @@
 package backend.model.posting
 
+import backend.controller.exceptions.BadRequestException
 import backend.model.user.UserCore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -11,6 +12,11 @@ class CommentServiceImpl @Autowired constructor(val repository: CommentRepositor
 
     @Transactional
     override fun createComment(text: String, date: LocalDateTime, posting: Posting, user: UserCore): Comment {
+
+        if (text.trim() == "")
+            throw BadRequestException("empty comments not allowed")
+
+
         val comment: Comment = Comment(text, date, posting, user)
         repository.save(comment)
         posting.comments.add(comment)
