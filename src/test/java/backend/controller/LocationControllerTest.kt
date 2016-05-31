@@ -36,7 +36,7 @@ class LocationControllerTest : IntegrationTest() {
     override fun setUp() {
         super.setUp()
 
-        munichEvent = eventService.createEvent("Event 1", LocalDateTime.now(), "munich", Coord(0.0, 1.1), 36)
+        munichEvent = eventService.createEvent("Event 1", LocalDateTime.now(), "munich", Coord(1.0, 1.0), 36)
         berlinEvent = eventService.createEvent("Event 2", LocalDateTime.now(), "berlin", Coord(1.1, 0.0), 36)
 
         firstUser = userService.create("test1@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
@@ -66,9 +66,9 @@ class LocationControllerTest : IntegrationTest() {
 
     @Test
     fun testGetAllLocationsForEvent() {
-        locationService.create(Coord(0.0, 1.1), firstUser, LocalDateTime.now())
-        locationService.create(Coord(0.0, 1.1), thirdUser, LocalDateTime.now())
-        locationService.create(Coord(0.0, 1.1), fifthUser, LocalDateTime.now()) // This one should not be found!
+        locationService.create(Coord(1.0, 1.0), firstUser, LocalDateTime.now())
+        locationService.create(Coord(1.0, 1.0), thirdUser, LocalDateTime.now())
+        locationService.create(Coord(1.0, 1.0), fifthUser, LocalDateTime.now()) // This one should not be found!
 
         val request = get("/event/${munichEvent.id}/location/")
 
@@ -95,9 +95,9 @@ class LocationControllerTest : IntegrationTest() {
 
     @Test
     fun testGetAllLocationsForEventAndTeam() {
-        locationService.create(Coord(0.0, 1.1), firstUser, LocalDateTime.now())
-        locationService.create(Coord(0.0, 1.1), thirdUser, LocalDateTime.now())
-        locationService.create(Coord(0.0, 1.1), fifthUser, LocalDateTime.now()) // This one should not be found!
+        locationService.create(Coord(1.0, 1.0), firstUser, LocalDateTime.now())
+        locationService.create(Coord(1.0, 1.0), thirdUser, LocalDateTime.now())
+        locationService.create(Coord(1.0, 1.0), fifthUser, LocalDateTime.now()) // This one should not be found!
 
         val request = get("/event/${munichEvent.id}/team/${firstTeam.id}/location/")
 
@@ -122,8 +122,8 @@ class LocationControllerTest : IntegrationTest() {
     fun testCreateLocation() {
 
         val data = mapOf(
-                "latitude" to 0.0,
-                "longitude" to 1.1,
+                "latitude" to 1.0,
+                "longitude" to 1.0,
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
         )
 
@@ -155,7 +155,7 @@ class LocationControllerTest : IntegrationTest() {
         val timeEvent = LocalDateTime.of(2016, 6, 3, 9, 0, 0)
         val timeLocation = LocalDateTime.of(2016, 6, 3, 9, 1, 0)
 
-        val thisEvent = eventService.createEvent("Event", timeEvent, "Test", Coord(0.0, 1.1), 36)
+        val thisEvent = eventService.createEvent("Event", timeEvent, "Test", Coord(1.0, 1.0), 36)
         val thisUser = userService.create("testduring@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val thisTeam = teamService.create(thisUser, "team awesome", "description", thisEvent)
         setAuthenticatedUser(thisUser.email)
@@ -164,8 +164,8 @@ class LocationControllerTest : IntegrationTest() {
         featureReposity.save(feature)
 
         val data = mapOf(
-                "latitude" to 0.0,
-                "longitude" to 1.1,
+                "latitude" to 1.0,
+                "longitude" to 1.0,
                 "date" to timeLocation.atZone(ZoneId.systemDefault()).toInstant().epochSecond
         )
 
@@ -195,7 +195,7 @@ class LocationControllerTest : IntegrationTest() {
         val timeEvent = LocalDateTime.of(2016, 6, 3, 9, 0, 0)
         val timeLocation = LocalDateTime.of(2016, 6, 3, 8, 59, 0)
 
-        val thisEvent = eventService.createEvent("Event", timeEvent, "Test", Coord(0.0, 1.1), 36)
+        val thisEvent = eventService.createEvent("Event", timeEvent, "Test", Coord(1.0, 1.0), 36)
         val thisUser = userService.create("testduring@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val thisTeam = teamService.create(thisUser, "team awesome", "description", thisEvent)
         setAuthenticatedUser(thisUser.email)
@@ -204,8 +204,8 @@ class LocationControllerTest : IntegrationTest() {
         featureReposity.save(feature)
 
         val data = mapOf(
-                "latitude" to 0.0,
-                "longitude" to 1.1,
+                "latitude" to 1.0,
+                "longitude" to 1.0,
                 "date" to timeLocation.atZone(ZoneId.systemDefault()).toInstant().epochSecond
         )
 
@@ -235,7 +235,7 @@ class LocationControllerTest : IntegrationTest() {
         val timeEvent = LocalDateTime.of(2016, 6, 3, 9, 0, 0)
         val timeLocation = LocalDateTime.of(2016, 6, 4, 21, 1, 0)
 
-        val thisEvent = eventService.createEvent("Event", timeEvent, "Test", Coord(0.0, 1.1), 36)
+        val thisEvent = eventService.createEvent("Event", timeEvent, "Test", Coord(1.0, 1.0), 36)
         val thisUser = userService.create("testduring@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val thisTeam = teamService.create(thisUser, "team awesome", "description", thisEvent)
 
@@ -245,8 +245,8 @@ class LocationControllerTest : IntegrationTest() {
         setAuthenticatedUser(thisUser.email)
 
         val data = mapOf(
-                "latitude" to 0.0,
-                "longitude" to 1.1,
+                "latitude" to 1.0,
+                "longitude" to 1.0,
                 "date" to timeLocation.atZone(ZoneId.systemDefault()).toInstant().epochSecond
         )
 
@@ -275,8 +275,8 @@ class LocationControllerTest : IntegrationTest() {
 
         val data = listOf(
                 mapOf(
-                        "latitude" to 0.0,
-                        "longitude" to 1.1,
+                        "latitude" to 1.0,
+                        "longitude" to 1.0,
                         "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)),
                 mapOf(
                         "latitude" to 2.2,

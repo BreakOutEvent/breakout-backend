@@ -23,13 +23,13 @@ class LocationServiceImplTest : IntegrationTest() {
         super.setUp()
         this.user = userService.create("email1@test.com", "password", { addRole(Participant::class) })
         val participant = user.getRole(Participant::class)!!
-        this.event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
+        this.event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(1.0, 1.0), 36)
         this.team = teamService.create(participant, "name", "description", event)
     }
 
     @Test
     fun testFindAll() {
-        this.locationService.create(Coord(0.0, 0.0), user.getRole(Participant::class)!!, LocalDateTime.now())
+        this.locationService.create(Coord(1.0, 1.0), user.getRole(Participant::class)!!, LocalDateTime.now())
         this.locationService.create(Coord(1.1, 1.1), user.getRole(Participant::class)!!, LocalDateTime.now())
         this.locationService.create(Coord(2.2, 2.2), user.getRole(Participant::class)!!, LocalDateTime.now())
 
@@ -42,7 +42,7 @@ class LocationServiceImplTest : IntegrationTest() {
 
     @Test
     fun testSave() {
-        val location = Location(Coord(0.0, 0.0), user.getRole(Participant::class)!!, LocalDateTime.now(), mapOf())
+        val location = Location(Coord(1.0, 1.0), user.getRole(Participant::class)!!, LocalDateTime.now(), mapOf())
         locationService.save(location)
 
         val foundLocations = locationService.findAll()
@@ -51,7 +51,7 @@ class LocationServiceImplTest : IntegrationTest() {
 
     @Test
     fun testCreate() {
-        locationService.create(Coord(0.0, 0.0), user.getRole(Participant::class)!!, LocalDateTime.now())
+        locationService.create(Coord(1.0, 1.0), user.getRole(Participant::class)!!, LocalDateTime.now())
 
         val foundLocations = locationService.findAll()
         assertEquals(1, foundLocations.count())
@@ -63,7 +63,7 @@ class LocationServiceImplTest : IntegrationTest() {
         val secondParticipant = secondUser.getRole(Participant::class)!!
         val secondTeam = teamService.create(secondParticipant, "other name", "other description", event)
 
-        locationService.create(Coord(0.0, 1.1), secondParticipant, LocalDateTime.now())
+        locationService.create(Coord(1.0, 1.0), secondParticipant, LocalDateTime.now())
 
         val foundLocations = locationService.findByTeamId(secondTeam.id!!)
         assertEquals(1, foundLocations.count())
