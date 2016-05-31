@@ -15,5 +15,5 @@ interface UserRepository : CrudRepository<UserCore, Long> {
     fun existsByEmail(email: String): Boolean
 
     @Query("from UserCore u where u.firstname like concat('%',:search,'%') or u.lastname like concat('%',:search,'%') or u.email like concat('%',:search,'%')")
-    fun searchByString(@Param("search") search: String): Iterable<UserCore>
+    fun searchByString(@Param("search") search: String): List<UserCore>
 }

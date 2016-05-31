@@ -27,4 +27,7 @@ interface TeamRepository : CrudRepository<Team, Long> {
     fun findInvitationsByInviteCode(@Param("code") code: String): Invitation?
 
     fun findByEventId(eventId: Long): List<Team>
+
+    @Query("from Team t where t.name like concat('%',:search,'%')")
+    fun searchByString(@Param("search") search: String): List<Team>
 }

@@ -121,7 +121,7 @@ class UserServiceImpl : UserService {
         this.save(user)
     }
 
-    override fun searchByString(search: String): Iterable<UserCore> {
+    override fun searchByString(search: String): List<UserCore> {
         return userRepository.searchByString(search)
     }
 }

@@ -115,15 +115,15 @@ open class UserController {
         return userService.getAllUsers().map { BasicUserView(it) };
     }
 
-
     /**
      * GET /user/search/{search}/
      * Searches for User by String greater 2 chars
      */
     @RequestMapping("/search/{search}/", method = arrayOf(GET))
-    open fun getPostingsByHashtag(@PathVariable("search") search: String): List<SimpleUserView> {
+    open fun searchUsers(@PathVariable("search") search: String): List<SimpleUserView> {
         if (search.length < 3) return listOf()
-        val users = userService.searchByString(search)
+        val users = userService.searchByString(search).take(6).toMutableList()
+        users.addAll(teamService.searchByString(search).take(3).flatMap { it.members.map { it.core } })
         return users.map { SimpleUserView(it) }
     }
 

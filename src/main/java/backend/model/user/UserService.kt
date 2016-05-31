@@ -26,5 +26,5 @@ interface UserService {
 
     fun resetPassword(emailString: String, password: String, token: String)
 
-    fun searchByString(search: String): Iterable<UserCore>
+    fun searchByString(search: String): List<UserCore>
 }

@@ -466,7 +466,7 @@ class TestUserEndpoint : IntegrationTest() {
         }).getRole(Participant::class)!!
 
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
-        teamService.create(creator, "team-name", "description", event)
+        val team = teamService.create(creator, "team-name1234", "description", event)
 
 
         userService.create("secondTest@break-out.org", "password", {
@@ -481,7 +481,8 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$[0].id").exists())
                 .andExpect(jsonPath("$[0].firstname").value("Florian"))
                 .andExpect(jsonPath("$[0].lastname").value("Schmidt"))
-                .andExpect(jsonPath("$[0].teamname").value("team-name"))
+                .andExpect(jsonPath("$[0].teamId").value(team.id!!.toInt()))
+                .andExpect(jsonPath("$[0].teamname").value("team-name1234"))
                 .andExpect(jsonPath("$[0].email").doesNotExist())
                 .andExpect(jsonPath("$[1]").doesNotExist())
 
@@ -496,6 +497,37 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$[1].firstname").exists())
                 .andExpect(jsonPath("$[1].lastname").exists())
                 .andExpect(jsonPath("$[1].email").doesNotExist())
+    }
+
+    @Test
+    fun getUserBySearchTeamname() {
+        val creator = userService.create("test@break-out.org", "password", {
+            firstname = "Florian"
+            lastname = "Schmidt"
+            gender = "Male"
+            addRole(Participant::class)
+        }).getRole(Participant::class)!!
+
+        val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
+        val team = teamService.create(creator, "team-name1234", "description", event)
+
+
+        userService.create("secondTest@break-out.org", "password", {
+            firstname = "Leo"
+            lastname = "Theo"
+            gender = "Male"
+        })
+
+        mockMvc.perform(get("/user/search/name1234/"))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$[0].id").exists())
+                .andExpect(jsonPath("$[0].firstname").value("Florian"))
+                .andExpect(jsonPath("$[0].lastname").value("Schmidt"))
+                .andExpect(jsonPath("$[0].teamId").value(team.id!!.toInt()))
+                .andExpect(jsonPath("$[0].teamname").value("team-name1234"))
+                .andExpect(jsonPath("$[0].email").doesNotExist())
+                .andExpect(jsonPath("$[1]").doesNotExist())
     }
 
     @Test

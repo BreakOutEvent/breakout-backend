@@ -247,4 +247,8 @@ class TeamServiceImpl : TeamService {
         val team: Team = this.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")
         return getDonateSum(team)
     }
+
+    override fun searchByString(search: String): List<Team> {
+        return repository.searchByString(search)
+    }
 }
