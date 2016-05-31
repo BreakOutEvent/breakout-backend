@@ -6,6 +6,8 @@ import backend.model.challenges.ChallengeStatus
 import backend.model.location.Location
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
+import backend.model.sponsoring.SponsoringStatus.ACCEPTED
+import backend.model.sponsoring.SponsoringStatus.PAYED
 import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserService
@@ -183,33 +185,40 @@ class TeamServiceImpl : TeamService {
 
     fun getSponsoringSum(team: Team): BigDecimal {
         val distanceKm = this.getLinearDistanceForTeam(team.id!!)
-        val sponsorSum = BigDecimal.ZERO
+        var sponsorSum = BigDecimal.ZERO
 
-        team.sponsoring.forEach { sponsoring ->
+        val sponsorings = team.sponsoring.filter { it.status == ACCEPTED || it.status == PAYED }
+
+        sponsorings.forEach { sponsoring ->
             val amount = sponsoring.amountPerKm.numberStripped.multiply(BigDecimal.valueOf(distanceKm))
-            if (amount.compareTo(sponsoring.limit.numberStripped) == -1) {
-                sponsorSum.add(sponsoring.limit.numberStripped)
+            if (amount.compareTo(sponsoring.limit.numberStripped) == 1) {
+                sponsorSum = sponsorSum.add(sponsoring.limit.numberStripped)
             } else {
-                sponsorSum.add(amount)
+                sponsorSum = sponsorSum.add(amount)
             }
         }
+
+        sponsorSum = sponsorSum.setScale(2, BigDecimal.ROUND_HALF_UP)
 
         return sponsorSum
     }
 
     fun getChallengeSum(team: Team): Map<String, BigDecimal> {
-        val withProofSum = BigDecimal.ZERO
-        val acceptedProofSum = BigDecimal.ZERO
+        var withProofSum = BigDecimal.ZERO
+        var acceptedProofSum = BigDecimal.ZERO
 
         team.challenges.forEach { challenge ->
             if (challenge.status == ChallengeStatus.WITH_PROOF) {
-                withProofSum.add(challenge.amount.numberStripped)
+                withProofSum = withProofSum.add(challenge.amount.numberStripped)
             }
 
             if (challenge.status == ChallengeStatus.PROOF_ACCEPTED) {
-                acceptedProofSum.add(challenge.amount.numberStripped)
+                acceptedProofSum = acceptedProofSum.add(challenge.amount.numberStripped)
             }
         }
+
+        withProofSum = withProofSum.setScale(2, BigDecimal.ROUND_HALF_UP)
+        acceptedProofSum = acceptedProofSum.setScale(2, BigDecimal.ROUND_HALF_UP)
 
         return mapOf(
                 "challenges_with_proof_sum" to withProofSum,
@@ -219,12 +228,13 @@ class TeamServiceImpl : TeamService {
     @Cacheable(cacheNames = arrayOf("singleCache"), key = "'functionDonateSumTeam'.concat(#team.id)")
     override fun getDonateSum(team: Team): Map<String, BigDecimal> {
         val sponsorSum = getSponsoringSum(team)
-
         val challengesSum = getChallengeSum(team)
 
-        val fullSum = BigDecimal.ZERO
-        fullSum.add(sponsorSum)
-        fullSum.add(challengesSum["challenges_with_proof_sum"]!!)
+        var fullSum = BigDecimal.ZERO
+        fullSum = fullSum.add(sponsorSum)
+        fullSum = fullSum.add(challengesSum["challenges_with_proof_sum"]!!)
+        fullSum = fullSum.add(challengesSum["challenges_accepted_proof_sum"]!!)
+        fullSum = fullSum.setScale(2, BigDecimal.ROUND_HALF_UP)
 
         return mapOf(
                 "sponsoring_sum" to sponsorSum,

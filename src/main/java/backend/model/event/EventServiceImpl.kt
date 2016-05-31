@@ -46,18 +46,23 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository, v
     override fun getDonateSum(id: Long): Map<String, BigDecimal> {
         val event = this.findById(id) ?: throw NotFoundException("event with id $id does not exist")
 
-        val sponsorSum = BigDecimal.ZERO
-        val withProofSum = BigDecimal.ZERO
-        val acceptedProofSum = BigDecimal.ZERO
-        val fullSum = BigDecimal.ZERO
+        var sponsorSum = BigDecimal.ZERO
+        var withProofSum = BigDecimal.ZERO
+        var acceptedProofSum = BigDecimal.ZERO
+        var fullSum = BigDecimal.ZERO
 
         event.teams.forEach { team ->
             val donateSum = teamService.getDonateSum(team.id!!)
-            sponsorSum.add(donateSum["sponsoring_sum"]!!)
-            withProofSum.add(donateSum["challenges_with_proof_sum"]!!)
-            acceptedProofSum.add(donateSum["challenges_accepted_proof_sum"]!!)
-            fullSum.add(donateSum["full_sum"]!!)
+            sponsorSum = sponsorSum.add(donateSum["sponsoring_sum"]!!)
+            withProofSum = withProofSum.add(donateSum["challenges_with_proof_sum"]!!)
+            acceptedProofSum = acceptedProofSum.add(donateSum["challenges_accepted_proof_sum"]!!)
+            fullSum = fullSum.add(donateSum["full_sum"]!!)
         }
+
+        sponsorSum = sponsorSum.setScale(2, BigDecimal.ROUND_HALF_UP)
+        withProofSum = withProofSum.setScale(2, BigDecimal.ROUND_HALF_UP)
+        acceptedProofSum = acceptedProofSum.setScale(2, BigDecimal.ROUND_HALF_UP)
+        fullSum = fullSum.setScale(2, BigDecimal.ROUND_HALF_UP)
 
         return mapOf(
                 "sponsoring_sum" to sponsorSum,
