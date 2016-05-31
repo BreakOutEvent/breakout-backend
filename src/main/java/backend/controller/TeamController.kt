@@ -121,7 +121,11 @@ open class TeamController {
 
         checkAuthenticationForEditTeam(team, user)
 
-        team.hasStarted = body.hasStarted ?: false
+        body.hasStarted?.let {
+            if(user.hasRole(Admin::class)) team.hasStarted = it
+            else throw UnauthorizedException("Only an admin can change the hasStarted property of a team")
+        }
+
         team.description = body.description ?: team.description
         team.name = body.name ?: team.name
 

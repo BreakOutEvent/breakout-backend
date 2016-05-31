@@ -51,13 +51,7 @@ class TeamControllerTest : IntegrationTest() {
 
 
         mockMvc.perform(request)
-                .andExpect(status().isOk)
-                .andExpect(jsonPath("$.hasStarted").value(true))
-
-        // Make sure hasStarted gets persisted
-        mockMvc.perform(get("/event/${event.id}/team/${team.id}/"))
-                .andExpect(status().isOk)
-                .andExpect(jsonPath("$.hasStarted").value(true))
+                .andExpect(status().isUnauthorized)
     }
 
     @Test
