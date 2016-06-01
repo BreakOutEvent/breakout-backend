@@ -30,6 +30,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     private lateinit var configurationService: ConfigurationService
     private lateinit var JWT_SECRET: String
     private lateinit var user: User
+    private lateinit var admin: User
     private lateinit var event: Event
     private lateinit var team: Team
 
@@ -40,9 +41,90 @@ open class TestPostingEndpoint : IntegrationTest() {
         this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
 
         event = eventService.createEvent("Breakout München", LocalDateTime.now(), "Munich", Coord(1.0, 1.0), 36)
-        userService.create("test_admin@break-out.org", "password", { addRole(Admin::class); isBlocked = false })
+        admin = userService.create("test_admin@break-out.org", "password", { addRole(Admin::class); isBlocked = false })
         user = userService.create("test@mail.com", "password", { addRole(Participant::class) })
         team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+    }
+
+
+    @Test
+    open fun adminDeletePosting() {
+        val posting = postingService.savePostingWithLocationAndMedia("hello breakout", null, user.core, null, 0.0, LocalDateTime.now())
+
+        val request = MockMvcRequestBuilders
+                .delete("/posting/${posting.id}/")
+                .asUser(mockMvc, admin.email, "password")
+
+        val response = mockMvc.perform (request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.message").value("success"))
+                .andReturn().response.contentAsString
+
+        println(response)
+    }
+
+    @Test
+    open fun adminDeletePostingFailNotAdmin() {
+        val posting = postingService.savePostingWithLocationAndMedia("hello breakout", null, user.core, null, 0.0, LocalDateTime.now())
+
+        val request = MockMvcRequestBuilders
+                .delete("/posting/${posting.id}/")
+                .asUser(mockMvc, user.email, "password")
+
+        val response = mockMvc.perform (request)
+                .andExpect(status().isForbidden)
+                .andReturn().response.contentAsString
+
+        println(response)
+    }
+
+
+    @Test
+    open fun adminDeletePostingCascade() {
+        val posting = postingService.savePostingWithLocationAndMedia("hello #breakout", Coord(1.0, 1.0), user.core, listOf("image", "audio"), 0.0, LocalDateTime.now())
+        likeService.createLike(LocalDateTime.now(), posting, user.core)
+        commentService.createComment("Hello!", LocalDateTime.now(), posting, user.core)
+
+        val postData = mapOf(
+                "url" to "https://aws.amazon.com/bla.jpg",
+                "width" to 400,
+                "height" to 200,
+                "length" to 0.0,
+                "size" to 0.0,
+                "type" to "image"
+        )
+
+        println(posting.media)
+
+        val requestMediaSize = post("/media/${posting.media.first().id}/")
+                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
+                .json(postData)
+
+        mockMvc.perform (requestMediaSize)
+                .andExpect(status().isCreated)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.url").exists())
+                .andExpect(jsonPath("$.width").exists())
+                .andExpect(jsonPath("$.height").exists())
+                .andExpect(jsonPath("$.length").exists())
+                .andExpect(jsonPath("$.size").exists())
+                .andExpect(jsonPath("$.type").exists())
+                .andReturn().response.contentAsString
+
+
+        val request = MockMvcRequestBuilders
+                .delete("/posting/${posting.id}/")
+                .asUser(mockMvc, admin.email, "password")
+
+        val response = mockMvc.perform (request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.message").value("success"))
+                .andReturn().response.contentAsString
+
+        println(response)
     }
 
     @Test

@@ -88,4 +88,12 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
 
     override fun findByHashtag(hashtag: String): List<Posting> = repository.findByHashtag(hashtag)
 
+    @Transactional
+    override fun delete(posting: Posting) {
+        posting.media.forEach {
+            mediaRepository.delete(it)
+        }
+
+        repository.delete(posting)
+    }
 }

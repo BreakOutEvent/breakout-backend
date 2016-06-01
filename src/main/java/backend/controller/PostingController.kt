@@ -85,6 +85,19 @@ open class PostingController {
     }
 
     /**
+     * DELETE /posting/{id}/
+     * Allows Admin to delete Posting
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @RequestMapping("/{id}/", method = arrayOf(DELETE))
+    open fun adminDeletePosting(@PathVariable("id") id: Long): Map<String, String> {
+        val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
+        postingService.delete(posting)
+        return mapOf("message" to "success")
+    }
+
+
+    /**
      * GET /posting/
      * Gets all postings
      */

@@ -26,4 +26,6 @@ interface PostingService {
 
     fun findByHashtag(hashtag: String): List<Posting>
 
+    fun delete(posting: Posting)
+
 }
