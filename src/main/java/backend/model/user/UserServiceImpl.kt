@@ -124,5 +124,9 @@ class UserServiceImpl : UserService {
     override fun searchByString(search: String): List<UserCore> {
         return userRepository.searchByString(search)
     }
+
+    override fun findAllSponsors(): Iterable<Sponsor> {
+        return userRepository.findAllSponsors()
+    }
 }
 
