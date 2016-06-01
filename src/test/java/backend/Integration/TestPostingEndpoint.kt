@@ -289,7 +289,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewPostingWithTextAndHashtags() {
         val postData = mapOf(
-                "text" to "hello #breakout bla blub #awsome",
+                "text" to "hello #breakout bla #bräkauß blub #awsome",
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
         )
 
@@ -301,10 +301,11 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .andExpect(status().isCreated)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.text").value("hello #breakout bla blub #awsome"))
+                .andExpect(jsonPath("$.text").value("hello #breakout bla #bräkauß blub #awsome"))
                 .andExpect(jsonPath("$.hashtags").isArray)
                 .andExpect(jsonPath("$.hashtags[0]").value("breakout"))
-                .andExpect(jsonPath("$.hashtags[1]").value("awsome"))
+                .andExpect(jsonPath("$.hashtags[1]").value("bräkauß"))
+                .andExpect(jsonPath("$.hashtags[2]").value("awsome"))
                 .andExpect(jsonPath("$.date").exists())
                 .andExpect(jsonPath("$.user").exists())
                 .andReturn().response.contentAsString
