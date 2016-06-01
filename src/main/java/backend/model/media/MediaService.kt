@@ -10,4 +10,6 @@ interface MediaService {
 
     fun save(media: Media): Media?
 
+    fun deleteSizes(media: Media)
+
 }

@@ -34,7 +34,7 @@ class Posting : BasicEntity {
     @ManyToOne
     var user: UserCore? = null
 
-    @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+    @OneToMany(cascade = arrayOf(CascadeType.ALL))
     var media: MutableList<Media> = arrayListOf()
 
     @OneToMany(cascade = arrayOf(CascadeType.ALL), mappedBy = "posting", orphanRemoval = true)

@@ -8,6 +8,7 @@ import backend.util.verifyJwtClaim
 import backend.view.MediaSizeView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.POST
 import javax.validation.Valid
@@ -18,7 +19,7 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/media")
-class MediaController {
+open class MediaController {
 
     private val mediaSizeService: MediaSizeService
     private val mediaService: MediaService
@@ -42,14 +43,26 @@ class MediaController {
      */
     @RequestMapping("/{id}/", method = arrayOf(POST))
     @ResponseStatus(CREATED)
-    fun createMediaSize(@PathVariable("id") id: Long,
-                        @RequestHeader("X-UPLOAD-TOKEN") uploadToken: String,
-                        @Valid @RequestBody body: MediaSizeView): MediaSizeView {
+    open fun createMediaSize(@PathVariable("id") id: Long,
+                             @RequestHeader("X-UPLOAD-TOKEN") uploadToken: String,
+                             @Valid @RequestBody body: MediaSizeView): MediaSizeView {
 
         verifyJwtClaim(JWT_SECRET, uploadToken, id.toString())
         val media = mediaService.getByID(id) ?: throw NotFoundException("No media with id $id")
 
         val mediaSize = mediaSizeService.createOrUpdate(media.id!!, body.url!!, body.width!!, body.height!!, body.length!!, body.size!!, body.type!!)
         return MediaSizeView(mediaSize)
+    }
+
+    /**
+     * DELETE /media/{id}/
+     * Allows Admin to delete all mediaSizes for media
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @RequestMapping("/{id}/", method = arrayOf(RequestMethod.DELETE))
+    open fun adminDeletePosting(@PathVariable("id") id: Long): Map<String, String> {
+        val media = mediaService.getByID(id) ?: throw NotFoundException("media with id $id does not exist")
+        mediaService.deleteSizes(media)
+        return mapOf("message" to "success")
     }
 }
