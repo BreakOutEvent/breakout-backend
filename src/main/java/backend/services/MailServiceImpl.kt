@@ -13,6 +13,8 @@ import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
 import org.springframework.web.util.UriComponentsBuilder
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
 
 @Service
 @Profile(PRODUCTION)
@@ -24,6 +26,7 @@ class MailServiceImpl : MailService {
     private val emailRepository: EmailRepository
 
     private val logger = LoggerFactory.getLogger(MailServiceImpl::class.java)
+    private val pool = Executors.newCachedThreadPool()
 
     @Autowired
     constructor(restTemplate: RestOperations, configurationService: ConfigurationService, emailRepository: EmailRepository) {
@@ -70,5 +73,11 @@ class MailServiceImpl : MailService {
             send(email = email, saveToDb = true)
         }
         return failedMails.size
+    }
+
+    override fun sendAsync(email: Email, saveToDb: Boolean) {
+        pool.submit(Callable {
+            send(email, saveToDb)
+        })
     }
 }
