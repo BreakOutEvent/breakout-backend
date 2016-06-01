@@ -63,6 +63,7 @@ class Challenge : BasicEntity {
                 (ACCEPTED to REJECTED),
                 (ACCEPTED to WITHDRAWN),
                 (REJECTED to ACCEPTED),
+                (REJECTED to WITHDRAWN),
                 (ACCEPTED to WITH_PROOF),
                 (WITH_PROOF to PROOF_ACCEPTED),
                 (WITH_PROOF to PROOF_REJECTED),

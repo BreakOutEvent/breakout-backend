@@ -45,6 +45,7 @@ class Sponsoring : BasicEntity {
                 PROPOSED to ACCEPTED,
                 PROPOSED to REJECTED,
                 PROPOSED to WITHDRAWN,
+                REJECTED to WITHDRAWN,
                 ACCEPTED to WITHDRAWN,
                 ACCEPTED to PAYED)
 
