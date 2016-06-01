@@ -1,6 +1,7 @@
 package backend.model.location
 
 import backend.controller.exceptions.BadRequestException
+import backend.exceptions.DomainException
 import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.services.FeatureFlagService
@@ -47,10 +48,18 @@ class LocationServiceImpl : LocationService {
 
         val locationData = if (doGeoCode) geoCodingService.getGeoCoded(coord) else mapOf()
         val location = Location(coord, participant, date, locationData)
-        if (featureFlagService.isEnabled("event.isNow")) {
+
+        checkAndSetIsDuringEvent(location, participant)
+
+        return locationRepository.save(location)
+    }
+
+    private fun checkAndSetIsDuringEvent(location: Location, participant: Participant) {
+        val teamHasStarted = participant.currentTeam?.hasStarted ?: throw DomainException("User has no team")
+
+        if (featureFlagService.isEnabled("event.isNow") && teamHasStarted) {
             location.isDuringEvent = true
         }
-        return locationRepository.save(location)
     }
 
     override fun findByTeamId(id: Long): Iterable<Location> {
