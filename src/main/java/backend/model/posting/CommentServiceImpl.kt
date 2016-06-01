@@ -28,4 +28,8 @@ class CommentServiceImpl @Autowired constructor(val repository: CommentRepositor
     override fun findAll(): Iterable<Comment> = repository.findAll()
 
     override fun getByID(id: Long): Comment? = repository.findById(id)
+
+    override fun delete(comment: Comment) {
+        repository.delete(comment)
+    }
 }

@@ -128,6 +128,77 @@ open class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
+    open fun adminDeleteComment() {
+
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, 0.0, LocalDateTime.now())
+        val comment = commentService.createComment("TestComment", LocalDateTime.now(), posting, user.core)
+
+        val requestPosting = get("/posting/${posting.id}/")
+
+        mockMvc.perform (requestPosting)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.text").exists())
+                .andExpect(jsonPath("$.date").exists())
+                .andExpect(jsonPath("$.user").exists())
+                .andExpect(jsonPath("$.comments").isArray)
+                .andExpect(jsonPath("$.comments[0].text").value("TestComment"))
+
+
+        val requestDelete = MockMvcRequestBuilders
+                .delete("/posting/${posting.id}/comment/${comment.id}/")
+                .asUser(mockMvc, admin.email, "password")
+
+        mockMvc.perform (requestDelete)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.message").value("success"))
+
+
+        val requestPosting2 = get("/posting/${posting.id}/")
+
+        mockMvc.perform (requestPosting2)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.text").exists())
+                .andExpect(jsonPath("$.date").exists())
+                .andExpect(jsonPath("$.user").exists())
+                .andExpect(jsonPath("$.comments").isArray)
+                .andExpect(jsonPath("$.comments[0]").doesNotExist())
+
+    }
+
+    @Test
+    open fun adminDeleteCommentFailNotAdmin() {
+
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, 0.0, LocalDateTime.now())
+        val comment = commentService.createComment("TestComment", LocalDateTime.now(), posting, user.core)
+
+        val requestPosting = get("/posting/${posting.id}/")
+
+        mockMvc.perform (requestPosting)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.text").exists())
+                .andExpect(jsonPath("$.date").exists())
+                .andExpect(jsonPath("$.user").exists())
+                .andExpect(jsonPath("$.comments").isArray)
+                .andExpect(jsonPath("$.comments[0].text").value("TestComment"))
+
+
+        val requestDelete = MockMvcRequestBuilders
+                .delete("/posting/${posting.id}/comment/${comment.id}/")
+                .asUser(mockMvc, user.email, "password")
+
+        mockMvc.perform (requestDelete)
+                .andExpect(status().isForbidden)
+
+    }
+
+    @Test
     open fun createNewPostingWithTextAndLocationAndMedia() {
         val postData = mapOf(
                 "text" to "TestPost",

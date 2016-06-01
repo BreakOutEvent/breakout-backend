@@ -96,6 +96,18 @@ open class PostingController {
         return mapOf("message" to "success")
     }
 
+    /**
+     * DELETE /posting/{id}/comment/{commentId}/
+     * Allows Admin to delete Comment
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @RequestMapping("/{id}/comment/{commentId}/", method = arrayOf(DELETE))
+    open fun adminDeleteComment(@PathVariable("commentId") commentId: Long): Map<String, String> {
+        val comment = commentService.getByID(commentId) ?: throw NotFoundException("comments with id $commentId does not exist")
+        commentService.delete(comment)
+        return mapOf("message" to "success")
+    }
+
 
     /**
      * GET /posting/
