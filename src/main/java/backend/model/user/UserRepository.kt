@@ -16,4 +16,8 @@ interface UserRepository : CrudRepository<UserCore, Long> {
 
     @Query("from UserCore u where u.firstname like concat('%',:search,'%') or u.lastname like concat('%',:search,'%') or u.email like concat('%',:search,'%')")
     fun searchByString(@Param("search") search: String): List<UserCore>
+
+    @Query("from Sponsor s")
+    fun findAllSponsors(): Iterable<Sponsor>
+
 }
