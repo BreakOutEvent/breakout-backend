@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service
 @Profile(DEVELOPMENT, TEST)
 class FakeGeoCodingServiceImpl @Autowired constructor(configurationService: ConfigurationService) : GeoCodingService by GeoCodingServiceImpl(configurationService) {
 
-    val logger = LoggerFactory.getLogger(FakeMailServiceImpl::class.java)
+    val logger = LoggerFactory.getLogger(FakeGeoCodingServiceImpl::class.java)
 
     override fun getGeoCoded(coord: Coord): Map<String, String> {
         logger.info("Faked Geocoding for (${coord.latitude}, ${coord.longitude})")
