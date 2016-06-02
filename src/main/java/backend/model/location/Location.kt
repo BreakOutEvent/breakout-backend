@@ -8,7 +8,6 @@ import backend.model.posting.Posting
 import backend.model.user.Participant
 import backend.util.distanceCoordsKM
 import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
 import javax.persistence.*
 
 @Entity
@@ -21,9 +20,8 @@ class Location : BasicEntity {
     @ManyToOne
     var uploader: Participant? = null
 
-    @OneToOne(mappedBy = "location")
+    @OneToOne(mappedBy = "location", fetch = FetchType.EAGER)
     var posting: Posting? = null
-        private set
 
     @ManyToOne
     var team: Team? = null
@@ -34,7 +32,7 @@ class Location : BasicEntity {
 
     var distance: Double = 0.0
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @MapKeyColumn(name = "location_data_key")
     @Column(name = "location_data_value")
     var locationData: Map<String, String> = mapOf()

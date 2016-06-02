@@ -89,8 +89,6 @@ interface TeamService {
 
     fun getLinearDistanceForTeam(teamId: Long): Double
 
-    fun getActualDistanceForTeam(teamId: Long): Double
-
     fun getDistance(teamId: Long): Map<String, Double>
 
     fun join(participant: Participant, team: Team)

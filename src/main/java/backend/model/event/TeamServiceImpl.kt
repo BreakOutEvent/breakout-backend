@@ -13,11 +13,11 @@ import backend.model.user.User
 import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.services.MailService
-import backend.util.distanceCoordsListKMfromStart
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
@@ -86,12 +86,7 @@ class TeamServiceImpl : TeamService {
     override fun findLocationPostingsById(id: Long) = repository.findLocationByTeamId(id)
 
     override fun getLocationMaxDistanceById(id: Long): Location? {
-        val locationList = repository.getLocationMaxDistanceById(id)
-        if (locationList.size <= 0) {
-            return null
-        } else {
-            return locationList.dropWhile { !it.isDuringEvent }.firstOrNull()
-        }
+        return repository.getLocationMaxDistanceById(id, PageRequest(0, 1)).firstOrNull()
     }
 
     override fun findInvitationsForUser(user: User): List<Invitation> {
@@ -106,16 +101,6 @@ class TeamServiceImpl : TeamService {
     override fun getLinearDistanceForTeam(teamId: Long): Double {
         val locationDistance = this.getLocationMaxDistanceById(teamId)
         val distance = locationDistance?.distance ?: 0.0
-
-        return distance
-    }
-
-    override fun getActualDistanceForTeam(teamId: Long): Double {
-
-        val team: Team = this.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")
-        val startingCoordinates = team.event.startingLocation
-        val postingCoordinates = this.findLocationPostingsById(teamId).dropWhile { !it.isDuringEvent }.map { it.coord }
-        val distance = distanceCoordsListKMfromStart(startingCoordinates, postingCoordinates)
 
         return distance
     }
@@ -143,9 +128,8 @@ class TeamServiceImpl : TeamService {
     @Cacheable(cacheNames = arrayOf("singleCache"), key = "'functionDistanceTeam'.concat(#teamId)")
     override fun getDistance(teamId: Long): Map<String, Double> {
         val linearDistance = this.getLinearDistanceForTeam(teamId)
-        val actualDistance = this.getActualDistanceForTeam(teamId)
 
-        return mapOf("actual_distance" to actualDistance, "linear_distance" to linearDistance)
+        return mapOf("actual_distance" to 0.0, "linear_distance" to linearDistance)
     }
 
     override fun getFullTeamMailForMember(participants: Set<Participant>): List<Email> {

@@ -1,6 +1,7 @@
 package backend.model.event
 
 import backend.model.location.Location
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
@@ -14,8 +15,8 @@ interface TeamRepository : CrudRepository<Team, Long> {
     @Query("Select l from Location l inner join l.team t where t.id = :id order by l.date asc")
     fun findLocationByTeamId(@Param("id") id: Long): List<Location>
 
-    @Query("Select l from Location l inner join l.team t where t.id = :id order by l.distance desc")
-    fun getLocationMaxDistanceById(@Param("id") id: Long): List<Location>
+    @Query("Select l from Location l inner join l.team t where t.id = :id and l.isDuringEvent = true order by l.distance desc")
+    fun getLocationMaxDistanceById(@Param("id") id: Long, pageable: Pageable): List<Location>
 
     @Query("Select i from Invitation i where i.invitee.value = :email")
     fun findInvitationsWithEmail(@Param("email") email: String): List<Invitation>
