@@ -42,6 +42,7 @@ class BasicUserView() {
         var eventCity: String? = null
         var teamId: Long? = null
         var teamName: String? = null
+        var tshirtSize: String? = null
 
         constructor(user: User) : this() {
             this.participant = user.getRole(Participant::class)
@@ -49,6 +50,7 @@ class BasicUserView() {
             this.eventCity = participant?.currentTeam?.event?.city
             this.teamId = participant?.currentTeam?.id
             this.teamName = participant?.currentTeam?.name
+            this.tshirtSize = participant?.tshirtsize
         }
     }
 }
