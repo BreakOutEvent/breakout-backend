@@ -1,14 +1,21 @@
 package backend.model.sponsoring
 
 import backend.Integration.IntegrationTest
+import backend.model.event.TeamService
 import backend.model.misc.Coord
 import backend.model.sponsoring.SponsoringStatus.*
 import backend.model.user.Address
 import backend.model.user.Participant
 import backend.model.user.Sponsor
+import backend.model.user.UserService
+import backend.services.MailService
 import backend.util.euroOf
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.powermock.api.mockito.PowerMockito
+import org.powermock.core.classloader.annotations.PrepareForTest
+import org.powermock.modules.junit4.PowerMockRunner
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertFails

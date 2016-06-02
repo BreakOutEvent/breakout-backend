@@ -5,8 +5,11 @@ import backend.model.event.TeamService
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.user.Sponsor
+import backend.model.user.UserService
 import backend.services.MailService
 import org.javamoney.moneta.Money
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
@@ -18,13 +21,21 @@ class SponsoringServiceImpl : SponsoringService {
     private val sponsoringRepository: SponsoringRepository
     private val mailService: MailService
     private val teamService: TeamService
+    private val userService: UserService
+    private val logger: Logger
 
 
     @Autowired
-    constructor(sponsoringRepository: SponsoringRepository, mailService: MailService, teamService: TeamService) {
+    constructor(sponsoringRepository: SponsoringRepository,
+                mailService: MailService,
+                teamService: TeamService,
+                userService: UserService) {
+
         this.sponsoringRepository = sponsoringRepository
         this.mailService = mailService
         this.teamService = teamService
+        this.userService = userService
+        this.logger = LoggerFactory.getLogger(SponsoringServiceImpl::class.java)
     }
 
     @Transactional
@@ -47,6 +58,41 @@ class SponsoringServiceImpl : SponsoringService {
         mailService.send(email)
 
         return sponsoringRepository.save(sponsoring)
+    }
+
+    override fun sendEmailsToSponsorsWhenEventHasStarted() {
+
+        userService.findAllSponsors()
+                .filter { it.challenges.count() + it.sponsorings.count() > 0 }
+                .apply { logger.info("Sending emails that event has started to ${this.count()} sponsors") }
+                .forEach {
+                    val mail = Email(
+                            to = listOf(EmailAddress(it.email)),
+                            subject = "BreakOut 2016 - Jetzt geht's los",
+                            body = getEmailBodyWhenEventHasStarted(it),
+                            buttonText = "ZUM LIVEBLOG",
+                            buttonUrl = "https://event.break-out.org/?utm_source=backend&utm_medium=email&utm_content=intial&utm_campaign=event_started_sponsor")
+
+                    mailService.sendAsync(mail)
+                }
+    }
+
+    private fun getEmailBodyWhenEventHasStarted(sponsor: Sponsor): String {
+        val title = when (sponsor.gender) {
+            "male" -> "Sehr geehrter Herr"
+            "female" -> "Sehr geehrte Frau"
+            else -> "Sehr geehrte Frau / Herr"
+        }
+
+        return "$title ${sponsor.firstname} ${sponsor.lastname},<br><br>" +
+                "BreakOut 2016 hat begonnen! Wir freuen uns sehr, Sie als Sponsor dabei zu haben!<br>" +
+                "Sie können unter <a href=\"https://event.break-out.org/?utm_source=backend&utm_medium=email&u" +
+                "tm_content=intial&utm_campaign=event_started_sponsor\">https://event.break-out.org/</a> die nächsten 36 Stunden live mitverfolgen, " +
+                "wohin die Reise geht und welche Abenteuer Ihr Team dabei erlebt. Natürlich können Sie " +
+                "während der 36h Ihr Team noch mit spontanen Challenges herausfordern. " +
+                "Wir wünschen Ihnen viel Spaß dabei!!<br><br>" +
+                "Herzliche Grüße<br>" +
+                "Ihr BreakOut-Team"
     }
 
     @Transactional
