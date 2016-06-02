@@ -23,5 +23,8 @@ interface SponsoringService {
 
     @PreAuthorize("#team.isMember(authentication.name)")
     fun createSponsoringWithOfflineSponsor(team: Team, amountPerKm: Money, limit: Money, unregisteredSponsor: UnregisteredSponsor): Sponsoring
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    fun sendEmailsToSponsorsWhenEventHasStarted()
 }
 
