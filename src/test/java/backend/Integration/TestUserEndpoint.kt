@@ -61,13 +61,13 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$[0].firstname").exists())
                 .andExpect(jsonPath("$[0].lastname").exists())
                 .andExpect(jsonPath("$[0].email").doesNotExist())
-                .andExpect(jsonPath("$[0].gender").doesNotExist())
+                .andExpect(jsonPath("$[0].gender").exists())
                 .andExpect(jsonPath("$[0].passwordHash").doesNotExist())
                 .andExpect(jsonPath("$[1].id").exists())
                 .andExpect(jsonPath("$[1].firstname").exists())
                 .andExpect(jsonPath("$[1].lastname").exists())
                 .andExpect(jsonPath("$[1].email").doesNotExist())
-                .andExpect(jsonPath("$[1].gender").doesNotExist())
+                .andExpect(jsonPath("$[1].gender").exists())
                 .andExpect(jsonPath("$[1].passwordHash").doesNotExist())
     }
 
@@ -186,7 +186,7 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(MockMvcResultMatchers.content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.email").doesNotExist())
-                .andExpect(jsonPath("$.gender").doesNotExist())
+                .andExpect(jsonPath("$.gender").exists())
                 .andExpect(jsonPath("$.passwordHash").doesNotExist())
                 .andExpect(jsonPath("$.profilePic").exists())
                 .andExpect(jsonPath("$.profilePic.id").exists())
@@ -452,7 +452,7 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.firstname").exists())
                 .andExpect(jsonPath("$.lastname").exists())
                 .andExpect(jsonPath("$.email").doesNotExist())
-                .andExpect(jsonPath("$.gender").doesNotExist())
+                .andExpect(jsonPath("$.gender").exists())
                 .andExpect(jsonPath("$.passwordHash").doesNotExist())
     }
 
