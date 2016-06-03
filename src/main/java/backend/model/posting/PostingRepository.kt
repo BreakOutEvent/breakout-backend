@@ -11,7 +11,7 @@ interface PostingRepository : CrudRepository<Posting, Long> {
     @Query("select p.id from Posting p where p.id > :id order by p.id desc")
     fun findAllIdsSince(@Param("id") id: Long): List<Long>
 
-    @Query("select p from Posting p inner join p.hashtags h where h.value = :hashtag group by concat(lower(h.value), ' - ', p.id) order by p.id desc")
+    @Query("select p from Posting p inner join p.hashtags h where h.value = :hashtag order by p.id desc")
     fun findByHashtag(@Param("hashtag") hashtag: String): List<Posting>
 
     fun findAllByOrderByIdDesc(pageable: Pageable): List<Posting>
