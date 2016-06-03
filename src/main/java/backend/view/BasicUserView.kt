@@ -13,6 +13,8 @@ class BasicUserView() {
     var firstname: String? = null
     var lastname: String? = null
 
+    var gender: String? = null
+
     var id: Long? = null
     var isBlocked: Boolean? = null
 
@@ -28,6 +30,7 @@ class BasicUserView() {
         this.firstname = user.firstname
         this.lastname = user.lastname
         this.id = user.core.id
+        this.gender = user.gender
         this.isBlocked = user.isBlocked
         this.participant = if (user.hasRole(Participant::class)) BasicParticipantViewModel(user) else null
         this.profilePic = MediaView(user.profilePic)
