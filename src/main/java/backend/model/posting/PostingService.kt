@@ -22,7 +22,7 @@ interface PostingService {
 
     fun findAllByIds(body: List<Long>): Iterable<Posting>
 
-    fun findAllSince(id: Long): List<Posting>
+    fun findAllIdsSince(id: Long): List<Long>
 
     fun findByHashtag(hashtag: String): List<Posting>
 

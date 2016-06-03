@@ -147,7 +147,7 @@ open class PostingController {
      */
     @RequestMapping("/get/since/{id}/", method = arrayOf(GET))
     open fun getPostingIdsSince(@PathVariable("id") id: Long): Iterable<Long> {
-        return postingService.findAllSince(id).map { it.id!! }
+        return postingService.findAllIdsSince(id)
     }
 
     /**

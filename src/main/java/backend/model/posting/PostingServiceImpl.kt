@@ -23,7 +23,7 @@ import java.time.LocalDateTime
 @Service
 class PostingServiceImpl @Autowired constructor(val repository: PostingRepository, val locationService: LocationService, val mediaRepository: MediaRepository) : PostingService {
 
-    override fun findAllSince(id: Long): List<Posting> = repository.findAllSince(id)
+    override fun findAllIdsSince(id: Long): List<Long> = repository.findAllIdsSince(id)
 
     override fun findAllByIds(body: List<Long>): Iterable<Posting> = repository.findAllByIds(body)
 
