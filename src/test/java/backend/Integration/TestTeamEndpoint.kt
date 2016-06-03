@@ -196,6 +196,7 @@ class TestTeamEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.members[0].id").exists())
                 .andExpect(jsonPath("$.members[0].firstname").exists())
                 .andExpect(jsonPath("$.members[0].lastname").exists())
+                .andExpect(jsonPath("$.members[0].gender").exists())
                 .andExpect(jsonPath("$.members[0].profilePic").exists())
                 .andExpect(jsonPath("$.members[0].roles").exists())
                 .andReturn().response.contentAsString
