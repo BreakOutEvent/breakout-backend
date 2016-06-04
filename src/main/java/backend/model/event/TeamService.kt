@@ -103,4 +103,6 @@ interface TeamService {
 
     fun searchByString(search: String): List<Team>
 
+    fun sendEmailsToTeamsWhenEventHasEnded()
+
 }

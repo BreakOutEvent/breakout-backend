@@ -26,5 +26,7 @@ interface SponsoringService {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     fun sendEmailsToSponsorsWhenEventHasStarted()
+
+    fun sendEmailsToSponsorsWhenEventHasEnded()
 }
 

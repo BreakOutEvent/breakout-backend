@@ -5,7 +5,6 @@ import backend.controller.exceptions.NotFoundException
 import backend.model.event.TeamService
 import backend.model.sponsoring.SponsoringService
 import backend.services.MailService
-import backend.view.TeamView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -59,6 +58,8 @@ open class AdminController {
     open fun sendEmail(@PathVariable identifier: String): Map<String, String> {
         when (identifier) {
             "SPONSOR_EVENT_STARTED" -> sponsoringService.sendEmailsToSponsorsWhenEventHasStarted()
+            "SPONSOR_EVENT_ENDED" -> sponsoringService.sendEmailsToSponsorsWhenEventHasEnded()
+            "TEAM_EVENT_ENDED" -> teamService.sendEmailsToTeamsWhenEventHasEnded()
             else -> throw NotFoundException("identifier $identifier not registered as email trigger")
         }
 

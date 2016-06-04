@@ -95,6 +95,41 @@ class SponsoringServiceImpl : SponsoringService {
                 "Ihr BreakOut-Team"
     }
 
+    override fun sendEmailsToSponsorsWhenEventHasEnded() {
+
+        userService.findAllSponsors()
+                .filter { it.challenges.count() + it.sponsorings.count() > 0 }
+                .apply { logger.info("Sending emails that event has ended to ${this.count()} sponsors") }
+                .forEach {
+                    val mail = Email(
+                            to = listOf(EmailAddress(it.email)),
+                            subject = "BreakOut 2016 - War ein voller Erfolg!",
+                            body = getEmailBodyWhenEventHasEnded(it),
+                            buttonText = "ZUM LIVEBLOG",
+                            buttonUrl = "https://event.break-out.org/?utm_source=backend&utm_medium=email&utm_content=intial&utm_campaign=event_ended_sponsor")
+
+                    mailService.sendAsync(mail)
+                }
+    }
+
+    private fun getEmailBodyWhenEventHasEnded(sponsor: Sponsor): String {
+        val title = when (sponsor.gender) {
+            "male" -> "Sehr geehrter Herr"
+            "female" -> "Sehr geehrte Frau"
+            else -> "Sehr geehrte Frau / Herr"
+        }
+
+        return "$title ${sponsor.firstname} ${sponsor.lastname},<br><br>" +
+                "BreakOut 2016 ist vollendet. Vielen herzlichen Dank, dass Sie als Sponsor die Reise Ihres Teams unterstützt und damit den Erfolg unseres Projektes erst ermöglicht haben." +
+                "Ein riesiges Dankeschön von uns!<br><br>" +
+
+                "Ihr Team erholt sich gerade von den kräftezehrenden 36 Stunden während wir Ihr genaues Spendenversprechen ermitteln." +
+                "Dazu werden Sie morgen Abend eine E-Mail mit dem genauen Spendenbetrag von uns erhalten.<br><br>" +
+
+                "Herzliche Grüße<br>" +
+                "Ihr BreakOut-Team"
+    }
+
     @Transactional
     override fun createSponsoringWithOfflineSponsor(team: Team,
                                                     amountPerKm: Money,

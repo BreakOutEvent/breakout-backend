@@ -67,6 +67,11 @@ class TestTeamEndpoint : IntegrationTest() {
     }
 
     @Test
+    fun eventEndedMail() {
+        teamService.sendEmailsToTeamsWhenEventHasEnded()
+    }
+
+    @Test
     fun testCreateTeam() {
 
         val body = mapOf("name" to "Team awesome", "description" to "Our team is awesome").toJsonString()

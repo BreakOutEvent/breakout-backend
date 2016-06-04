@@ -235,4 +235,35 @@ class TeamServiceImpl : TeamService {
     override fun searchByString(search: String): List<Team> {
         return repository.searchByString(search)
     }
+
+    override fun sendEmailsToTeamsWhenEventHasEnded() {
+
+        repository.findAll().filter { it.hasStarted }
+                .apply { logger.info("Sending emails that event has ended to ${this.count()} teams") }
+                .forEach {
+                    val mail = Email(
+                            to = it.members.map { EmailAddress(it.email) },
+                            subject = "BreakOut 2016 - War ein voller Erfolg!",
+                            body = getEmailBodyToTeamsWhenEventHasEnded(it),
+                            buttonText = "ZUM LIVEBLOG",
+                            buttonUrl = "https://event.break-out.org/?utm_source=backend&utm_medium=email&utm_content=intial&utm_campaign=event_ended_team")
+
+                    mailService.sendAsync(mail)
+                }
+    }
+
+    private fun getEmailBodyToTeamsWhenEventHasEnded(team: Team): String {
+
+        return "Liebes Team ${team.name}," +
+
+                "Ihr habt es geschafft und habt erfolgreich bei BreakOut 2016 teilgenommen. Wir feiern Euch hart ab. Mega, dass Ihr mitgemacht und so gemeinsam Spenden für das DAFI-Programm der UNO Flüchtlingshilfe gesammelt habt.<br><br>" +
+
+                "Damit wir Eure überragende Leistung gebührend zusammen feiern können, seid Ihr alle herzlich zur BreakOut- Siegerehrung eingeladen.<br>" +
+                "Diese findet am 15. Juni um 18:00 Uhr in der 089-Bar in München statt.<br><br>" +
+
+                "Weitere Informationen zur Siegerehrung und Eurer Reise folgen bald.<br><br>" +
+
+                "Genießt den Abend. Wir wünschen Euch eine schöne und sichere Heimreise.<br>" +
+                "Ihr BreakOut-Team"
+    }
 }
