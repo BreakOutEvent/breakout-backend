@@ -55,7 +55,7 @@ open class ChallengeController {
      * Get a list of all sponsorings for the user with userId
      * This can only be done if the user is a sponsor
      */
-    @PreAuthorize("hasAuthority('SPONSOR')")
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping("/user/{userId}/sponsor/challenge/", method = arrayOf(GET))
     open fun getAllChallengesForSponsor(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
                                         @PathVariable userId: Long): Iterable<ChallengeView> {
@@ -154,5 +154,4 @@ open class ChallengeController {
         }
     }
 }
-
 

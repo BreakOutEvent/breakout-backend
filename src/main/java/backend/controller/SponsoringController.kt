@@ -149,6 +149,7 @@ open class SponsoringController {
      * Get a list of all sponsorings for the user with userId
      * This can only be done if the user is a sponsor
      */
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping("/user/{userId}/sponsor/sponsoring/", method = arrayOf(GET))
     open fun getAllSponsoringsForSponsor(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
                                          @PathVariable userId: Long): Iterable<SponsoringView> {
