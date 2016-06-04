@@ -52,11 +52,14 @@ class MediaSizeServiceImpl : MediaSizeService {
 
         val media = mediaRepository.findById(mediaId)
 
-        val mediaSizeFound: MediaSize?
-        if (width > height) {
-            mediaSizeFound = this.findByWidthAndMediaAndMediaType(width, media, MediaType.valueOf(type.toUpperCase()));
-        } else {
-            mediaSizeFound = this.findByHeightAndMediaAndMediaType(height, media, MediaType.valueOf(type.toUpperCase()));
+        var mediaSizeFound: MediaSize? = null
+
+        if (MediaType.valueOf(type.toUpperCase()).equals(MediaType.IMAGE)) {
+            if (width > height) {
+                mediaSizeFound = this.findByWidthAndMediaAndMediaType(width, media, MediaType.valueOf(type.toUpperCase()));
+            } else {
+                mediaSizeFound = this.findByHeightAndMediaAndMediaType(height, media, MediaType.valueOf(type.toUpperCase()));
+            }
         }
 
         if (mediaSizeFound == null) {
