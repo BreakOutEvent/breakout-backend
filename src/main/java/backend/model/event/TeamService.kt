@@ -105,4 +105,5 @@ interface TeamService {
 
     fun sendEmailsToTeamsWhenEventHasEnded()
 
+    fun findAll(): Iterable<Team>
 }

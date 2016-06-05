@@ -68,7 +68,7 @@ class MailServiceImpl : MailService {
             .build().toUriString()
 
     override fun resendFailed(): Int {
-        val failedMails = emailRepository.findByIsSent(false)
+        val failedMails = emailRepository.findByIsSent(false).take(100)
         failedMails.forEach { email ->
             send(email = email, saveToDb = true)
         }

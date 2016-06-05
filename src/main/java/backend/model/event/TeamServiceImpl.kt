@@ -266,4 +266,8 @@ class TeamServiceImpl : TeamService {
                 "Genießt den Abend. Wir wünschen Euch eine schöne und sichere Heimreise.<br>" +
                 "Ihr BreakOut-Team"
     }
+
+    override fun findAll(): Iterable<Team> {
+        return repository.findAll()
+    }
 }
