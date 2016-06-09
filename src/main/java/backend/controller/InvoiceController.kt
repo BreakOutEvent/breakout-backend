@@ -3,10 +3,12 @@ package backend.controller
 import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
+import backend.model.payment.SponsoringInvoiceService
 import backend.model.payment.TeamEntryFeeService
 import backend.model.user.Admin
 import backend.model.user.UserService
 import backend.view.PaymentView
+import backend.view.SponsoringInvoiceView
 import backend.view.TeamEntryFeeInvoiceView
 import org.javamoney.moneta.Money
 import org.slf4j.Logger
@@ -28,12 +30,14 @@ import javax.validation.Valid
 open class InvoiceController {
 
     private val teamEntryFeeService: TeamEntryFeeService
+    private val sponsoringInvoiceService: SponsoringInvoiceService
     private val userService: UserService
     private val logger: Logger
 
     @Autowired
-    constructor(teamEntryFeeService: TeamEntryFeeService, userService: UserService) {
+    constructor(teamEntryFeeService: TeamEntryFeeService, userService: UserService, sponsoringInvoiceService: SponsoringInvoiceService) {
         this.teamEntryFeeService = teamEntryFeeService
+        this.sponsoringInvoiceService = sponsoringInvoiceService
         this.userService = userService
         this.logger = LoggerFactory.getLogger(InvoiceController::class.java)
     }
@@ -60,18 +64,27 @@ open class InvoiceController {
 
 
     /**
-     * GET /invoice/{id}/
+     * GET /invoice/teamfee/{id}/
      * Allows admin to get given invoice
      */
     @PreAuthorize("hasAuthority('ADMIN')")
-    @RequestMapping("/{invoiceId}/", method = arrayOf(GET))
-    open fun getInvoice(@PathVariable invoiceId: Long,
-                        @AuthenticationPrincipal customUserDetails: CustomUserDetails): TeamEntryFeeInvoiceView {
+    @RequestMapping("/teamfee/{invoiceId}/", method = arrayOf(GET))
+    open fun getTeamFeeInvoice(@PathVariable invoiceId: Long,
+                               @AuthenticationPrincipal customUserDetails: CustomUserDetails): TeamEntryFeeInvoiceView {
 
-        val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val invoice = teamEntryFeeService.findById(invoiceId) ?: throw NotFoundException("No invoice with id $invoiceId found")
-        user.getRole(Admin::class) ?: throw UnauthorizedException("User is no admin")
-
         return TeamEntryFeeInvoiceView(invoice)
+    }
+
+    /**
+     * GET /invoice/sponsoring/
+     * Allows admin to get all sponsoringinvoices
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @RequestMapping("/sponsoring/", method = arrayOf(GET))
+    open fun getAllSponsorInvoices(@AuthenticationPrincipal customUserDetails: CustomUserDetails): List<SponsoringInvoiceView> {
+
+        val invoices = sponsoringInvoiceService.findAll()
+        return invoices.map { SponsoringInvoiceView(it) }
     }
 }

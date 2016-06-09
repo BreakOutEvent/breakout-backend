@@ -54,7 +54,7 @@ open class InvoiceControllerTest : IntegrationTest() {
 
     @Test
     open fun testGetInvoice() {
-        val request = get("/invoice/${team.invoice!!.id}/")
+        val request = get("/invoice/teamfee/${team.invoice!!.id}/")
                 .asUser(mockMvc, admin.email, "password")
 
         mockMvc.perform(request)

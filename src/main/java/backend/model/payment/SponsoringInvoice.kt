@@ -20,7 +20,7 @@ class SponsoringInvoice : Invoice {
     var sponsorings: List<Sponsoring> = listOf()
 
     @OneToMany(mappedBy = "invoice", cascade = arrayOf(CascadeType.MERGE, CascadeType.PERSIST))
-    var challanges: List<Challenge> = listOf()
+    var challenges: List<Challenge> = listOf()
 
     var subject: String? = null
 
@@ -30,7 +30,7 @@ class SponsoringInvoice : Invoice {
         this.team = team
         this.subject = subject
         this.sponsorings = sponsorings
-        this.challanges = challenges
+        this.challenges = challenges
     }
 
     override fun checkPaymentEligability(payment: Payment) {
