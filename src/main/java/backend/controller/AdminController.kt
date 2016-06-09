@@ -1,16 +1,20 @@
 package backend.controller
 
 import backend.controller.exceptions.NotFoundException
+import backend.model.challenges.Challenge
 import backend.model.challenges.ChallengeService
 import backend.model.challenges.ChallengeStatus
 import backend.model.event.TeamService
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.misc.EmailRepository
+import backend.model.payment.SponsoringInvoiceService
+import backend.model.sponsoring.Sponsoring
 import backend.model.sponsoring.SponsoringService
 import backend.model.sponsoring.SponsoringStatus
 import backend.model.user.UserService
 import backend.services.MailService
+import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,6 +38,7 @@ open class AdminController {
     private val challengeService: ChallengeService
     private val userService: UserService
     private val emailRepository: EmailRepository
+    private val sponsoringInvoiceService: SponsoringInvoiceService
     private val logger: Logger
 
     @Autowired
@@ -42,7 +47,8 @@ open class AdminController {
                 sponsoringService: SponsoringService,
                 challengeService: ChallengeService,
                 userService: UserService,
-                emailRepository: EmailRepository) {
+                emailRepository: EmailRepository,
+                sponsoringInvoiceService: SponsoringInvoiceService) {
 
         this.mailService = mailService
         this.teamService = teamService
@@ -50,6 +56,7 @@ open class AdminController {
         this.sponsoringService = sponsoringService
         this.challengeService = challengeService
         this.emailRepository = emailRepository
+        this.sponsoringInvoiceService = sponsoringInvoiceService
         this.logger = LoggerFactory.getLogger(AdminController::class.java)
     }
 
@@ -90,22 +97,119 @@ open class AdminController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping("/email/{identifier}/generate/")
     open fun generateEmail(@PathVariable identifier: String,
-                           @RequestParam(value = "save", required = false) save: String?): List<Map<String, Any>> {
+                           @RequestParam(value = "save", required = false) save: String?,
+                           @RequestParam(value = "invoices", required = false) invoices: String?): List<Map<String, Any>> {
         when (identifier) {
             "REGISTERED_SPONSORS_PAYMENT_PROMPT" -> {
                 val data = getRegisteredSponsorsData()
                 if (save != null && save == "true") generateRegisteredSponsorEmail(data)
+                if (invoices != null && invoices == "true") generateRegisteredSponsorInvoices(data)
                 return data
             }
             "UNREGISTERED_SPONSORS_PAYMENT_PROMPT" -> {
                 val data = getUnregisteredSponsorsData()
                 if (save != null && save == "true") generateUnregisteredSponsorEmail(data)
+                if (invoices != null && invoices == "true") generateUnregisteredSponsorInvoices(data)
                 return data
             }
             else -> throw NotFoundException("identifier $identifier not registered as email trigger")
         }
     }
 
+
+    private fun generateUnregisteredSponsorInvoices(data: List<Map<String, Any>>) {
+
+        data.forEach { team ->
+
+            val sponsorSum = mutableMapOf<String, BigDecimal>()
+            val sponsorSponsorings = mutableMapOf<String, MutableList<Sponsoring>>()
+            val sponsorChallenges = mutableMapOf<String, MutableList<Challenge>>()
+
+
+            (team["sponsorings"] as List<Map<String, Any>>).forEach { sponsoring ->
+                val sponsorAddress = "${sponsoring["sponsor_street"]} ${sponsoring["sponsor_housenumber"]} ${sponsoring["sponsor_zipcode"]} ${sponsoring["sponsor_city"]}"
+                sponsorSum.put(sponsorAddress, (sponsorSum.getOrElse(sponsorAddress) { BigDecimal.ZERO }).add(sponsoring["sponsor_amount_sum"] as BigDecimal))
+
+                val thisSponsoring = sponsoringService.findOne(sponsoring["sponsoring_id"] as Long)!!
+                val sponsoringList = (sponsorSponsorings.getOrElse(sponsorAddress) { mutableListOf() })
+                sponsoringList.add(thisSponsoring)
+                sponsorSponsorings.put(sponsorAddress, sponsoringList)
+
+            }
+
+            (team["challenges"] as List<Map<String, Any>>).forEach { challenge ->
+
+                val sponsorAddress = "${challenge["sponsor_street"]} ${challenge["sponsor_housenumber"]} ${challenge["sponsor_zipcode"]} ${challenge["sponsor_city"]}"
+                sponsorSum.put(sponsorAddress, (sponsorSum.getOrElse(sponsorAddress) { BigDecimal.ZERO }).add(challenge["challenge_amount"] as BigDecimal))
+
+                val thisChallenge = challengeService.findOne(challenge["challenge_id"] as Long)!!
+                val challengeList = (sponsorChallenges.getOrElse(sponsorAddress) { mutableListOf() })
+                challengeList.add(thisChallenge)
+                sponsorChallenges.put(sponsorAddress, challengeList)
+            }
+
+            sponsorSum.forEach { sponsor ->
+
+                var subject = "BreakOut Team ${team["team_id"]} ${sponsor.key}"
+                if (subject.length > 160) subject = subject.substring(0, 160)
+
+                val invoiceTeam = teamService.findOne(team["team_id"] as Long)!!
+                val amount = Money.of(sponsor.value, "EUR")
+
+                sponsoringInvoiceService.createInvoice(invoiceTeam, amount, subject, sponsorSponsorings.getOrElse(sponsor.key) { mutableListOf() }, sponsorChallenges.getOrElse(sponsor.key) { mutableListOf() })
+            }
+
+        }
+
+    }
+
+    private fun generateRegisteredSponsorInvoices(data: List<Map<String, Any>>) {
+
+        data.forEach { sponsor ->
+
+            val teamSum = mutableMapOf<Long, BigDecimal>()
+            val teamSponsorings = mutableMapOf<Long, MutableList<Sponsoring>>()
+            val teamChallenges = mutableMapOf<Long, MutableList<Challenge>>()
+
+
+            (sponsor["sponsorings"] as List<Map<String, Any>>).forEach { sponsoring ->
+
+                val team_id = sponsoring["team_id"] as Long
+                teamSum.put(team_id, (teamSum.getOrElse(team_id) { BigDecimal.ZERO }).add(sponsoring["sponsor_amount_sum"] as BigDecimal))
+
+                val thisSponsoring = sponsoringService.findOne(sponsoring["sponsoring_id"] as Long)!!
+                val sponsoringList = (teamSponsorings.getOrElse(team_id) { mutableListOf() })
+                sponsoringList.add(thisSponsoring)
+                teamSponsorings.put(team_id, sponsoringList)
+
+            }
+
+            (sponsor["challenges"] as List<Map<String, Any>>).forEach { challenge ->
+
+                val team_id = challenge["team_id"] as Long
+                teamSum.put(team_id, (teamSum.getOrElse(team_id) { BigDecimal.ZERO }).add(challenge["challenge_amount"] as BigDecimal))
+
+                val thisChallenge = challengeService.findOne(challenge["challenge_id"] as Long)!!
+                val challengeList = (teamChallenges.getOrElse(team_id) { mutableListOf() })
+                challengeList.add(thisChallenge)
+                teamChallenges.put(team_id, challengeList)
+
+            }
+
+            teamSum.forEach { team ->
+
+                var subject = "BreakOut Team ${team.key} ${sponsor["sponsor_street"]} ${sponsor["sponsor_housenumber"]} ${sponsor["sponsor_zipcode"]} ${sponsor["sponsor_city"]}"
+                if (subject.length > 160) subject = subject.substring(0, 160)
+
+                val invoiceTeam = teamService.findOne(team.key)!!
+                val amount = Money.of(team.value, "EUR")
+
+                sponsoringInvoiceService.createInvoice(invoiceTeam, amount, subject, teamSponsorings.getOrElse(team.key) { mutableListOf() }, teamChallenges.getOrElse(team.key) { mutableListOf() })
+
+            }
+
+        }
+    }
 
     private fun generateRegisteredSponsorEmail(data: List<Map<String, Any>>) {
 
@@ -292,6 +396,7 @@ open class AdminController {
                             "team_distance" to distanceKm,
                             "sponsor_amount_per_km" to sponsoring.amountPerKm.numberStripped,
                             "is_limited" to isLimit,
+                            "sponsoring_id" to sponsoring.id!!,
                             "sponsor_amount_sum" to sponsorSum,
                             "sponsor_firstname" to sponsoring.unregisteredSponsor!!.firstname,
                             "sponsor_lastname" to sponsoring.unregisteredSponsor!!.lastname,
@@ -311,6 +416,7 @@ open class AdminController {
                             "team_name" to challenge.team!!.name,
                             "challenge_description" to challenge.description,
                             "challenge_amount" to challenge.amount.numberStripped,
+                            "challenge_id" to challenge.id!!,
                             "sponsor_firstname" to challenge.unregisteredSponsor!!.firstname,
                             "sponsor_lastname" to challenge.unregisteredSponsor!!.lastname,
                             "sponsor_street" to challenge.unregisteredSponsor!!.address.street,
@@ -389,6 +495,7 @@ open class AdminController {
 
                     sponsoringsMap.add(mapOf(
                             "team_id" to sponsoring.team!!.id!!,
+                            "sponsoring_id" to sponsoring.id!!,
                             "team_name" to sponsoring.team!!.name,
                             "team_distance" to distanceKm,
                             "sponsor_amount_per_km" to sponsoring.amountPerKm.numberStripped,
@@ -403,6 +510,7 @@ open class AdminController {
 
                     challengesMap.add(mapOf(
                             "team_id" to challenge.team!!.id!!,
+                            "challenge_id" to challenge.id!!,
                             "team_name" to challenge.team!!.name,
                             "challenge_description" to challenge.description,
                             "challenge_amount" to challenge.amount.numberStripped
