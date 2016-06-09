@@ -7,6 +7,7 @@ import backend.model.event.Team
 import backend.model.media.Media
 import backend.model.media.MediaType.DOCUMENT
 import backend.model.misc.EmailAddress
+import backend.model.payment.SponsoringInvoice
 import backend.model.posting.Posting
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
@@ -79,6 +80,9 @@ class Challenge : BasicEntity {
 
     @ManyToOne
     var team: Team? = null
+
+    @ManyToOne
+    var invoice: SponsoringInvoice? = null
 
     @ManyToOne
     var sponsor: Sponsor? = null

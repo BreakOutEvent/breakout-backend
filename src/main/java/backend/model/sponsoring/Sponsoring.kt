@@ -6,6 +6,7 @@ import backend.model.event.Team
 import backend.model.media.Media
 import backend.model.media.MediaType.DOCUMENT
 import backend.model.misc.EmailAddress
+import backend.model.payment.SponsoringInvoice
 import backend.model.sponsoring.SponsoringStatus.*
 import backend.model.user.Sponsor
 import org.javamoney.moneta.Money
@@ -66,6 +67,9 @@ class Sponsoring : BasicEntity {
 
     @ManyToOne
     var sponsor: Sponsor? = null
+
+    @ManyToOne
+    var invoice: SponsoringInvoice? = null
 
     @Embedded
     var unregisteredSponsor: UnregisteredSponsor? = null

@@ -49,5 +49,4 @@ abstract class Invoice : BasicEntity {
     @Throws
     abstract fun checkPaymentEligability(payment: Payment)
 
-
 }
