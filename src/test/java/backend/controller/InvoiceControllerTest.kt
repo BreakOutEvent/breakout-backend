@@ -63,4 +63,27 @@ open class InvoiceControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.team").value(team.id!!.toInt()))
                 .andExpect(jsonPath("$.payments").isArray)
     }
+
+    @Test
+    open fun testCreateInvoice() {
+        val body = mapOf(
+                "teamId" to team.id,
+                "amount" to 30.0,
+                "firstname" to "test",
+                "lastname" to "test2",
+                "company" to ""
+        )
+
+        val request = post("/invoice/sponsoring/")
+                .asUser(mockMvc, admin.email, "password")
+                .json(body)
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.amount").value(30.0))
+                .andExpect(jsonPath("$.teamId").value(team.id!!.toInt()))
+                .andExpect(jsonPath("$.firstname").value("test"))
+                .andExpect(jsonPath("$.lastname").value("test2"))
+                .andExpect(jsonPath("$.company").value(""))
+    }
 }

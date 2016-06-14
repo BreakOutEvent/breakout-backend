@@ -18,4 +18,6 @@ interface SponsoringInvoiceService {
 
     fun createInvoice(team: Team, amount: Money, subject: String, sponsorings: List<Sponsoring>, challenges: List<Challenge>): SponsoringInvoice
 
+    fun createInvoice(team: Team, amount: Money, company: String, firstname: String, lastname: String): SponsoringInvoice
+
 }

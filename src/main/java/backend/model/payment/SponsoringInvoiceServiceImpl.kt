@@ -69,5 +69,13 @@ class SponsoringInvoiceServiceImpl : SponsoringInvoiceService {
 
         return savedInvoice
     }
+
+    @Transactional
+    override fun createInvoice(team: Team, amount: Money, company: String, firstname: String, lastname: String): SponsoringInvoice {
+        val invoice = SponsoringInvoice(team, amount, company, firstname, lastname)
+        val savedInvoice = sponsoringInvoiceRepository.save(invoice)
+
+        return savedInvoice
+    }
 }
 

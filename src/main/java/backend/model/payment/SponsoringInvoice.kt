@@ -24,6 +24,12 @@ class SponsoringInvoice : Invoice {
 
     var subject: String? = null
 
+    var company: String? = null
+
+    var firstname: String? = null
+
+    var lastname: String? = null
+
     private constructor() : super()
 
     constructor(team: Team, amount: Money, subject: String, sponsorings: List<Sponsoring>, challenges: List<Challenge>) : super(amount) {
@@ -31,6 +37,13 @@ class SponsoringInvoice : Invoice {
         this.subject = subject
         this.sponsorings = sponsorings
         this.challenges = challenges
+    }
+
+    constructor(team: Team, amount: Money, company: String, firstname: String, lastname: String) : super(amount) {
+        this.team = team
+        this.company = company
+        this.firstname = firstname
+        this.lastname = lastname
     }
 
     override fun checkPaymentEligability(payment: Payment) {

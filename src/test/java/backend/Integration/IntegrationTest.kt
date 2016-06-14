@@ -19,6 +19,8 @@ import backend.model.media.MediaSizeRepository
 import backend.model.media.MediaSizeService
 import backend.model.messaging.GroupMessageRepository
 import backend.model.messaging.GroupMessageService
+import backend.model.payment.SponsoringInvoiceRepository
+import backend.model.payment.SponsoringInvoiceService
 import backend.model.payment.TeamEntryFeeService
 import backend.model.posting.*
 import backend.model.sponsoring.SponsoringRepository
@@ -79,6 +81,7 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var groupMessageRepository: GroupMessageRepository
     @Autowired lateinit protected var challengeRepository: ChallengeRepository
     @Autowired lateinit protected var featureReposity: FeatureRepository
+    @Autowired lateinit protected var sponsoringInvoiceRepository: SponsoringInvoiceRepository
 
     // Services
     @Autowired lateinit protected var userService: UserService
@@ -96,11 +99,13 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var userDetailsService: UserDetailsService
     @Autowired lateinit protected var challengeService: ChallengeService
     @Autowired lateinit protected var featureService: FeatureFlagService
+    @Autowired lateinit protected var sponsoringInvoiceService: SponsoringInvoiceService
 
     lateinit protected var mockMvc: MockMvc
 
     @Before
     open fun setUp() {
+        sponsoringInvoiceRepository.deleteAll()
         teamRepository.deleteAll()
         likeRepository.deleteAll()
         postingRepository.deleteAll()
