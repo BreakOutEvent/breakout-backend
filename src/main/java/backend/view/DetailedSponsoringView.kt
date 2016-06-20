@@ -28,6 +28,8 @@ class DetailedSponsoringView() {
 
     var lastname: String? = null
 
+    var company: String? = null
+
     var status: String? = null
 
     var contract: MediaView? = null
@@ -59,6 +61,7 @@ class DetailedSponsoringView() {
                 this.sponsorId = sponsoring.sponsor?.id
                 this.firstname = sponsoring.sponsor?.firstname
                 this.lastname = sponsoring.sponsor?.lastname
+                this.company = sponsoring.sponsor?.company
             }
         }
 

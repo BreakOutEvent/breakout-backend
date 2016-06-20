@@ -25,6 +25,8 @@ class DetailedChallengeView {
 
     var lastname: String? = null
 
+    var company: String? = null
+
     var sponsorIsHidden: Boolean = false
 
     @Valid
@@ -65,6 +67,7 @@ class DetailedChallengeView {
                 this.sponsorId = challenge.sponsor?.id
                 this.firstname = challenge.sponsor?.firstname
                 this.lastname = challenge.sponsor?.lastname
+                this.company = challenge.sponsor?.company
             }
         }
 
