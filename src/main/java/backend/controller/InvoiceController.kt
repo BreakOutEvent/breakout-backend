@@ -55,16 +55,25 @@ open class InvoiceController {
     @RequestMapping("/{invoiceId}/payment/", method = arrayOf(POST))
     open fun createPayment(@PathVariable invoiceId: Long,
                            @Valid @RequestBody paymentView: PaymentView,
-                           @AuthenticationPrincipal customUserDetails: CustomUserDetails): TeamEntryFeeInvoiceView {
+                           @AuthenticationPrincipal customUserDetails: CustomUserDetails): Any {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
-        val invoice = teamEntryFeeService.findById(invoiceId) ?: throw NotFoundException("No invoice with id $invoiceId found")
+        val teamFeeInvoice = teamEntryFeeService.findById(invoiceId)
+        val sponsoringInvoice = sponsoringInvoiceService.findById(invoiceId)
         val admin = user.getRole(Admin::class) ?: throw UnauthorizedException("User is no admin")
         val amount = Money.of(BigDecimal.valueOf(paymentView.amount!!), "EUR")
 
-        val savedInvoice = teamEntryFeeService.addAdminPaymentToInvoice(admin, amount, invoice)
-        val responseView = TeamEntryFeeInvoiceView(savedInvoice)
-        return responseView
+        if (teamFeeInvoice != null) {
+            val savedInvoice = teamEntryFeeService.addAdminPaymentToInvoice(admin, amount, teamFeeInvoice)
+            return TeamEntryFeeInvoiceView(savedInvoice)
+        }
+
+        if (sponsoringInvoice != null) {
+            val savedInvoice = sponsoringInvoiceService.addAdminPaymentToInvoice(admin, amount, sponsoringInvoice)
+            return SponsoringInvoiceView(savedInvoice)
+        }
+
+        throw NotFoundException("No invoice with id $invoiceId found")
     }
 
 
@@ -101,7 +110,7 @@ open class InvoiceController {
     @RequestMapping("/sponsoring/", method = arrayOf(POST))
     open fun createSponsorInvoice(@Valid @RequestBody body: Map<String, Any>): SponsoringInvoiceView {
 
-        val amount = body["amount"] as? Double ?: throw BadRequestException("body is missing field amount")
+        val amount = body["amount"] as? Number ?: throw BadRequestException("body is missing field amount")
         val teamId = body["teamId"] as? Int ?: throw BadRequestException("body is missing field teamId")
         val firstname = body["firstname"] as? String ?: throw BadRequestException("body is missing field firstname")
         val lastname = body["lastname"] as? String ?: throw BadRequestException("body is missing field lastname")

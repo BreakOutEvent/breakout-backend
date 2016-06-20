@@ -3,10 +3,12 @@ package backend.controller
 import backend.Integration.IntegrationTest
 import backend.model.event.Team
 import backend.model.misc.Coord
+import backend.model.payment.SponsoringInvoice
 import backend.model.user.Admin
 import backend.model.user.Participant
 import backend.testHelper.asUser
 import backend.testHelper.json
+import org.javamoney.moneta.Money
 import org.junit.Before
 import org.junit.Test
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
@@ -18,6 +20,7 @@ open class InvoiceControllerTest : IntegrationTest() {
 
     private lateinit var team: Team
     private lateinit var admin: Admin
+    private lateinit var sponsoringInvoice: SponsoringInvoice
 
     @Before
     override fun setUp() {
@@ -31,6 +34,8 @@ open class InvoiceControllerTest : IntegrationTest() {
         invitee.getRole(Participant::class)!!.currentTeam = team
         teamService.save(team)
         userService.save(invitee)
+
+        sponsoringInvoice = sponsoringInvoiceService.createInvoice(team, Money.of(20, "EUR"), "", "test", "test2")
     }
 
     @Test
@@ -65,6 +70,25 @@ open class InvoiceControllerTest : IntegrationTest() {
     }
 
     @Test
+    open fun testCreatePaymentForSponsoringInvoice() {
+
+        val body = mapOf("amount" to 30.0)
+
+        val request = post("/invoice/${sponsoringInvoice.id}/payment/")
+                .asUser(mockMvc, admin.email, "password")
+                .json(body)
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.amount").value(20.0))
+                .andExpect(jsonPath("$.teamId").value(team.id!!.toInt()))
+                .andExpect(jsonPath("$.payments").isArray)
+                .andExpect(jsonPath("$.payments.[0].amount").value(30.0))
+                .andExpect(jsonPath("$.payments.[0]").exists())
+                .andExpect(jsonPath("$.payments.[1]").doesNotExist())
+    }
+
+    @Test
     open fun testCreateInvoice() {
         val body = mapOf(
                 "teamId" to team.id,
@@ -79,6 +103,26 @@ open class InvoiceControllerTest : IntegrationTest() {
                 .json(body)
 
         mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.amount").value(30.0))
+                .andExpect(jsonPath("$.teamId").value(team.id!!.toInt()))
+                .andExpect(jsonPath("$.firstname").value("test"))
+                .andExpect(jsonPath("$.lastname").value("test2"))
+                .andExpect(jsonPath("$.company").value(""))
+
+        val body2 = mapOf(
+                "teamId" to team.id,
+                "amount" to 30,
+                "firstname" to "test",
+                "lastname" to "test2",
+                "company" to ""
+        )
+
+        val request2 = post("/invoice/sponsoring/")
+                .asUser(mockMvc, admin.email, "password")
+                .json(body2)
+
+        mockMvc.perform(request2)
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.amount").value(30.0))
                 .andExpect(jsonPath("$.teamId").value(team.id!!.toInt()))
