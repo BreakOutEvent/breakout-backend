@@ -6,8 +6,11 @@ import backend.model.misc.Coord
 import backend.model.payment.SponsoringInvoice
 import backend.model.user.Admin
 import backend.model.user.Participant
+import backend.model.user.Sponsor
+import backend.model.user.User
 import backend.testHelper.asUser
 import backend.testHelper.json
+import backend.util.euroOf
 import org.javamoney.moneta.Money
 import org.junit.Before
 import org.junit.Test
@@ -21,11 +24,12 @@ open class InvoiceControllerTest : IntegrationTest() {
     private lateinit var team: Team
     private lateinit var admin: Admin
     private lateinit var sponsoringInvoice: SponsoringInvoice
+    private lateinit var creator: User
 
     @Before
     override fun setUp() {
         super.setUp()
-        val creator = userService.create("creator@mail.de", "password", { addRole(Participant::class) })
+        creator = userService.create("creator@mail.de", "password", { addRole(Participant::class) })
         val invitee = userService.create("invitee@mail.de", "password", { addRole(Participant::class) })
         admin = userService.create("admin@mail.de", "password", { addRole(Admin::class) }).getRole(Admin::class)!!
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
@@ -37,6 +41,34 @@ open class InvoiceControllerTest : IntegrationTest() {
 
         sponsoringInvoice = sponsoringInvoiceService.createInvoice(team, Money.of(20, "EUR"), "", "test", "test2")
     }
+
+    @Test
+    fun testGetInvoiceAndPaymentsForTeamSponsoring() {
+
+        val requestTeamMember = get("/invoice/sponsoring/${team.id}/")
+                .asUser(mockMvc, creator.email, "password")
+
+        mockMvc.perform(requestTeamMember)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$[0].id").exists())
+                .andExpect(jsonPath("$[0].amount").value(20.0))
+                .andExpect(jsonPath("$[0].teamId").value(team.id!!.toInt()))
+                .andExpect(jsonPath("$[0].firstname").value("test"))
+                .andExpect(jsonPath("$[0].lastname").value("test2"))
+                .andExpect(jsonPath("$[0].company").value(""))
+                .andExpect(jsonPath("$[0].payments").isArray)
+
+        val requestAdmin = get("/invoice/sponsoring/${team.id}/")
+                .asUser(mockMvc, admin.email, "password")
+
+        mockMvc.perform(requestAdmin).andExpect(status().isOk)
+
+        val requestUnauth = get("/invoice/sponsoring/${team.id}/")
+        mockMvc.perform(requestUnauth).andExpect(status().isUnauthorized)
+
+    }
+
 
     @Test
     open fun testCreatePayment() {

@@ -8,6 +8,7 @@ import backend.model.event.TeamService
 import backend.model.payment.SponsoringInvoiceService
 import backend.model.payment.TeamEntryFeeService
 import backend.model.user.Admin
+import backend.model.user.Participant
 import backend.model.user.UserService
 import backend.view.PaymentView
 import backend.view.SponsoringInvoiceView
@@ -87,6 +88,30 @@ open class InvoiceController {
 
         val invoice = teamEntryFeeService.findById(invoiceId) ?: throw NotFoundException("No invoice with id $invoiceId found")
         return TeamEntryFeeInvoiceView(invoice)
+    }
+
+    /**
+     * GET /invoice/sponsoring/{teamId}/
+     * Get all sponsoring invoices by teamId
+     * Allowed for admin & members of team
+     */
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping("/sponsoring/{teamId}/", method = arrayOf(GET))
+    open fun getAllSponsorInvoicesForTeam(@PathVariable teamId: Long,
+                                          @AuthenticationPrincipal cud: CustomUserDetails): Iterable<SponsoringInvoiceView> {
+        val user = userService.getUserFromCustomUserDetails(cud)
+        if(user.hasRole(Admin::class)) {
+            val invoices = sponsoringInvoiceService.findByTeamId(teamId);
+            return invoices.map { SponsoringInvoiceView(it) }
+        }
+
+        val team = teamService.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found");
+        val participant = user.getRole(Participant::class) ?: throw UnauthorizedException("User not admin or member of team")
+
+        if(team.isMember(participant)) {
+            val invoices = sponsoringInvoiceService.findByTeamId(teamId);
+            return invoices.map { SponsoringInvoiceView(it) }
+        } else throw UnauthorizedException("User not part of team")
     }
 
     /**
