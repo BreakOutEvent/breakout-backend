@@ -36,17 +36,17 @@ class LocationServiceImpl : LocationService {
         return locationRepository.save(location)
     }
 
-    override fun create(coord: Coord, participant: Participant, date: LocalDateTime): Location {
-        return create(coord, participant, date, false)
-    }
-
     @Transactional
     override fun create(coord: Coord, participant: Participant, date: LocalDateTime, doGeoCode: Boolean): Location {
 
         if (coord.latitude == 0.0 || coord.longitude == 0.0)
             throw BadRequestException("0.0, 0.0 locations not allowed")
 
-        val locationData = if (doGeoCode) geoCodingService.getGeoCoded(coord) else mapOf()
+        val locationData = when (doGeoCode) {
+            true -> geoCodingService.getGeoCoded(coord)
+            else -> mapOf()
+        }
+
         val location = Location(coord, participant, date, locationData)
 
         checkAndSetIsDuringEvent(location, participant)
@@ -68,6 +68,15 @@ class LocationServiceImpl : LocationService {
 
     override fun findByEventId(id: Long): Iterable<Location> {
         return locationRepository.findByEventId(id)
+    }
+
+    override fun findByEventIdSinceId(eventId: Long, sinceId: Long): Iterable<Location> {
+        return locationRepository.findByEventIdSinceId(eventId, sinceId)
+    }
+
+    override fun findByTeamIdSince(teamId: Long, sinceId: Long): Iterable<Location> {
+        return locationRepository.findByTeamIdSinceId(teamId, sinceId)
+
     }
 
 }

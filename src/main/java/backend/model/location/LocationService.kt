@@ -6,9 +6,7 @@ import java.time.LocalDateTime
 
 interface LocationService {
 
-    fun create(coord: Coord, participant: Participant, date: LocalDateTime): Location
-
-    fun create(coord: Coord, participant: Participant, date: LocalDateTime, doGeoCode: Boolean): Location
+    fun create(coord: Coord, participant: Participant, date: LocalDateTime, doGeoCode: Boolean = false): Location
 
     fun save(location: Location): Location
 
@@ -18,4 +16,7 @@ interface LocationService {
 
     fun findByEventId(id: Long): Iterable<Location>
 
+    fun findByEventIdSinceId(eventId: Long, sinceId: Long): Iterable<Location>
+
+    fun findByTeamIdSince(teamId: Long, sinceId: Long): Iterable<Location>
 }

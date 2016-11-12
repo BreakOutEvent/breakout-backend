@@ -77,7 +77,7 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
             else -> Pair(null, null)
         }
 
-        return this.savePostingWithLocationAndMedia(text = text, postingLocation = distanceLocation.first, user = user.core, mediaTypes = uploadMediaTypes, distance = distanceLocation.second, date = clientDate)
+        return this.savePostingWithLocationAndMedia(text, distanceLocation.first, user.core, uploadMediaTypes, distanceLocation.second, clientDate)
     }
 
     override fun getByID(id: Long): Posting? = repository.findById(id)

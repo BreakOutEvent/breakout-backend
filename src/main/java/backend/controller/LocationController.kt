@@ -58,6 +58,16 @@ open class LocationController {
     }
 
     /**
+     * GET /event/{eventId}/location/since/{sinceId}/
+     * Return a list of locations for a specific event since given id
+     */
+    @RequestMapping("/location/since/{sinceId}/", method = arrayOf(GET))
+    open fun getLocationsForEventSince(@PathVariable("eventId") eventId: Long,
+                                       @PathVariable("sinceId") sinceId: Long): Iterable<LocationView> {
+        return locationService.findByEventIdSinceId(eventId, sinceId).map(::LocationView)
+    }
+
+    /**
      * GET /event/{eventId}/team/{teamId}/location/
      * Return a list of all locations for a certain team at a certain event
      */
@@ -67,6 +77,17 @@ open class LocationController {
                                             @PathVariable("teamId") teamId: Long): Iterable<LocationView> {
         logger.info("Getting team $teamId location without cache")
         return locationService.findByTeamId(teamId).map(::LocationView)
+    }
+
+    /**
+     * GET /event/{eventId}/team/{teamId}/location/since/{sinceId}/
+     * Return a list of locations for a certain team at a certain event since given id
+     */
+    @RequestMapping("/team/{teamId}/location/since/{sinceId}/", method = arrayOf(GET))
+    open fun getLocationsForEventAndTeamSince(@PathVariable("eventId") eventId: Long,
+                                              @PathVariable("teamId") teamId: Long,
+                                              @PathVariable("sinceId") sinceId: Long): Iterable<LocationView> {
+        return locationService.findByTeamIdSince(teamId, sinceId).map(::LocationView)
     }
 
     /**
