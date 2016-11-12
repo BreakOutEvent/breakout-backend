@@ -12,6 +12,6 @@ class MoneyConverter() : AttributeConverter<Money, String> {
     }
 
     override fun convertToEntityAttribute(dbData: String): Money {
-        return Money.parse(dbData);
+        return Money.parse(dbData)
     }
 }

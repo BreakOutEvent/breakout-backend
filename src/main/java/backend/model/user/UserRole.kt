@@ -100,8 +100,8 @@ abstract class UserRole : BasicEntity, User, GrantedAuthority {
                     ?: throw Exception("no args constructor not found on $clazz")
             constructor.isAccessible = true
             val o = constructor.newInstance() as T
-            o.core = core;
-            return o;
+            o.core = core
+            return o
         }
     }
 }

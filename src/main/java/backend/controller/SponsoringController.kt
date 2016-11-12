@@ -66,7 +66,7 @@ open class SponsoringController {
         val participant = user.getRole(Participant::class)
 
         if (participant != null && team.isMember(participant)) {
-            return sponsoringService.findByTeamId(team.id!!).map { SponsoringView(it) }
+            return sponsoringService.findByTeamId(team.id!!).map(::SponsoringView)
         } else {
             throw UnauthorizedException("Only members of the team ${team.id} can view its sponsorings")
         }
@@ -158,7 +158,7 @@ open class SponsoringController {
         if (user.core.id != userId) throw UnauthorizedException("A sponsor can only see it's own sponsorings")
 
         val sponsorings = sponsoringService.findBySponsorId(userId)
-        return sponsorings.map { SponsoringView(it) }
+        return sponsorings.map(::SponsoringView)
     }
 
     @PreAuthorize("isAuthenticated()")

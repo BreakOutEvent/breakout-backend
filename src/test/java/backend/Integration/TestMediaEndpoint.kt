@@ -47,7 +47,7 @@ open class TestMediaEndpoint : IntegrationTest() {
 
     @Test
     open fun adminDeleteMediaSizes() {
-        val posting = postingService.savePostingWithLocationAndMedia("hello #breakout", Coord(1.0, 1.0), user.core, listOf("image", "audio"), 0.0, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("hello #breakout", Coord(1.0, 1.0), user.core, listOf("image", "audio"), LocalDateTime.now())
         likeService.createLike(LocalDateTime.now(), posting, user.core)
         commentService.createComment("Hello!", LocalDateTime.now(), posting, user.core)
 

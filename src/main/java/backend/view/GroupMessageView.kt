@@ -13,7 +13,7 @@ class GroupMessageView() {
 
     constructor(groupMessage: GroupMessage) : this() {
         this.id = groupMessage.id
-        this.users = groupMessage.users.map { BasicUserView(it) }
-        this.messages = groupMessage.messages.map { MessageView(it) }
+        this.users = groupMessage.users.map(::BasicUserView)
+        this.messages = groupMessage.messages.map(::MessageView)
     }
 }

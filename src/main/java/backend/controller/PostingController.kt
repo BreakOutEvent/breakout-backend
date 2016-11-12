@@ -222,7 +222,7 @@ open class PostingController {
     open fun getLikesForPosting(@PathVariable("id") id: Long): List<LikeView> {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
         val likes = likeService.findAllByPosting(posting)
-        return likes.map { LikeView(it) }
+        return likes.map(::LikeView)
     }
 
     /**

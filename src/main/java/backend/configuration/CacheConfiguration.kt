@@ -17,10 +17,10 @@ open class CacheConfiguration {
     open fun cacheManager(): CacheManager {
         val cacheManager = SimpleCacheManager()
 
-        val allChache = GuavaCache("allCache", CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build())
+        val allCache = GuavaCache("allCache", CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build())
         val singleCache = GuavaCache("singleCache", CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build())
 
-        cacheManager.setCaches(listOf(allChache, singleCache))
+        cacheManager.setCaches(listOf(allCache, singleCache))
         return cacheManager
     }
 

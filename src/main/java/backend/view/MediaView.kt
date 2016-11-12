@@ -16,6 +16,6 @@ class MediaView() {
         this.id = media.id
         this.type = media.mediaType.toString()
         this.uploadToken = media.uploadToken
-        this.sizes = media.sizes.map { MediaSizeView(it) }
+        this.sizes = media.sizes.map(::MediaSizeView)
     }
 }

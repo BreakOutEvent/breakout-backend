@@ -1,4 +1,4 @@
-package backend.model.misc;
+package backend.model.misc
 
 import backend.model.BasicEntity
 import com.fasterxml.jackson.annotation.JsonIgnore
@@ -60,7 +60,7 @@ class Email : BasicEntity {
 
     @JsonProperty("files")
     fun filesAsString(): List<String> {
-        return files.map { it.toString() }
+        return files.map(Url::toString)
     }
 
     lateinit var subject: String

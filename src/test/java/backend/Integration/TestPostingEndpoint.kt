@@ -49,13 +49,13 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun adminDeletePosting() {
-        val posting = postingService.savePostingWithLocationAndMedia("hello breakout", null, user.core, null, 0.0, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("hello breakout", null, user.core, null, LocalDateTime.now())
 
         val request = MockMvcRequestBuilders
                 .delete("/posting/${posting.id}/")
                 .asUser(mockMvc, admin.email, "password")
 
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.message").exists())
                 .andExpect(jsonPath("$.message").value("success"))
@@ -66,13 +66,13 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun adminDeletePostingFailNotAdmin() {
-        val posting = postingService.savePostingWithLocationAndMedia("hello breakout", null, user.core, null, 0.0, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("hello breakout", null, user.core, null, LocalDateTime.now())
 
         val request = MockMvcRequestBuilders
                 .delete("/posting/${posting.id}/")
                 .asUser(mockMvc, user.email, "password")
 
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isForbidden)
                 .andReturn().response.contentAsString
 
@@ -82,7 +82,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun adminDeletePostingCascade() {
-        val posting = postingService.savePostingWithLocationAndMedia("hello #breakout", Coord(1.0, 1.0), user.core, listOf("image", "audio"), 0.0, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("hello #breakout", Coord(1.0, 1.0), user.core, listOf("image", "audio"), LocalDateTime.now())
         likeService.createLike(LocalDateTime.now(), posting, user.core)
         commentService.createComment("Hello!", LocalDateTime.now(), posting, user.core)
 
@@ -101,7 +101,7 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .json(postData)
 
-        mockMvc.perform (requestMediaSize)
+        mockMvc.perform(requestMediaSize)
                 .andExpect(status().isCreated)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -118,7 +118,7 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .delete("/posting/${posting.id}/")
                 .asUser(mockMvc, admin.email, "password")
 
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.message").exists())
                 .andExpect(jsonPath("$.message").value("success"))
@@ -130,12 +130,12 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun adminDeleteComment() {
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, 0.0, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, LocalDateTime.now())
         val comment = commentService.createComment("TestComment", LocalDateTime.now(), posting, user.core)
 
         val requestPosting = get("/posting/${posting.id}/")
 
-        mockMvc.perform (requestPosting)
+        mockMvc.perform(requestPosting)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -150,7 +150,7 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .delete("/posting/${posting.id}/comment/${comment.id}/")
                 .asUser(mockMvc, admin.email, "password")
 
-        mockMvc.perform (requestDelete)
+        mockMvc.perform(requestDelete)
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.message").exists())
                 .andExpect(jsonPath("$.message").value("success"))
@@ -158,7 +158,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val requestPosting2 = get("/posting/${posting.id}/")
 
-        mockMvc.perform (requestPosting2)
+        mockMvc.perform(requestPosting2)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -173,12 +173,12 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun adminDeleteCommentFailNotAdmin() {
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, 0.0, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, LocalDateTime.now())
         val comment = commentService.createComment("TestComment", LocalDateTime.now(), posting, user.core)
 
         val requestPosting = get("/posting/${posting.id}/")
 
-        mockMvc.perform (requestPosting)
+        mockMvc.perform(requestPosting)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -193,7 +193,7 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .delete("/posting/${posting.id}/comment/${comment.id}/")
                 .asUser(mockMvc, user.email, "password")
 
-        mockMvc.perform (requestDelete)
+        mockMvc.perform(requestDelete)
                 .andExpect(status().isForbidden)
 
     }
@@ -315,13 +315,13 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun getPostingsByHashTag() {
-        postingService.savePostingWithLocationAndMedia("hello #breakout", null, user.core, null, 0.0, LocalDateTime.now())
-        postingService.savePostingWithLocationAndMedia("hello #awsome", null, user.core, null, 0.0, LocalDateTime.now())
+        postingService.savePostingWithLocationAndMedia("hello #breakout", null, user.core, null, LocalDateTime.now())
+        postingService.savePostingWithLocationAndMedia("hello #awsome", null, user.core, null, LocalDateTime.now())
 
         val request = MockMvcRequestBuilders
                 .get("/posting/hashtag/breakout/")
 
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$[0].id").exists())
@@ -466,13 +466,13 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun getPostingById() {
         //given
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, 0.0, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, LocalDateTime.now())
 
         //when
         val request = get("/posting/${posting.id}/")
 
         //then
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -494,16 +494,16 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun getPostingsByIds() {
 
-        val postingZero = postingService.savePostingWithLocationAndMedia("Test0", Coord(1.0, 1.0), user.core, null, 0.0, LocalDateTime.now())
-        postingService.savePostingWithLocationAndMedia("Test1", Coord(1.0, 1.0), user.core, null, 0.0, LocalDateTime.now())
-        val postingTwo = postingService.savePostingWithLocationAndMedia("Test2", Coord(1.0, 1.0), user.core, null, 0.0, LocalDateTime.now())
+        val postingZero = postingService.savePostingWithLocationAndMedia("Test0", Coord(1.0, 1.0), user.core, null, LocalDateTime.now())
+        postingService.savePostingWithLocationAndMedia("Test1", Coord(1.0, 1.0), user.core, null, LocalDateTime.now())
+        val postingTwo = postingService.savePostingWithLocationAndMedia("Test2", Coord(1.0, 1.0), user.core, null, LocalDateTime.now())
 
         val postingsIds: List<Long> = listOf(postingZero.id!!, postingTwo.id!!)
 
         val request = post("/posting/get/ids")
                 .json(postingsIds)
 
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$").isArray)
@@ -524,7 +524,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         val request = post("/posting/get/ids")
                 .json(postingsIds)
 
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$").isArray)
@@ -538,15 +538,15 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun getPostingIdsSince() {
         //given
 
-        val postingZero = postingService.savePostingWithLocationAndMedia("Test0", Coord(1.0, 1.0), user.core, null, 0.0, LocalDateTime.now())
-        postingService.savePostingWithLocationAndMedia("Test1", Coord(1.0, 1.0), user.core, null, 0.0, LocalDateTime.now())
-        postingService.savePostingWithLocationAndMedia("Test2", Coord(1.0, 1.0), user.core, null, 0.0, LocalDateTime.now())
+        val postingZero = postingService.savePostingWithLocationAndMedia("Test0", Coord(1.0, 1.0), user.core, null, LocalDateTime.now())
+        postingService.savePostingWithLocationAndMedia("Test1", Coord(1.0, 1.0), user.core, null, LocalDateTime.now())
+        postingService.savePostingWithLocationAndMedia("Test2", Coord(1.0, 1.0), user.core, null, LocalDateTime.now())
 
         //when
         val request = get("/posting/get/since/${postingZero.id}/")
 
         //then
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$").isArray)
@@ -563,7 +563,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun createNewPostingWithMediaAndAddMediaSizesWithoutToken() {
         //given
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, 0.0, LocalDateTime.now());
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, LocalDateTime.now());
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -582,7 +582,7 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .json(postData)
 
         //then
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isBadRequest)
                 .andReturn().response.contentAsString
 
@@ -593,7 +593,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun createNewPostingWithMediaAndAddMediaSizesWithWrongToken() {
 
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, 0.0, LocalDateTime.now());
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, LocalDateTime.now());
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -611,7 +611,7 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .header("X-UPLOAD-TOKEN", "87654321")
                 .json(postData)
 
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isUnauthorized)
                 .andReturn().response.contentAsString
 
@@ -625,7 +625,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val requestMedia = get("/posting/${posting.id}/")
 
-        val responseMedia = mockMvc.perform (requestMedia)
+        val responseMedia = mockMvc.perform(requestMedia)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.media").exists())
@@ -645,7 +645,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun createNewPostingWithMediaAndAddMediaSizesWithValidToken() {
 
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, 0.0, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, LocalDateTime.now())
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -665,7 +665,7 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .json(postData)
 
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -682,7 +682,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val requestMedia = get("/posting/${savedposting.id}/")
 
-        val responseMedia = mockMvc.perform (requestMedia)
+        val responseMedia = mockMvc.perform(requestMedia)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.media").exists())
@@ -710,7 +710,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun createNewPostingWithMediaAndAddManyMediaSizes() {
 
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, 0.0, LocalDateTime.now());
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, LocalDateTime.now());
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -730,13 +730,13 @@ open class TestPostingEndpoint : IntegrationTest() {
                     .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                     .json(postData)
 
-            mockMvc.perform (request)
+            mockMvc.perform(request)
         }
 
 
         val requestMedia = get("/posting/${savedposting!!.id}/")
 
-        val responseMedia = mockMvc.perform (requestMedia)
+        val responseMedia = mockMvc.perform(requestMedia)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.media").exists())
@@ -765,7 +765,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun createNewPostingWithMediaAndAddMediaSizesUpdateMediaSizes() {
 
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, 0.0, LocalDateTime.now());
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, LocalDateTime.now());
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -785,7 +785,7 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .json(postData)
 
-        var response = mockMvc.perform (request)
+        var response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -815,7 +815,7 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .json(postData)
 
-        response = mockMvc.perform (request)
+        response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -833,7 +833,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         val requestMedia = MockMvcRequestBuilders
                 .get("/posting/${savedposting.id}/")
 
-        val responseMedia = mockMvc.perform (requestMedia)
+        val responseMedia = mockMvc.perform(requestMedia)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.media").exists())
@@ -862,7 +862,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun createNewPostingWithMediaAndAddMediaSizesUpdateMediaSizesWithVariationWidth() {
 
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, 0.0, LocalDateTime.now());
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, LocalDateTime.now());
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -882,7 +882,7 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .json(postData)
 
-        var response = mockMvc.perform (request)
+        var response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -912,7 +912,7 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .json(postData)
 
-        response = mockMvc.perform (request)
+        response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -929,7 +929,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val requestMedia = get("/posting/${savedposting.id}/")
 
-        val responseMedia = mockMvc.perform (requestMedia)
+        val responseMedia = mockMvc.perform(requestMedia)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.media").exists())
@@ -958,7 +958,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun createNewPostingWithMediaAndAddMediaSizesUpdateMediaSizesWithVariationHeight() {
 
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, 0.0, LocalDateTime.now());
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, LocalDateTime.now());
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -978,7 +978,7 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .json(postData)
 
-        var response = mockMvc.perform (request)
+        var response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -1008,7 +1008,7 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .json(postData)
 
-        response = mockMvc.perform (request)
+        response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -1025,7 +1025,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val requestMedia = get("/posting/${savedposting.id}/")
 
-        val responseMedia = mockMvc.perform (requestMedia)
+        val responseMedia = mockMvc.perform(requestMedia)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.media").exists())
@@ -1054,7 +1054,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun getAllPostings() {
 
         for (i in 1..200) {
-            postingService.savePostingWithLocationAndMedia("Text $i", null, user.core, null, 0.0, LocalDateTime.now())
+            postingService.savePostingWithLocationAndMedia("Text $i", null, user.core, null, LocalDateTime.now())
         }
 
         val request = get("/posting/")
@@ -1073,7 +1073,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun getAllPostingsLimit() {
 
         for (i in 1..200) {
-            postingService.savePostingWithLocationAndMedia("Text $i", null, user.core, null, 0.0, LocalDateTime.now())
+            postingService.savePostingWithLocationAndMedia("Text $i", null, user.core, null, LocalDateTime.now())
         }
 
         val request = get("/posting/?limit=100&offset=0")
@@ -1092,7 +1092,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewComment() {
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, 0.0, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, LocalDateTime.now())
 
         val postData = mapOf(
                 "text" to "TestComment",
@@ -1117,7 +1117,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val requestPosting = get("/posting/${posting.id}/")
 
-        val responsePosting = mockMvc.perform (requestPosting)
+        val responsePosting = mockMvc.perform(requestPosting)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -1134,7 +1134,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createEmptyCommentFail() {
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, 0.0, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, LocalDateTime.now())
 
         val postData = mapOf(
                 "text" to "",
@@ -1156,7 +1156,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewLike() {
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, 0.0, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, LocalDateTime.now())
 
         val postData = mapOf(
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
@@ -1179,7 +1179,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val requestPosting = get("/posting/${posting.id}/")
 
-        val responsePosting = mockMvc.perform (requestPosting)
+        val responsePosting = mockMvc.perform(requestPosting)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -1197,7 +1197,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createLikeHasLikedFlag() {
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, 0.0, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, LocalDateTime.now())
 
         val postData = mapOf(
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
@@ -1220,7 +1220,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val requestPosting = get("/posting/${posting.id}/?userid=${user.core.id}")
 
-        val responsePosting = mockMvc.perform (requestPosting)
+        val responsePosting = mockMvc.perform(requestPosting)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -1238,7 +1238,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun deleteLike() {
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, 0.0, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, LocalDateTime.now())
 
         val postData = mapOf(
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
@@ -1261,7 +1261,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val requestPosting = get("/posting/${posting.id}/?userid=${user.core.id}")
 
-        val responsePosting = mockMvc.perform (requestPosting)
+        val responsePosting = mockMvc.perform(requestPosting)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -1285,7 +1285,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         println(responseDelete)
 
-        mockMvc.perform (requestPosting)
+        mockMvc.perform(requestPosting)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -1301,7 +1301,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewLikeFailDuplicate() {
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, 0.0, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, LocalDateTime.now())
 
         val postData = mapOf(
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
@@ -1326,7 +1326,7 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .asUser(mockMvc, user.email, "password")
                 .json(postData)
 
-        val responseSecond = mockMvc.perform (requestSecond)
+        val responseSecond = mockMvc.perform(requestSecond)
                 .andExpect(status().isConflict)
                 .andReturn().response.contentAsString
 
@@ -1335,7 +1335,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun getLikesForPosting() {
-        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, 0.0, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, LocalDateTime.now())
         likeService.createLike(LocalDateTime.now(), posting, user.core)
 
         val request = get("/posting/${posting.id}/like/")

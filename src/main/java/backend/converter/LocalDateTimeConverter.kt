@@ -9,10 +9,10 @@ import javax.persistence.Converter
 class LocalDateTimeConverter() : AttributeConverter<LocalDateTime, Timestamp> {
 
     override fun convertToDatabaseColumn(data: java.time.LocalDateTime): java.sql.Timestamp {
-        return java.sql.Timestamp.valueOf(data);
+        return java.sql.Timestamp.valueOf(data)
     }
 
     override fun convertToEntityAttribute(data: java.sql.Timestamp): java.time.LocalDateTime {
-        return data.toLocalDateTime();
+        return data.toLocalDateTime()
     }
 }

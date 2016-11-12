@@ -65,7 +65,7 @@ open class ChallengeController {
         if (user.core.id != userId) throw UnauthorizedException("A sponsor can only see it's own challenges")
 
         val challenges = challengeService.findBySponsorId(userId)
-        return challenges.map { ChallengeView(it) }
+        return challenges.map(::ChallengeView)
     }
 
     /**
@@ -138,7 +138,7 @@ open class ChallengeController {
             }
 
             else -> throw BadRequestException("Unknown status for challenge ${body.status}")
-        }.let { ChallengeView(it) }
+        }.let(::ChallengeView)
     }
 
     /**

@@ -25,8 +25,8 @@ class SponsoringInvoiceView {
         this.firstname = invoice.firstname
         this.lastname = invoice.lastname
         this.company = invoice.company
-        this.payments = invoice.getPayments().map { PaymentView(it) }
-        this.challenges = invoice.challenges.map { DetailedChallengeView(it) }
-        this.sponsorings = invoice.sponsorings.map { DetailedSponsoringView(it) }
+        this.payments = invoice.getPayments().map(::PaymentView)
+        this.challenges = invoice.challenges.map(::DetailedChallengeView)
+        this.sponsorings = invoice.sponsorings.map(::DetailedSponsoringView)
     }
 }

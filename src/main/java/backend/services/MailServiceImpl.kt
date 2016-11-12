@@ -39,7 +39,7 @@ class MailServiceImpl : MailService {
     override fun send(email: Email, saveToDb: Boolean) {
         val headers = HttpHeaders().apply {
             set("Content-Type", "application/json;charset=utf-8")
-            set("X-AUTH-TOKEN", "$token")
+            set("X-AUTH-TOKEN", token)
         }
         val body = ObjectMapper().writeValueAsString(email)
         val request = HttpEntity<String>(body, headers)

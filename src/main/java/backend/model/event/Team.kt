@@ -88,7 +88,7 @@ class Team : BasicEntity {
 
     @Throws
     fun invite(email: EmailAddress): Invitation {
-        if (isInvited(email)) throw DomainException("User ${email.toString()} already is invited to this team")
+        if (isInvited(email)) throw DomainException("User $email already is invited to this team")
         val invitation = Invitation(email, this)
         this.invitations.add(invitation)
         return invitation
@@ -102,7 +102,7 @@ class Team : BasicEntity {
     // which does not get recognized by the compiler
     @Suppress("UNUSED")
     fun isMember(username: String): Boolean {
-        return this.members.map { participant -> participant.email }.contains(username)
+        return this.members.map(Participant::email).contains(username)
     }
 
     fun isMember(participant: Participant): Boolean {

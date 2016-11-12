@@ -11,7 +11,7 @@ fun getBankingSubject(teamId: Long, firstname: String, lastname: String): String
     subject = subject
             .replace("Ä", "Ae").replace("Ü", "Ue").replace("Ö", "Oe")
             .replace("ä", "ae").replace("ü", "ue").replace("ö", "oe").replace("ß", "ss")
-            .replace(Regex("[^A-Za-z0-9-]"), "");
+            .replace(Regex("[^A-Za-z0-9-]"), "")
     if (subject.length > 140) {
         return subject.substring(0, 140)
     } else {

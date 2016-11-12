@@ -58,7 +58,7 @@ open class EventController {
     @RequestMapping("/", method = arrayOf(GET))
     open fun getAllEvents(): Iterable<EventView> {
         logger.info("Getting all events without cache")
-        return eventService.findAll().map { EventView(it) }
+        return eventService.findAll().map(::EventView)
     }
 
     /**

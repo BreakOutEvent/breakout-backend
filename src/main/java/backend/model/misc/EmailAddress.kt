@@ -25,7 +25,7 @@ class EmailAddress() {
         if ((other !is EmailAddress)) return false
         val o = other.value.toLowerCase()
         val t = this.value.toLowerCase()
-        return o.equals(t)
+        return o == t
     }
 
     override fun hashCode(): Int {

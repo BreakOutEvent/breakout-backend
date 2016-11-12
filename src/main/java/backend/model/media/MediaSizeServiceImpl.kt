@@ -46,19 +46,19 @@ class MediaSizeServiceImpl : MediaSizeService {
     @Transactional
     override fun createOrUpdate(mediaId: Long, url: String, width: Int, height: Int, length: Int, size: Long, type: String): MediaSize {
 
-        if (MediaType.valueOf(type.toUpperCase()).equals(MediaType.IMAGE)) {
-            this.deleteOlderOneMinute(mediaId);
+        if (MediaType.valueOf(type.toUpperCase()) == MediaType.IMAGE) {
+            this.deleteOlderOneMinute(mediaId)
         }
 
         val media = mediaRepository.findById(mediaId)
 
         var mediaSizeFound: MediaSize? = null
 
-        if (MediaType.valueOf(type.toUpperCase()).equals(MediaType.IMAGE)) {
+        if (MediaType.valueOf(type.toUpperCase()) == MediaType.IMAGE) {
             if (width > height) {
-                mediaSizeFound = this.findByWidthAndMediaAndMediaType(width, media, MediaType.valueOf(type.toUpperCase()));
+                mediaSizeFound = this.findByWidthAndMediaAndMediaType(width, media, MediaType.valueOf(type.toUpperCase()))
             } else {
-                mediaSizeFound = this.findByHeightAndMediaAndMediaType(height, media, MediaType.valueOf(type.toUpperCase()));
+                mediaSizeFound = this.findByHeightAndMediaAndMediaType(height, media, MediaType.valueOf(type.toUpperCase()))
             }
         }
 

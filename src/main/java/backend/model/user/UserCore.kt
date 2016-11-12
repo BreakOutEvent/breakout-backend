@@ -70,13 +70,13 @@ open class UserCore : BasicEntity, User {
     private var activationToken: String? = null
 
     fun getAuthorities(): Collection<GrantedAuthority> {
-        return this.userRoles.values.map { BasicGrantedAuthority(it) }
+        return this.userRoles.values.map(::BasicGrantedAuthority)
     }
 
     override fun activate(token: String) {
         if (isActivationTokenCorrect(token)) {
             this.isBlocked = false
-            this.activationToken = null;
+            this.activationToken = null
         } else {
             throw DomainException("Provided token $token does not match the activation token")
         }
@@ -92,7 +92,7 @@ open class UserCore : BasicEntity, User {
     }
 
     override fun isActivated(): Boolean {
-        return !isBlocked;
+        return !isBlocked
     }
 
     override fun setNewPassword(password: String, token: String) {

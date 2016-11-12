@@ -6,6 +6,7 @@ import backend.services.GeoCodingService
 import backend.services.GeoCodingServiceImpl
 import backend.util.Profiles.DEVELOPMENT
 import backend.util.Profiles.TEST
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Service
 @Profile(DEVELOPMENT, TEST)
 class FakeGeoCodingServiceImpl @Autowired constructor(configurationService: ConfigurationService) : GeoCodingService by GeoCodingServiceImpl(configurationService) {
 
-    val logger = LoggerFactory.getLogger(FakeGeoCodingServiceImpl::class.java)
+    val logger: Logger = LoggerFactory.getLogger(FakeGeoCodingServiceImpl::class.java)
 
     override fun getGeoCoded(coord: Coord): Map<String, String> {
         logger.info("Faked Geocoding for (${coord.latitude}, ${coord.longitude})")

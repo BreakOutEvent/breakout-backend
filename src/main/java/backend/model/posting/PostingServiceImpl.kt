@@ -1,7 +1,6 @@
 package backend.model.posting
 
 import backend.controller.exceptions.BadRequestException
-import backend.controller.exceptions.UnauthorizedException
 import backend.exceptions.DomainException
 import backend.model.location.Location
 import backend.model.location.LocationService
@@ -11,7 +10,6 @@ import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserCore
-import backend.util.distanceCoordsKM
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -36,7 +34,6 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
                                                  postingLocation: Coord?,
                                                  user: UserCore,
                                                  mediaTypes: List<String>?,
-                                                 distance: Double?,
                                                  date: LocalDateTime): Posting {
 
         var location: Location? = null
@@ -64,20 +61,7 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
         if (uploadMediaTypes == null && (text == null || text.trim() == "") && locationCoord == null)
             throw BadRequestException("empty postings not allowed")
 
-        val distanceLocation = when (locationCoord) {
-            is Coord -> {
-                val creator = user.getRole(Participant::class) ?: throw UnauthorizedException("User is no participant")
-                val team = creator.currentTeam ?: throw UnauthorizedException("User has no team")
-
-                //Calculate Distance from starting point of Event to Location Position and
-                val distance = distanceCoordsKM(team.event.startingLocation, locationCoord)
-
-                Pair(locationCoord, distance)
-            }
-            else -> Pair(null, null)
-        }
-
-        return this.savePostingWithLocationAndMedia(text, distanceLocation.first, user.core, uploadMediaTypes, distanceLocation.second, clientDate)
+        return this.savePostingWithLocationAndMedia(text, locationCoord, user.core, uploadMediaTypes, clientDate)
     }
 
     override fun getByID(id: Long): Posting? = repository.findById(id)

@@ -45,6 +45,6 @@ open class AuthenticatedUserController {
     open fun showInvitationsForUser(@AuthenticationPrincipal customUserDetails: CustomUserDetails): Iterable<InvitationView> {
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val invitations = teamService.findInvitationsForUser(user)
-        return invitations.map { InvitationView(it) }
+        return invitations.map(::InvitationView)
     }
 }

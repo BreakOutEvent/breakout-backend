@@ -101,16 +101,16 @@ open class InvoiceController {
                                           @AuthenticationPrincipal cud: CustomUserDetails): Iterable<SponsoringInvoiceView> {
         val user = userService.getUserFromCustomUserDetails(cud)
         if(user.hasRole(Admin::class)) {
-            val invoices = sponsoringInvoiceService.findByTeamId(teamId);
-            return invoices.map { SponsoringInvoiceView(it) }
+            val invoices = sponsoringInvoiceService.findByTeamId(teamId)
+            return invoices.map(::SponsoringInvoiceView)
         }
 
-        val team = teamService.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found");
+        val team = teamService.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")
         val participant = user.getRole(Participant::class) ?: throw UnauthorizedException("User not admin or member of team")
 
         if(team.isMember(participant)) {
-            val invoices = sponsoringInvoiceService.findByTeamId(teamId);
-            return invoices.map { SponsoringInvoiceView(it) }
+            val invoices = sponsoringInvoiceService.findByTeamId(teamId)
+            return invoices.map(::SponsoringInvoiceView)
         } else throw UnauthorizedException("User not part of team")
     }
 
@@ -124,7 +124,7 @@ open class InvoiceController {
     open fun getAllSponsorInvoices(): List<SponsoringInvoiceView> {
 
         val invoices = sponsoringInvoiceService.findAll()
-        return invoices.map { SponsoringInvoiceView(it) }
+        return invoices.map(::SponsoringInvoiceView)
     }
 
     /**

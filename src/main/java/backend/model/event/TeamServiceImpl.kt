@@ -77,7 +77,7 @@ class TeamServiceImpl : TeamService {
         return "${baseUrl.replace("CUSTOMTOKEN", token)}?utm_source=backend&utm_medium=email&utm_campaign=invite"
     }
 
-    override fun save(team: Team) = repository.save(team)
+    override fun save(team: Team): Team = repository.save(team)
 
     override fun findOne(id: Long) = repository.findById(id)
 

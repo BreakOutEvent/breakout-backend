@@ -34,7 +34,7 @@ class UserServiceImpl : UserService {
 
     override fun getUserByActivationToken(token: String): User? = userRepository.findByActivationToken(token)
 
-    override fun getUserByEmail(email: String): User? = userRepository.findByEmail(email);
+    override fun getUserByEmail(email: String): User? = userRepository.findByEmail(email)
 
     override fun getAllUsers(): Iterable<UserCore> = userRepository.findAll()
 
@@ -49,7 +49,7 @@ class UserServiceImpl : UserService {
 
         sendActivationEmail(token, user)
 
-        return userRepository.save(user.core);
+        return userRepository.save(user.core)
     }
 
     override fun activate(user: User, token: String) {

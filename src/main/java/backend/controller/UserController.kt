@@ -112,7 +112,7 @@ open class UserController {
     @RequestMapping("/", method = arrayOf(GET))
     open fun showUsers(): Iterable<BasicUserView> {
         logger.info("Getting all users without cache")
-        return userService.getAllUsers().map { BasicUserView(it) };
+        return userService.getAllUsers().map(::BasicUserView)
     }
 
     /**
@@ -124,7 +124,7 @@ open class UserController {
         if (search.length < 3) return listOf()
         val users = userService.searchByString(search).take(6).toMutableList()
         users.addAll(teamService.searchByString(search).take(3).flatMap { it.members.map { it.core } })
-        return users.map { SimpleUserView(it) }
+        return users.map(::SimpleUserView)
     }
 
     /**

@@ -13,6 +13,6 @@ class TeamEntryFeeInvoiceView {
     constructor(invoice: TeamEntryFeeInvoice) {
         this.amount = invoice.amount.numberStripped.toDouble()
         this.team = invoice.team?.id
-        this.payments = invoice.getPayments().map { PaymentView(it) }
+        this.payments = invoice.getPayments().map(::PaymentView)
     }
 }

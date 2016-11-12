@@ -56,7 +56,7 @@ class Posting : BasicEntity {
     }
 
     private fun extractHashtags(text: String): List<Hashtag> {
-        val pattern: Pattern = Pattern.compile("\\#([^\\s]*)");
+        val pattern: Pattern = Pattern.compile("\\#([^\\s]*)")
         val matcher: Matcher = pattern.matcher(text)
 
         val hashtags = ArrayList<Hashtag>()

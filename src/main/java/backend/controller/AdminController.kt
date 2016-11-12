@@ -337,7 +337,7 @@ open class AdminController {
                     "Euer BreakOut-Team"
 
             val email = Email(
-                    to = (team["team_emails"] as List<String>).map { EmailAddress(it) },
+                    to = (team["team_emails"] as List<String>).map(::EmailAddress),
                     subject = "BreakOut 2016 - Ihr Spendenversprechen",
                     body = body,
                     campaignCode = "unregistrated_sponsor_payment"

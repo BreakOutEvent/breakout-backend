@@ -16,7 +16,7 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository, v
 
     override fun findById(id: Long) = repository.findById(id)
 
-    override fun findAll() = repository.findAll()
+    override fun findAll(): Iterable<Event> = repository.findAll()
 
     @Transactional
     override fun createEvent(title: String, date: LocalDateTime, city: String, startingLocation: Coord, duration: Int): Event {

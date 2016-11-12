@@ -19,7 +19,7 @@ fun verifyJwtClaim(secret: String, token: String, id: String) {
     try {
         val claims = verifier.verify(token)
         val subject = claims["subject"] as String
-        if (!subject.equals(id)) throw UnauthorizedException("Invalid JWT token")
+        if (subject != id) throw UnauthorizedException("Invalid JWT token")
     } catch (e: SignatureException) {
         throw UnauthorizedException(e.message ?: "Invalid JWT token")
     } catch (e: IllegalStateException) {
