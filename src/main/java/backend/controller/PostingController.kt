@@ -3,6 +3,7 @@ package backend.controller
 import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.NotFoundException
 import backend.model.media.MediaService
+import backend.model.misc.Coord
 import backend.model.posting.CommentService
 import backend.model.posting.LikeService
 import backend.model.posting.PostingService
@@ -12,6 +13,7 @@ import backend.util.getSignedJwtToken
 import backend.util.localDateTimeOf
 import backend.view.CommentView
 import backend.view.LikeView
+import backend.view.LocationView
 import backend.view.PostingView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -68,7 +70,15 @@ open class PostingController {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
 
-        val posting = postingService.createPosting(user, body.text, body.uploadMediaTypes, body.postingLocation, body.date)
+        val postingLocation = body.postingLocation
+        val locationCoord = when (postingLocation) {
+            is LocationView -> Coord(postingLocation.latitude, postingLocation.longitude)
+            else -> null
+        }
+
+        val clientDate = localDateTimeOf(body.date ?: throw RuntimeException("Client date has not been given"))
+
+        val posting = postingService.createPosting(user, body.text, body.uploadMediaTypes, locationCoord, clientDate)
         posting.media.forEach { it.uploadToken = getSignedJwtToken(JWT_SECRET, it.id.toString()) }
 
         return PostingView(posting)

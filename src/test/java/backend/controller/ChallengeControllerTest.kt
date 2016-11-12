@@ -19,7 +19,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
-import java.time.ZoneOffset
 
 class ChallengeControllerTest : IntegrationTest() {
 
@@ -168,7 +167,7 @@ class ChallengeControllerTest : IntegrationTest() {
     @Test
     fun testFulfillChallenge() {
 
-        val posting = postingService.createPosting(participant, "text", null, null, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
+        val posting = postingService.createPosting(participant, "text", null, null, LocalDateTime.now())
         setAuthenticatedUser("sponsor@break-out.org")
         val challenge = challengeService.proposeChallenge(sponsor, team, euroOf(10.0), "An awesome challenge")
 

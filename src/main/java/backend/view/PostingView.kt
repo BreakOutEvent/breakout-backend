@@ -43,12 +43,12 @@ class PostingView() {
         this.text = posting.text
         this.hashtags = posting.hashtags.map { it.value }
         this.date = posting.date.toEpochSecond(ZoneOffset.UTC)
-        this.postingLocation = if (posting.location != null) LocationView(posting.location!!) else null
+        this.postingLocation = posting.location?.let(::LocationView)
         this.user = BasicUserView(posting.user!!.core)
-        this.media = posting.media.map { MediaView(it) }
-        this.comments = posting.comments.map { CommentView(it) }
+        this.media = posting.media.map(::MediaView)
+        this.comments = posting.comments.map(::CommentView)
         this.likes = posting.likes.count()
         this.hasLiked = posting.hasLiked
-        this.proves = if (posting.challenge != null) ChallengeView(posting.challenge!!) else null
+        this.proves = posting.challenge?.let(::ChallengeView)
     }
 }

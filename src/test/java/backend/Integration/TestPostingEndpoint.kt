@@ -621,7 +621,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewPostingWithMedia() {
 
-        val posting = postingService.createPosting(user.core, "Test", arrayListOf("VIDEO"), null, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
+        val posting = postingService.createPosting(user.core, "Test", arrayListOf("VIDEO"), null, LocalDateTime.now())
 
         val requestMedia = get("/posting/${posting.id}/")
 
@@ -645,7 +645,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun createNewPostingWithMediaAndAddMediaSizesWithValidToken() {
 
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, 0.0, LocalDateTime.now());
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, 0.0, LocalDateTime.now())
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)

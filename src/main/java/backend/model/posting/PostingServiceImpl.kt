@@ -12,8 +12,6 @@ import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserCore
 import backend.util.distanceCoordsKM
-import backend.util.localDateTimeOf
-import backend.view.LocationView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -56,32 +54,30 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
         return repository.save(Posting(text, date, location, user, media))
     }
 
-    //TODO: Move views and datetime stuff to controller layer
     override fun createPosting(user: User,
                                text: String?,
                                uploadMediaTypes: List<String>?,
-                               postingLocation: LocationView?,
-                               date: Long?): Posting {
+                               locationCoord: Coord?,
+                               clientDate: LocalDateTime): Posting {
 
         //check if any of the optional posting types is available
-        if (uploadMediaTypes == null && (text == null || text.trim() == "") && postingLocation == null)
+        if (uploadMediaTypes == null && (text == null || text.trim() == "") && locationCoord == null)
             throw BadRequestException("empty postings not allowed")
 
-        var location: Coord? = null
-        var distance: Double? = null
+        val distanceLocation = when (locationCoord) {
+            is Coord -> {
+                val creator = user.getRole(Participant::class) ?: throw UnauthorizedException("User is no participant")
+                val team = creator.currentTeam ?: throw UnauthorizedException("User has no team")
 
-        val locationIsAvailable: Boolean = postingLocation != null
-        if (locationIsAvailable) {
-            location = Coord(postingLocation!!.latitude, postingLocation.longitude)
-            val creator = user.getRole(Participant::class) ?: throw UnauthorizedException("User is no participant")
-            val team = creator.currentTeam ?: throw UnauthorizedException("User has no team")
+                //Calculate Distance from starting point of Event to Location Position and
+                val distance = distanceCoordsKM(team.event.startingLocation, locationCoord)
 
-            //Calculate Distance from starting point of Event to Location Position and
-            distance = distanceCoordsKM(team.event.startingLocation, location)
+                Pair(locationCoord, distance)
+            }
+            else -> Pair(null, null)
         }
 
-        val clientDate = localDateTimeOf(date!!)
-        return this.savePostingWithLocationAndMedia(text = text, postingLocation = location, user = user.core, mediaTypes = uploadMediaTypes, distance = distance, date = clientDate)
+        return this.savePostingWithLocationAndMedia(text = text, postingLocation = distanceLocation.first, user = user.core, mediaTypes = uploadMediaTypes, distance = distanceLocation.second, date = clientDate)
     }
 
     override fun getByID(id: Long): Posting? = repository.findById(id)
