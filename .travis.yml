@@ -24,6 +24,7 @@ env:
     - secure: "A/wnr8B8fk35hRgOy1zq/nc8iHS7wz7ufEpXwMZCNZtbuwKuIPsDLTk+K2iPBifJs2I68yxoP2tZfCli6XZYXSOl22fgeV1M/peFQk7A/uDk5hh3lLBTjanB17HoGUX2+i1VMl+HMeDi71pd+xhGR3/JCHceMn7Klx/5CfxWaJO5qiB+VkiqyHieFCfvVJ6pR5HSGOIslm4I1bumUTr9pPsjQCF0aKcH8UlAK2Fn60Q2BMNQx65lA6xIy/j2qGbHPq4RW4y5fk8z1MORI2hAQDVwFT4cWX7SDkVICOxUYfx/xmcXNh2KGCv2d+TPy3hQyYBlfHRIZqRB+vJ4cOFasEd1Sye7i9BptHPtzitM2OuGohGgSiSg2ZfmtJuzwTPLSIB3jkdK4bL5qloWGKUNfsvmaHCGOn9rin9hJBNNC3Wj4HNJV5z+JaLCXDrDQx6Fpj455h0ArDlh4jLRjzWi61xf1kjUmXD9GqfX2PUQVZHcB+KgGhEwfsVgWW5Rxbvx3d7Rz0ZPkfZDbQq6vNP8dcuR2Sp7t0Em/ZMB9C9tt1gF2IXiE4G9OdG8/oogAHvizmjfn2ocwctjyNriD1Uaf/n1bjRMpfHg6PqOK1U251PartEykEAeKAjtgRqLt+vVH+uJsGHwgHiLxFsJwedqQXVNQhEb8gm5udwkPevhWlM=" #DOCKER_PASS
     - secure: "jKs+2BXez83l5vd66zr+wQFsxlah1+KRoXe++wfRynYSBITjAiWgotSjB9g1nmvtz1IJ52Q9tBLaIr/0FITWlqX5BsIJ/F0s9+SoMOQIQAPeylEAZI6dql76WC3JkpszCNBSJEnxKLihrczQXNEAIfpLCHCxHze6P+NgoagJCdd46b8IcFvHRNlngX5kGZkh/ANTQne037sFrvyewWiBbydmYcWdC1/0UTFOwqAYdxAoQuFNJ7usvHmAFLvtNxIjswKXPWUPEijSllEeKX0rA2A28cG0QnHEfv9xYQ/0LHJAxwQ6v7FrwiT2tKKZwzcl+d8vx7yU8dB8cSYoZDdkNIlF/fWTC5QOp3lpUq+/0YrA1AauRMwMbrhY/pmXmdtSt2etLEsyi8caO/fJYfY3rBXsFkR3YUKDnIO9zLBHIoEnlj5Kluk5p+76+X0Ti/Z3lbAUkqJs/hUVJ6XCn5NudUulq2HrweRvnXeXdVUYQuFRmi49RvSubbe717b+cmALzVO5rhp5LFhEeP+rIrKIk7ZbLLFFTzph+yorEdLGmC2r4Wb8MpCIJKOyddXg1VHutqICMS9H+WPoN6aMl6M1r5iwTsEzdoJpxyB4OiuoqUHSKlv1PnpoVPmDAlSJTcvlvxtpTvwFkEstqrb+RaXAhjPcbw2jh4s6NEuZKX834J8=" #DOCKER_REPO
     - secure: "MqJ/Qrg8GhxOrv2LaqNsqBQ5ULR2dSmnDsO6rbyW+rmPtGi7Zw9JnraBy1pSZEyUf5833fM4OinJbmU7795niS3V65QD1mUjgioSsRQyhUfSsDKZjhGCk21sCJ7sNX6+K2i5JKMat2pcAhZrPlUgIq3p6GnICepz6taM/oilCwMpRyEuKdW3vUZVxhxgcJx0y8ljVoH/vvA/k6A8DTEFn3DGQB2nsPkh1WRVKArXJCIv5J7xjwRUVzp3Xxvp8k8swuRsFGMd88bUlMRgz3/qzYhG/lBUBzdqvvy29fIzaG+CDMYGdGPDgcMK5jSHt66e13QpitzCwHsYlKGWE9+o2noq7E/MoljU5MbHQZHbm4EVchkQY8v2Dvqz3AR1vk5oB+91pTEmM47LjDUq5xMtjq5cq/C10IP2x0ui/J3uDKDV02MzmZ6oVuB655bEoIMwaHhj9X4xL3dg6nXbqDOyeNoTe/jt18VJjZv5kUDrCByxjONJRYw5TqwwN0eUlmCRF9CWw7Fb/HU+Ukr1cUHSw4KunKwxMtGYqFpMXI3ZbKuwCrbq+3sAlhDfqU8m+Wkywt+zDy7jg0Zt3Ln7iTDqY76s1iLZM8R9lButolpegJaSX0phwsw0/mqBYkErEJS4QZEEyMmArMhYXijueQLtRJV8QHo/NZhd2utAw49fOk4=" #DOCKER_URL
+    - secure: "tgekSK1la9UNWxzV6dMAyhQhDyztqA7Cd6xzXKH5Kt4jMJ7KOF/+hDgF8KPi9ey7ZkiS0PRaUETgkFrUzZ+qpFKfBIgYEb3CvGVISauQlavocIqy2dcFrpHFCPXcIDYIoIEXrELBB5pluJSdYJVpb8IofAYvRnuNWaIZlgp0uvUEK2SYUq3+1LUjUsHZ+wuVhHzCqan3hL0uIs1MKtR3gjj0TC4O91twYFRMzxCvM4AOivRf8LoK5NqE6i6mdPTgfGao4YeUNeKU9Sx9bz2xVFE35431liYeE0EpFFXivojX+2FQoYNRZGvUuIblfXhkwloIRFQ1L2a+PvH7u+f4BRmRQg1bGTZTuqPGcx7QnKMt/4L3sjAPMjE/hU0d6uM7vn6nJfDdnsQGGDcYuCBG7cPcTPBT0SrU/x/Gz8zqfs8xx4Pu1wo0wEUh6M1eO9LhXa0zGc766//FX96kfkqRiSvnp/MAgkil6wk28Wia/EEfCQiTlnWXhN9EVqIkUHWiOTbXhycwFsSdVVDLyq0VwG0T+TU6x4GC24k+RPWjdrBDgdgwm3n2dkAaPZcA/zFQSCO7uQV7Km+fZp99HdG6yHAEq5lpUQ0aP/vVay4O7XCny9hakfUMsDnjCVlsPbk5f9jvtgsApZQWLQgJtffYl6EmRCQsZn7BexhO+ZAXSnA=" #STAGE_LOGIN
 cache:
   directories:
   - $HOME/.gradle/
@@ -35,21 +36,11 @@ addons:
     - mysql-server-5.6
     - mysql-client-core-5.6
     - mysql-client-5.6
+    - unzip
 services:
   - docker
   - mysql
 before_install:
   - mysql -h 127.0.0.1 -u root -e "DROP DATABASE IF EXISTS test; CREATE DATABASE test;"
 after_success:
-  - if [ ! -z "$TRAVIS_TAG" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-      echo "This will deploy!";
-      gradle clean;
-      openssl aes-256-cbc -K $encrypted_a6989f7c6f70_key -iv $encrypted_a6989f7c6f70_iv -in application-production.properties.enc -out src/main/resources/application-production.properties -d;
-      docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS $DOCKER_URL;
-      docker build -f Dockerfile -t $DOCKER_REPO .;
-      docker tag $DOCKER_REPO $DOCKER_URL/$DOCKER_REPO:$TRAVIS_TAG;
-      docker push $DOCKER_URL/$DOCKER_REPO:$TRAVIS_TAG;
-      rm "/home/${USER}/.docker/config.json";
-    else
-      echo "This will not deploy (no tag)!";
-    fi;
+  - bash deploy.sh

@@ -96,3 +96,9 @@ clean << {
 sourceSets {
     main.java.srcDirs += 'src/main/kotlin'
 }
+
+test {
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}

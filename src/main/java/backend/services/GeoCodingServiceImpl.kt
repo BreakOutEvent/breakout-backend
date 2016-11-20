@@ -2,6 +2,7 @@ package backend.services
 
 import backend.model.misc.Coord
 import backend.util.Profiles.PRODUCTION
+import backend.util.Profiles.STAGING
 import com.google.maps.GeoApiContext
 import com.google.maps.GeocodingApi
 import com.google.maps.model.AddressComponent
@@ -13,7 +14,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 
 @Service
-@Profile(PRODUCTION)
+@Profile(PRODUCTION, STAGING)
 class GeoCodingServiceImpl : GeoCodingService {
 
     private val apiKey: String
