@@ -17,8 +17,23 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
-class PostingServiceImpl @Autowired constructor(val repository: PostingRepository, val locationService: LocationService, val mediaRepository: MediaRepository) : PostingService {
+class PostingServiceImpl @Autowired constructor(val repository: PostingRepository,
+                                                val locationService: LocationService,
+                                                val mediaRepository: MediaRepository) : PostingService {
 
+    override fun removeComment(posting: Posting, commentId: Long) {
+        posting.removeComment(commentId)
+        this.save(posting)
+    }
+
+    // TODO: This should return Posting (will break API)
+    override fun addComment(posting: Posting, from: UserCore, at: LocalDateTime, withText: String): Comment {
+        val comment = posting.addComment(from, at, withText)
+        this.save(posting)
+        return comment
+    }
+
+    // TODO: This should return Posting (will break API)
     override fun like(posting: Posting, core: UserCore, timeCreated: LocalDateTime): Like {
         val like = posting.like(timeCreated, core)
         this.save(posting)

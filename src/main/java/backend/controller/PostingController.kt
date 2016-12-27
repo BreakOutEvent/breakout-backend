@@ -4,7 +4,6 @@ import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.NotFoundException
 import backend.model.media.MediaService
 import backend.model.misc.Coord
-import backend.model.posting.CommentService
 import backend.model.posting.PostingService
 import backend.model.user.UserService
 import backend.services.ConfigurationService
@@ -30,7 +29,6 @@ import javax.validation.Valid
 open class PostingController {
 
     private val mediaService: MediaService
-    private val commentService: CommentService
     private val postingService: PostingService
     private val configurationService: ConfigurationService
     private val logger: Logger
@@ -39,13 +37,11 @@ open class PostingController {
 
     @Autowired
     constructor(postingService: PostingService,
-                commentService: CommentService,
                 mediaService: MediaService,
                 configurationService: ConfigurationService,
                 userService: UserService) {
 
         this.postingService = postingService
-        this.commentService = commentService
         this.mediaService = mediaService
         this.configurationService = configurationService
         this.logger = LoggerFactory.getLogger(PostingController::class.java)
@@ -108,9 +104,12 @@ open class PostingController {
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping("/{id}/comment/{commentId}/", method = arrayOf(DELETE))
-    open fun adminDeleteComment(@PathVariable("commentId") commentId: Long): Map<String, String> {
-        val comment = commentService.getByID(commentId) ?: throw NotFoundException("comments with id $commentId does not exist")
-        commentService.delete(comment)
+    open fun adminDeleteComment(@PathVariable("id") postingId: Long,
+                                @PathVariable("commentId") commentId: Long): Map<String, String> {
+
+        val posting = postingService.getByID(postingId) ?: throw NotFoundException("Posting with id $postingId not found")
+        postingService.removeComment(from = posting, id = commentId)
+
         return mapOf("message" to "success")
     }
 
@@ -169,7 +168,12 @@ open class PostingController {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
-        val comment = commentService.createComment(body.text, localDateTimeOf(epochSeconds = body.date!!), posting, user.core)
+
+        val comment = postingService.addComment(
+                to = posting,
+                from = user.core,
+                at = localDateTimeOf(body.date!!),
+                withText = body.text)
 
         return CommentView(comment)
     }

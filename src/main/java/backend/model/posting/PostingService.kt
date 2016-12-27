@@ -30,4 +30,8 @@ interface PostingService {
     fun like(posting: Posting, core: UserCore, timeCreated: LocalDateTime): Like
 
     fun unlike(by: UserCore, from: Posting)
+
+    fun removeComment(from: Posting, id: Long)
+
+    fun addComment(to: Posting, from: UserCore, at: LocalDateTime, withText: String): Comment
 }

@@ -19,22 +19,16 @@ class Comment : BasicEntity {
     lateinit var date: LocalDateTime
 
     @ManyToOne
-    lateinit var posting: Posting
-
-    @ManyToOne
     var user: UserCore? = null
 
-    constructor(text: String, date: LocalDateTime, posting: Posting, user: UserCore) : this() {
+    constructor(text: String, date: LocalDateTime, user: UserCore) : this() {
         this.text = text
         this.date = date
-        this.posting = posting
         this.user = user
     }
 
-
     @PreRemove
     fun preRemove() {
-        this.posting.comments.remove(this)
         this.user = null
     }
 }

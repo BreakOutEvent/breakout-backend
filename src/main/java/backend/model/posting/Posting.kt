@@ -1,6 +1,8 @@
 package backend.model.posting
 
+import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.ConflictException
+import backend.controller.exceptions.NotFoundException
 import backend.model.BasicEntity
 import backend.model.challenges.Challenge
 import backend.model.location.Location
@@ -38,7 +40,7 @@ class Posting : BasicEntity {
     @OneToMany(cascade = arrayOf(CascadeType.ALL))
     var media: MutableList<Media> = arrayListOf()
 
-    @OneToMany(cascade = arrayOf(CascadeType.ALL), mappedBy = "posting", orphanRemoval = true)
+    @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
     var comments: MutableList<Comment> = arrayListOf()
 
     @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
@@ -121,5 +123,30 @@ class Posting : BasicEntity {
             this.hasLiked = this.likes.any { it.user?.id == userId }
         }
         return this
+    }
+
+    private fun findCommentById(commentId: Long): Comment? {
+        return this.comments.filter { it.id == commentId }.firstOrNull()
+    }
+
+    fun removeComment(commentId: Long) {
+
+        this.findCommentById(commentId)?.let {
+            this.comments.remove(it)
+            return
+        }
+
+        throw NotFoundException("Comment with id $commentId not found at posting $id")
+    }
+
+    fun addComment(from: UserCore, at: LocalDateTime, withText: String): Comment {
+
+        if (withText.trim().isEmpty()) {
+            throw BadRequestException("Empty comments are not allowed")
+        }
+
+        val comment = Comment(withText, at, from)
+        this.comments.add(comment)
+        return comment
     }
 }
