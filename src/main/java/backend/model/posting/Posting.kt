@@ -1,5 +1,6 @@
 package backend.model.posting
 
+import backend.controller.exceptions.ConflictException
 import backend.model.BasicEntity
 import backend.model.challenges.Challenge
 import backend.model.location.Location
@@ -40,8 +41,12 @@ class Posting : BasicEntity {
     @OneToMany(cascade = arrayOf(CascadeType.ALL), mappedBy = "posting", orphanRemoval = true)
     var comments: MutableList<Comment> = arrayListOf()
 
-    @OneToMany(cascade = arrayOf(CascadeType.ALL), mappedBy = "posting", orphanRemoval = true)
-    var likes: MutableList<Like> = arrayListOf()
+    @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+    @JoinTable(
+            joinColumns = arrayOf(JoinColumn(name = "posting_id", referencedColumnName = "id")),
+            inverseJoinColumns = arrayOf(JoinColumn(name = "like_id", referencedColumnName = "id"))
+    )
+    var likes: MutableSet<Like> = hashSetOf()
 
     @Transient
     var hasLiked = false
@@ -69,6 +74,37 @@ class Posting : BasicEntity {
         return hashtags
     }
 
+    fun like(createdAt: LocalDateTime, user: UserCore): Like {
+        val like = Like(createdAt, user)
+
+        if (this.isLikedBy(user)) {
+            throw ConflictException("User ${user.id} has already liked this posting!")
+        } else {
+            this.likes.add(like)
+        }
+
+        return like
+    }
+
+    fun unlike(user: UserCore) {
+        if (this.isLikedBy(user)) {
+            val like = findLikeByUser(user)
+            this.likes.remove(like)
+        } else {
+            throw ConflictException("Can't unlike because user ${user.id} has not liked posting ${this.id}")
+        }
+    }
+
+    private fun findLikeByUser(user: UserCore): Like? {
+        return this.likes
+                .filter { it.user?.id == user.id } // TODO: use equals here somehow?
+                .firstOrNull()
+    }
+
+    private fun isLikedBy(user: UserCore): Boolean {
+        return findLikeByUser(user) != null
+    }
+
 
     @PreRemove
     fun preRemove() {
@@ -79,6 +115,7 @@ class Posting : BasicEntity {
         this.user = null
     }
 
+    // TODO: Refactor this!
     fun hasLikesBy(userId: Long?): Posting {
         if (userId != null) {
             this.hasLiked = this.likes.any { it.user?.id == userId }

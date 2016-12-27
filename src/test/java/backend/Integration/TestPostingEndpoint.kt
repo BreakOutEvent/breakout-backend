@@ -83,7 +83,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun adminDeletePostingCascade() {
         val posting = postingService.savePostingWithLocationAndMedia("hello #breakout", Coord(1.0, 1.0), user.core, listOf("image", "audio"), LocalDateTime.now())
-        likeService.createLike(LocalDateTime.now(), posting, user.core)
+        postingService.like(posting, user.core, LocalDateTime.now())
         commentService.createComment("Hello!", LocalDateTime.now(), posting, user.core)
 
         val postData = mapOf(
@@ -1169,7 +1169,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.id").exists())
+//                .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.date").exists())
                 .andExpect(jsonPath("$.user").exists())
                 .andReturn().response.contentAsString
@@ -1210,7 +1210,6 @@ open class TestPostingEndpoint : IntegrationTest() {
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.date").exists())
                 .andExpect(jsonPath("$.user").exists())
                 .andReturn().response.contentAsString
@@ -1251,7 +1250,6 @@ open class TestPostingEndpoint : IntegrationTest() {
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.date").exists())
                 .andExpect(jsonPath("$.user").exists())
                 .andReturn().response.contentAsString
@@ -1314,7 +1312,6 @@ open class TestPostingEndpoint : IntegrationTest() {
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.date").exists())
                 .andExpect(jsonPath("$.user").exists())
                 .andReturn().response.contentAsString
@@ -1336,7 +1333,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun getLikesForPosting() {
         val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, LocalDateTime.now())
-        likeService.createLike(LocalDateTime.now(), posting, user.core)
+        postingService.like(posting, user.core, LocalDateTime.now())
 
         val request = get("/posting/${posting.id}/like/")
                 .asUser(mockMvc, user.email, "password")

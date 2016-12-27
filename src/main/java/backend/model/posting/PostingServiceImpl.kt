@@ -19,6 +19,17 @@ import java.time.LocalDateTime
 @Service
 class PostingServiceImpl @Autowired constructor(val repository: PostingRepository, val locationService: LocationService, val mediaRepository: MediaRepository) : PostingService {
 
+    override fun like(posting: Posting, core: UserCore, timeCreated: LocalDateTime): Like {
+        val like = posting.like(timeCreated, core)
+        this.save(posting)
+        return like // TODO: Transactional?
+    }
+
+    override fun unlike(by: UserCore, from: Posting) {
+        from.unlike(by)
+        this.save(from)
+    }
+
     override fun findAllIdsSince(id: Long): List<Long> = repository.findAllIdsSince(id)
 
     override fun findAllByIds(body: List<Long>): Iterable<Posting> = repository.findAllByIds(body)

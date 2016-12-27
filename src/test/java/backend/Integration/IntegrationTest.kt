@@ -72,7 +72,6 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var eventRepository: EventRepository
     @Autowired lateinit protected var teamRepository: TeamRepository
     @Autowired lateinit protected var commentRepository: CommentRepository
-    @Autowired lateinit protected var likeRepository: LikeRepository
     @Autowired lateinit protected var postingRepository: PostingRepository
     @Autowired lateinit protected var mediaRepository: MediaRepository
     @Autowired lateinit protected var mediaSizeRepository: MediaSizeRepository
@@ -88,7 +87,6 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var teamService: TeamService
     @Autowired lateinit protected var commentService: CommentService
     @Autowired lateinit protected var postingService: PostingService
-    @Autowired lateinit protected var likeService: LikeService
     @Autowired lateinit protected var eventService: EventService
     @Autowired lateinit protected var mediaService: MediaService
     @Autowired lateinit protected var mediaSizeService: MediaSizeService
@@ -107,7 +105,6 @@ abstract class IntegrationTest {
     open fun setUp() {
         sponsoringInvoiceRepository.deleteAll()
         teamRepository.deleteAll()
-        likeRepository.deleteAll()
         postingRepository.deleteAll()
         commentRepository.deleteAll()
         groupMessageRepository.deleteAll()

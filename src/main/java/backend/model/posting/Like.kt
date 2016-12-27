@@ -3,16 +3,14 @@ package backend.model.posting
 import backend.model.BasicEntity
 import backend.model.user.UserCore
 import java.time.LocalDateTime
-import javax.persistence.*
+import javax.persistence.Entity
+import javax.persistence.ManyToOne
+import javax.persistence.PreRemove
+import javax.persistence.Table
 
 @Entity
 
-@Table(
-        name = "postinglike",
-        uniqueConstraints = arrayOf(
-                UniqueConstraint(columnNames = arrayOf("posting_id", "user_id"))
-        )
-)
+@Table(name = "postinglike")
 class Like : BasicEntity {
 
     private constructor() : super()
@@ -20,20 +18,25 @@ class Like : BasicEntity {
     lateinit var date: LocalDateTime
 
     @ManyToOne
-    lateinit var posting: Posting
-
-    @ManyToOne
     var user: UserCore? = null
 
-    constructor(date: LocalDateTime, posting: Posting, user: UserCore) : this() {
+    constructor(date: LocalDateTime, user: UserCore) : this() {
         this.date = date
-        this.posting = posting
         this.user = user
     }
 
     @PreRemove
     fun preRemove() {
-        this.posting.likes.remove(this)
         this.user = null
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Like) return false
+
+        if (date != other.date) return false
+        if (user!!.id == other.user!!.id) return false // TODO: Implement equals in UserCore!
+
+        return true
     }
 }

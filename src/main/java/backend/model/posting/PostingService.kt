@@ -27,4 +27,7 @@ interface PostingService {
 
     fun delete(posting: Posting)
 
+    fun like(posting: Posting, core: UserCore, timeCreated: LocalDateTime): Like
+
+    fun unlike(by: UserCore, from: Posting)
 }

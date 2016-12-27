@@ -5,7 +5,6 @@ import backend.controller.exceptions.NotFoundException
 import backend.model.media.MediaService
 import backend.model.misc.Coord
 import backend.model.posting.CommentService
-import backend.model.posting.LikeService
 import backend.model.posting.PostingService
 import backend.model.user.UserService
 import backend.services.ConfigurationService
@@ -32,7 +31,6 @@ open class PostingController {
 
     private val mediaService: MediaService
     private val commentService: CommentService
-    private val likeService: LikeService
     private val postingService: PostingService
     private val configurationService: ConfigurationService
     private val logger: Logger
@@ -42,14 +40,12 @@ open class PostingController {
     @Autowired
     constructor(postingService: PostingService,
                 commentService: CommentService,
-                likeService: LikeService,
                 mediaService: MediaService,
                 configurationService: ConfigurationService,
                 userService: UserService) {
 
         this.postingService = postingService
         this.commentService = commentService
-        this.likeService = likeService
         this.mediaService = mediaService
         this.configurationService = configurationService
         this.logger = LoggerFactory.getLogger(PostingController::class.java)
@@ -192,7 +188,7 @@ open class PostingController {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
-        val like = likeService.createLike(localDateTimeOf(body.date!!), posting, user.core)
+        val like = postingService.like(posting, user.core, localDateTimeOf(body.date!!))
 
         return LikeView(like)
     }
@@ -209,7 +205,7 @@ open class PostingController {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
-        likeService.deleteLike(posting, user.core)
+        postingService.unlike(by = user.core, from = posting)
 
         return mapOf("message" to "success")
     }
@@ -221,7 +217,7 @@ open class PostingController {
     @RequestMapping("/{id}/like/", method = arrayOf(GET))
     open fun getLikesForPosting(@PathVariable("id") id: Long): List<LikeView> {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
-        val likes = likeService.findAllByPosting(posting)
+        val likes = posting.likes
         return likes.map(::LikeView)
     }
 

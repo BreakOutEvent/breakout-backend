@@ -48,7 +48,7 @@ open class TestMediaEndpoint : IntegrationTest() {
     @Test
     open fun adminDeleteMediaSizes() {
         val posting = postingService.savePostingWithLocationAndMedia("hello #breakout", Coord(1.0, 1.0), user.core, listOf("image", "audio"), LocalDateTime.now())
-        likeService.createLike(LocalDateTime.now(), posting, user.core)
+        postingService.like(posting, user.core, LocalDateTime.now())
         commentService.createComment("Hello!", LocalDateTime.now(), posting, user.core)
 
         val postData = mapOf(
@@ -64,7 +64,7 @@ open class TestMediaEndpoint : IntegrationTest() {
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .json(postData)
 
-        mockMvc.perform (requestMediaSize)
+        mockMvc.perform(requestMediaSize)
                 .andExpect(status().isCreated)
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.url").exists())
@@ -78,7 +78,7 @@ open class TestMediaEndpoint : IntegrationTest() {
 
         val requestPosting = get("/posting/${posting.id}/")
 
-        mockMvc.perform (requestPosting)
+        mockMvc.perform(requestPosting)
                 .andExpect(status().isOk)
                 .andExpect(MockMvcResultMatchers.content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -93,7 +93,7 @@ open class TestMediaEndpoint : IntegrationTest() {
                 .delete("/media/${posting.media.first().id}/")
                 .asUser(mockMvc, admin.email, "password")
 
-        mockMvc.perform (request)
+        mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.message").exists())
                 .andExpect(jsonPath("$.message").value("success"))
@@ -101,7 +101,7 @@ open class TestMediaEndpoint : IntegrationTest() {
 
         val requestPosting2 = get("/posting/${posting.id}/")
 
-        mockMvc.perform (requestPosting2)
+        mockMvc.perform(requestPosting2)
                 .andExpect(status().isOk)
                 .andExpect(MockMvcResultMatchers.content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
