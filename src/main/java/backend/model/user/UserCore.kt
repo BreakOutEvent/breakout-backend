@@ -133,6 +133,19 @@ open class UserCore : BasicEntity, User {
         this.payments.forEach { it.user = null }
         this.payments.clear()
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is UserCore) return false
+
+        if (email != other.email) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return email.hashCode()
+    }
 }
 
 class BasicGrantedAuthority : GrantedAuthority {

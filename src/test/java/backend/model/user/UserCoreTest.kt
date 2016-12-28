@@ -71,4 +71,12 @@ class UserCoreTest {
         val core = userCore.core
         assertEquals(userCore.core, core)
     }
+
+    @Test
+    fun testEquals() {
+        val otherCore = UserCore()
+        otherCore.email = userCore.email
+        assertEquals(otherCore, userCore)
+        assertEquals(otherCore, otherCore)
+    }
 }

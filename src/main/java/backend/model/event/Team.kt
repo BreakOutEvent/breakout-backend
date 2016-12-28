@@ -106,7 +106,7 @@ class Team : BasicEntity {
     }
 
     fun isMember(participant: Participant): Boolean {
-        return this.members.filter { it.isSameUserAs(participant) }.isNotEmpty()
+        return this.members.filter { it.core == participant.core }.isNotEmpty()
     }
 
     fun isFull(): Boolean {

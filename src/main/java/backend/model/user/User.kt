@@ -35,7 +35,5 @@ interface User {
     fun createActivationToken(): String
     fun isActivated(): Boolean
 
-    fun isSameUserAs(user: User) = this.core.id == user.core.id
-
     fun setNewPassword(password: String, token: String)
 }
