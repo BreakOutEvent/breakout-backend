@@ -4,6 +4,7 @@ import backend.Integration.IntegrationTest
 import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.misc.Coord
+import backend.model.misc.EmailAddress
 import backend.model.user.Admin
 import backend.model.user.Participant
 import backend.model.user.User
@@ -25,7 +26,6 @@ open class TeamEntryFeeServiceImplTest : IntegrationTest() {
     private lateinit var event: Event
 
     @Before
-    @Transactional //TODO: After join is moved to service layer, make this non transactional again
     override fun setUp() {
         super.setUp()
         user = userService.create("creator@mail.de", "password", { addRole(Participant::class) })
@@ -34,8 +34,12 @@ open class TeamEntryFeeServiceImplTest : IntegrationTest() {
         admin = userService.create("admin@mail.com", "password", { addRole(Admin::class) }).getRole(Admin::class)!!
         event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
         team = teamService.create(creator, "name", "description", event)
-        team.members.add(invitee)
-        teamService.save(team)
+
+        setAuthenticatedUser(creator.email)
+        teamService.invite(EmailAddress(invitee.email), team)
+
+        setAuthenticatedUser(invitee.email)
+        teamService.join(invitee, team)
     }
 
     @Test
