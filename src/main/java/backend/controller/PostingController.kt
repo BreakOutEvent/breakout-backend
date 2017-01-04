@@ -171,7 +171,7 @@ open class PostingController {
 
         val comment = postingService.addComment(
                 to = posting,
-                from = user.core,
+                from = user.account,
                 at = localDateTimeOf(body.date!!),
                 withText = body.text)
 
@@ -192,7 +192,7 @@ open class PostingController {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
-        val like = postingService.like(posting, user.core, localDateTimeOf(body.date!!))
+        val like = postingService.like(posting, user.account, localDateTimeOf(body.date!!))
 
         return LikeView(like)
     }
@@ -209,7 +209,7 @@ open class PostingController {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
-        postingService.unlike(by = user.core, from = posting)
+        postingService.unlike(by = user.account, from = posting)
 
         return mapOf("message" to "success")
     }

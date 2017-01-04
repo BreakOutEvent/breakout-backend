@@ -2,12 +2,12 @@ package backend.model.posting
 
 import backend.model.misc.Coord
 import backend.model.user.User
-import backend.model.user.UserCore
+import backend.model.user.UserAccount
 import java.time.LocalDateTime
 
 interface PostingService {
 
-    fun savePostingWithLocationAndMedia(text: String?, postingLocation: Coord?, user: UserCore, mediaTypes: List<String>?, date: LocalDateTime): Posting
+    fun savePostingWithLocationAndMedia(text: String?, postingLocation: Coord?, user: UserAccount, mediaTypes: List<String>?, date: LocalDateTime): Posting
 
     fun createPosting(user: User, text: String?, uploadMediaTypes: List<String>?, locationCoord: Coord?, clientDate: LocalDateTime): Posting
 
@@ -27,11 +27,11 @@ interface PostingService {
 
     fun delete(posting: Posting)
 
-    fun like(posting: Posting, core: UserCore, timeCreated: LocalDateTime): Like
+    fun like(posting: Posting, account: UserAccount, timeCreated: LocalDateTime): Like
 
-    fun unlike(by: UserCore, from: Posting)
+    fun unlike(by: UserAccount, from: Posting)
 
     fun removeComment(from: Posting, id: Long)
 
-    fun addComment(to: Posting, from: UserCore, at: LocalDateTime, withText: String): Comment
+    fun addComment(to: Posting, from: UserAccount, at: LocalDateTime, withText: String): Comment
 }

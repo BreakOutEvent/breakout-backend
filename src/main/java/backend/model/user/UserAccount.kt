@@ -18,7 +18,7 @@ import javax.persistence.*
 import kotlin.reflect.KClass
 
 @Entity
-open class UserCore : BasicEntity, User {
+open class UserAccount : BasicEntity, User {
 
     constructor() : super() {
         this.isBlocked = true
@@ -61,7 +61,7 @@ open class UserCore : BasicEntity, User {
     /*
      * cascade all operations to children
      * orphanRemoval = true allows removing a role from the database
-     * if it gets removed from Map userRoles and the core is saved!
+     * if it gets removed from Map userRoles and the account is saved!
      * See: http://stackoverflow.com/a/2011546
      */
     @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.EAGER, orphanRemoval = true)
@@ -124,7 +124,7 @@ open class UserCore : BasicEntity, User {
         return role as T
     }
 
-    override val core: UserCore
+    override val account: UserAccount
         @JsonIgnore
         get() = this
 
@@ -136,7 +136,7 @@ open class UserCore : BasicEntity, User {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is UserCore) return false
+        if (other !is UserAccount) return false
 
         if (email != other.email) return false
 

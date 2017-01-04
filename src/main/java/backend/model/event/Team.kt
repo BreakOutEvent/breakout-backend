@@ -106,7 +106,7 @@ class Team : BasicEntity {
     }
 
     fun isMember(participant: Participant): Boolean {
-        return this.members.filter { it.core == participant.core }.isNotEmpty()
+        return this.members.filter { it.account == participant.account }.isNotEmpty()
     }
 
     fun isFull(): Boolean {

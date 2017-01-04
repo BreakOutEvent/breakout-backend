@@ -347,7 +347,7 @@ class SponsoringControllerTest : IntegrationTest() {
         val sponsor2 = userService.create("sponsor2@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
         sponsoringService.createSponsoring(sponsor2, team, euroOf(1), euroOf(200))
 
-        val request = get("/user/${sponsor1.core.id}/sponsor/sponsoring/")
+        val request = get("/user/${sponsor1.account.id}/sponsor/sponsoring/")
                 .asUser(mockMvc, sponsor1.email, "password")
 
         mockMvc.perform(request)

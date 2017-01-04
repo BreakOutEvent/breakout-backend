@@ -8,7 +8,7 @@ interface UserService {
 
     fun getUserById(id: Long): User?
     fun getUserByEmail(email: String): User?
-    fun getAllUsers(): Iterable<UserCore>
+    fun getAllUsers(): Iterable<UserAccount>
 
     fun create(email: String, password: String): User
     fun create(email: String, password: String, f: User.() -> Unit): User
@@ -26,7 +26,7 @@ interface UserService {
 
     fun resetPassword(emailString: String, password: String, token: String)
 
-    fun searchByString(search: String): List<UserCore>
+    fun searchByString(search: String): List<UserAccount>
 
     fun findAllSponsors(): Iterable<Sponsor>
 }

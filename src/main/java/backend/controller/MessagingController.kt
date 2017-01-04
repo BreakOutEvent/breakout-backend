@@ -42,11 +42,11 @@ open class MessagingController {
                                 @AuthenticationPrincipal customUserDetails: CustomUserDetails): GroupMessageView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
-        val groupMessage = groupMessageService.createGroupMessage(user.core)
+        val groupMessage = groupMessageService.createGroupMessage(user.account)
 
         body.forEach { userId ->
             val userToAdd = userService.getUserById(userId) ?: throw NotFoundException("user with id $userId does not exist")
-            if (!groupMessage.users.contains(userToAdd.core)) groupMessageService.addUser(userToAdd.core, groupMessage)
+            if (!groupMessage.users.contains(userToAdd.account)) groupMessageService.addUser(userToAdd.account, groupMessage)
         }
 
         return GroupMessageView(groupMessage)
@@ -64,11 +64,11 @@ open class MessagingController {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val groupMessage = groupMessageService.getByID(id) ?: throw NotFoundException("groupmessage with id $id does not exist")
-        if (!groupMessage.users.contains(user.core)) throw UnauthorizedException("authenticated user and requested resource mismatch")
+        if (!groupMessage.users.contains(user.account)) throw UnauthorizedException("authenticated user and requested resource mismatch")
 
         body.forEach { userId ->
             val userToAdd = userService.getUserById(userId) ?: throw NotFoundException("user with id $userId does not exist")
-            if (!groupMessage.users.contains(userToAdd.core)) groupMessageService.addUser(userToAdd.core, groupMessage)
+            if (!groupMessage.users.contains(userToAdd.account)) groupMessageService.addUser(userToAdd.account, groupMessage)
         }
 
         return GroupMessageView(groupMessage)
@@ -87,9 +87,9 @@ open class MessagingController {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val groupMessage = groupMessageService.getByID(id) ?: throw NotFoundException("groupmessage with id $id does not exist")
-        if (!groupMessage.users.contains(user.core)) throw UnauthorizedException("authenticated user and requested resource mismatch")
+        if (!groupMessage.users.contains(user.account)) throw UnauthorizedException("authenticated user and requested resource mismatch")
 
-        val message = Message(user.core, body.text!!, localDateTimeOf(body.date!!))
+        val message = Message(user.account, body.text!!, localDateTimeOf(body.date!!))
         groupMessageService.addMessage(message, groupMessage)
 
         return GroupMessageView(groupMessage)
@@ -106,7 +106,7 @@ open class MessagingController {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val groupMessage = groupMessageService.getByID(id) ?: throw NotFoundException("groupmessage with id $id does not exist")
-        if (!groupMessage.users.contains(user.core)) throw UnauthorizedException("authenticated user and requested resource mismatch")
+        if (!groupMessage.users.contains(user.account)) throw UnauthorizedException("authenticated user and requested resource mismatch")
 
         return GroupMessageView(groupMessage)
     }

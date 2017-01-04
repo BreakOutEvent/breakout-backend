@@ -37,9 +37,9 @@ class Sponsor : UserRole {
      */
     private constructor() : super()
 
-    constructor(core: UserCore) : super(core)
+    constructor(account: UserAccount) : super(account)
 
-    constructor(core: UserCore, company: String, logo: String, url: Url, address: Address, isHidden: Boolean) : super(core) {
+    constructor(account: UserAccount, company: String, logo: String, url: Url, address: Address, isHidden: Boolean) : super(account) {
         this.company = company
         this.logo = Media("IMAGE")
         this.url = url

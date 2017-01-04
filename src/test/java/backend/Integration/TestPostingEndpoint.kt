@@ -51,7 +51,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun adminDeletePosting() {
-        val posting = postingService.savePostingWithLocationAndMedia("hello breakout", null, user.core, null, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("hello breakout", null, user.account, null, LocalDateTime.now())
 
         val request = MockMvcRequestBuilders
                 .delete("/posting/${posting.id}/")
@@ -68,7 +68,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun adminDeletePostingFailNotAdmin() {
-        val posting = postingService.savePostingWithLocationAndMedia("hello breakout", null, user.core, null, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("hello breakout", null, user.account, null, LocalDateTime.now())
 
         val request = MockMvcRequestBuilders
                 .delete("/posting/${posting.id}/")
@@ -84,10 +84,10 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun adminDeletePostingCascade() {
-        val posting = postingService.savePostingWithLocationAndMedia("hello #breakout", Coord(1.0, 1.0), user.core, listOf("image", "audio"), LocalDateTime.now())
-        postingService.like(posting, user.core, LocalDateTime.now())
-        postingService.addComment(posting, user.core, LocalDateTime.now(), "Hello!")
-//        commentService.createComment("Hello!", LocalDateTime.now(), posting, user.core)
+        val posting = postingService.savePostingWithLocationAndMedia("hello #breakout", Coord(1.0, 1.0), user.account, listOf("image", "audio"), LocalDateTime.now())
+        postingService.like(posting, user.account, LocalDateTime.now())
+        postingService.addComment(posting, user.account, LocalDateTime.now(), "Hello!")
+//        commentService.createComment("Hello!", LocalDateTime.now(), posting, user.account)
 
         val postData = mapOf(
                 "url" to "https://aws.amazon.com/bla.jpg",
@@ -133,9 +133,9 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun adminDeleteComment() {
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, LocalDateTime.now())
-//        val comment = commentService.createComment("TestComment", LocalDateTime.now(), posting, user.core)
-        postingService.addComment(posting, user.core, LocalDateTime.now(), "TestComment")
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.account, null, LocalDateTime.now())
+//        val comment = commentService.createComment("TestComment", LocalDateTime.now(), posting, user.account)
+        postingService.addComment(posting, user.account, LocalDateTime.now(), "TestComment")
         val requestPosting = get("/posting/${posting.id}/")
 
         mockMvc.perform(requestPosting)
@@ -188,9 +188,9 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun adminDeleteCommentFailNotAdmin() {
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, LocalDateTime.now())
-//        val comment = commentService.createComment("TestComment", LocalDateTime.now(), posting, user.core)
-        val comment = postingService.addComment(posting, user.core, LocalDateTime.now(), "Hello!")
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.account, null, LocalDateTime.now())
+//        val comment = commentService.createComment("TestComment", LocalDateTime.now(), posting, user.account)
+        val comment = postingService.addComment(posting, user.account, LocalDateTime.now(), "Hello!")
         val requestPosting = get("/posting/${posting.id}/")
 
         mockMvc.perform(requestPosting)
@@ -343,8 +343,8 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun getPostingsByHashTag() {
-        postingService.savePostingWithLocationAndMedia("hello #breakout", null, user.core, null, LocalDateTime.now())
-        postingService.savePostingWithLocationAndMedia("hello #awsome", null, user.core, null, LocalDateTime.now())
+        postingService.savePostingWithLocationAndMedia("hello #breakout", null, user.account, null, LocalDateTime.now())
+        postingService.savePostingWithLocationAndMedia("hello #awsome", null, user.account, null, LocalDateTime.now())
 
         val request = MockMvcRequestBuilders
                 .get("/posting/hashtag/breakout/")
@@ -494,7 +494,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun getPostingById() {
         //given
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now())
 
         //when
         val request = get("/posting/${posting.id}/")
@@ -522,9 +522,9 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun getPostingsByIds() {
 
-        val postingZero = postingService.savePostingWithLocationAndMedia("Test0", Coord(1.0, 1.0), user.core, null, LocalDateTime.now())
-        postingService.savePostingWithLocationAndMedia("Test1", Coord(1.0, 1.0), user.core, null, LocalDateTime.now())
-        val postingTwo = postingService.savePostingWithLocationAndMedia("Test2", Coord(1.0, 1.0), user.core, null, LocalDateTime.now())
+        val postingZero = postingService.savePostingWithLocationAndMedia("Test0", Coord(1.0, 1.0), user.account, null, LocalDateTime.now())
+        postingService.savePostingWithLocationAndMedia("Test1", Coord(1.0, 1.0), user.account, null, LocalDateTime.now())
+        val postingTwo = postingService.savePostingWithLocationAndMedia("Test2", Coord(1.0, 1.0), user.account, null, LocalDateTime.now())
 
         val postingsIds: List<Long> = listOf(postingZero.id!!, postingTwo.id!!)
 
@@ -566,9 +566,9 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun getPostingIdsSince() {
         //given
 
-        val postingZero = postingService.savePostingWithLocationAndMedia("Test0", Coord(1.0, 1.0), user.core, null, LocalDateTime.now())
-        postingService.savePostingWithLocationAndMedia("Test1", Coord(1.0, 1.0), user.core, null, LocalDateTime.now())
-        postingService.savePostingWithLocationAndMedia("Test2", Coord(1.0, 1.0), user.core, null, LocalDateTime.now())
+        val postingZero = postingService.savePostingWithLocationAndMedia("Test0", Coord(1.0, 1.0), user.account, null, LocalDateTime.now())
+        postingService.savePostingWithLocationAndMedia("Test1", Coord(1.0, 1.0), user.account, null, LocalDateTime.now())
+        postingService.savePostingWithLocationAndMedia("Test2", Coord(1.0, 1.0), user.account, null, LocalDateTime.now())
 
         //when
         val request = get("/posting/get/since/${postingZero.id}/")
@@ -591,7 +591,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun createNewPostingWithMediaAndAddMediaSizesWithoutToken() {
         //given
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, LocalDateTime.now());
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now());
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -621,7 +621,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun createNewPostingWithMediaAndAddMediaSizesWithWrongToken() {
 
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, LocalDateTime.now());
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now());
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -649,7 +649,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewPostingWithMedia() {
 
-        val posting = postingService.createPosting(user.core, "Test", arrayListOf("VIDEO"), null, LocalDateTime.now())
+        val posting = postingService.createPosting(user.account, "Test", arrayListOf("VIDEO"), null, LocalDateTime.now())
 
         val requestMedia = get("/posting/${posting.id}/")
 
@@ -673,7 +673,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun createNewPostingWithMediaAndAddMediaSizesWithValidToken() {
 
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now())
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -738,7 +738,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun createNewPostingWithMediaAndAddManyMediaSizes() {
 
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, LocalDateTime.now());
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now());
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -793,7 +793,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun createNewPostingWithMediaAndAddMediaSizesUpdateMediaSizes() {
 
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, LocalDateTime.now());
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now());
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -890,7 +890,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun createNewPostingWithMediaAndAddMediaSizesUpdateMediaSizesWithVariationWidth() {
 
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, LocalDateTime.now());
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now());
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -986,7 +986,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun createNewPostingWithMediaAndAddMediaSizesUpdateMediaSizesWithVariationHeight() {
 
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.core, null, LocalDateTime.now());
+        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now());
         val media = mediaService.createMedia("image")
         posting.media = listOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
@@ -1082,7 +1082,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun getAllPostings() {
 
         for (i in 1..200) {
-            postingService.savePostingWithLocationAndMedia("Text $i", null, user.core, null, LocalDateTime.now())
+            postingService.savePostingWithLocationAndMedia("Text $i", null, user.account, null, LocalDateTime.now())
         }
 
         val request = get("/posting/")
@@ -1101,7 +1101,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun getAllPostingsLimit() {
 
         for (i in 1..200) {
-            postingService.savePostingWithLocationAndMedia("Text $i", null, user.core, null, LocalDateTime.now())
+            postingService.savePostingWithLocationAndMedia("Text $i", null, user.account, null, LocalDateTime.now())
         }
 
         val request = get("/posting/?limit=100&offset=0")
@@ -1120,7 +1120,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewComment() {
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.account, null, LocalDateTime.now())
 
         val postData = mapOf(
                 "text" to "TestComment",
@@ -1162,7 +1162,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createEmptyCommentFail() {
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.account, null, LocalDateTime.now())
 
         val postData = mapOf(
                 "text" to "",
@@ -1184,7 +1184,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewLike() {
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.account, null, LocalDateTime.now())
 
         val postData = mapOf(
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
@@ -1225,7 +1225,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createLikeHasLikedFlag() {
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.account, null, LocalDateTime.now())
 
         val postData = mapOf(
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
@@ -1245,7 +1245,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         println(response)
 
 
-        val requestPosting = get("/posting/${posting.id}/?userid=${user.core.id}")
+        val requestPosting = get("/posting/${posting.id}/?userid=${user.account.id}")
 
         val responsePosting = mockMvc.perform(requestPosting)
                 .andExpect(status().isOk)
@@ -1265,7 +1265,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun deleteLike() {
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.account, null, LocalDateTime.now())
 
         val postData = mapOf(
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
@@ -1285,7 +1285,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         println(response)
 
 
-        val requestPosting = get("/posting/${posting.id}/?userid=${user.core.id}")
+        val requestPosting = get("/posting/${posting.id}/?userid=${user.account.id}")
 
         val responsePosting = mockMvc.perform(requestPosting)
                 .andExpect(status().isOk)
@@ -1327,7 +1327,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewLikeFailDuplicate() {
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.account, null, LocalDateTime.now())
 
         val postData = mapOf(
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
@@ -1360,8 +1360,8 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun getLikesForPosting() {
-        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.core, null, LocalDateTime.now())
-        postingService.like(posting, user.core, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.account, null, LocalDateTime.now())
+        postingService.like(posting, user.account, LocalDateTime.now())
 
         val request = get("/posting/${posting.id}/like/")
                 .asUser(mockMvc, user.email, "password")

@@ -463,8 +463,8 @@ open class AdminController {
 
         registeredSponsors.forEach { sponsor ->
 
-            val sponsorings = sponsoringService.findBySponsorId(sponsor.core.id!!).filter { it.status == SponsoringStatus.ACCEPTED || it.status == SponsoringStatus.PAYED }
-            val challenges = challengeService.findBySponsorId(sponsor.core.id!!).filter { it.status == ChallengeStatus.WITH_PROOF || it.status == ChallengeStatus.PROOF_ACCEPTED }
+            val sponsorings = sponsoringService.findBySponsorId(sponsor.account.id!!).filter { it.status == SponsoringStatus.ACCEPTED || it.status == SponsoringStatus.PAYED }
+            val challenges = challengeService.findBySponsorId(sponsor.account.id!!).filter { it.status == ChallengeStatus.WITH_PROOF || it.status == ChallengeStatus.PROOF_ACCEPTED }
 
             if (sponsorings.count() > 0 || challenges.count() > 0) {
                 val sponsorMap = mutableMapOf<String, Any>()
@@ -518,7 +518,7 @@ open class AdminController {
                 }
 
                 // Summen Ausgabe
-                sponsorMap.put("sponsor_id", sponsor.core.id!!)
+                sponsorMap.put("sponsor_id", sponsor.account.id!!)
                 sponsorMap.put("sponsor_firstname", sponsor.firstname!!)
                 sponsorMap.put("sponsor_lastname", sponsor.lastname!!)
                 sponsorMap.put("sponsor_email", sponsor.email)

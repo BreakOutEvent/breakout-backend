@@ -7,7 +7,7 @@ import backend.model.BasicEntity
 import backend.model.challenges.Challenge
 import backend.model.location.Location
 import backend.model.media.Media
-import backend.model.user.UserCore
+import backend.model.user.UserAccount
 import java.time.LocalDateTime
 import java.util.*
 import java.util.regex.Matcher
@@ -35,7 +35,7 @@ class Posting : BasicEntity {
     var challenge: Challenge? = null
 
     @ManyToOne
-    var user: UserCore? = null
+    var user: UserAccount? = null
 
     @OneToMany(cascade = arrayOf(CascadeType.ALL))
     var media: MutableList<Media> = arrayListOf()
@@ -53,7 +53,7 @@ class Posting : BasicEntity {
     @Transient
     var hasLiked = false
 
-    constructor(text: String?, date: LocalDateTime, location: Location?, user: UserCore, media: MutableList<Media>) : this() {
+    constructor(text: String?, date: LocalDateTime, location: Location?, user: UserAccount, media: MutableList<Media>) : this() {
         this.text = text
         this.date = date
         this.location = location
@@ -76,7 +76,7 @@ class Posting : BasicEntity {
         return hashtags
     }
 
-    fun like(createdAt: LocalDateTime, user: UserCore): Like {
+    fun like(createdAt: LocalDateTime, user: UserAccount): Like {
         val like = Like(createdAt, user)
 
         if (this.isLikedBy(user)) {
@@ -88,7 +88,7 @@ class Posting : BasicEntity {
         return like
     }
 
-    fun unlike(user: UserCore) {
+    fun unlike(user: UserAccount) {
         if (this.isLikedBy(user)) {
             val like = findLikeByUser(user)
             this.likes.remove(like)
@@ -97,13 +97,13 @@ class Posting : BasicEntity {
         }
     }
 
-    private fun findLikeByUser(user: UserCore): Like? {
+    private fun findLikeByUser(user: UserAccount): Like? {
         return this.likes
                 .filter { it.user?.id == user.id } // TODO: use equals here somehow?
                 .firstOrNull()
     }
 
-    private fun isLikedBy(user: UserCore): Boolean {
+    private fun isLikedBy(user: UserAccount): Boolean {
         return findLikeByUser(user) != null
     }
 
@@ -139,7 +139,7 @@ class Posting : BasicEntity {
         throw NotFoundException("Comment with id $commentId not found at posting $id")
     }
 
-    fun addComment(from: UserCore, at: LocalDateTime, withText: String): Comment {
+    fun addComment(from: UserAccount, at: LocalDateTime, withText: String): Comment {
 
         if (withText.trim().isEmpty()) {
             throw BadRequestException("Empty comments are not allowed")

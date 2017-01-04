@@ -29,12 +29,12 @@ class BasicUserView() {
         this.user = user
         this.firstname = user.firstname
         this.lastname = user.lastname
-        this.id = user.core.id
+        this.id = user.account.id
         this.gender = user.gender
         this.isBlocked = user.isBlocked
         this.participant = if (user.hasRole(Participant::class)) BasicParticipantViewModel(user) else null
         this.profilePic = MediaView(user.profilePic)
-        this.roles = user.core.getAuthorities().map { it.authority }
+        this.roles = user.account.getAuthorities().map { it.authority }
     }
 
     class BasicParticipantViewModel() {

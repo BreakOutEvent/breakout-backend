@@ -47,10 +47,10 @@ open class TestMediaEndpoint : IntegrationTest() {
 
     @Test
     open fun adminDeleteMediaSizes() {
-        val posting = postingService.savePostingWithLocationAndMedia("hello #breakout", Coord(1.0, 1.0), user.core, listOf("image", "audio"), LocalDateTime.now())
-        postingService.like(posting, user.core, LocalDateTime.now())
-//        commentService.createComment("Hello!", LocalDateTime.now(), posting, user.core)
-        postingService.addComment(posting, user.core, LocalDateTime.now(), "Hello!")
+        val posting = postingService.savePostingWithLocationAndMedia("hello #breakout", Coord(1.0, 1.0), user.account, listOf("image", "audio"), LocalDateTime.now())
+        postingService.like(posting, user.account, LocalDateTime.now())
+//        commentService.createComment("Hello!", LocalDateTime.now(), posting, user.account)
+        postingService.addComment(posting, user.account, LocalDateTime.now(), "Hello!")
 
         val postData = mapOf(
                 "url" to "https://aws.amazon.com/bla.jpg",

@@ -155,7 +155,7 @@ open class SponsoringController {
                                          @PathVariable userId: Long): Iterable<SponsoringView> {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
-        if (user.core.id != userId) throw UnauthorizedException("A sponsor can only see it's own sponsorings")
+        if (user.account.id != userId) throw UnauthorizedException("A sponsor can only see it's own sponsorings")
 
         val sponsorings = sponsoringService.findBySponsorId(userId)
         return sponsorings.map(::SponsoringView)

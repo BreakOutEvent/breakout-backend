@@ -178,7 +178,7 @@ class TestUserEndpoint : IntegrationTest() {
         println(response)
 
         val requestMedia = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/user/${user.core.id}/")
+                .request(HttpMethod.GET, "/user/${user.account.id}/")
                 .contentType(MediaType.APPLICATION_JSON)
 
         val responseMedia = mockMvc.perform (requestMedia)

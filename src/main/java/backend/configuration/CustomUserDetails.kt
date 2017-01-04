@@ -21,12 +21,12 @@ class CustomUserDetails : UserDetails, Serializable {
     private val passwordHash: String
 
     constructor(user: User) {
-        this.id = user.core.id!!
+        this.id = user.account.id!!
         this.username = user.email
         this.isCredentialsNonExpired = true
         this.isAccountNonExpired = true
         this.isAccountNonLocked = true
-        this.authorities = user.core.getAuthorities().toMutableList()
+        this.authorities = user.account.getAuthorities().toMutableList()
         this.isEnabled = true
         this.passwordHash = user.passwordHash
     }

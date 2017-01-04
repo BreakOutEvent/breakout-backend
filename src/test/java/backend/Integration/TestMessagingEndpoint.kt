@@ -34,7 +34,7 @@ class TestMessagingEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.messages").isArray)
                 .andExpect(jsonPath("$.users").isArray)
-                .andExpect(jsonPath("$.users[0].id").value(user.core.id!!.toInt()))
+                .andExpect(jsonPath("$.users[0].id").value(user.account.id!!.toInt()))
                 .andReturn().response.contentAsString
 
         println(response)
@@ -57,7 +57,7 @@ class TestMessagingEndpoint : IntegrationTest() {
         val user = userService.create("user@break-out.org", "password")
         val user1 = userService.create("user1@mail.com", "password")
 
-        val data = listOf(user1.core.id)
+        val data = listOf(user1.account.id)
 
         val request = post("/messaging/")
                 .asUser(mockMvc, "user@break-out.org", "password")
@@ -69,8 +69,8 @@ class TestMessagingEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.messages").isArray)
                 .andExpect(jsonPath("$.users").isArray)
-                .andExpect(jsonPath("$.users[0].id").value(user.core.id!!.toInt()))
-                .andExpect(jsonPath("$.users[1].id").value(user1.core.id!!.toInt()))
+                .andExpect(jsonPath("$.users[0].id").value(user.account.id!!.toInt()))
+                .andExpect(jsonPath("$.users[1].id").value(user1.account.id!!.toInt()))
                 .andReturn().response.contentAsString
 
         println(response)
@@ -79,7 +79,7 @@ class TestMessagingEndpoint : IntegrationTest() {
     @Test
     fun getGroupMessage() {
         val user = userService.create("user@break-out.org", "password")
-        val groupMessage = groupMessageService.createGroupMessage(user.core)
+        val groupMessage = groupMessageService.createGroupMessage(user.account)
 
         val request = get("/messaging/${groupMessage.id}/")
                 .asUser(mockMvc, user.email, "password")
@@ -91,7 +91,7 @@ class TestMessagingEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.messages").isArray)
                 .andExpect(jsonPath("$.users").isArray)
-                .andExpect(jsonPath("$.users[0].id").value(user.core.id!!.toInt()))
+                .andExpect(jsonPath("$.users[0].id").value(user.account.id!!.toInt()))
                 .andReturn().response.contentAsString
 
         println(response)
@@ -103,7 +103,7 @@ class TestMessagingEndpoint : IntegrationTest() {
         val user = userService.create("user@break-out.org", "password")
         val user1 = userService.create("user1@mail.com", "password")
 
-        val groupMessage = groupMessageService.createGroupMessage(user.core)
+        val groupMessage = groupMessageService.createGroupMessage(user.account)
 
         val request = get("/messaging/${groupMessage.id}/")
                 .asUser(mockMvc, user1.email, "password")
@@ -120,7 +120,7 @@ class TestMessagingEndpoint : IntegrationTest() {
     fun getGroupMessageFailMessageNotFound() {
 
         val user = userService.create("user@break-out.org", "password")
-        groupMessageService.createGroupMessage(user.core)
+        groupMessageService.createGroupMessage(user.account)
 
 
         val request = request(HttpMethod.GET, "/messaging/0/")
@@ -139,9 +139,9 @@ class TestMessagingEndpoint : IntegrationTest() {
 
         val user = userService.create("user@break-out.org", "password")
         val user1 = userService.create("user1@mail.com", "password")
-        val groupMessage = groupMessageService.createGroupMessage(user.core)
+        val groupMessage = groupMessageService.createGroupMessage(user.account)
 
-        val postData = listOf(user1.core.id).toJsonString()
+        val postData = listOf(user1.account.id).toJsonString()
 
         val request = request(HttpMethod.PUT, "/messaging/${groupMessage.id}/")
                 .asUser(mockMvc, user.email, "password")
@@ -153,8 +153,8 @@ class TestMessagingEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.messages").isArray)
                 .andExpect(jsonPath("$.users").isArray)
-                .andExpect(jsonPath("$.users[0].id").value(user.core.id!!.toInt()))
-                .andExpect(jsonPath("$.users[1].id").value(user1.core.id!!.toInt()))
+                .andExpect(jsonPath("$.users[0].id").value(user.account.id!!.toInt()))
+                .andExpect(jsonPath("$.users[1].id").value(user1.account.id!!.toInt()))
                 .andReturn().response.contentAsString
 
         println(response)
@@ -170,8 +170,8 @@ class TestMessagingEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.messages").isArray)
                 .andExpect(jsonPath("$.users").isArray)
-                .andExpect(jsonPath("$.users[0].id").value(user.core.id!!.toInt()))
-                .andExpect(jsonPath("$.users[1].id").value(user1.core.id!!.toInt()))
+                .andExpect(jsonPath("$.users[0].id").value(user.account.id!!.toInt()))
+                .andExpect(jsonPath("$.users[1].id").value(user1.account.id!!.toInt()))
                 .andReturn().response.contentAsString
     }
 
@@ -181,9 +181,9 @@ class TestMessagingEndpoint : IntegrationTest() {
         val user = userService.create("user@break-out.org", "password")
         val user1 = userService.create("user1@mail.com", "password")
 
-        val groupMessage = groupMessageService.createGroupMessage(user.core)
+        val groupMessage = groupMessageService.createGroupMessage(user.account)
 
-        val postData = listOf(user1.core.id).toJsonString()
+        val postData = listOf(user1.account.id).toJsonString()
 
         val request = put("/messaging/${groupMessage.id}/")
                 .asUser(mockMvc, user1.email, "password")
@@ -199,7 +199,7 @@ class TestMessagingEndpoint : IntegrationTest() {
     @Test
     fun addMessageToGroupMessage() {
         val user = userService.create("user@break-out.org", "password")
-        val groupMessage = groupMessageService.createGroupMessage(user.core)
+        val groupMessage = groupMessageService.createGroupMessage(user.account)
 
         val postData = mapOf("text" to "message Text", "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
 
@@ -210,7 +210,7 @@ class TestMessagingEndpoint : IntegrationTest() {
         val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.messages[0].creator.id").value(user.core.id!!.toInt()))
+                .andExpect(jsonPath("$.messages[0].creator.id").value(user.account.id!!.toInt()))
                 .andExpect(jsonPath("$.messages[0].date").exists())
                 .andExpect(jsonPath("$.messages[0].text").value("message Text"))
                 .andReturn().response.contentAsString
@@ -225,7 +225,7 @@ class TestMessagingEndpoint : IntegrationTest() {
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.messages[0].creator.id").value(user.core.id!!.toInt()))
+                .andExpect(jsonPath("$.messages[0].creator.id").value(user.account.id!!.toInt()))
                 .andExpect(jsonPath("$.messages[0].date").exists())
                 .andExpect(jsonPath("$.messages[0].text").value("message Text"))
                 .andReturn().response.contentAsString
@@ -234,7 +234,7 @@ class TestMessagingEndpoint : IntegrationTest() {
     @Test
     fun addMessageToGroupMessageFailMessageNotFound() {
         val user = userService.create("user@break-out.org", "password")
-        groupMessageService.createGroupMessage(user.core)
+        groupMessageService.createGroupMessage(user.account)
 
         val postData = mapOf("text" to "message Text", "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
 
@@ -254,7 +254,7 @@ class TestMessagingEndpoint : IntegrationTest() {
         val user = userService.create("user@break-out.org", "password")
         val user1 = userService.create("user1@mail.com", "password")
 
-        val groupMessage = groupMessageService.createGroupMessage(user.core)
+        val groupMessage = groupMessageService.createGroupMessage(user.account)
 
         val postData = mapOf("text" to "message Text", "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
 

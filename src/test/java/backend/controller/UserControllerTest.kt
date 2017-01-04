@@ -63,13 +63,13 @@ class UserControllerTest : IntegrationTest() {
                 )
         )
 
-        val request = put("/user/${user.core.id}/")
+        val request = put("/user/${user.account.id}/")
                 .asUser(mockMvc, user.email, "password")
                 .json(body)
 
         val result = mockMvc.perform(request)
                 .andExpect(status().isOk)
-                .andExpect(jsonPath("$.id").value(user.core.id!!.toInt()))
+                .andExpect(jsonPath("$.id").value(user.account.id!!.toInt()))
                 .andExpect(jsonPath("$.email").value("user@break-out.org"))
                 .andExpect(jsonPath("$.firstname").value("Florian"))
                 .andExpect(jsonPath("$.lastname").value("Schmidt"))

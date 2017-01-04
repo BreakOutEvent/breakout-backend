@@ -16,7 +16,7 @@ class SimpleUserView() {
     var teamname: String? = null
 
     constructor(user: User) : this() {
-        this.id = user.core.id
+        this.id = user.account.id
         this.firstname = user.firstname
         this.lastname = user.lastname
         this.teamId = user.getRole(Participant::class)?.currentTeam?.id

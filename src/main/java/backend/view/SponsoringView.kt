@@ -51,7 +51,7 @@ class SponsoringView() {
                 this.sponsorIsHidden = true
                 this.contract = null
             } else {
-                this.userId = sponsoring.sponsor?.core?.id
+                this.userId = sponsoring.sponsor?.account?.id
                 this.sponsorId = sponsoring.sponsor?.id
             }
         }

@@ -44,7 +44,7 @@ class PostingView() {
         this.hashtags = posting.hashtags.map { it.value }
         this.date = posting.date.toEpochSecond(ZoneOffset.UTC)
         this.postingLocation = posting.location?.let(::LocationView)
-        this.user = BasicUserView(posting.user!!.core)
+        this.user = BasicUserView(posting.user!!.account)
         this.media = posting.media.map(::MediaView)
         this.comments = posting.comments.map(::CommentView)
         this.likes = posting.likes.count()

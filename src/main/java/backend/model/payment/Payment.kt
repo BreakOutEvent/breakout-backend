@@ -2,7 +2,7 @@ package backend.model.payment
 
 import backend.model.BasicEntity
 import backend.model.user.User
-import backend.model.user.UserCore
+import backend.model.user.UserAccount
 import org.javamoney.moneta.Money
 import javax.persistence.Entity
 import javax.persistence.ManyToOne
@@ -15,7 +15,7 @@ abstract class Payment : BasicEntity {
         private set
 
     @ManyToOne
-    var user: UserCore? = null
+    var user: UserAccount? = null
 
     @ManyToOne
     var invoice: Invoice? = null
@@ -24,7 +24,7 @@ abstract class Payment : BasicEntity {
 
     constructor(amount: Money, user: User) {
         this.amount = amount
-        this.user = user.core
+        this.user = user.account
     }
 
     abstract fun getPaymentMethod(): String

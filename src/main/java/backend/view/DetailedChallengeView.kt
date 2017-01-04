@@ -63,7 +63,7 @@ class DetailedChallengeView {
                 this.sponsorIsHidden = true
                 this.contract = null
             } else {
-                this.userId = challenge.sponsor?.core?.id
+                this.userId = challenge.sponsor?.account?.id
                 this.sponsorId = challenge.sponsor?.id
                 this.firstname = challenge.sponsor?.firstname
                 this.lastname = challenge.sponsor?.lastname

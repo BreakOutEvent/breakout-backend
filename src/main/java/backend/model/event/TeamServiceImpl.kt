@@ -42,7 +42,7 @@ class TeamServiceImpl : TeamService {
 
     // TODO: Maybe make this transactional
     override fun create(creator: Participant, name: String, description: String, event: Event): Team {
-        if (creator.currentTeam != null) throw DomainException("participant ${creator.core.id} already is part of a team")
+        if (creator.currentTeam != null) throw DomainException("participant ${creator.account.id} already is part of a team")
         val team = Team(creator, name, description, event)
         val savedTeam = this.save(team)
         userService.save(creator)

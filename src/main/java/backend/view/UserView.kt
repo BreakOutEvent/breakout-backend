@@ -44,13 +44,13 @@ class UserView() {
         this.lastname = user.lastname
         this.email = user.email
         this.gender = user.gender
-        this.id = user.core.id
+        this.id = user.account.id
         this.isBlocked = user.isBlocked
         this.participant = if (user.hasRole(Participant::class)) ParticipantViewModel(user) else null
         this.sponsor = if (user.hasRole(Sponsor::class)) SponsorView(user) else null
         this.profilePic = MediaView(user.profilePic)
-        this.roles = user.core.getAuthorities().map { it.authority }
-        this.groupMessageIds = user.core.groupMessages.map { it.id!! }
+        this.roles = user.account.getAuthorities().map { it.authority }
+        this.groupMessageIds = user.account.groupMessages.map { it.id!! }
     }
 
     class ParticipantViewModel() {

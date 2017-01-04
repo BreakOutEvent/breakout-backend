@@ -41,7 +41,7 @@ class DummyDataController {
             val user = userService.create("email$it@mail.com", "password")
             val token = user.createActivationToken()
             user.activate(token)
-            return@map user.core.id!!
+            return@map user.account.id!!
         }
     }
 
@@ -55,7 +55,7 @@ class DummyDataController {
         return (0..count).map {
             val random = Random()
             val id = random.nextInt(max - 1).toLong() + 1
-            val user = userService.getUserById(id)?.core
+            val user = userService.getUserById(id)?.account
             if (user != null) {
                 postingService.savePostingWithLocationAndMedia(
                         text = "text$it",

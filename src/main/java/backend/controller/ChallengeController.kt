@@ -62,7 +62,7 @@ open class ChallengeController {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
 
-        if (user.core.id != userId) throw UnauthorizedException("A sponsor can only see it's own challenges")
+        if (user.account.id != userId) throw UnauthorizedException("A sponsor can only see it's own challenges")
 
         val challenges = challengeService.findBySponsorId(userId)
         return challenges.map(::ChallengeView)

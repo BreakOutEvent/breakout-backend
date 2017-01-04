@@ -15,7 +15,7 @@ class TestUser : IntegrationTest() {
      */
     @Test
     fun createUserWithoutRole() {
-        val user = UserCore()
+        val user = UserAccount()
         assertFalse(user.hasRole(Employee::class))
         assertNull(user.getRole(Employee::class))
         assertNull(user.removeRole(Employee::class))
@@ -30,7 +30,7 @@ class TestUser : IntegrationTest() {
     @Throws(Exception::class)
     fun createUserWithRoleEmployee() {
 
-        val user = UserCore()
+        val user = UserAccount()
         user.addRole(Employee::class)
 
         assertTrue(user.hasRole(Employee::class))
@@ -44,14 +44,14 @@ class TestUser : IntegrationTest() {
 
     /**
      * Create user and add some details
-     * Check if role delegates calls to core
+     * Check if role delegates calls to account
 
      * @throws Exception
      */
     @Test
     @Throws(Exception::class)
     fun createUserWithDetails() {
-        val user = UserCore()
+        val user = UserAccount()
         user.firstname = "Florian"
         user.lastname = "Schmidt"
         user.email = "florian.schmidt.1994@icloud.com"
@@ -98,7 +98,7 @@ class TestUser : IntegrationTest() {
     fun createAndSaveUser() {
 
         // Create user with role and save it
-        val user = UserCore().addRole(Employee::class).apply {
+        val user = UserAccount().addRole(Employee::class).apply {
             firstname = "Florian"
             lastname = "Schmidt"
             email = "florian.schmidt.1995@icloud.com"
@@ -107,22 +107,22 @@ class TestUser : IntegrationTest() {
             gender = "Male"
         }
 
-        userRepository.save(user.core)
+        userRepository.save(user.account)
 
         // Check if saved user can be found again
         val user1 = userRepository.findByEmail("florian.schmidt.1995@icloud.com")
-        assertNotNull(user.core)
-        assertEquals(user.core.id, user1.core.id)
+        assertNotNull(user.account)
+        assertEquals(user.account.id, user1.account.id)
         assertTrue(user.hasRole(Employee::class))
 
         // Add and remove roles from user and save
         user1.addRole(Participant::class)
         user1.removeRole(Employee::class)
-        userRepository.save(user1.core)
+        userRepository.save(user1.account)
 
         // Check if found user has correct roles
         val user2 = userRepository.findByEmail("florian.schmidt.1995@icloud.com")
-        assertEquals(user.core.id, user2.core.id)
+        assertEquals(user.account.id, user2.account.id)
         assertTrue(user2.hasRole(Participant::class))
         assertFalse(user2.hasRole(Employee::class))
 

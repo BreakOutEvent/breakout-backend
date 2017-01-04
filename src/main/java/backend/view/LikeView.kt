@@ -18,6 +18,6 @@ class LikeView() {
     constructor(like: Like) : this() {
         this.id = like.id
         this.date = like.date.toEpochSecond(ZoneOffset.UTC)
-        this.user = BasicUserView(like.user!!.core)
+        this.user = BasicUserView(like.user!!.account)
     }
 }

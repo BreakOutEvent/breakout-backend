@@ -1,7 +1,7 @@
 package backend.model.posting
 
 import backend.model.BasicEntity
-import backend.model.user.UserCore
+import backend.model.user.UserAccount
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -19,9 +19,9 @@ class Comment : BasicEntity {
     lateinit var date: LocalDateTime
 
     @ManyToOne
-    var user: UserCore? = null
+    var user: UserAccount? = null
 
-    constructor(text: String, date: LocalDateTime, user: UserCore) : this() {
+    constructor(text: String, date: LocalDateTime, user: UserAccount) : this() {
         this.text = text
         this.date = date
         this.user = user

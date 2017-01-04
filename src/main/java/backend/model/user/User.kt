@@ -10,7 +10,7 @@ interface User {
     var passwordHash: String
     var isBlocked: Boolean
 
-    val core: UserCore
+    val account: UserAccount
     var firstname: String?
     var lastname: String?
     var gender: String?
@@ -23,7 +23,7 @@ interface User {
 
     companion object {
         fun create(email: String, password: String): User {
-            val user = UserCore()
+            val user = UserAccount()
             user.email = email
             user.passwordHash = BCryptPasswordEncoder().encode(password)
             return user

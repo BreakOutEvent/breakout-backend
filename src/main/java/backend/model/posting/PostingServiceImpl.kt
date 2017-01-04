@@ -9,7 +9,7 @@ import backend.model.media.MediaRepository
 import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.model.user.User
-import backend.model.user.UserCore
+import backend.model.user.UserAccount
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -27,20 +27,20 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
     }
 
     // TODO: This should return Posting (will break API)
-    override fun addComment(posting: Posting, from: UserCore, at: LocalDateTime, withText: String): Comment {
+    override fun addComment(posting: Posting, from: UserAccount, at: LocalDateTime, withText: String): Comment {
         val comment = posting.addComment(from, at, withText)
         this.save(posting)
         return comment
     }
 
     // TODO: This should return Posting (will break API)
-    override fun like(posting: Posting, core: UserCore, timeCreated: LocalDateTime): Like {
-        val like = posting.like(timeCreated, core)
+    override fun like(posting: Posting, account: UserAccount, timeCreated: LocalDateTime): Like {
+        val like = posting.like(timeCreated, account)
         this.save(posting)
         return like // TODO: Transactional?
     }
 
-    override fun unlike(by: UserCore, from: Posting) {
+    override fun unlike(by: UserAccount, from: Posting) {
         from.unlike(by)
         this.save(from)
     }
@@ -58,7 +58,7 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
     @Transactional
     override fun savePostingWithLocationAndMedia(text: String?,
                                                  postingLocation: Coord?,
-                                                 user: UserCore,
+                                                 user: UserAccount,
                                                  mediaTypes: List<String>?,
                                                  date: LocalDateTime): Posting {
 
@@ -87,7 +87,7 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
         if (uploadMediaTypes == null && (text == null || text.trim() == "") && locationCoord == null)
             throw BadRequestException("empty postings not allowed")
 
-        return this.savePostingWithLocationAndMedia(text, locationCoord, user.core, uploadMediaTypes, clientDate)
+        return this.savePostingWithLocationAndMedia(text, locationCoord, user.account, uploadMediaTypes, clientDate)
     }
 
     override fun getByID(id: Long): Posting? = repository.findById(id)

@@ -36,7 +36,7 @@ class UserServiceImpl : UserService {
 
     override fun getUserByEmail(email: String): User? = userRepository.findByEmail(email)
 
-    override fun getAllUsers(): Iterable<UserCore> = userRepository.findAll()
+    override fun getAllUsers(): Iterable<UserAccount> = userRepository.findAll()
 
     override fun exists(id: Long) = userRepository.exists(id)
 
@@ -49,7 +49,7 @@ class UserServiceImpl : UserService {
 
         sendActivationEmail(token, user)
 
-        return userRepository.save(user.core)
+        return userRepository.save(user.account)
     }
 
     override fun activate(user: User, token: String) {
@@ -85,7 +85,7 @@ class UserServiceImpl : UserService {
         return "$host/reset/$email/$token?utm_source=backend&utm_medium=email&utm_campaign=pwreset"
     }
 
-    override fun save(user: User): User = userRepository.save(user.core)
+    override fun save(user: User): User = userRepository.save(user.account)
 
     override fun create(email: String, password: String, f: User.() -> Unit): User {
         val user = this.create(email, password)
@@ -121,7 +121,7 @@ class UserServiceImpl : UserService {
         this.save(user)
     }
 
-    override fun searchByString(search: String): List<UserCore> {
+    override fun searchByString(search: String): List<UserAccount> {
         return userRepository.searchByString(search)
     }
 

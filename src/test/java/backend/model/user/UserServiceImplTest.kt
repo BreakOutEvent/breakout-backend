@@ -52,12 +52,12 @@ class UserServiceImplTest {
     @Test
     fun testCreate() {
         val expectedUser = User.create("mail@mail.de", "password")
-        `when`(userRepository.save(any<UserCore>())).thenReturn(expectedUser.core)
+        `when`(userRepository.save(any<UserAccount>())).thenReturn(expectedUser.account)
 
         userServiceImpl.create("mail@mail.de", "password")
 
         verify(mailService).send(anyObject(), eq(false))
-        verify(userRepository).save(anyObject<UserCore>())
+        verify(userRepository).save(anyObject<UserAccount>())
     }
 
     // Workaround for Mockito with Kotlin

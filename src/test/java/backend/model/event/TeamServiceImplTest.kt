@@ -36,7 +36,7 @@ class TeamServiceImplTest : IntegrationTest() {
 
         assertNotNull(savedTeam)
         assertEquals(team.id, savedTeam.id)
-        assertEquals(participant.core.id, savedTeam.members.first().core.id)
+        assertEquals(participant.account.id, savedTeam.members.first().account.id)
     }
 
     @Test

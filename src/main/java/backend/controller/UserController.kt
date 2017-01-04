@@ -123,7 +123,7 @@ open class UserController {
     open fun searchUsers(@PathVariable("search") search: String): List<SimpleUserView> {
         if (search.length < 3) return listOf()
         val users = userService.searchByString(search).take(6).toMutableList()
-        users.addAll(teamService.searchByString(search).take(3).flatMap { it.members.map { it.core } })
+        users.addAll(teamService.searchByString(search).take(3).flatMap { it.members.map { it.account } })
         return users.map(::SimpleUserView)
     }
 
@@ -138,7 +138,7 @@ open class UserController {
                         @AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
-        if (user.core.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")
+        if (user.account.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")
 
         user.setValuesFrom(body)
         userService.save(user)

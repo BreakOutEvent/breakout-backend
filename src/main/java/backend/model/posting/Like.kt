@@ -1,7 +1,7 @@
 package backend.model.posting
 
 import backend.model.BasicEntity
-import backend.model.user.UserCore
+import backend.model.user.UserAccount
 import java.time.LocalDateTime
 import javax.persistence.Entity
 import javax.persistence.ManyToOne
@@ -18,9 +18,9 @@ class Like : BasicEntity {
     lateinit var date: LocalDateTime
 
     @ManyToOne
-    var user: UserCore? = null
+    var user: UserAccount? = null
 
-    constructor(date: LocalDateTime, user: UserCore) : this() {
+    constructor(date: LocalDateTime, user: UserAccount) : this() {
         this.date = date
         this.user = user
     }
@@ -35,7 +35,7 @@ class Like : BasicEntity {
         if (other !is Like) return false
 
         if (date != other.date) return false
-        if (user!!.id == other.user!!.id) return false // TODO: Implement equals in UserCore!
+        if (user!!.id == other.user!!.id) return false // TODO: Implement equals in UserAccount!
 
         return true
     }
