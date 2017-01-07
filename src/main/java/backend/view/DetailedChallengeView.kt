@@ -58,27 +58,28 @@ class DetailedChallengeView {
 
         // Add information about registered sponsor
         // if he exists and isHidden is false
-        challenge.sponsor?.isHidden?.let {
+        // TODO: Make this view "smaller" and refactor by using ISponsor
+        challenge.getSponsor().sponsorRole?.isHidden?.let {
             if (it) {
                 this.sponsorIsHidden = true
                 this.contract = null
             } else {
-                this.userId = challenge.sponsor?.account?.id
-                this.sponsorId = challenge.sponsor?.id
-                this.firstname = challenge.sponsor?.firstname
-                this.lastname = challenge.sponsor?.lastname
-                this.company = challenge.sponsor?.company
+                this.userId = challenge.getSponsor().sponsorRole?.account?.id
+                this.sponsorId = challenge.getSponsor().sponsorRole?.id
+                this.firstname = challenge.getSponsor().sponsorRole?.firstname
+                this.lastname = challenge.getSponsor().sponsorRole?.lastname
+                this.company = challenge.getSponsor().sponsorRole?.company
             }
         }
 
         // Add information about unregistered sponsor
         // if he exists and isHidden is false
-        challenge.unregisteredSponsor?.isHidden?.let {
+        challenge.getSponsor().unregisteredSponsor?.isHidden?.let {
             if (it) {
                 this.sponsorIsHidden = true
                 this.contract = null
             } else {
-                this.unregisteredSponsor = UnregisteredSponsorView(challenge.unregisteredSponsor!!)
+                this.unregisteredSponsor = UnregisteredSponsorView(challenge.getSponsor().unregisteredSponsor!!)
             }
         }
     }

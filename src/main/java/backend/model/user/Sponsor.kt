@@ -5,15 +5,30 @@ package backend.model.user
 import backend.model.challenges.Challenge
 import backend.model.media.Media
 import backend.model.misc.Url
+import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.Sponsoring
+import backend.model.sponsoring.UnregisteredSponsor
 import javax.persistence.*
 import javax.persistence.CascadeType.ALL
 
 @Entity
 @DiscriminatorValue("S")
-class Sponsor : UserRole {
+class Sponsor : UserRole, ISponsor {
 
-    var company: String? = null
+    @Transient
+    override var sponsorRole: Sponsor? = this
+        set(value) {}
+
+    @Transient
+    override var unregisteredSponsor: UnregisteredSponsor? = null
+        set(value) {}
+
+    // TODO: This is also a hack!
+    @Transient
+    override var userAccount: UserAccount? = null
+        set(value) {}
+
+    override var company: String? = null
 
     @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true)
     lateinit var logo: Media
@@ -21,16 +36,16 @@ class Sponsor : UserRole {
     @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "sponsor")
     var sponsorings: MutableList<Sponsoring> = arrayListOf()
 
-    @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "sponsor")
+    @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "registeredSponsor")
     var challenges: MutableList<Challenge> = arrayListOf()
 
     @Embedded
     var url: Url? = null
 
     @Embedded
-    var address: Address? = null
+    override lateinit var address: Address
 
-    var isHidden: Boolean = false
+    override var isHidden: Boolean = false
 
     /**
      * Private constructor for JPA
@@ -45,6 +60,7 @@ class Sponsor : UserRole {
         this.url = url
         this.address = address
         this.isHidden = isHidden
+        this.userAccount = account
     }
 
     override fun getAuthority(): String = "SPONSOR"
@@ -54,7 +70,7 @@ class Sponsor : UserRole {
         this.sponsorings.forEach { it.sponsor = null }
         this.sponsorings.clear()
 
-        this.challenges.forEach { it.sponsor = null }
+        this.challenges.forEach(Challenge::removeSponsors)
         this.sponsorings.clear()
     }
 }

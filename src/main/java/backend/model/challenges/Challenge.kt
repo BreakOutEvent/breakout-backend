@@ -9,6 +9,7 @@ import backend.model.media.MediaType.DOCUMENT
 import backend.model.misc.EmailAddress
 import backend.model.payment.SponsoringInvoice
 import backend.model.posting.Posting
+import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
 import org.javamoney.moneta.Money
@@ -33,7 +34,7 @@ class Challenge : BasicEntity {
     private fun checkTransition(from: ChallengeStatus, to: ChallengeStatus) {
         if (from == to) return
         else if (unregisteredSponsor != null) checkTransitionForUnregisteredSponsor(from, to)
-        else if (sponsor != null) checkTransitionForRegisteredSponsor(from, to)
+        else if (registeredSponsor != null) checkTransitionForRegisteredSponsor(from, to)
         else throw Exception("Sponsoring has neither Sponsor")
     }
 
@@ -75,8 +76,17 @@ class Challenge : BasicEntity {
         }
     }
 
+    fun getSponsor(): ISponsor {
+        return this.unregisteredSponsor ?: this.registeredSponsor!!
+    }
+
     lateinit var amount: Money
         private set
+
+    fun removeSponsors() {
+        this.registeredSponsor = null
+        this.unregisteredSponsor = null
+    }
 
     @ManyToOne
     var team: Team? = null
@@ -85,10 +95,10 @@ class Challenge : BasicEntity {
     var invoice: SponsoringInvoice? = null
 
     @ManyToOne
-    var sponsor: Sponsor? = null
+    private var registeredSponsor: Sponsor? = null
         set(value) {
             if (unregisteredSponsor != null) {
-                throw DomainException("Can't add sponsor to challenge with unregistered sponsor")
+                throw DomainException("Can't add registeredSponsor to challenge with unregistered sponsor")
             } else {
                 field = value
             }
@@ -98,10 +108,10 @@ class Challenge : BasicEntity {
     var proof: Posting? = null
 
     @Embedded
-    var unregisteredSponsor: UnregisteredSponsor? = null
+    private var unregisteredSponsor: UnregisteredSponsor? = null
         set(value) {
-            if (sponsor != null) {
-                throw DomainException("Can't unregistered sponsor to challenge with sponsor")
+            if (registeredSponsor != null) {
+                throw DomainException("Can't add unregistered sponsor to challenge with registeredSponsor")
             } else {
                 field = value
             }
@@ -113,7 +123,7 @@ class Challenge : BasicEntity {
     private constructor() : super()
 
     constructor(sponsor: Sponsor, team: Team, amount: Money, description: String) {
-        this.sponsor = sponsor
+        this.registeredSponsor = sponsor
         this.team = team
         this.amount = amount
         this.description = description
@@ -159,13 +169,13 @@ class Challenge : BasicEntity {
     fun checkWithdrawPermissions(username: String): Boolean {
         if (this.unregisteredSponsor != null) {
             return this.team!!.isMember(username)
-        } else if (this.sponsor != null) {
-            return EmailAddress(this.sponsor!!.email) == EmailAddress(username)
+        } else if (this.registeredSponsor != null) {
+            return EmailAddress(this.registeredSponsor!!.email) == EmailAddress(username)
         } else throw Exception("Error checking withdrawal permissions")
     }
 
     fun hasRegisteredSponsor(): Boolean {
-        return sponsor != null
+        return registeredSponsor != null
     }
 }
 

@@ -54,7 +54,7 @@ class ChallengeServiceImplTest : IntegrationTest() {
 
         val found = challengeRepository.findOne(challenge.id)
         assertNotNull(found)
-        assertEquals(sponsor.id, found.sponsor!!.id)
+        assertEquals(sponsor.id, found.getSponsor().sponsorRole!!.id)
     }
 
     @Test
@@ -64,7 +64,7 @@ class ChallengeServiceImplTest : IntegrationTest() {
 
         val found = challengeRepository.findOne(challenge.id)
         assertNotNull(found)
-        assertNotNull(found.unregisteredSponsor)
+        assertNotNull(found.getSponsor().unregisteredSponsor)
     }
 
     @Test

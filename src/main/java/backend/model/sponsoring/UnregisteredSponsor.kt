@@ -1,20 +1,43 @@
 package backend.model.sponsoring
 
 import backend.model.user.Address
+import backend.model.user.Sponsor
+import backend.model.user.UserAccount
 import javax.persistence.Column
 import javax.persistence.Embeddable
 import javax.persistence.Embedded
+import javax.persistence.Transient
 
-@Embeddable
-class UnregisteredSponsor {
+@Embeddable // TODO: Make Entity!
+class UnregisteredSponsor : ISponsor {
 
-    lateinit var firstname: String
-    lateinit var lastname: String
-    lateinit var company: String
+    @Transient
+    override var userAccount: UserAccount? = null
+        set(value) {}
+
+    @Transient
+    override var sponsorRole: Sponsor? = null
+        set(value) {}
+
+    @Transient
+    override var unregisteredSponsor: UnregisteredSponsor? = this
+        set(value) {}
+
+    override var firstname: String? = null
+
+    override var lastname: String? = null
+
+    override var company: String? = null
+
     lateinit var gender: String
     lateinit var url: String
-    @Embedded lateinit var address: Address
-    @Column(nullable = true) var isHidden: Boolean = false
+
+    @Embedded
+    override lateinit var address: Address
+
+    @Column(nullable = true) // TODO: Why nullable?
+    override
+    var isHidden: Boolean = false
 
     /**
      * private no-args constructor for JPA / Hibernate

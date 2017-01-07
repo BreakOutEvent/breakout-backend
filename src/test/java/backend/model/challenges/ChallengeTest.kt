@@ -8,6 +8,7 @@ import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
 import backend.util.euroOf
 import org.junit.Assert.assertEquals
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.powermock.api.mockito.PowerMockito
@@ -16,6 +17,7 @@ import org.powermock.modules.junit4.PowerMockRunner
 import kotlin.test.assertFails
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 @RunWith(PowerMockRunner::class)
 @PrepareForTest(Sponsor::class, Team::class, Posting::class, UnregisteredSponsor::class)
@@ -28,11 +30,12 @@ class ChallengeTest {
 
         val challenge = Challenge(sponsor, team, euroOf(50), "description")
 
-        assertEquals(sponsor, challenge.sponsor)
-        assertNull(challenge.unregisteredSponsor)
+        assertEquals(sponsor, challenge.getSponsor())
+        assertNull(challenge.getSponsor().unregisteredSponsor)
     }
 
     @Test
+    @Ignore("Will not be needed with new ISponsor Interface")
     fun testFailToSetSponsorWhenUnregisteredSponsorExists() {
         val sponsor = PowerMockito.mock(Sponsor::class.java)
         val unregistered = PowerMockito.mock(UnregisteredSponsor::class.java)
@@ -40,7 +43,7 @@ class ChallengeTest {
 
         val challenge = Challenge(unregistered, team, euroOf(50), "description")
 
-        assertFailsWith(DomainException::class, { challenge.sponsor = sponsor })
+//        assertFailsWith(DomainException::class, { challenge.sponsor = sponsor })
     }
 
     @Test
@@ -50,8 +53,8 @@ class ChallengeTest {
 
         val challenge = Challenge(unregistered, team, euroOf(50), "description")
 
-        assertEquals(unregistered, challenge.unregisteredSponsor)
-        assertNull(challenge.sponsor)
+        assertTrue(challenge.getSponsor() is UnregisteredSponsor)
+        assertNull(challenge.getSponsor().sponsorRole)
     }
 
     @Test
