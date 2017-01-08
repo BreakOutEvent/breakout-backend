@@ -76,7 +76,7 @@ open class SponsoringController {
         return sponsoringService.findByTeamId(team.id!!).map { sponsoring ->
             val view = SponsoringView(sponsoring)
 
-            sponsoring.unregisteredSponsor?.let {
+            sponsoring.sponsor.unregisteredSponsor?.let {
                 if (it.isHidden) {
                     view.unregisteredSponsor = null
                     view.sponsorIsHidden = true
@@ -84,7 +84,7 @@ open class SponsoringController {
                 view.unregisteredSponsor?.address = null
             }
 
-            sponsoring.sponsor?.let {
+            sponsoring.sponsor.let {
                 if (it.isHidden) {
                     view.sponsorId = null
                     view.sponsorIsHidden = true

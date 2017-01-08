@@ -46,24 +46,24 @@ class SponsoringView() {
 
         // Add information about registered sponsor
         // if he exists and isHidden is false
-        sponsoring.sponsor?.isHidden?.let {
+        sponsoring.sponsor.sponsorRole?.isHidden?.let {
             if (it) {
                 this.sponsorIsHidden = true
                 this.contract = null
             } else {
-                this.userId = sponsoring.sponsor?.account?.id
-                this.sponsorId = sponsoring.sponsor?.id
+                this.userId = sponsoring.sponsor.userAccount?.id
+                this.sponsorId = sponsoring.sponsor.sponsorRole?.id
             }
         }
 
         // Add information about unregistered sponsor
         // if he exists and isHidden is false
-        sponsoring.unregisteredSponsor?.isHidden?.let {
+        sponsoring.sponsor.unregisteredSponsor?.isHidden?.let {
             if (it) {
                 this.sponsorIsHidden = true
                 this.contract = null
             } else {
-                this.unregisteredSponsor = UnregisteredSponsorView(sponsoring.unregisteredSponsor!!)
+                this.unregisteredSponsor = UnregisteredSponsorView(sponsoring.sponsor.unregisteredSponsor!!)
             }
         }
     }

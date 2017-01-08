@@ -83,6 +83,8 @@ class Challenge : BasicEntity {
     lateinit var amount: Money
         private set
 
+    // TOOD: Remove after using Join Table
+    @Deprecated("Used for PreRemove on Sponsor. A Challenge should never exist without a sponsor")
     fun removeSponsors() {
         this.registeredSponsor = null
         this.unregisteredSponsor = null
@@ -163,7 +165,6 @@ class Challenge : BasicEntity {
     fun withdraw() {
         this.status = WITHDRAWN
     }
-
 
     @Suppress("UNUSED") //Used by Spring @PreAuthorize
     fun checkWithdrawPermissions(username: String): Boolean {

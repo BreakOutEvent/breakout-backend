@@ -24,37 +24,6 @@ class Sponsoring : BasicEntity {
             field = value
         }
 
-    private fun checkTransition(from: SponsoringStatus, to: SponsoringStatus) {
-        if (from == to) return
-        else if (unregisteredSponsor != null) checkTransitionForUnregisteredSponsor(from, to)
-        else if (sponsor != null) checkTransitionForRegisteredSponsor(from, to)
-        else throw Exception("Sponsoring has neither Sponsor")
-    }
-
-    private fun checkTransitionForUnregisteredSponsor(from: SponsoringStatus, to: SponsoringStatus) {
-        val transitions = listOf(
-                PROPOSED to ACCEPTED,
-                ACCEPTED to WITHDRAWN,
-                ACCEPTED to PAYED)
-        if (!transitions.contains(from to to)) {
-            throw DomainException("Transition from $from to $to for status not allowed")
-        }
-    }
-
-    private fun checkTransitionForRegisteredSponsor(from: SponsoringStatus, to: SponsoringStatus) {
-        val transitions = listOf(
-                PROPOSED to ACCEPTED,
-                PROPOSED to REJECTED,
-                PROPOSED to WITHDRAWN,
-                REJECTED to WITHDRAWN,
-                ACCEPTED to WITHDRAWN,
-                ACCEPTED to PAYED)
-
-        if (!transitions.contains(from to to)) {
-            throw DomainException("Transition from $from to $to for status not allowed")
-        }
-    }
-
     lateinit var amountPerKm: Money
         private set
 
@@ -66,13 +35,18 @@ class Sponsoring : BasicEntity {
     var team: Team? = null
 
     @ManyToOne
-    var sponsor: Sponsor? = null
-
-    @ManyToOne
     var invoice: SponsoringInvoice? = null
 
     @Embedded
-    var unregisteredSponsor: UnregisteredSponsor? = null
+    private var unregisteredSponsor: UnregisteredSponsor? = null
+
+    @ManyToOne
+    private var registeredSponsor: Sponsor? = null
+
+    var sponsor: ISponsor
+        get() = this.unregisteredSponsor ?: this.registeredSponsor
+                ?: throw NullPointerException("Neither unregisteredSponsor nor registeredSponsor are set")
+        private set(value) {}
 
     /**
      * private no-args constructor for JPA / Hibernate
@@ -80,7 +54,7 @@ class Sponsoring : BasicEntity {
     private constructor() : super()
 
     constructor(sponsor: Sponsor, team: Team, amountPerKm: Money, limit: Money) {
-        this.sponsor = sponsor
+        this.registeredSponsor = sponsor
         this.team = team
         this.amountPerKm = amountPerKm
         this.limit = limit
@@ -109,15 +83,53 @@ class Sponsoring : BasicEntity {
     }
 
     fun hasRegisteredSponsor(): Boolean {
-        return sponsor != null
+        return registeredSponsor != null
+    }
+
+    // TOOD: Remove after using Join Table
+    @Deprecated("Used for PreRemove on Sponsor. A Sponsoring should never exist without a sponsor")
+    fun removeSponsors() {
+        this.unregisteredSponsor = null
+        this.registeredSponsor = null
     }
 
     @Suppress("UNUSED") //Used by Spring @PreAuthorize
     fun checkWithdrawPermissions(username: String): Boolean {
         if (this.unregisteredSponsor != null) {
             return this.team!!.isMember(username)
-        } else if (this.sponsor != null) {
-            return EmailAddress(this.sponsor!!.email) == EmailAddress(username)
+        } else if (this.registeredSponsor != null) {
+            return EmailAddress(this.registeredSponsor!!.email) == EmailAddress(username)
         } else throw Exception("Error checking withdrawal permissions")
+    }
+
+    private fun checkTransition(from: SponsoringStatus, to: SponsoringStatus) {
+        if (from == to) return
+        else if (unregisteredSponsor != null) checkTransitionForUnregisteredSponsor(from, to)
+        else if (registeredSponsor != null) checkTransitionForRegisteredSponsor(from, to)
+        else throw Exception("Sponsoring has neither Sponsor")
+    }
+
+    private fun checkTransitionForUnregisteredSponsor(from: SponsoringStatus, to: SponsoringStatus) {
+        val transitions = listOf(
+                PROPOSED to ACCEPTED,
+                ACCEPTED to WITHDRAWN,
+                ACCEPTED to PAYED)
+        if (!transitions.contains(from to to)) {
+            throw DomainException("Transition from $from to $to for status not allowed")
+        }
+    }
+
+    private fun checkTransitionForRegisteredSponsor(from: SponsoringStatus, to: SponsoringStatus) {
+        val transitions = listOf(
+                PROPOSED to ACCEPTED,
+                PROPOSED to REJECTED,
+                PROPOSED to WITHDRAWN,
+                REJECTED to WITHDRAWN,
+                ACCEPTED to WITHDRAWN,
+                ACCEPTED to PAYED)
+
+        if (!transitions.contains(from to to)) {
+            throw DomainException("Transition from $from to $to for status not allowed")
+        }
     }
 }

@@ -26,14 +26,16 @@ class Sponsor : UserRole, ISponsor {
     // TODO: This is also a hack!
     @Transient
     override var userAccount: UserAccount? = null
-        set(value) {}
+        get() {
+            return this.account
+        }
 
     override var company: String? = null
 
     @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true)
     lateinit var logo: Media
 
-    @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "sponsor")
+    @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "registeredSponsor")
     var sponsorings: MutableList<Sponsoring> = arrayListOf()
 
     @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "registeredSponsor")
@@ -52,7 +54,9 @@ class Sponsor : UserRole, ISponsor {
      */
     private constructor() : super()
 
-    constructor(account: UserAccount) : super(account)
+    constructor(account: UserAccount) : super(account) {
+        this.userAccount = account
+    }
 
     constructor(account: UserAccount, company: String, logo: String, url: Url, address: Address, isHidden: Boolean) : super(account) {
         this.company = company
@@ -67,7 +71,7 @@ class Sponsor : UserRole, ISponsor {
 
     @PreRemove
     fun preRemove() {
-        this.sponsorings.forEach { it.sponsor = null }
+        this.sponsorings.forEach(Sponsoring::removeSponsors)
         this.sponsorings.clear()
 
         this.challenges.forEach(Challenge::removeSponsors)

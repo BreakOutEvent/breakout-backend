@@ -398,12 +398,12 @@ open class AdminController {
                             "is_limited" to isLimit,
                             "sponsoring_id" to sponsoring.id!!,
                             "sponsor_amount_sum" to sponsorSum,
-                            "sponsor_firstname" to (sponsoring.unregisteredSponsor!!.firstname ?: ""),
-                            "sponsor_lastname" to (sponsoring.unregisteredSponsor!!.lastname ?: ""),
-                            "sponsor_street" to (sponsoring.unregisteredSponsor!!.address?.street ?: ""),
-                            "sponsor_housenumber" to (sponsoring.unregisteredSponsor!!.address?.housenumber?: ""),
-                            "sponsor_zipcode" to (sponsoring.unregisteredSponsor!!.address?.zipcode?: ""),
-                            "sponsor_city" to (sponsoring.unregisteredSponsor!!.address?.city?: "")
+                            "sponsor_firstname" to (sponsoring.sponsor.firstname ?: ""),
+                            "sponsor_lastname" to (sponsoring.sponsor.lastname ?: ""),
+                            "sponsor_street" to (sponsoring.sponsor.address.street),
+                            "sponsor_housenumber" to (sponsoring.sponsor.address.housenumber),
+                            "sponsor_zipcode" to (sponsoring.sponsor.address.zipcode),
+                            "sponsor_city" to (sponsoring.sponsor.address.city)
                     ))
                 }
 
