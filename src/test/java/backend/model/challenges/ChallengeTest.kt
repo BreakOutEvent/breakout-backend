@@ -1,6 +1,5 @@
 package backend.model.challenges
 
-import backend.exceptions.DomainException
 import backend.model.challenges.ChallengeStatus.*
 import backend.model.event.Team
 import backend.model.posting.Posting
@@ -11,11 +10,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.powermock.api.mockito.PowerMockito
+import org.powermock.api.mockito.PowerMockito.mock
 import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.PowerMockRunner
 import kotlin.test.assertFails
-import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -25,8 +24,8 @@ class ChallengeTest {
 
     @Test
     fun testSetSponsor() {
-        val sponsor = PowerMockito.mock(Sponsor::class.java)
-        val team = PowerMockito.mock(Team::class.java)
+        val sponsor = mock(Sponsor::class.java)
+        val team = mock(Team::class.java)
 
         val challenge = Challenge(sponsor, team, euroOf(50), "description")
 
@@ -37,9 +36,9 @@ class ChallengeTest {
     @Test
     @Ignore("Will not be needed with new ISponsor Interface")
     fun testFailToSetSponsorWhenUnregisteredSponsorExists() {
-        val sponsor = PowerMockito.mock(Sponsor::class.java)
-        val unregistered = PowerMockito.mock(UnregisteredSponsor::class.java)
-        val team = PowerMockito.mock(Team::class.java)
+        val sponsor = mock(Sponsor::class.java)
+        val unregistered = mock(UnregisteredSponsor::class.java)
+        val team = mock(Team::class.java)
 
         val challenge = Challenge(unregistered, team, euroOf(50), "description")
 
@@ -48,8 +47,8 @@ class ChallengeTest {
 
     @Test
     fun testSetUnregisteredSponsor() {
-        val unregistered = PowerMockito.mock(UnregisteredSponsor::class.java)
-        val team = PowerMockito.mock(Team::class.java)
+        val unregistered = mock(UnregisteredSponsor::class.java)
+        val team = mock(Team::class.java)
 
         val challenge = Challenge(unregistered, team, euroOf(50), "description")
 
@@ -59,8 +58,8 @@ class ChallengeTest {
 
     @Test
     fun testAccept() {
-        val sponsor = PowerMockito.mock(Sponsor::class.java)
-        val team = PowerMockito.mock(Team::class.java)
+        val sponsor = mock(Sponsor::class.java)
+        val team = mock(Team::class.java)
 
         val challenge = Challenge(sponsor, team, euroOf(50), "description")
 
@@ -71,8 +70,8 @@ class ChallengeTest {
 
     @Test
     fun testMutipleAccept() {
-        val sponsor = PowerMockito.mock(Sponsor::class.java)
-        val team = PowerMockito.mock(Team::class.java)
+        val sponsor = mock(Sponsor::class.java)
+        val team = mock(Team::class.java)
 
         val challenge = Challenge(sponsor, team, euroOf(50), "description")
 
@@ -84,8 +83,8 @@ class ChallengeTest {
 
     @Test
     fun testReject() {
-        val sponsor = PowerMockito.mock(Sponsor::class.java)
-        val team = PowerMockito.mock(Team::class.java)
+        val sponsor = mock(Sponsor::class.java)
+        val team = mock(Team::class.java)
 
         val challenge = Challenge(sponsor, team, euroOf(50), "description")
 
@@ -96,9 +95,9 @@ class ChallengeTest {
 
     @Test
     fun testAddProof() {
-        val sponsor = PowerMockito.mock(Sponsor::class.java)
-        val team = PowerMockito.mock(Team::class.java)
-        val proof = PowerMockito.mock(Posting::class.java)
+        val sponsor = mock(Sponsor::class.java)
+        val team = mock(Team::class.java)
+        val proof = mock(Posting::class.java)
 
         val challenge = Challenge(sponsor, team, euroOf(50), "description")
         challenge.accept()
@@ -110,9 +109,9 @@ class ChallengeTest {
 
     @Test
     fun testAcceptProof() {
-        val sponsor = PowerMockito.mock(Sponsor::class.java)
-        val team = PowerMockito.mock(Team::class.java)
-        val proof = PowerMockito.mock(Posting::class.java)
+        val sponsor = mock(Sponsor::class.java)
+        val team = mock(Team::class.java)
+        val proof = mock(Posting::class.java)
 
         val challenge = Challenge(sponsor, team, euroOf(50), "description")
         challenge.accept()
@@ -123,9 +122,9 @@ class ChallengeTest {
 
     @Test
     fun testRejectProof() {
-        val sponsor = PowerMockito.mock(Sponsor::class.java)
-        val team = PowerMockito.mock(Team::class.java)
-        val proof = PowerMockito.mock(Posting::class.java)
+        val sponsor = mock(Sponsor::class.java)
+        val team = mock(Team::class.java)
+        val proof = mock(Posting::class.java)
 
         val challenge = Challenge(sponsor, team, euroOf(50), "description")
         challenge.accept()
@@ -136,8 +135,8 @@ class ChallengeTest {
 
     @Test
     fun testWithdraw() {
-        val team = PowerMockito.mock(Team::class.java)
-        val sponsor = PowerMockito.mock(Sponsor::class.java)
+        val team = mock(Team::class.java)
+        val sponsor = mock(Sponsor::class.java)
         val challenge = Challenge(sponsor, team, euroOf(50), "description")
 
         challenge.withdraw()
@@ -147,4 +146,37 @@ class ChallengeTest {
         assertFails { challenge.reject() }
     }
 
+    @Test
+    fun whenSponsorIsRegistered_thenGetSponsorReturnsSponsor() {
+        val sponsor = mock(Sponsor::class.java)
+        val team = mock(Team::class.java)
+        val challenge = Challenge(sponsor, team, euroOf(50), "description")
+
+        assertTrue { challenge.getSponsor() is Sponsor }
+    }
+
+    @Test
+    fun whenSponsorIsUnregistered_thenGetSponsorReturnsUnregisteredSponsor() {
+        val sponsor = mock(UnregisteredSponsor::class.java)
+        val team = mock(Team::class.java)
+        val challenge = Challenge(sponsor, team, euroOf(50), "description")
+
+        assertTrue { challenge.getSponsor() is UnregisteredSponsor }
+    }
+
+    fun whenSponsorIsUnregistered_thenHasRegisteredSponsorReturnsFalse() {
+        val sponsor = mock(Sponsor::class.java)
+        val team = mock(Team::class.java)
+        val challenge = Challenge(sponsor, team, euroOf(50), "description")
+
+        assertFalse { challenge.hasRegisteredSponsor() }
+    }
+
+    fun whenSponsorIsRegistered_thenHasRegisteredSponsorReturnsTrue() {
+        val sponsor = mock(Sponsor::class.java)
+        val team = mock(Team::class.java)
+        val challenge = Challenge(sponsor, team, euroOf(50), "description")
+
+        assertTrue { challenge.hasRegisteredSponsor() }
+    }
 }

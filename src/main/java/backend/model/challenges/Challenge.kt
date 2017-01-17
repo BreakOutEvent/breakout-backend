@@ -76,18 +76,18 @@ class Challenge : BasicEntity {
         }
     }
 
-    fun getSponsor(): ISponsor {
-        return this.unregisteredSponsor ?: this.registeredSponsor!!
-    }
-
     lateinit var amount: Money
         private set
 
     // TOOD: Remove after using Join Table
     @Deprecated("Used for PreRemove on Sponsor. A Challenge should never exist without a sponsor")
-    fun removeSponsors() {
+    fun removeSponsor() {
         this.registeredSponsor = null
         this.unregisteredSponsor = null
+    }
+
+    fun getSponsor(): ISponsor {
+        return this.unregisteredSponsor ?: this.registeredSponsor!!
     }
 
     @ManyToOne
@@ -124,20 +124,19 @@ class Challenge : BasicEntity {
      */
     private constructor() : super()
 
-    constructor(sponsor: Sponsor, team: Team, amount: Money, description: String) {
-        this.registeredSponsor = sponsor
-        this.team = team
-        this.amount = amount
-        this.description = description
-        this.contract = Media(DOCUMENT)
-    }
+    constructor(sponsor: ISponsor, team: Team, amount: Money, description: String) {
+        when (sponsor) {
+            is UnregisteredSponsor -> {
+                this.unregisteredSponsor = sponsor
+                this.status = ACCEPTED
+            }
+            is Sponsor -> this.registeredSponsor = sponsor
+            else -> throw Exception("sponsor: ISponsor does not Sponsor or UnregisteredSponsor")
+        }
 
-    constructor(unregisteredSponsor: UnregisteredSponsor, team: Team, amount: Money, description: String) {
-        this.unregisteredSponsor = unregisteredSponsor
         this.team = team
         this.amount = amount
         this.description = description
-        this.status = ACCEPTED
         this.contract = Media(DOCUMENT)
     }
 

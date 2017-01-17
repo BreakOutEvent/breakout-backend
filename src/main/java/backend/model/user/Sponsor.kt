@@ -74,7 +74,7 @@ class Sponsor : UserRole, ISponsor {
         this.sponsorings.forEach(Sponsoring::removeSponsors)
         this.sponsorings.clear()
 
-        this.challenges.forEach(Challenge::removeSponsors)
+        this.challenges.forEach(Challenge::removeSponsor)
         this.sponsorings.clear()
     }
 }
