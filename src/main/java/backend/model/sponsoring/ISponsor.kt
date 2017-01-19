@@ -18,10 +18,7 @@ interface ISponsor {
     var isHidden: Boolean
 
     @Deprecated("Just a workaround")
-    var userAccount: UserAccount? // TODO: Fix this. Just a workaround!
-
-    @Deprecated("Just a workaround")
-    var sponsorRole: Sponsor? // TODO: Fix this. Just a workaround!
+    var registeredSponsor: Sponsor? // TODO: Fix this. Just a workaround!
 
     @Deprecated("Just a workaround")
     var unregisteredSponsor: UnregisteredSponsor? // TODO: Fix this. Just a workaround!

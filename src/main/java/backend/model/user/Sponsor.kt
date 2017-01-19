@@ -16,19 +16,12 @@ import javax.persistence.CascadeType.ALL
 class Sponsor : UserRole, ISponsor {
 
     @Transient
-    override var sponsorRole: Sponsor? = this
+    override var registeredSponsor: Sponsor? = this
         set(value) {}
 
     @Transient
     override var unregisteredSponsor: UnregisteredSponsor? = null
         set(value) {}
-
-    // TODO: This is also a hack!
-    @Transient
-    override var userAccount: UserAccount? = null
-        get() {
-            return this.account
-        }
 
     override var company: String? = null
 
@@ -55,7 +48,7 @@ class Sponsor : UserRole, ISponsor {
     private constructor() : super()
 
     constructor(account: UserAccount) : super(account) {
-        this.userAccount = account
+        this.account = account
     }
 
     constructor(account: UserAccount, company: String, logo: String, url: Url, address: Address, isHidden: Boolean) : super(account) {
@@ -64,7 +57,7 @@ class Sponsor : UserRole, ISponsor {
         this.url = url
         this.address = address
         this.isHidden = isHidden
-        this.userAccount = account
+        this.account = account
     }
 
     override fun getAuthority(): String = "SPONSOR"

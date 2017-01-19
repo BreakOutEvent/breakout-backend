@@ -52,13 +52,13 @@ class DetailedSponsoringView() {
 
         // Add information about registered sponsor
         // if he exists and isHidden is false
-        sponsoring.sponsor.sponsorRole?.isHidden?.let {
+        sponsoring.sponsor.registeredSponsor?.isHidden?.let {
             if (it) {
                 this.sponsorIsHidden = true
                 this.contract = null
             } else {
-                this.userId = sponsoring.sponsor.userAccount?.id
-                this.sponsorId = sponsoring.sponsor.sponsorRole?.id
+                this.userId = sponsoring.sponsor.registeredSponsor?.account?.id
+                this.sponsorId = sponsoring.sponsor.registeredSponsor?.id
 
                 this.firstname = sponsoring.sponsor.firstname
                 this.lastname = sponsoring.sponsor.lastname

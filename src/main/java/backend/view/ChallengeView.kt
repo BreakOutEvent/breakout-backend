@@ -52,24 +52,24 @@ class ChallengeView {
 
         // Add information about registered sponsor
         // if he exists and isHidden is false
-        challenge.getSponsor().sponsorRole?.isHidden?.let {
+        challenge.sponsor.registeredSponsor?.isHidden?.let {
             if (it) {
                 this.sponsorIsHidden = true
                 this.contract = null
             } else {
-                this.userId = challenge.getSponsor().sponsorRole?.account?.id
-                this.sponsorId = challenge.getSponsor().sponsorRole?.id
+                this.userId = challenge.sponsor.registeredSponsor?.account?.id
+                this.sponsorId = challenge.sponsor.registeredSponsor?.id
             }
         }
 
         // Add information about unregistered sponsor
         // if he exists and isHidden is false
-        challenge.getSponsor()?.unregisteredSponsor?.isHidden?.let {
+        challenge.sponsor?.unregisteredSponsor?.isHidden?.let {
             if (it) {
                 this.sponsorIsHidden = true
                 this.contract = null
             } else {
-                this.unregisteredSponsor = UnregisteredSponsorView(challenge.getSponsor().unregisteredSponsor!!)
+                this.unregisteredSponsor = UnregisteredSponsorView(challenge.sponsor.unregisteredSponsor!!)
             }
         }
     }

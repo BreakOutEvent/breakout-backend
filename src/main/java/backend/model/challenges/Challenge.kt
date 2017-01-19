@@ -87,9 +87,10 @@ class Challenge : BasicEntity {
         this.unregisteredSponsor = null
     }
 
-    fun getSponsor(): ISponsor {
-        return this.unregisteredSponsor ?: this.registeredSponsor!!
-    }
+    var sponsor: ISponsor
+        get() = this.unregisteredSponsor as? ISponsor ?: this.registeredSponsor
+                ?: throw NullPointerException("Neither unregisteredSponsor nor registeredSponsor are set")
+        private set(value) {}
 
     @ManyToOne
     var team: Team? = null

@@ -29,8 +29,8 @@ class ChallengeTest {
 
         val challenge = Challenge(sponsor, team, euroOf(50), "description")
 
-        assertEquals(sponsor, challenge.getSponsor())
-        assertNull(challenge.getSponsor().unregisteredSponsor)
+        assertEquals(sponsor, challenge.sponsor)
+        assertNull(challenge.sponsor.unregisteredSponsor)
     }
 
     @Test
@@ -52,8 +52,8 @@ class ChallengeTest {
 
         val challenge = Challenge(unregistered, team, euroOf(50), "description")
 
-        assertTrue(challenge.getSponsor() is UnregisteredSponsor)
-        assertNull(challenge.getSponsor().sponsorRole)
+        assertTrue(challenge.sponsor is UnregisteredSponsor)
+        assertNull(challenge.sponsor.registeredSponsor)
     }
 
     @Test
@@ -152,7 +152,7 @@ class ChallengeTest {
         val team = mock(Team::class.java)
         val challenge = Challenge(sponsor, team, euroOf(50), "description")
 
-        assertTrue { challenge.getSponsor() is Sponsor }
+        assertTrue { challenge.sponsor is Sponsor }
     }
 
     @Test
@@ -161,7 +161,7 @@ class ChallengeTest {
         val team = mock(Team::class.java)
         val challenge = Challenge(sponsor, team, euroOf(50), "description")
 
-        assertTrue { challenge.getSponsor() is UnregisteredSponsor }
+        assertTrue { challenge.sponsor is UnregisteredSponsor }
     }
 
     fun whenSponsorIsUnregistered_thenHasRegisteredSponsorReturnsFalse() {

@@ -417,12 +417,12 @@ open class AdminController {
                             "challenge_description" to challenge.description,
                             "challenge_amount" to challenge.amount.numberStripped,
                             "challenge_id" to challenge.id!!,
-                            "sponsor_firstname" to (challenge.getSponsor().firstname ?: ""),
-                            "sponsor_lastname" to (challenge.getSponsor().lastname ?: ""),
-                            "sponsor_street" to challenge.getSponsor().address.street,
-                            "sponsor_housenumber" to challenge.getSponsor().address.housenumber,
-                            "sponsor_zipcode" to challenge.getSponsor().address.zipcode,
-                            "sponsor_city" to challenge.getSponsor().address.city
+                            "sponsor_firstname" to (challenge.sponsor.firstname ?: ""),
+                            "sponsor_lastname" to (challenge.sponsor.lastname ?: ""),
+                            "sponsor_street" to challenge.sponsor.address.street,
+                            "sponsor_housenumber" to challenge.sponsor.address.housenumber,
+                            "sponsor_zipcode" to challenge.sponsor.address.zipcode,
+                            "sponsor_city" to challenge.sponsor.address.city
                     ))
                 }
 

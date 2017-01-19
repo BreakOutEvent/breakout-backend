@@ -11,11 +11,7 @@ import javax.persistence.*
 class UnregisteredSponsor : BasicEntity, ISponsor {
 
     @Transient
-    override var userAccount: UserAccount? = null
-        set(value) {}
-
-    @Transient
-    override var sponsorRole: Sponsor? = null
+    override var registeredSponsor: Sponsor? = null
         set(value) {}
 
     @Transient
