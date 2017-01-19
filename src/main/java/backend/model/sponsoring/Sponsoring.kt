@@ -11,6 +11,7 @@ import backend.model.sponsoring.SponsoringStatus.*
 import backend.model.user.Sponsor
 import org.javamoney.moneta.Money
 import javax.persistence.*
+import javax.persistence.CascadeType.PERSIST
 
 @Entity
 class Sponsoring : BasicEntity {
@@ -37,14 +38,14 @@ class Sponsoring : BasicEntity {
     @ManyToOne
     var invoice: SponsoringInvoice? = null
 
-    @Embedded
+    @ManyToOne(cascade = arrayOf(PERSIST))
     private var unregisteredSponsor: UnregisteredSponsor? = null
 
     @ManyToOne
     private var registeredSponsor: Sponsor? = null
 
     var sponsor: ISponsor
-        get() = this.unregisteredSponsor ?: this.registeredSponsor
+        get() = this.unregisteredSponsor as? ISponsor ?: this.registeredSponsor
                 ?: throw NullPointerException("Neither unregisteredSponsor nor registeredSponsor are set")
         private set(value) {}
 

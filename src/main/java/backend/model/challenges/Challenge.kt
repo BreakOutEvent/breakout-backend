@@ -15,6 +15,7 @@ import backend.model.user.Sponsor
 import org.javamoney.moneta.Money
 import javax.persistence.*
 import javax.persistence.CascadeType.ALL
+import javax.persistence.CascadeType.PERSIST
 
 @Entity
 class Challenge : BasicEntity {
@@ -109,7 +110,7 @@ class Challenge : BasicEntity {
     @OneToOne(mappedBy = "challenge")
     var proof: Posting? = null
 
-    @Embedded
+    @ManyToOne(cascade = arrayOf(PERSIST))
     private var unregisteredSponsor: UnregisteredSponsor? = null
         set(value) {
             if (registeredSponsor != null) {
@@ -129,8 +130,12 @@ class Challenge : BasicEntity {
             is UnregisteredSponsor -> {
                 this.unregisteredSponsor = sponsor
                 this.status = ACCEPTED
+                sponsor.challenges.add(this)
             }
-            is Sponsor -> this.registeredSponsor = sponsor
+            is Sponsor -> {
+                this.registeredSponsor = sponsor
+                sponsor.challenges.add(this)
+            }
             else -> throw Exception("sponsor: ISponsor does not Sponsor or UnregisteredSponsor")
         }
 

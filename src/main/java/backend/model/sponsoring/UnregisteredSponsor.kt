@@ -1,15 +1,14 @@
 package backend.model.sponsoring
 
+import backend.model.BasicEntity
+import backend.model.challenges.Challenge
 import backend.model.user.Address
 import backend.model.user.Sponsor
 import backend.model.user.UserAccount
-import javax.persistence.Column
-import javax.persistence.Embeddable
-import javax.persistence.Embedded
-import javax.persistence.Transient
+import javax.persistence.*
 
-@Embeddable // TODO: Make Entity!
-class UnregisteredSponsor : ISponsor {
+@Entity
+class UnregisteredSponsor : BasicEntity, ISponsor {
 
     @Transient
     override var userAccount: UserAccount? = null
@@ -30,10 +29,17 @@ class UnregisteredSponsor : ISponsor {
     override var company: String? = null
 
     lateinit var gender: String
+
     lateinit var url: String
 
     @Embedded
     override lateinit var address: Address
+
+    @OneToMany(mappedBy = "unregisteredSponsor")
+    var sponsorings: MutableList<Sponsoring> = mutableListOf()
+
+    @OneToMany(mappedBy = "unregisteredSponsor")
+    var challenges: MutableList<Challenge> = mutableListOf()
 
     @Column(nullable = true) // TODO: Why nullable?
     override
