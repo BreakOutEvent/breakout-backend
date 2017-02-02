@@ -143,4 +143,11 @@ class Team : BasicEntity {
         this.challenges.forEach { it.team = null }
         this.challenges.clear()
     }
+
+    /**
+     * Returns the teams current distance in km
+     */
+    fun getCurrentDistance(): Double {
+        return this.locations.maxBy { it.distance }?.distance ?: 0.0
+    }
 }

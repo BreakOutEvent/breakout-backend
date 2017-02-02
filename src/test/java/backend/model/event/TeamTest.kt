@@ -1,5 +1,6 @@
 package backend.model.event
 
+import backend.model.location.Location
 import backend.model.misc.Coord
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
@@ -8,10 +9,17 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.Mockito.`when`
+import org.powermock.api.mockito.PowerMockito.mock
+import org.powermock.core.classloader.annotations.PrepareForTest
+import org.powermock.modules.junit4.PowerMockRunner
 import java.time.LocalDateTime
 import kotlin.test.assertFails
 import kotlin.test.assertFailsWith
 
+@RunWith(PowerMockRunner::class)
+@PrepareForTest(Location::class)
 class TeamTest {
 
     lateinit var event: Event
@@ -134,5 +142,25 @@ class TeamTest {
         team.join(invitee)
 
         assertTrue(team.isFull())
+    }
+
+    @Test
+    fun getCurrentDistance() {
+        val location1 = mock(Location::class.java)
+        val location2 = mock(Location::class.java)
+        val location3 = mock(Location::class.java)
+
+        `when`(location1.distance).thenReturn(10.0)
+        `when`(location2.distance).thenReturn(20.0)
+        `when`(location3.distance).thenReturn(15.0)
+
+        team.locations.addAll(listOf(location1, location2, location3))
+
+        assertEquals(20.0, team.getCurrentDistance(), 0.0)
+    }
+
+    @Test
+    fun whenNoLocation_thenGetCurrentDistanceReturnsZero() {
+        assertEquals(0.0, team.getCurrentDistance(), 0.0)
     }
 }

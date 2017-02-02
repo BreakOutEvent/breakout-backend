@@ -6,15 +6,21 @@ import backend.model.event.Team
 import backend.model.media.Media
 import backend.model.media.MediaType.DOCUMENT
 import backend.model.misc.EmailAddress
+import backend.model.payment.Billable
 import backend.model.payment.SponsoringInvoice
 import backend.model.sponsoring.SponsoringStatus.*
 import backend.model.user.Sponsor
 import org.javamoney.moneta.Money
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import javax.persistence.*
 import javax.persistence.CascadeType.PERSIST
 
 @Entity
-class Sponsoring : BasicEntity {
+class Sponsoring : BasicEntity, Billable {
+
+    @Transient
+    private val logger: Logger
 
     @OneToOne(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
     lateinit var contract: Media
@@ -52,9 +58,11 @@ class Sponsoring : BasicEntity {
     /**
      * private no-args constructor for JPA / Hibernate
      */
-    private constructor() : super()
+    private constructor() : super() {
+        this.logger = LoggerFactory.getLogger(Sponsoring::class.java)
+    }
 
-    constructor(sponsor: Sponsor, team: Team, amountPerKm: Money, limit: Money) {
+    constructor(sponsor: Sponsor, team: Team, amountPerKm: Money, limit: Money) : this() {
         this.registeredSponsor = sponsor
         this.team = team
         this.amountPerKm = amountPerKm
@@ -62,7 +70,7 @@ class Sponsoring : BasicEntity {
         this.contract = Media(DOCUMENT)
     }
 
-    constructor(unregisteredSponsor: UnregisteredSponsor, team: Team, amountPerKm: Money, limit: Money) {
+    constructor(unregisteredSponsor: UnregisteredSponsor, team: Team, amountPerKm: Money, limit: Money) : this() {
         this.unregisteredSponsor = unregisteredSponsor
         this.team = team
         this.amountPerKm = amountPerKm
@@ -131,6 +139,23 @@ class Sponsoring : BasicEntity {
 
         if (!transitions.contains(from to to)) {
             throw DomainException("Transition from $from to $to for status not allowed")
+        }
+    }
+
+    // TODO: Implement billableAmout correctly
+    override fun billableAmount(): Money {
+
+        val distance: Double = team?.getCurrentDistance() ?: run {
+            logger.warn("No team for current sponsoring found. Using 0.0 for currentDistance")
+            return@run 0.0
+        }
+
+        val raisedSum = amountPerKm.multiply(distance)
+
+        if (raisedSum <= limit) {
+            return raisedSum
+        } else {
+            return limit
         }
     }
 }

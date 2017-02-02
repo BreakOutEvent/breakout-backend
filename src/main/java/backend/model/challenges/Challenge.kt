@@ -7,18 +7,23 @@ import backend.model.event.Team
 import backend.model.media.Media
 import backend.model.media.MediaType.DOCUMENT
 import backend.model.misc.EmailAddress
+import backend.model.payment.Billable
 import backend.model.payment.SponsoringInvoice
 import backend.model.posting.Posting
 import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
+import backend.util.euroOf
 import org.javamoney.moneta.Money
-import javax.persistence.*
 import javax.persistence.CascadeType.ALL
 import javax.persistence.CascadeType.PERSIST
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.ManyToOne
+import javax.persistence.OneToOne
 
 @Entity
-class Challenge : BasicEntity {
+class Challenge : BasicEntity, Billable {
 
     @Column(columnDefinition = "TEXT")
     lateinit var description: String
@@ -182,6 +187,18 @@ class Challenge : BasicEntity {
 
     fun hasRegisteredSponsor(): Boolean {
         return registeredSponsor != null
+    }
+
+    override fun billableAmount(): Money {
+        return when (status) {
+            PROPOSED -> euroOf(0.0)
+            WITHDRAWN -> euroOf(0.0)
+            ACCEPTED -> euroOf(0.0)
+            REJECTED -> euroOf(0.0)
+            WITH_PROOF -> amount
+            PROOF_ACCEPTED -> amount
+            PROOF_REJECTED -> euroOf(0.0)
+        }
     }
 }
 

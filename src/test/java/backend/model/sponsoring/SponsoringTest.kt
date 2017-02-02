@@ -108,5 +108,29 @@ class SponsoringTest {
         assertFails { sponsoring.accept() }
         assertFails { sponsoring.reject() }
     }
+
+    @Test
+    fun billableAmount() {
+        val team = PowerMockito.mock(Team::class.java)
+        val sponsor = PowerMockito.mock(Sponsor::class.java)
+
+        PowerMockito.`when`(team.getCurrentDistance()).thenReturn(10.0)
+
+        val sponsoring = Sponsoring(sponsor, team, euroOf(10.0), euroOf(200))
+
+        assertEquals(euroOf(100.0), sponsoring.billableAmount())
+    }
+
+    @Test
+    fun whenLimitReached_thenBillableAmountIsLimit() {
+        val team = PowerMockito.mock(Team::class.java)
+        val sponsor = PowerMockito.mock(Sponsor::class.java)
+
+        PowerMockito.`when`(team.getCurrentDistance()).thenReturn(10.0)
+
+        val sponsoring = Sponsoring(sponsor, team, euroOf(100.0), euroOf(200))
+
+        assertEquals(euroOf(200.0), sponsoring.billableAmount())
+    }
 }
 

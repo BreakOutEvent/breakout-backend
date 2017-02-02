@@ -10,6 +10,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.powermock.api.mockito.PowerMockito.`when`
 import org.powermock.api.mockito.PowerMockito.mock
 import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.PowerMockRunner
@@ -69,7 +70,7 @@ class ChallengeTest {
     }
 
     @Test
-    fun testMutipleAccept() {
+    fun testMultipleAccept() {
         val sponsor = mock(Sponsor::class.java)
         val team = mock(Team::class.java)
 
@@ -178,5 +179,118 @@ class ChallengeTest {
         val challenge = Challenge(sponsor, team, euroOf(50), "description")
 
         assertTrue { challenge.hasRegisteredSponsor() }
+    }
+
+    @Test
+    fun whenChallengeIsFullfilled_thenBillableAmountReturnsAmountOfChallenge() {
+        val challenge = Challenge(mock(Sponsor::class.java), mock(Team::class.java), euroOf(50), "description")
+
+        challenge.addProof(mock(Posting::class.java))
+
+        assertEquals(euroOf(50), challenge.billableAmount())
+    }
+
+    @Test
+    fun whenChallengeIsProposed_thenBillableAmountIsZero() {
+        val challenge = Challenge(mock(Sponsor::class.java), mock(Team::class.java), euroOf(50), "description")
+
+        assertEquals(euroOf(0.0), challenge.billableAmount())
+    }
+
+    @Test
+    fun whenChallengeIsWithdrawn_thenBillableAmountIsZero() {
+        val challenge = Challenge(mock(Sponsor::class.java), mock(Team::class.java), euroOf(50), "description")
+
+        challenge.withdraw()
+
+        assertEquals(euroOf(0), challenge.billableAmount())
+    }
+
+    @Test
+    fun whenChallengeIsAccepted_thenBillableAmountIsZero() {
+        val challenge = Challenge(mock(Sponsor::class.java), mock(Team::class.java), euroOf(50), "description")
+
+        challenge.accept()
+
+        assertEquals(euroOf(0), challenge.billableAmount())
+    }
+
+    @Test
+    fun whenChallengeIsRejected_thenBillableAmountIsZero() {
+        val challenge = Challenge(mock(Sponsor::class.java), mock(Team::class.java), euroOf(50), "description")
+
+        challenge.reject()
+
+        assertEquals(euroOf(0), challenge.billableAmount())
+    }
+
+    @Test
+    fun whenChallengeProofIsRejected_thenBillableAmountIsZero() {
+        val challenge = Challenge(mock(Sponsor::class.java), mock(Team::class.java), euroOf(50), "description")
+
+        challenge.addProof(mock(Posting::class.java))
+        challenge.rejectProof()
+
+        assertEquals(euroOf(0), challenge.billableAmount())
+    }
+
+    @Test
+    fun whenChallengeProofIsAccepted_thenBillableAmountIsAmount() {
+        val challenge = Challenge(mock(Sponsor::class.java), mock(Team::class.java), euroOf(50), "description")
+
+        challenge.addProof(mock(Posting::class.java))
+        challenge.acceptProof()
+
+        assertEquals(euroOf(50), challenge.billableAmount())
+    }
+
+    @Test
+    fun whenSponsorIsRegistered_thenHasRegisteredSponsorIsTrue() {
+        val challenge = Challenge(mock(Sponsor::class.java), mock(Team::class.java), euroOf(50), "description")
+        assertTrue(challenge.hasRegisteredSponsor())
+    }
+
+    fun whenUnregisteredSponsorAndUsernameInTeam_thenChallengeCanBeWithdrawn() {
+        val username = "sponso@example.com"
+        val sponsor = mock(UnregisteredSponsor::class.java)
+        val team = mock(Team::class.java)
+
+        `when`(team.isMember(username)).thenReturn(true)
+
+        val challenge = Challenge(sponsor, team, euroOf(0), "description")
+
+        assertTrue(challenge.checkWithdrawPermissions(username))
+    }
+
+    fun whenUnregisteredSponsorAndUsernameNotInTeam_thenChallengeCantBeWithdrawn() {
+        val username = "sponso@example.com"
+        val sponsor = mock(UnregisteredSponsor::class.java)
+        val team = mock(Team::class.java)
+
+        `when`(team.isMember(username)).thenReturn(false)
+
+        val challenge = Challenge(sponsor, team, euroOf(0), "description")
+
+        assertFalse(challenge.checkWithdrawPermissions(username))
+    }
+
+    fun whenRegisteredAndSponsorEmailIsUsername_thenChallengeCanBeWithdrawn() {
+        val username = "sponsor@example.com"
+        val sponsor = mock(Sponsor::class.java)
+        `when`(sponsor.email).thenReturn(username)
+
+        val challenge = Challenge(sponsor, mock(Team::class.java), euroOf(0.0), "description")
+
+        assertTrue(challenge.checkWithdrawPermissions(username))
+    }
+
+    fun whenRegisteredAndSponsorEmailIsNotUsername_thenChallengeCantBeWithdrawn() {
+        val username = "sponsor@example.com"
+        val sponsor = mock(Sponsor::class.java)
+        `when`(sponsor.email).thenReturn(username)
+
+        val challenge = Challenge(sponsor, mock(Team::class.java), euroOf(0.0), "description")
+
+        assertFalse(challenge.checkWithdrawPermissions(username))
     }
 }
