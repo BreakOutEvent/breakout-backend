@@ -9,10 +9,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import static backend.util.Profiles.HEROKU;
+import static backend.util.Profiles.STAGING;
 
-@Profile(HEROKU)
+@Profile({HEROKU, STAGING})
 @Configuration
-public class HerokuConfiguration {
+public class DatasourceConfiguration {
 
     @Bean
     public DataSource dataSource() throws URISyntaxException {

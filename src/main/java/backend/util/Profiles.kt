@@ -5,4 +5,5 @@ object Profiles {
     const val TEST = "test"
     const val DEVELOPMENT = "development"
     const val HEROKU = "heroku"
+    const val STAGING = "staging"
 }

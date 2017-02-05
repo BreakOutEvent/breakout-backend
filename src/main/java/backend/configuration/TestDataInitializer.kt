@@ -12,6 +12,7 @@ import backend.model.user.Participant
 import backend.model.user.Sponsor
 import backend.model.user.UserService
 import backend.util.Profiles.HEROKU
+import backend.util.Profiles.STAGING
 import backend.util.euroOf
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,8 +25,8 @@ import java.time.LocalDateTime
 import javax.annotation.PostConstruct
 
 @Service
-@Profile(HEROKU)
-class HerokuDataInitializer {
+@Profile(HEROKU, STAGING)
+class TestDataInitializer {
 
     // Services
     @Autowired lateinit private var userService: UserService

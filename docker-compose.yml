@@ -1,0 +1,31 @@
+version: '2'
+services:
+  mariadb:
+    container_name: mariadb
+    image: mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=breakout
+  backend:
+    container_name: backend
+    image: docker.breakout.xyz:5000/breakout-backend:${BACKEND_VERSION}
+    ports:
+      - "8082:8082"
+    links:
+      - mariadb:mariadb
+    environment:
+      - SPRING_PROFILES_ACTIVE=${BACKEND_PROFILE}
+      - CLEARDB_DATABASE_URL=mysql://root:rootpassword@mariadb/breakout?reconnect=true
+  frontend:
+    container_name: frontend
+    image: docker.breakout.xyz:5000/breakout-frontend:${FRONTEND_VERSION}
+    ports:
+      - "3000:3000"
+    links:
+      - mongodb:mongo
+    volumes:
+      - ./img:/src/public/img/uploads
+      - ./logs/live:/src/logs
+  mongodb:
+    container_name: mongodb
+    image: mongo
