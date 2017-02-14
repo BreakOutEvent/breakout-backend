@@ -17,7 +17,6 @@ import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.PathVariable
@@ -119,7 +118,6 @@ open class InvoiceController {
      * Allows admin to get all sponsoring invoices
      */
     @PreAuthorize("hasAuthority('ADMIN')")
-    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'allSponsorInvoices'")
     @RequestMapping("/sponsoring/", method = arrayOf(GET))
     open fun getAllSponsorInvoices(): List<SponsoringInvoiceView> {
 

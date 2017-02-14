@@ -19,7 +19,6 @@ import backend.view.TeamView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -198,7 +197,6 @@ open class TeamController {
      * GET /event/{eventId}/team/{teamId}/
      * gets a specific Team
      */
-    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'team'.concat(#teamId)")
     @RequestMapping("/{teamId}/", method = arrayOf(GET))
     open fun showTeam(@PathVariable teamId: Long): TeamView {
         logger.info("Getting team $teamId without cache")
@@ -212,7 +210,6 @@ open class TeamController {
      * GET /event/{eventId}/team/
      * gets all Teams for Event
      */
-    @Cacheable(cacheNames = arrayOf("allCache"), key = "'allTeams'.concat(#eventId)")
     @RequestMapping("/", method = arrayOf(GET))
     open fun showTeamsByEvent(@PathVariable eventId: Long): Iterable<TeamView> {
         logger.info("Getting team by event $eventId without cache")
@@ -244,7 +241,6 @@ open class TeamController {
      * Actual distance = |A -> B| + |B -> C|
      * Linear distance = |A -> C|
      */
-    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'teamDistance'.concat(#teamId)")
     @RequestMapping("/{id}/distance/", method = arrayOf(GET))
     open fun getTeamDistance(@PathVariable("id") teamId: Long): Map<String, Double> {
         logger.info("Getting team $teamId distance without cache")
@@ -255,7 +251,6 @@ open class TeamController {
      * GET /event/{eventId}/team/{id}/donatesum/
      * Get the sponsored sums per team
      */
-    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'teamDonateSum'.concat(#teamId)")
     @RequestMapping("/{id}/donatesum/", method = arrayOf(GET))
     open fun getTeamDonateSum(@PathVariable("id") teamId: Long): Map<String, BigDecimal> {
         logger.info("Getting team $teamId donate sum without cache")

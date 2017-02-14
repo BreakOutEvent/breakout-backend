@@ -14,7 +14,6 @@ import backend.view.LocationView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -50,7 +49,6 @@ open class LocationController {
      * GET /event/{eventId}/location/
      * Return a list of all locations for a specific event
      */
-    @Cacheable(cacheNames = arrayOf("allCache"), key = "'eventLocation'.concat(#eventId)")
     @RequestMapping("/location/", method = arrayOf(GET))
     open fun getAllLocationsForEvent(@PathVariable eventId: Long): Iterable<LocationView> {
         logger.info("Getting event $eventId location without cache")
@@ -71,7 +69,6 @@ open class LocationController {
      * GET /event/{eventId}/team/{teamId}/location/
      * Return a list of all locations for a certain team at a certain event
      */
-    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'teamLocation'.concat(#teamId)")
     @RequestMapping("/team/{teamId}/location/", method = arrayOf(GET))
     open fun getAllLocationsForEventAndTeam(@PathVariable("eventId") eventId: Long,
                                             @PathVariable("teamId") teamId: Long): Iterable<LocationView> {

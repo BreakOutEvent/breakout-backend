@@ -7,7 +7,6 @@ import backend.view.EventView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -54,7 +53,6 @@ open class EventController {
      * GET /event/
      * Gets a list of all events
      */
-    @Cacheable(cacheNames = arrayOf("allCache"), key = "'allEvents'")
     @RequestMapping("/", method = arrayOf(GET))
     open fun getAllEvents(): Iterable<EventView> {
         logger.info("Getting all events without cache")
@@ -75,7 +73,6 @@ open class EventController {
      * GET /event/{id}/posting/
      * Gets all Postings for given event
      */
-    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'eventPostings'.concat(#id)")
     @RequestMapping("/{id}/posting/", method = arrayOf(GET))
     open fun getEventPostings(@PathVariable("id") id: Long): List<Long> {
         logger.info("Getting event $id postings without cache")
@@ -87,7 +84,6 @@ open class EventController {
      * GET /event/{id}/distance/
      * Returns the sum of the distance of all teams of the event with {id}
      */
-    @Cacheable(cacheNames = arrayOf("allCache"), key = "'eventDistance'.concat(#id)")
     @RequestMapping("/{id}/distance/", method = arrayOf(GET))
     open fun getEventDistance(@PathVariable("id") id: Long): Map<String, Double> {
         logger.info("Getting event $id distance without cache")
@@ -98,7 +94,6 @@ open class EventController {
      * GET /event/{id}/donatesum/
      * Returns the sum of the distance of all teams of the event with {id}
      */
-    @Cacheable(cacheNames = arrayOf("allCache"), key = "'eventDonateSum'.concat(#id)")
     @RequestMapping("/{id}/donatesum/", method = arrayOf(GET))
     open fun getEventDonateSum(@PathVariable("id") id: Long): Map<String, BigDecimal> {
         logger.info("Getting event $id donate sum without cache")

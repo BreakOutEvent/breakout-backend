@@ -18,7 +18,6 @@ import io.swagger.annotations.Api
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -108,7 +107,6 @@ open class UserController {
      * GET /user/
      * Gets all users
      */
-    @Cacheable(cacheNames = arrayOf("allCache"), key = "'allUsers'")
     @RequestMapping("/", method = arrayOf(GET))
     open fun showUsers(): Iterable<BasicUserView> {
         logger.info("Getting all users without cache")

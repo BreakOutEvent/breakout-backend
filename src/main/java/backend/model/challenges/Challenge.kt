@@ -13,9 +13,12 @@ import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
 import org.javamoney.moneta.Money
-import javax.persistence.*
 import javax.persistence.CascadeType.ALL
 import javax.persistence.CascadeType.PERSIST
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.ManyToOne
+import javax.persistence.OneToOne
 
 @Entity
 class Challenge : BasicEntity {

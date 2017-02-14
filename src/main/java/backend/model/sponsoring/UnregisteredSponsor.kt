@@ -4,7 +4,6 @@ import backend.model.BasicEntity
 import backend.model.challenges.Challenge
 import backend.model.user.Address
 import backend.model.user.Sponsor
-import backend.model.user.UserAccount
 import javax.persistence.*
 
 @Entity

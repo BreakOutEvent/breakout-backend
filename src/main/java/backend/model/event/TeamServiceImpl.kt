@@ -16,7 +16,6 @@ import backend.services.MailService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -97,7 +96,6 @@ class TeamServiceImpl : TeamService {
         return repository.findInvitationsWithEmailAndEventId(user.email, eventId)
     }
 
-    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'functionLinearDistanceTeam'.concat(#teamId)")
     override fun getLinearDistanceForTeam(teamId: Long): Double {
         val locationDistance = this.getLocationMaxDistanceById(teamId)
         val distance = locationDistance?.distance ?: 0.0
@@ -125,7 +123,6 @@ class TeamServiceImpl : TeamService {
         }
     }
 
-    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'functionDistanceTeam'.concat(#teamId)")
     override fun getDistance(teamId: Long): Map<String, Double> {
         val linearDistance = this.getLinearDistanceForTeam(teamId)
 
@@ -209,7 +206,6 @@ class TeamServiceImpl : TeamService {
                 "challenges_accepted_proof_sum" to acceptedProofSum)
     }
 
-    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'functionDonateSumTeam'.concat(#team.id)")
     override fun getDonateSum(team: Team): Map<String, BigDecimal> {
         val sponsorSum = getSponsoringSum(team)
         val challengesSum = getChallengeSum(team)

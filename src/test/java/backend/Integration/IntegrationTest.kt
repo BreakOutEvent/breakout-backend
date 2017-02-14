@@ -22,7 +22,8 @@ import backend.model.messaging.GroupMessageService
 import backend.model.payment.SponsoringInvoiceRepository
 import backend.model.payment.SponsoringInvoiceService
 import backend.model.payment.TeamEntryFeeService
-import backend.model.posting.*
+import backend.model.posting.PostingRepository
+import backend.model.posting.PostingService
 import backend.model.sponsoring.SponsoringRepository
 import backend.model.sponsoring.SponsoringService
 import backend.model.user.User
