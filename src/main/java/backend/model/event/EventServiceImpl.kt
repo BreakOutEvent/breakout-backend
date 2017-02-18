@@ -3,6 +3,8 @@ package backend.model.event
 import backend.controller.exceptions.NotFoundException
 import backend.model.location.Location
 import backend.model.misc.Coord
+import backend.util.data.DonateSums
+import backend.util.parallelStream
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -30,44 +32,32 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository, v
 
     override fun getLocationMaxDistanceByIdEachTeam(id: Long): List<Location> = repository.getLocationMaxDistanceByIdEachTeam(id)
 
-    override fun getDistance(id: Long): Map<String, Double> {
+    override fun getDistance(id: Long): Double {
         val event = this.findById(id) ?: throw NotFoundException("event with id $id does not exist")
 
-        val teamDistances = event.teams.map { teamService.getDistance(it.id!!) }
-        val actualDistance = teamDistances.sumByDouble { it["actual_distance"]!! }
-        val linearDistance = teamDistances.sumByDouble { it["linear_distance"]!! }
-
-        return mapOf(
-                "actual_distance" to actualDistance,
-                "linear_distance" to linearDistance)
-
+        return event.teams.parallelStream().map { team ->
+            teamService.getDistance(team.id!!)
+        }.reduce { acc: Double, distance: Double ->
+            acc + distance
+        }.orElseGet { 0.0 }
     }
 
-    override fun getDonateSum(id: Long): Map<String, BigDecimal> {
+    override fun getDonateSum(id: Long): DonateSums {
         val event = this.findById(id) ?: throw NotFoundException("event with id $id does not exist")
 
-        var sponsorSum = BigDecimal.ZERO
-        var withProofSum = BigDecimal.ZERO
-        var acceptedProofSum = BigDecimal.ZERO
-        var fullSum = BigDecimal.ZERO
-
-        event.teams.forEach { team ->
+        val donateSumTeams = event.teams.parallelStream().map { team ->
             val donateSum = teamService.getDonateSum(team.id!!)
-            sponsorSum = sponsorSum.add(donateSum["sponsoring_sum"]!!)
-            withProofSum = withProofSum.add(donateSum["challenges_with_proof_sum"]!!)
-            acceptedProofSum = acceptedProofSum.add(donateSum["challenges_accepted_proof_sum"]!!)
-            fullSum = fullSum.add(donateSum["full_sum"]!!)
+            return@map DonateSums(donateSum.sponsorSum,
+                    donateSum.withProofSum,
+                    donateSum.acceptedProofSum,
+                    donateSum.fullSum)
         }
 
-        sponsorSum = sponsorSum.setScale(2, BigDecimal.ROUND_HALF_UP)
-        withProofSum = withProofSum.setScale(2, BigDecimal.ROUND_HALF_UP)
-        acceptedProofSum = acceptedProofSum.setScale(2, BigDecimal.ROUND_HALF_UP)
-        fullSum = fullSum.setScale(2, BigDecimal.ROUND_HALF_UP)
-
-        return mapOf(
-                "sponsoring_sum" to sponsorSum,
-                "challenges_with_proof_sum" to withProofSum,
-                "challenges_accepted_proof_sum" to acceptedProofSum,
-                "full_sum" to fullSum)
+        return donateSumTeams.parallel().reduce { accSums: DonateSums, donateSums: DonateSums ->
+            DonateSums(accSums.sponsorSum + donateSums.sponsorSum,
+                    accSums.withProofSum + donateSums.withProofSum,
+                    accSums.acceptedProofSum + donateSums.acceptedProofSum,
+                    accSums.fullSum + donateSums.fullSum)
+        }.orElseGet { DonateSums(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO) }
     }
 }

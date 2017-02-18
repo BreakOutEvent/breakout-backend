@@ -13,6 +13,9 @@ import backend.model.user.User
 import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.services.MailService
+import backend.util.data.ChallengeDonateSums
+import backend.util.data.DonateSums
+import backend.util.parallelStream
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -98,9 +101,7 @@ class TeamServiceImpl : TeamService {
 
     override fun getLinearDistanceForTeam(teamId: Long): Double {
         val locationDistance = this.getLocationMaxDistanceById(teamId)
-        val distance = locationDistance?.distance ?: 0.0
-
-        return distance
+        return locationDistance?.distance ?: 0.0
     }
 
     override fun findInvitationsByInviteCode(code: String): Invitation? {
@@ -123,10 +124,8 @@ class TeamServiceImpl : TeamService {
         }
     }
 
-    override fun getDistance(teamId: Long): Map<String, Double> {
-        val linearDistance = this.getLinearDistanceForTeam(teamId)
-
-        return mapOf("actual_distance" to 0.0, "linear_distance" to linearDistance)
+    override fun getDistance(teamId: Long): Double {
+        return this.getLinearDistanceForTeam(teamId)
     }
 
     override fun getFullTeamMailForMember(participants: Set<Participant>): List<Email> {
@@ -165,65 +164,46 @@ class TeamServiceImpl : TeamService {
     }
 
     fun getSponsoringSum(team: Team): BigDecimal {
-        val distanceKm = this.getLinearDistanceForTeam(team.id!!)
-        var sponsorSum = BigDecimal.ZERO
+        val distance = this.getLinearDistanceForTeam(team.id!!)
 
-        val sponsorings = team.sponsoring.filter { it.status == ACCEPTED || it.status == PAYED }
-
-        sponsorings.forEach { sponsoring ->
-            val amount = sponsoring.amountPerKm.numberStripped.multiply(BigDecimal.valueOf(distanceKm))
-            if (amount.compareTo(sponsoring.limit.numberStripped) == 1) {
-                sponsorSum = sponsorSum.add(sponsoring.limit.numberStripped)
-            } else {
-                sponsorSum = sponsorSum.add(amount)
-            }
-        }
-
-        sponsorSum = sponsorSum.setScale(2, BigDecimal.ROUND_HALF_UP)
-
-        return sponsorSum
+        return team.sponsoring.parallelStream().filter { it.status == ACCEPTED || it.status == PAYED }.map { sponsoring ->
+            val amount = sponsoring.amountPerKm.numberStripped * BigDecimal.valueOf(distance)
+            return@map when (amount > sponsoring.limit.numberStripped) {
+                true -> sponsoring.limit.numberStripped
+                false -> amount
+            }.setScale(2, BigDecimal.ROUND_HALF_UP)
+        }.reduce { acc: BigDecimal, sponsorSum: BigDecimal ->
+            acc + sponsorSum
+        }.orElseGet { BigDecimal.ZERO }
     }
 
-    fun getChallengeSum(team: Team): Map<String, BigDecimal> {
-        var withProofSum = BigDecimal.ZERO
-        var acceptedProofSum = BigDecimal.ZERO
-
-        team.challenges.forEach { challenge ->
-            if (challenge.status == ChallengeStatus.WITH_PROOF) {
-                withProofSum = withProofSum.add(challenge.amount.numberStripped)
+    fun getChallengeSum(team: Team): ChallengeDonateSums {
+        return team.challenges.parallelStream().map { challenge ->
+            return@map when (challenge.status) {
+                ChallengeStatus.WITH_PROOF -> ChallengeDonateSums(challenge.amount.numberStripped, BigDecimal.ZERO)
+                ChallengeStatus.PROOF_ACCEPTED -> ChallengeDonateSums(BigDecimal.ZERO, challenge.amount.numberStripped)
+                else -> ChallengeDonateSums(BigDecimal.ZERO, BigDecimal.ZERO)
             }
-
-            if (challenge.status == ChallengeStatus.PROOF_ACCEPTED) {
-                acceptedProofSum = acceptedProofSum.add(challenge.amount.numberStripped)
-            }
-        }
-
-        withProofSum = withProofSum.setScale(2, BigDecimal.ROUND_HALF_UP)
-        acceptedProofSum = acceptedProofSum.setScale(2, BigDecimal.ROUND_HALF_UP)
-
-        return mapOf(
-                "challenges_with_proof_sum" to withProofSum,
-                "challenges_accepted_proof_sum" to acceptedProofSum)
+        }.reduce { accSums: ChallengeDonateSums, challengeDonateSums: ChallengeDonateSums ->
+            ChallengeDonateSums(accSums.withProofSum + challengeDonateSums.withProofSum,
+                    accSums.acceptedProofSum + challengeDonateSums.acceptedProofSum)
+        }.orElseGet { ChallengeDonateSums(BigDecimal.ZERO, BigDecimal.ZERO) }
     }
 
-    override fun getDonateSum(team: Team): Map<String, BigDecimal> {
+    override fun getDonateSum(team: Team): DonateSums {
         val sponsorSum = getSponsoringSum(team)
         val challengesSum = getChallengeSum(team)
 
-        var fullSum = BigDecimal.ZERO
-        fullSum = fullSum.add(sponsorSum)
-        fullSum = fullSum.add(challengesSum["challenges_with_proof_sum"]!!)
-        fullSum = fullSum.add(challengesSum["challenges_accepted_proof_sum"]!!)
-        fullSum = fullSum.setScale(2, BigDecimal.ROUND_HALF_UP)
+        val fullSum = sponsorSum + challengesSum.withProofSum + challengesSum.acceptedProofSum
 
-        return mapOf(
-                "sponsoring_sum" to sponsorSum,
-                "challenges_with_proof_sum" to challengesSum["challenges_with_proof_sum"]!!,
-                "challenges_accepted_proof_sum" to challengesSum["challenges_accepted_proof_sum"]!!,
-                "full_sum" to fullSum)
+        return DonateSums(sponsorSum,
+                challengesSum.withProofSum,
+                challengesSum.acceptedProofSum,
+                fullSum)
     }
 
-    override fun getDonateSum(teamId: Long): Map<String, BigDecimal> {
+    @Transactional
+    override fun getDonateSum(teamId: Long): DonateSums {
         val team: Team = this.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")
         return getDonateSum(team)
     }

@@ -13,6 +13,7 @@ import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserService
 import backend.services.ConfigurationService
+import backend.util.data.DonateSums
 import backend.util.getSignedJwtToken
 import backend.view.InvitationView
 import backend.view.TeamView
@@ -24,7 +25,6 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.*
-import java.math.BigDecimal
 import javax.validation.Valid
 
 @RestController
@@ -121,7 +121,7 @@ open class TeamController {
         checkAuthenticationForEditTeam(team, user)
 
         body.hasStarted?.let {
-            if(user.hasRole(Admin::class)) team.hasStarted = it
+            if (user.hasRole(Admin::class)) team.hasStarted = it
             else throw UnauthorizedException("Only an admin can change the hasStarted property of a team")
         }
 
@@ -156,7 +156,7 @@ open class TeamController {
                         @PathVariable teamId: Long,
                         @Valid @RequestBody body: Map<String, Any>): Map<String, String> {
 
-        if (eventService.exists(eventId) == false) throw NotFoundException("No event with id $eventId")
+        if (!eventService.exists(eventId)) throw NotFoundException("No event with id $eventId")
 
         val team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId")
         val emailString = body["email"] as? String ?: throw BadRequestException("body is missing field email")
@@ -179,7 +179,7 @@ open class TeamController {
                       @Valid @RequestBody body: Map<String, String>): TeamView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
-        if (eventService.exists(eventId) == false) throw NotFoundException("No event with id $eventId")
+        if (!eventService.exists(eventId)) throw NotFoundException("No event with id $eventId")
 
         val team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId")
         val emailString = body["email"] ?: throw BadRequestException("body is missing field email")
@@ -244,7 +244,7 @@ open class TeamController {
     @RequestMapping("/{id}/distance/", method = arrayOf(GET))
     open fun getTeamDistance(@PathVariable("id") teamId: Long): Map<String, Double> {
         logger.info("Getting team $teamId distance without cache")
-        return teamService.getDistance(teamId)
+        return mapOf("distance" to teamService.getDistance(teamId))
     }
 
     /**
@@ -252,7 +252,7 @@ open class TeamController {
      * Get the sponsored sums per team
      */
     @RequestMapping("/{id}/donatesum/", method = arrayOf(GET))
-    open fun getTeamDonateSum(@PathVariable("id") teamId: Long): Map<String, BigDecimal> {
+    open fun getTeamDonateSum(@PathVariable("id") teamId: Long): DonateSums {
         logger.info("Getting team $teamId donate sum without cache")
         return teamService.getDonateSum(teamId)
     }

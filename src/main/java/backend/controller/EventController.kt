@@ -3,6 +3,7 @@ package backend.controller
 import backend.controller.exceptions.NotFoundException
 import backend.model.event.EventService
 import backend.model.misc.Coord
+import backend.util.data.DonateSums
 import backend.view.EventView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -12,7 +13,6 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RequestMethod.POST
-import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import javax.validation.Valid
@@ -87,7 +87,7 @@ open class EventController {
     @RequestMapping("/{id}/distance/", method = arrayOf(GET))
     open fun getEventDistance(@PathVariable("id") id: Long): Map<String, Double> {
         logger.info("Getting event $id distance without cache")
-        return eventService.getDistance(id)
+        return mapOf("distance" to eventService.getDistance(id))
     }
 
     /**
@@ -95,7 +95,7 @@ open class EventController {
      * Returns the sum of the distance of all teams of the event with {id}
      */
     @RequestMapping("/{id}/donatesum/", method = arrayOf(GET))
-    open fun getEventDonateSum(@PathVariable("id") id: Long): Map<String, BigDecimal> {
+    open fun getEventDonateSum(@PathVariable("id") id: Long): DonateSums {
         logger.info("Getting event $id donate sum without cache")
         return eventService.getDonateSum(id)
     }

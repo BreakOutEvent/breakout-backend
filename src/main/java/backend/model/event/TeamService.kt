@@ -5,8 +5,8 @@ import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
 import backend.model.user.User
+import backend.util.data.DonateSums
 import org.springframework.security.access.prepost.PreAuthorize
-import java.math.BigDecimal
 
 interface TeamService {
 
@@ -89,7 +89,7 @@ interface TeamService {
 
     fun getLinearDistanceForTeam(teamId: Long): Double
 
-    fun getDistance(teamId: Long): Map<String, Double>
+    fun getDistance(teamId: Long): Double
 
     fun join(participant: Participant, team: Team)
 
@@ -97,9 +97,9 @@ interface TeamService {
 
     fun findByEventId(eventId: Long): List<Team>
 
-    fun getDonateSum(teamId: Long): Map<String, BigDecimal>
+    fun getDonateSum(teamId: Long): DonateSums
 
-    fun getDonateSum(team: Team): Map<String, BigDecimal>
+    fun getDonateSum(team: Team): DonateSums
 
     fun searchByString(search: String): List<Team>
 

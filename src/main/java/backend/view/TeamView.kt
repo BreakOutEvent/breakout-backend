@@ -1,7 +1,7 @@
 package backend.view
 
 import backend.model.event.Team
-import java.math.BigDecimal
+import backend.util.data.DonateSums
 import java.util.*
 
 class TeamView() {
@@ -26,9 +26,9 @@ class TeamView() {
 
     var isFull: Boolean? = null
 
-    var distance: Map<String, Double>? = null
+    var distance: Double? = null
 
-    var donateSum: Map<String, BigDecimal>? = null
+    var donateSum: DonateSums? = null
 
     constructor(team: Team) : this() {
         this.id = team.id
@@ -44,7 +44,7 @@ class TeamView() {
         this.isFull = team.isFull()
     }
 
-    constructor(team: Team, distance: Map<String, Double>, donateSum: Map<String, BigDecimal>) : this() {
+    constructor(team: Team, distance: Double, donateSum: DonateSums) : this() {
         this.id = team.id
         this.name = team.name
         this.event = team.event.id
