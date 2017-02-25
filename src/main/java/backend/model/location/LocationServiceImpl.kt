@@ -69,17 +69,28 @@ class LocationServiceImpl : LocationService {
         }
     }
 
-    override fun findByTeamId(id: Long): Iterable<Location> {
-        return locationRepository.findByTeamId(id)
+    override fun findByTeamId(id: Long, perTeam: Int): Iterable<Location> {
+        val first = locationRepository.findTeamLocationBounds(id).firstOrNull()
+        if (first != null) {
+            try {
+                val test = first as Array<*>
+                val locations = locationRepository.findByTeamId(id, (test[0] as Number).toLong(), (test[1] as Number).toLong(), (test[2] as Number).toLong(), perTeam)
+                return locations.filter { it.isDuringEvent }
+            } catch (e: Exception) {
+                return emptyList()
+            }
+        } else {
+            return emptyList()
+        }
     }
 
-    override fun findByEventId(id: Long): Map<Team, Iterable<Location>> {
+    override fun findByEventId(id: Long, perTeam: Int): Map<Team, Iterable<Location>> {
         val event = eventService.findById(id) ?: throw NotFoundException("event with id $id does not exist")
-        return event.teams.parallelStream().map { team ->
-            val locations = this.findByTeamId(team.id!!)
+        return event.teams.filter(Team::hasStarted).parallelStream().map { team ->
+            val locations = this.findByTeamId(team.id!!, perTeam)
             return@map mutableMapOf(team to locations)
         }.reduce { acc: MutableMap<Team, Iterable<Location>>, team: Map<Team, Iterable<Location>> ->
-            acc.putAll(team)
+            acc.putAll(team.filter { it.value.toList().isNotEmpty() })
             return@reduce acc
         }.orElseGet { mutableMapOf<Team, Iterable<Location>>() }
     }

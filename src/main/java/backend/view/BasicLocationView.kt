@@ -18,6 +18,8 @@ class BasicLocationView {
 
     var locationData: Map<String, String> = mapOf()
 
+    var isDuringEvent: Boolean? = null
+
     @NotNull
     val date: Long
 
@@ -28,6 +30,7 @@ class BasicLocationView {
         this.longitude = location.coord.longitude
         this.distance = location.distance
         this.date = location.date.toEpochSecond(ZoneOffset.UTC)
+        this.isDuringEvent = location.isDuringEvent
 
         this.locationData = location.locationData
     }

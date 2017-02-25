@@ -13,8 +13,8 @@ interface LocationService {
 
     fun findAll(): Iterable<Location>
 
-    fun findByTeamId(id: Long): Iterable<Location>
+    fun findByTeamId(id: Long, perTeam: Int): Iterable<Location>
 
-    fun findByEventId(id: Long): Map<Team, Iterable<Location>>
+    fun findByEventId(id: Long, perTeam: Int): Map<Team, Iterable<Location>>
 
 }
