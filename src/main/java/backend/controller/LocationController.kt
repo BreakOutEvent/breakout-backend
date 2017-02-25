@@ -11,6 +11,7 @@ import backend.model.user.Participant
 import backend.model.user.UserService
 import backend.util.localDateTimeOf
 import backend.view.LocationView
+import backend.view.TeamLocationView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -50,19 +51,11 @@ open class LocationController {
      * Return a list of all locations for a specific event
      */
     @RequestMapping("/location/", method = arrayOf(GET))
-    open fun getAllLocationsForEvent(@PathVariable eventId: Long): Iterable<LocationView> {
+    open fun getAllLocationsForEvent(@PathVariable eventId: Long): Iterable<TeamLocationView> {
         logger.info("Getting event $eventId location without cache")
-        return locationService.findByEventId(eventId).map(::LocationView)
-    }
-
-    /**
-     * GET /event/{eventId}/location/since/{sinceId}/
-     * Return a list of locations for a specific event since given id
-     */
-    @RequestMapping("/location/since/{sinceId}/", method = arrayOf(GET))
-    open fun getLocationsForEventSince(@PathVariable("eventId") eventId: Long,
-                                       @PathVariable("sinceId") sinceId: Long): Iterable<LocationView> {
-        return locationService.findByEventIdSinceId(eventId, sinceId).map(::LocationView)
+        return locationService.findByEventId(eventId).map { data ->
+            TeamLocationView(data.key, data.value)
+        }
     }
 
     /**
@@ -74,17 +67,6 @@ open class LocationController {
                                             @PathVariable("teamId") teamId: Long): Iterable<LocationView> {
         logger.info("Getting team $teamId location without cache")
         return locationService.findByTeamId(teamId).map(::LocationView)
-    }
-
-    /**
-     * GET /event/{eventId}/team/{teamId}/location/since/{sinceId}/
-     * Return a list of locations for a certain team at a certain event since given id
-     */
-    @RequestMapping("/team/{teamId}/location/since/{sinceId}/", method = arrayOf(GET))
-    open fun getLocationsForEventAndTeamSince(@PathVariable("eventId") eventId: Long,
-                                              @PathVariable("teamId") teamId: Long,
-                                              @PathVariable("sinceId") sinceId: Long): Iterable<LocationView> {
-        return locationService.findByTeamIdSince(teamId, sinceId).map(::LocationView)
     }
 
     /**

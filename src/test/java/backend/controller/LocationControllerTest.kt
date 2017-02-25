@@ -72,48 +72,41 @@ class LocationControllerTest : IntegrationTest() {
 
         val request = get("/event/${munichEvent.id}/location/")
 
-        mockMvc.perform(request)
+        val resp = mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$").isArray)
                 .andExpect(jsonPath<MutableCollection<out Any>>("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id").exists())
-                .andExpect(jsonPath("$[0].latitude").exists())
-                .andExpect(jsonPath("$[0].longitude").exists())
-                .andExpect(jsonPath("$[0].team").exists())
-                .andExpect(jsonPath("$[0].teamId").exists())
-                .andExpect(jsonPath("$[0].eventId").exists())
+                .andExpect(jsonPath("$[0].name").exists())
                 .andExpect(jsonPath("$[0].event").exists())
-                .andExpect(jsonPath("$[0].locationData").exists())
-                .andExpect(jsonPath("$[0].locationData.COUNTRY").doesNotExist())
-                .andExpect(jsonPath("$[1].team").exists())
-                .andExpect(jsonPath("$[1].teamId").exists())
-                .andExpect(jsonPath("$[1].eventId").exists())
+                .andExpect(jsonPath("$[0].description").exists())
+                .andExpect(jsonPath("$[0].hasStarted").exists())
+                .andExpect(jsonPath("$[0].members").exists())
+                .andExpect(jsonPath("$[0].profilePic").exists())
+                .andExpect(jsonPath("$[0].locations").isArray)
+                .andExpect(jsonPath("$[0].locations[0].id").exists())
+                .andExpect(jsonPath("$[0].locations[0].latitude").exists())
+                .andExpect(jsonPath("$[0].locations[0].longitude").exists())
+                .andExpect(jsonPath("$[0].locations[0].distance").exists())
+                .andExpect(jsonPath("$[0].locations[0].date").exists())
+                .andExpect(jsonPath("$[0].locations[0].locationData").exists())
+                .andExpect(jsonPath("$[1].id").exists())
+                .andExpect(jsonPath("$[1].name").exists())
                 .andExpect(jsonPath("$[1].event").exists())
-                .andExpect(jsonPath("$[1].locationData").exists())
-                .andExpect(jsonPath("$[1].locationData.COUNTRY").doesNotExist())
-    }
+                .andExpect(jsonPath("$[1].description").exists())
+                .andExpect(jsonPath("$[1].hasStarted").exists())
+                .andExpect(jsonPath("$[1].members").exists())
+                .andExpect(jsonPath("$[1].profilePic").exists())
+                .andExpect(jsonPath("$[1].locations").isArray)
+                .andExpect(jsonPath("$[1].locations[0].id").exists())
+                .andExpect(jsonPath("$[1].locations[0].latitude").exists())
+                .andExpect(jsonPath("$[1].locations[0].longitude").exists())
+                .andExpect(jsonPath("$[1].locations[0].distance").exists())
+                .andExpect(jsonPath("$[1].locations[0].date").exists())
+                .andExpect(jsonPath("$[1].locations[0].locationData").exists())
+                .andReturn().response.contentAsString
 
-    @Test
-    fun testGetAllLocationsForEventSinceId() {
-        val location = locationService.create(Coord(1.0, 1.0), firstUser, LocalDateTime.now()) // This one should not be found!
-        locationService.create(Coord(1.0, 1.0), thirdUser, LocalDateTime.now())
-        locationService.create(Coord(1.0, 1.0), fifthUser, LocalDateTime.now()) // This one should not be found!
-
-        val request = get("/event/${munichEvent.id}/location/since/${location.id}/")
-
-        mockMvc.perform(request)
-                .andExpect(status().isOk)
-                .andExpect(jsonPath("$").isArray)
-                .andExpect(jsonPath<MutableCollection<out Any>>("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id").exists())
-                .andExpect(jsonPath("$[0].latitude").exists())
-                .andExpect(jsonPath("$[0].longitude").exists())
-                .andExpect(jsonPath("$[0].team").exists())
-                .andExpect(jsonPath("$[0].teamId").exists())
-                .andExpect(jsonPath("$[0].eventId").exists())
-                .andExpect(jsonPath("$[0].event").exists())
-                .andExpect(jsonPath("$[0].locationData").exists())
-                .andExpect(jsonPath("$[0].locationData.COUNTRY").doesNotExist())
+        println(resp)
     }
 
     @Test
@@ -139,39 +132,6 @@ class LocationControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$[0].locationData.COUNTRY").doesNotExist())
 
     }
-
-    @Test
-    fun testGetAllLocationsForEventAndTeamSinceId() {
-        val location = locationService.create(Coord(1.0, 1.0), firstUser, LocalDateTime.now()) // This one should not be found!
-        locationService.create(Coord(1.0, 1.0), firstUser, LocalDateTime.now())
-        locationService.create(Coord(1.0, 1.0), firstUser, LocalDateTime.now())
-
-        val request = get("/event/${munichEvent.id}/team/${firstTeam.id}/location/since/${location.id}/")
-
-        mockMvc.perform(request)
-                .andExpect(status().isOk)
-                .andExpect(jsonPath("$").isArray)
-                .andExpect(jsonPath<MutableCollection<out Any>>("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id").exists())
-                .andExpect(jsonPath("$[0].latitude").exists())
-                .andExpect(jsonPath("$[0].longitude").exists())
-                .andExpect(jsonPath("$[0].team").exists())
-                .andExpect(jsonPath("$[0].teamId").exists())
-                .andExpect(jsonPath("$[0].eventId").exists())
-                .andExpect(jsonPath("$[0].event").exists())
-                .andExpect(jsonPath("$[0].locationData").exists())
-                .andExpect(jsonPath("$[0].locationData.COUNTRY").doesNotExist())
-                .andExpect(jsonPath("$[1].id").exists())
-                .andExpect(jsonPath("$[1].latitude").exists())
-                .andExpect(jsonPath("$[1].longitude").exists())
-                .andExpect(jsonPath("$[1].team").exists())
-                .andExpect(jsonPath("$[1].teamId").exists())
-                .andExpect(jsonPath("$[1].eventId").exists())
-                .andExpect(jsonPath("$[1].event").exists())
-                .andExpect(jsonPath("$[1].locationData").exists())
-                .andExpect(jsonPath("$[1].locationData.COUNTRY").doesNotExist())
-    }
-
 
     @Test
     fun testCreateLocation() {
