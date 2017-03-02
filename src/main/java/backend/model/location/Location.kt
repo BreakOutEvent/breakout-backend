@@ -41,7 +41,7 @@ class Location : BasicEntity {
 
     constructor(coord: Coord, uploader: Participant, date: LocalDateTime, locationData: Map<String, String>) {
         this.coord = coord
-        this.team = uploader.currentTeam ?: throw DomainException("A user without a team can't upload locations")
+        this.team = uploader.getCurrentTeam() ?: throw DomainException("A user without a team can't upload locations")
         this.uploader = uploader
         this.date = date
         this.distance = distanceCoordsKM(from = team!!.event.startingLocation, to = coord)

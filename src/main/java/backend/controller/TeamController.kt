@@ -63,7 +63,7 @@ open class TeamController {
     open fun leaveTeam(@AuthenticationPrincipal customUserDetails: CustomUserDetails): Map<String, String> {
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val participant = user.getRole(Participant::class) ?: throw BadRequestException("User is no participant")
-        val team = participant.currentTeam ?: throw BadRequestException("User is no part of a team")
+        val team = participant.getCurrentTeam() ?: throw BadRequestException("User is no part of a team")
         teamService.leave(team, participant)
         return mapOf("message" to "success")
     }

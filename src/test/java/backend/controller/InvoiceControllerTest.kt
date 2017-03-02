@@ -35,7 +35,7 @@ open class InvoiceControllerTest : IntegrationTest() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
         team = teamService.create(creator.getRole(Participant::class)!!, "name", "description", event)
         team.members.add(invitee.getRole(Participant::class)!!)
-        invitee.getRole(Participant::class)!!.currentTeam = team
+        invitee.getRole(Participant::class)!!.setCurrentTeam(team)
         teamService.save(team)
         userService.save(invitee)
 

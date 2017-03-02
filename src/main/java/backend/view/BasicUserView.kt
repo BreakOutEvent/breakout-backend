@@ -49,10 +49,10 @@ class BasicUserView() {
 
         constructor(user: User) : this() {
             this.participant = user.getRole(Participant::class)
-            this.eventId = participant?.currentTeam?.event?.id
-            this.eventCity = participant?.currentTeam?.event?.city
-            this.teamId = participant?.currentTeam?.id
-            this.teamName = participant?.currentTeam?.name
+            this.eventId = participant?.getCurrentTeam()?.event?.id
+            this.eventCity = participant?.getCurrentTeam()?.event?.city
+            this.teamId = participant?.getCurrentTeam()?.id
+            this.teamName = participant?.getCurrentTeam()?.name
             this.tshirtSize = participant?.tshirtsize
         }
     }

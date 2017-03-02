@@ -3,7 +3,7 @@ package backend.util
 import backend.model.user.Participant
 
 fun getBankingSubject(participant: Participant): String {
-    return getBankingSubject(participant.currentTeam!!.id!!, participant.firstname ?: "", participant.lastname ?: "")
+    return getBankingSubject(participant.getCurrentTeam()!!.id!!, participant.firstname ?: "", participant.lastname ?: "")
 }
 
 fun getBankingSubject(teamId: Long, firstname: String, lastname: String): String {

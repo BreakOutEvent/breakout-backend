@@ -19,7 +19,7 @@ class SimpleUserView() {
         this.id = user.account.id
         this.firstname = user.firstname
         this.lastname = user.lastname
-        this.teamId = user.getRole(Participant::class)?.currentTeam?.id
-        this.teamname = user.getRole(Participant::class)?.currentTeam?.name
+        this.teamId = user.getRole(Participant::class)?.getCurrentTeam()?.id
+        this.teamname = user.getRole(Participant::class)?.getCurrentTeam()?.name
     }
 }

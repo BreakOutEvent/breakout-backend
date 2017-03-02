@@ -39,7 +39,7 @@ class TeamTest {
         val creator = User.create("creator@mail.de", "password").addRole(Participant::class)
         val team = Team(creator, "Team awesome", "our team is awesome", event)
 
-        assertEquals(team, creator.currentTeam)
+        assertEquals(team, creator.getCurrentTeam())
         assertEquals(team.members.size, 1)
         assertTrue(team.members.contains(creator))
     }

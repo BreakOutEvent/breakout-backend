@@ -26,6 +26,7 @@ class MediaSize : BasicEntity {
 
     constructor(media: Media, url: String, width: Int, height: Int, length: Int, size: Long, type: String) : this() {
         this.media = media
+        this.media?.sizes?.add(this)
         this.url = url
         this.width = width
         this.height = height

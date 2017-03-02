@@ -31,7 +31,9 @@ class ChallengeControllerTest : IntegrationTest() {
     override fun setUp() {
         super.setUp()
         this.event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
-        this.participant = userService.create("participant@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val user = userService.create("participant@break-out.org", "password")
+        this.participant = user.addRole(Participant::class)
+        userService.save(participant)
         this.team = teamService.create(participant, "name", "description", event)
         this.sponsor = userService.create("sponsor@break-out.org", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
     }

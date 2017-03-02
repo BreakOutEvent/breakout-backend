@@ -25,10 +25,10 @@ class Team : BasicEntity {
     private constructor() : super()
 
     constructor(creator: Participant, name: String, description: String, event: Event) : this() {
+        this.event = event
         this.addMember(creator)
         this.name = name
         this.description = description
-        this.event = event
         this.profilePic = Media("image")
         this.invoice = TeamEntryFeeInvoice(this, Money.of(BigDecimal.valueOf(60), "EUR"))
     }
@@ -65,11 +65,15 @@ class Team : BasicEntity {
     var challenges: MutableList<Challenge> = ArrayList()
 
     private fun addMember(participant: Participant) {
-        if (participant.currentTeam != null) throw DomainException("Participant ${participant.email} already is part of a team")
+
+        participant.getCurrentTeam()?.let {
+            if (it.event == this.event) throw DomainException("A participant can't join more than one team at the same event")
+        }
+
         if (this.isFull()) throw DomainException("This team already has two members")
 
         members.add(participant)
-        participant.currentTeam = this
+        participant.setCurrentTeam(this)
     }
 
     @Throws
@@ -115,17 +119,19 @@ class Team : BasicEntity {
 
     fun leave(participant: Participant) {
         if (!this.isMember(participant)) throw DomainException("Can't leave team because user never was a part of it")
+
+        // TODO: Check whether we still want this behaviour!
         if (this.isFull()) throw DomainException("Can't leave team because it is already full")
         this.invitations.forEach { it.team = null }
         this.invitations.clear()
 
-        this.members.forEach { it.currentTeam = null }
-        this.members.clear()
+        this.members.filter { it == participant }
+                .forEach { it.removeTeam(this) }
     }
 
     @PreRemove
     fun preRemove() {
-        this.members.forEach { it.currentTeam = null }
+        this.members.forEach { it.clearAllTeams() }
         this.members.clear()
 
         this.locations.forEach { it.team = null }

@@ -55,7 +55,7 @@ class LocationServiceImpl : LocationService {
     }
 
     private fun checkAndSetIsDuringEvent(location: Location, participant: Participant) {
-        val teamHasStarted = participant.currentTeam?.hasStarted ?: throw DomainException("User has no team")
+        val teamHasStarted = participant.getCurrentTeam()?.hasStarted ?: throw DomainException("User has no team")
 
         if (featureFlagService.isEnabled("event.isNow") && teamHasStarted) {
             location.isDuringEvent = true

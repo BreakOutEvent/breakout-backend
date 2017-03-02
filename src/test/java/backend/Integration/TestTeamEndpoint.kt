@@ -8,8 +8,10 @@ import backend.model.posting.Posting
 import backend.model.user.Participant
 import backend.model.user.User
 import backend.services.ConfigurationService
+import backend.testHelper.json
 import com.auth0.jwt.Algorithm
 import com.auth0.jwt.JWTSigner
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.hamcrest.Matchers.hasSize
 import org.junit.Before
 import org.junit.Test
@@ -20,10 +22,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
+import kotlin.test.assertFails
 
-class TestTeamEndpoint : IntegrationTest() {
+@Transactional
+open class TestTeamEndpoint : IntegrationTest() {
 
     @Autowired
     lateinit var configurationService: ConfigurationService
@@ -99,6 +104,51 @@ class TestTeamEndpoint : IntegrationTest() {
                 .andReturn().response.contentAsString
 
         print(response)
+    }
+
+    @Test
+    fun Given_a_user_is_in_a_team_at_an_event__When_he_wants_to_create_another_team__Then_it_fails() {
+        val testUserCredentials = createUser(this.mockMvc, "test@example.com", "pw", this.userService)
+        makeUserParticipant(testUserCredentials)
+
+        createTeam(testUserCredentials, "name", "description", event.id!!)
+
+        assertFails {
+            createTeam(testUserCredentials, "name", "description", event.id!!)
+        }
+    }
+
+    private fun createTeam(credentials: Credentials, name: String, description: String, eventId: Long): Long {
+        val body = mapOf(
+                "name" to name,
+                "description" to description
+        )
+
+        val request = post("/event/$eventId/team/")
+                .header("Authorization", "Bearer ${credentials.accessToken}")
+                .json(body)
+
+        val res = mockMvc.perform(request)
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.profilePic.type").exists())
+                .andExpect(jsonPath("$.profilePic.id").exists())
+                .andExpect(jsonPath("$.profilePic.uploadToken").exists())
+                .andExpect(jsonPath("$.profilePic.type").value("IMAGE"))
+                .andExpect(jsonPath("$.event").value(event.id!!.toInt()))
+                .andExpect(jsonPath("$.name").value(name))
+                .andExpect(jsonPath("$.description").value(description))
+                .andExpect(jsonPath("$.members").isArray)
+                .andExpect(jsonPath("$.invoiceId").exists())
+                .andExpect(jsonPath<MutableCollection<out Any>>("$.members", hasSize(1)))
+                .andReturn().response.contentAsString
+
+        val jsonRes: Map<String, Any> = ObjectMapper()
+                .readerFor(Map::class.java)
+                .readValue(res)
+
+        return (jsonRes["id"] as? Int)?.toLong() ?: throw Exception("Can't parse id ${jsonRes["id"]} to long")
+
     }
 
     @Test

@@ -40,10 +40,10 @@ class TeamServiceImpl : TeamService {
         this.logger = LoggerFactory.getLogger(TeamServiceImpl::class.java)
     }
 
-    // TODO: Maybe make this transactional
+    @Transactional
     override fun create(creator: Participant, name: String, description: String, event: Event): Team {
-        if (creator.currentTeam != null) throw DomainException("participant ${creator.account.id} already is part of a team")
         val team = Team(creator, name, description, event)
+        // TODO: Maybe use sensible cascading?
         val savedTeam = this.save(team)
         userService.save(creator)
         return savedTeam

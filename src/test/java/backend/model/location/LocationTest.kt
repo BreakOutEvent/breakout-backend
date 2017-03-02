@@ -37,7 +37,7 @@ class LocationTest {
         event = PowerMockito.mock(Event::class.java)
         date = PowerMockito.mock(LocalDateTime::class.java)
 
-        Mockito.`when`(participant.currentTeam).thenReturn(team)
+        Mockito.`when`(participant.getCurrentTeam()).thenReturn(team)
         Mockito.`when`(team.event).thenReturn(event)
         Mockito.`when`(event.startingLocation).thenReturn(Coord(100.0, 203.7))
 
