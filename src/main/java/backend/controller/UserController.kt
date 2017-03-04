@@ -109,7 +109,6 @@ open class UserController {
      */
     @RequestMapping("/", method = arrayOf(GET))
     open fun showUsers(): Iterable<BasicUserView> {
-        logger.info("Getting all users without cache")
         return userService.getAllUsers().map(::BasicUserView)
     }
 

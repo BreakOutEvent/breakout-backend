@@ -53,7 +53,6 @@ open class LocationController {
     @RequestMapping("/location/", method = arrayOf(GET))
     open fun getAllLocationsForEvent(@PathVariable eventId: Long,
                                      @RequestParam(value = "perTeam", required = false) perTeam: Int?): Iterable<TeamLocationView> {
-        logger.info("Getting event $eventId location without cache")
         return locationService.findByEventId(eventId, perTeam ?: 20).map { data ->
             TeamLocationView(data.key, data.value)
         }
@@ -67,7 +66,6 @@ open class LocationController {
     open fun getAllLocationsForEventAndTeam(@PathVariable("eventId") eventId: Long,
                                             @PathVariable("teamId") teamId: Long,
                                             @RequestParam(value = "perTeam", required = false) perTeam: Int?): Iterable<LocationView> {
-        logger.info("Getting team $teamId location without cache")
         return locationService.findByTeamId(teamId, perTeam ?: 20).map(::LocationView)
     }
 

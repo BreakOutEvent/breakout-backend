@@ -199,7 +199,6 @@ open class TeamController {
      */
     @RequestMapping("/{teamId}/", method = arrayOf(GET))
     open fun showTeam(@PathVariable teamId: Long): TeamView {
-        logger.info("Getting team $teamId without cache")
         val team = teamService.findOne(teamId) ?: throw NotFoundException("team with id $teamId does not exist")
         val teamDonateSum = teamService.getDonateSum(teamId)
         val teamDistance = teamService.getDistance(teamId)
@@ -212,7 +211,6 @@ open class TeamController {
      */
     @RequestMapping("/", method = arrayOf(GET))
     open fun showTeamsByEvent(@PathVariable eventId: Long): Iterable<TeamView> {
-        logger.info("Getting team by event $eventId without cache")
         val teams = teamService.findByEventId(eventId)
         return teams.map {
             val teamDonateSum = teamService.getDonateSum(it)
@@ -228,7 +226,6 @@ open class TeamController {
      */
     @RequestMapping("/{teamId}/posting/", method = arrayOf(GET))
     open fun getTeamPostingIds(@PathVariable teamId: Long): List<Long> {
-        logger.info("Getting team $teamId postings without cache")
         val postingIds = teamService.findPostingsById(teamId)
         return postingIds
     }
@@ -243,7 +240,6 @@ open class TeamController {
      */
     @RequestMapping("/{id}/distance/", method = arrayOf(GET))
     open fun getTeamDistance(@PathVariable("id") teamId: Long): Map<String, Double> {
-        logger.info("Getting team $teamId distance without cache")
         return mapOf("distance" to teamService.getDistance(teamId))
     }
 
@@ -253,7 +249,6 @@ open class TeamController {
      */
     @RequestMapping("/{id}/donatesum/", method = arrayOf(GET))
     open fun getTeamDonateSum(@PathVariable("id") teamId: Long): DonateSums {
-        logger.info("Getting team $teamId donate sum without cache")
         return teamService.getDonateSum(teamId)
     }
 }

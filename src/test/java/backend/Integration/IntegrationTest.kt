@@ -37,7 +37,6 @@ import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.IntegrationTest
 import org.springframework.boot.test.SpringApplicationConfiguration
-import org.springframework.cache.CacheManager
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -66,7 +65,6 @@ abstract class IntegrationTest {
     // Spring stuff
     @Autowired lateinit private var context: WebApplicationContext
     @Autowired lateinit protected var springSecurityFilterChain: Filter
-    @Autowired lateinit private var cacheManger: CacheManager
 
     // Repositories
     @Autowired lateinit protected var userRepository: UserRepository
@@ -118,10 +116,6 @@ abstract class IntegrationTest {
                 .webAppContextSetup(context)
                 .addFilters<DefaultMockMvcBuilder>(springSecurityFilterChain)
                 .build()
-
-        cacheManger.getCache("allCache").clear()
-        cacheManger.getCache("singleCache").clear()
-
     }
 
     fun post(path: String, json: String): MockHttpServletRequestBuilder {

@@ -55,7 +55,6 @@ open class EventController {
      */
     @RequestMapping("/", method = arrayOf(GET))
     open fun getAllEvents(): Iterable<EventView> {
-        logger.info("Getting all events without cache")
         return eventService.findAll().map(::EventView)
     }
 
@@ -75,7 +74,6 @@ open class EventController {
      */
     @RequestMapping("/{id}/posting/", method = arrayOf(GET))
     open fun getEventPostings(@PathVariable("id") id: Long): List<Long> {
-        logger.info("Getting event $id postings without cache")
         val postingIds = eventService.findPostingsById(id) ?: throw NotFoundException("event with id $id does not exist")
         return postingIds
     }
@@ -86,7 +84,6 @@ open class EventController {
      */
     @RequestMapping("/{id}/distance/", method = arrayOf(GET))
     open fun getEventDistance(@PathVariable("id") id: Long): Map<String, Double> {
-        logger.info("Getting event $id distance without cache")
         return mapOf("distance" to eventService.getDistance(id))
     }
 
@@ -96,7 +93,6 @@ open class EventController {
      */
     @RequestMapping("/{id}/donatesum/", method = arrayOf(GET))
     open fun getEventDonateSum(@PathVariable("id") id: Long): DonateSums {
-        logger.info("Getting event $id donate sum without cache")
         return eventService.getDonateSum(id)
     }
 }
