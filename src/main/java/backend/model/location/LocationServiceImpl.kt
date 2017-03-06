@@ -1,11 +1,15 @@
 package backend.model.location
 
 import backend.controller.exceptions.BadRequestException
+import backend.controller.exceptions.NotFoundException
 import backend.exceptions.DomainException
+import backend.model.event.EventService
+import backend.model.event.Team
 import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.services.FeatureFlagService
 import backend.services.GeoCodingService
+import backend.util.parallelStream
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -17,15 +21,18 @@ class LocationServiceImpl : LocationService {
     private val locationRepository: LocationRepository
     private val geoCodingService: GeoCodingService
     private val featureFlagService: FeatureFlagService
+    private val eventService: EventService
 
     @Autowired
     constructor(locationRepository: LocationRepository,
                 geoCodingService: GeoCodingService,
-                featureFlagService: FeatureFlagService) {
+                featureFlagService: FeatureFlagService,
+                eventService: EventService) {
 
         this.locationRepository = locationRepository
         this.geoCodingService = geoCodingService
         this.featureFlagService = featureFlagService
+        this.eventService = eventService
     }
 
     override fun findAll(): Iterable<Location> {
@@ -62,21 +69,30 @@ class LocationServiceImpl : LocationService {
         }
     }
 
-    override fun findByTeamId(id: Long): Iterable<Location> {
-        return locationRepository.findByTeamId(id)
+    override fun findByTeamId(id: Long, perTeam: Int): Iterable<Location> {
+        val first = locationRepository.findTeamLocationBounds(id).firstOrNull()
+        if (first != null) {
+            try {
+                val test = first as Array<*>
+                val locations = locationRepository.findByTeamId(id, (test[0] as Number).toLong(), (test[1] as Number).toLong(), (test[2] as Number).toLong(), perTeam)
+                return locations.filter { it.isDuringEvent }
+            } catch (e: Exception) {
+                return emptyList()
+            }
+        } else {
+            return emptyList()
+        }
     }
 
-    override fun findByEventId(id: Long): Iterable<Location> {
-        return locationRepository.findByEventId(id)
-    }
-
-    override fun findByEventIdSinceId(eventId: Long, sinceId: Long): Iterable<Location> {
-        return locationRepository.findByEventIdSinceId(eventId, sinceId)
-    }
-
-    override fun findByTeamIdSince(teamId: Long, sinceId: Long): Iterable<Location> {
-        return locationRepository.findByTeamIdSinceId(teamId, sinceId)
-
+    override fun findByEventId(id: Long, perTeam: Int): Map<Team, Iterable<Location>> {
+        val event = eventService.findById(id) ?: throw NotFoundException("event with id $id does not exist")
+        return event.teams.filter(Team::hasStarted).parallelStream().map { team ->
+            val locations = this.findByTeamId(team.id!!, perTeam)
+            return@map mutableMapOf(team to locations)
+        }.reduce { acc: MutableMap<Team, Iterable<Location>>, team: Map<Team, Iterable<Location>> ->
+            acc.putAll(team.filter { it.value.toList().isNotEmpty() })
+            return@reduce acc
+        }.orElseGet { mutableMapOf<Team, Iterable<Location>>() }
     }
 
 }

@@ -1,37 +1,18 @@
 package backend.configuration;
 
-import org.apache.tomcat.jdbc.pool.DataSource;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import javax.sql.DataSource;
 
-import static backend.util.Profiles.HEROKU;
-import static backend.util.Profiles.STAGING;
-
-@Profile({HEROKU, STAGING})
 @Configuration
 public class DatasourceConfiguration {
 
     @Bean
-    public DataSource dataSource() throws URISyntaxException {
-        URI dbUri = new URI(System.getenv("CLEARDB_DATABASE_URL"));
-
-        String username = dbUri.getUserInfo().split(":")[0];
-        String password = dbUri.getUserInfo().split(":")[1];
-        String dbUrl = "jdbc:mysql://" + dbUri.getHost() + dbUri.getPath();
-
-        DataSource basicDataSource = new DataSource();
-        basicDataSource.setUrl(dbUrl);
-        basicDataSource.setUsername(username);
-        basicDataSource.setPassword(password);
-
-        basicDataSource.setTestWhileIdle(true);
-        basicDataSource.setTimeBetweenEvictionRunsMillis(30000);
-        basicDataSource.setValidationQuery("SELECT 1");
-
-        return basicDataSource;
+    @ConfigurationProperties(prefix = "org.breakout.db")
+    public DataSource dataSource() {
+        return DataSourceBuilder.create().build();
     }
 }

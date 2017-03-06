@@ -16,7 +16,6 @@ import backend.view.PostingView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -33,6 +32,7 @@ open class PostingController {
     private val configurationService: ConfigurationService
     private val logger: Logger
     private var JWT_SECRET: String
+    private var PAGE_SIZE: Int
     private val userService: UserService
 
     @Autowired
@@ -46,6 +46,7 @@ open class PostingController {
         this.configurationService = configurationService
         this.logger = LoggerFactory.getLogger(PostingController::class.java)
         this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
+        this.PAGE_SIZE = configurationService.getRequired("org.breakout.api.page_size").toInt()
         this.userService = userService
     }
 
@@ -118,41 +119,10 @@ open class PostingController {
      * GET /posting/
      * Gets all postings
      */
-    @Cacheable(cacheNames = arrayOf("allCache"), key = "'allPostings'", condition = "#limit == null && #userId == null")
     @RequestMapping("/", method = arrayOf(GET))
-    open fun getAllPostings(@RequestParam(value = "offset", required = false) offset: Int?,
-                            @RequestParam(value = "limit", required = false) limit: Int?,
+    open fun getAllPostings(@RequestParam(value = "page", required = false) page: Int?,
                             @RequestParam(value = "userid", required = false) userId: Long?): Iterable<PostingView> {
-        if (limit == null) {
-            logger.info("Getting all postings without cache")
-            return postingService.findAll().map { PostingView(it.hasLikesBy(userId)) }
-        } else {
-            val off = offset ?: 0
-            return postingService.findAll(off, limit).map { PostingView(it.hasLikesBy(userId)) }
-        }
-    }
-
-    /**
-     * POST /posting/get/ids/
-     * Gets postings with given ids
-     */
-    @RequestMapping("/get/ids", method = arrayOf(POST))
-    open fun getPostingsById(@Valid @RequestBody body: List<Long>, @RequestParam(value = "userid", required = false) userId: Long?): Iterable<PostingView> {
-
-        if (body.count() <= 0) {
-            return listOf()
-        }
-
-        return postingService.findAllByIds(body).map { PostingView(it.hasLikesBy(userId)) }
-    }
-
-    /**
-     * GET /posting/get/since/id/
-     * Gets all postings after a given posting
-     */
-    @RequestMapping("/get/since/{id}/", method = arrayOf(GET))
-    open fun getPostingIdsSince(@PathVariable("id") id: Long): Iterable<Long> {
-        return postingService.findAllIdsSince(id)
+        return postingService.findAll(page ?: 0, PAGE_SIZE).map { PostingView(it.hasLikesBy(userId)) }
     }
 
     /**
@@ -229,11 +199,11 @@ open class PostingController {
      * GET /posting/hashtag/{hashtag}/
      * Gets Likes for Posting
      */
-    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'hashtagPostings'.concat(#hashtag)", condition = "#userId == null")
     @RequestMapping("/hashtag/{hashtag}/", method = arrayOf(GET))
-    open fun getPostingsByHashtag(@PathVariable("hashtag") hashtag: String,
+    open fun getPostingsByHashtag(@RequestParam(value = "page", required = false) page: Int?,
+                                  @PathVariable("hashtag") hashtag: String,
                                   @RequestParam(value = "userid", required = false) userId: Long?): List<PostingView> {
-        val posting = postingService.findByHashtag(hashtag)
+        val posting = postingService.findByHashtag(hashtag, page ?: 0, PAGE_SIZE)
         return posting.map { PostingView(it.hasLikesBy(userId)) }
     }
 }

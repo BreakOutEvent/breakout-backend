@@ -11,10 +11,10 @@ import backend.model.user.Participant
 import backend.model.user.UserService
 import backend.util.localDateTimeOf
 import backend.view.LocationView
+import backend.view.TeamLocationView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -50,44 +50,23 @@ open class LocationController {
      * GET /event/{eventId}/location/
      * Return a list of all locations for a specific event
      */
-    @Cacheable(cacheNames = arrayOf("allCache"), key = "'eventLocation'.concat(#eventId)")
     @RequestMapping("/location/", method = arrayOf(GET))
-    open fun getAllLocationsForEvent(@PathVariable eventId: Long): Iterable<LocationView> {
-        logger.info("Getting event $eventId location without cache")
-        return locationService.findByEventId(eventId).map(::LocationView)
-    }
-
-    /**
-     * GET /event/{eventId}/location/since/{sinceId}/
-     * Return a list of locations for a specific event since given id
-     */
-    @RequestMapping("/location/since/{sinceId}/", method = arrayOf(GET))
-    open fun getLocationsForEventSince(@PathVariable("eventId") eventId: Long,
-                                       @PathVariable("sinceId") sinceId: Long): Iterable<LocationView> {
-        return locationService.findByEventIdSinceId(eventId, sinceId).map(::LocationView)
+    open fun getAllLocationsForEvent(@PathVariable eventId: Long,
+                                     @RequestParam(value = "perTeam", required = false) perTeam: Int?): Iterable<TeamLocationView> {
+        return locationService.findByEventId(eventId, perTeam ?: 20).map { data ->
+            TeamLocationView(data.key, data.value)
+        }
     }
 
     /**
      * GET /event/{eventId}/team/{teamId}/location/
      * Return a list of all locations for a certain team at a certain event
      */
-    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'teamLocation'.concat(#teamId)")
     @RequestMapping("/team/{teamId}/location/", method = arrayOf(GET))
     open fun getAllLocationsForEventAndTeam(@PathVariable("eventId") eventId: Long,
-                                            @PathVariable("teamId") teamId: Long): Iterable<LocationView> {
-        logger.info("Getting team $teamId location without cache")
-        return locationService.findByTeamId(teamId).map(::LocationView)
-    }
-
-    /**
-     * GET /event/{eventId}/team/{teamId}/location/since/{sinceId}/
-     * Return a list of locations for a certain team at a certain event since given id
-     */
-    @RequestMapping("/team/{teamId}/location/since/{sinceId}/", method = arrayOf(GET))
-    open fun getLocationsForEventAndTeamSince(@PathVariable("eventId") eventId: Long,
-                                              @PathVariable("teamId") teamId: Long,
-                                              @PathVariable("sinceId") sinceId: Long): Iterable<LocationView> {
-        return locationService.findByTeamIdSince(teamId, sinceId).map(::LocationView)
+                                            @PathVariable("teamId") teamId: Long,
+                                            @RequestParam(value = "perTeam", required = false) perTeam: Int?): Iterable<LocationView> {
+        return locationService.findByTeamId(teamId, perTeam ?: 20).map(::LocationView)
     }
 
     /**

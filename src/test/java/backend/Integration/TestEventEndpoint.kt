@@ -154,8 +154,7 @@ class TestEventEndpoint : IntegrationTest() {
         val response = mockMvc.perform (request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.linear_distance").exists())
-                .andExpect(jsonPath("$.actual_distance").exists())
+                .andExpect(jsonPath("$.distance").exists())
                 .andReturn().response.contentAsString
 
         println(response)
@@ -169,10 +168,10 @@ class TestEventEndpoint : IntegrationTest() {
         val response = mockMvc.perform (request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.sponsoring_sum").exists())
-                .andExpect(jsonPath("$.challenges_with_proof_sum").exists())
-                .andExpect(jsonPath("$.challenges_accepted_proof_sum").exists())
-                .andExpect(jsonPath("$.full_sum").exists())
+                .andExpect(jsonPath("$.sponsorSum").exists())
+                .andExpect(jsonPath("$.withProofSum").exists())
+                .andExpect(jsonPath("$.acceptedProofSum").exists())
+                .andExpect(jsonPath("$.fullSum").exists())
                 .andReturn().response.contentAsString
 
         println(response)

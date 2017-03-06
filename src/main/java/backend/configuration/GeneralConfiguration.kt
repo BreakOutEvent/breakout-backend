@@ -32,10 +32,11 @@ class CustomLoggingFilter : AbstractRequestLoggingFilter() {
     }
 
     override fun beforeRequest(request: HttpServletRequest, message: String) {
-        logger.debug("${request.method} ${request.requestURI} - ${request.getHeader("User-Agent")}")
+        request.setAttribute("timing", System.currentTimeMillis())
     }
 
     override fun afterRequest(request: HttpServletRequest, message: String) {
+        logger.debug("${System.currentTimeMillis() - request.getAttribute("timing") as Long}ms ${request.method} ${request.requestURI} - ${request.getHeader("User-Agent")}")
     }
 
 }

@@ -2,7 +2,6 @@ package backend.model.sponsoring
 
 import backend.model.user.Address
 import backend.model.user.Sponsor
-import backend.model.user.UserAccount
 
 interface ISponsor {
     // TODO: Was braucht ein Sponsor??

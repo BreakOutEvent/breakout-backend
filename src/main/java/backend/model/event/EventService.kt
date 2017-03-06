@@ -2,7 +2,7 @@ package backend.model.event
 
 import backend.model.location.Location
 import backend.model.misc.Coord
-import java.math.BigDecimal
+import backend.util.data.DonateSums
 import java.time.LocalDateTime
 
 interface EventService {
@@ -34,7 +34,7 @@ interface EventService {
 
     fun getLocationMaxDistanceByIdEachTeam(id: Long): List<Location>
 
-    fun getDistance(id: Long): Map<String, Double>
+    fun getDistance(id: Long): Double
 
-    fun getDonateSum(id: Long): Map<String, BigDecimal>
+    fun getDonateSum(id: Long): DonateSums
 }
