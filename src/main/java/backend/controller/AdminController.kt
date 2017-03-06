@@ -22,6 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod.GET
+import org.springframework.web.bind.annotation.RequestMethod.POST
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.math.BigDecimal
@@ -78,7 +79,7 @@ open class AdminController {
      * Send emails for specific identifiers
      */
     @PreAuthorize("hasAuthority('ADMIN')")
-    @RequestMapping("/email/{identifier}/send/")
+    @RequestMapping("/email/{identifier}/send/", method = arrayOf(POST))
     open fun sendEmail(@PathVariable identifier: String): Map<String, String> {
         when (identifier) {
             "SPONSOR_EVENT_STARTED" -> sponsoringService.sendEmailsToSponsorsWhenEventHasStarted()
@@ -95,7 +96,7 @@ open class AdminController {
      * Send emails for specific identifiers
      */
     @PreAuthorize("hasAuthority('ADMIN')")
-    @RequestMapping("/email/{identifier}/generate/")
+    @RequestMapping("/email/{identifier}/generate/", method = arrayOf(GET))
     open fun generateEmail(@PathVariable identifier: String,
                            @RequestParam(value = "save", required = false) save: String?,
                            @RequestParam(value = "invoices", required = false) invoices: String?): List<Map<String, Any>> {

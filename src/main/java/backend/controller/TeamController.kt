@@ -13,19 +13,18 @@ import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserService
 import backend.services.ConfigurationService
+import backend.util.data.DonateSums
 import backend.util.getSignedJwtToken
 import backend.view.InvitationView
 import backend.view.TeamView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.*
-import java.math.BigDecimal
 import javax.validation.Valid
 
 @RestController
@@ -122,7 +121,7 @@ open class TeamController {
         checkAuthenticationForEditTeam(team, user)
 
         body.hasStarted?.let {
-            if(user.hasRole(Admin::class)) team.hasStarted = it
+            if (user.hasRole(Admin::class)) team.hasStarted = it
             else throw UnauthorizedException("Only an admin can change the hasStarted property of a team")
         }
 
@@ -157,7 +156,7 @@ open class TeamController {
                         @PathVariable teamId: Long,
                         @Valid @RequestBody body: Map<String, Any>): Map<String, String> {
 
-        if (eventService.exists(eventId) == false) throw NotFoundException("No event with id $eventId")
+        if (!eventService.exists(eventId)) throw NotFoundException("No event with id $eventId")
 
         val team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId")
         val emailString = body["email"] as? String ?: throw BadRequestException("body is missing field email")
@@ -180,7 +179,7 @@ open class TeamController {
                       @Valid @RequestBody body: Map<String, String>): TeamView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
-        if (eventService.exists(eventId) == false) throw NotFoundException("No event with id $eventId")
+        if (!eventService.exists(eventId)) throw NotFoundException("No event with id $eventId")
 
         val team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId")
         val emailString = body["email"] ?: throw BadRequestException("body is missing field email")
@@ -198,10 +197,8 @@ open class TeamController {
      * GET /event/{eventId}/team/{teamId}/
      * gets a specific Team
      */
-    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'team'.concat(#teamId)")
     @RequestMapping("/{teamId}/", method = arrayOf(GET))
     open fun showTeam(@PathVariable teamId: Long): TeamView {
-        logger.info("Getting team $teamId without cache")
         val team = teamService.findOne(teamId) ?: throw NotFoundException("team with id $teamId does not exist")
         val teamDonateSum = teamService.getDonateSum(teamId)
         val teamDistance = teamService.getDistance(teamId)
@@ -212,10 +209,8 @@ open class TeamController {
      * GET /event/{eventId}/team/
      * gets all Teams for Event
      */
-    @Cacheable(cacheNames = arrayOf("allCache"), key = "'allTeams'.concat(#eventId)")
     @RequestMapping("/", method = arrayOf(GET))
     open fun showTeamsByEvent(@PathVariable eventId: Long): Iterable<TeamView> {
-        logger.info("Getting team by event $eventId without cache")
         val teams = teamService.findByEventId(eventId)
         return teams.map {
             val teamDonateSum = teamService.getDonateSum(it)
@@ -231,7 +226,6 @@ open class TeamController {
      */
     @RequestMapping("/{teamId}/posting/", method = arrayOf(GET))
     open fun getTeamPostingIds(@PathVariable teamId: Long): List<Long> {
-        logger.info("Getting team $teamId postings without cache")
         val postingIds = teamService.findPostingsById(teamId)
         return postingIds
     }
@@ -244,21 +238,17 @@ open class TeamController {
      * Actual distance = |A -> B| + |B -> C|
      * Linear distance = |A -> C|
      */
-    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'teamDistance'.concat(#teamId)")
     @RequestMapping("/{id}/distance/", method = arrayOf(GET))
     open fun getTeamDistance(@PathVariable("id") teamId: Long): Map<String, Double> {
-        logger.info("Getting team $teamId distance without cache")
-        return teamService.getDistance(teamId)
+        return mapOf("distance" to teamService.getDistance(teamId))
     }
 
     /**
      * GET /event/{eventId}/team/{id}/donatesum/
      * Get the sponsored sums per team
      */
-    @Cacheable(cacheNames = arrayOf("singleCache"), key = "'teamDonateSum'.concat(#teamId)")
     @RequestMapping("/{id}/donatesum/", method = arrayOf(GET))
-    open fun getTeamDonateSum(@PathVariable("id") teamId: Long): Map<String, BigDecimal> {
-        logger.info("Getting team $teamId donate sum without cache")
+    open fun getTeamDonateSum(@PathVariable("id") teamId: Long): DonateSums {
         return teamService.getDonateSum(teamId)
     }
 }

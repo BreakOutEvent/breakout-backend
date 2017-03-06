@@ -45,15 +45,9 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
         this.save(from)
     }
 
-    override fun findAllIdsSince(id: Long): List<Long> = repository.findAllIdsSince(id)
-
-    override fun findAllByIds(body: List<Long>): Iterable<Posting> = repository.findAllByIds(body)
-
     override fun save(posting: Posting): Posting = repository.save(posting)!!
 
-    override fun findAll(offset: Int, limit: Int): List<Posting> = repository.findAllByOrderByIdDesc(PageRequest(offset, limit))
-
-    override fun findAll(): List<Posting> = repository.findAllByOrderByIdDesc()
+    override fun findAll(page: Int, size: Int): List<Posting> = repository.findAllByOrderByIdDesc(PageRequest(page, size))
 
     @Transactional
     override fun savePostingWithLocationAndMedia(text: String?,
@@ -92,7 +86,7 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
 
     override fun getByID(id: Long): Posting? = repository.findById(id)
 
-    override fun findByHashtag(hashtag: String): List<Posting> = repository.findByHashtag(hashtag)
+    override fun findByHashtag(hashtag: String, page: Int, size: Int): List<Posting> = repository.findByHashtag(hashtag, PageRequest(page, size))
 
     @Transactional
     override fun delete(posting: Posting) {

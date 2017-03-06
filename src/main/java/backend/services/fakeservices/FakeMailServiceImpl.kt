@@ -6,6 +6,7 @@ import backend.services.ConfigurationService
 import backend.services.MailService
 import backend.services.MailServiceImpl
 import backend.util.Profiles.DEVELOPMENT
+import backend.util.Profiles.STAGING
 import backend.util.Profiles.TEST
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,7 +17,7 @@ import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 
 @Service
-@Profile(DEVELOPMENT, TEST)
+@Profile(DEVELOPMENT, TEST, STAGING)
 class FakeMailServiceImpl @Autowired constructor(restTemplate: RestOperations, configurationService: ConfigurationService, emailRepository: EmailRepository) : MailService by MailServiceImpl(restTemplate, configurationService, emailRepository) {
 
     private val logger = LoggerFactory.getLogger(FakeMailServiceImpl::class.java)

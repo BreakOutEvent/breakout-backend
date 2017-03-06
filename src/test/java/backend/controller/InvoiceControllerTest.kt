@@ -6,11 +6,9 @@ import backend.model.misc.Coord
 import backend.model.payment.SponsoringInvoice
 import backend.model.user.Admin
 import backend.model.user.Participant
-import backend.model.user.Sponsor
 import backend.model.user.User
 import backend.testHelper.asUser
 import backend.testHelper.json
-import backend.util.euroOf
 import org.javamoney.moneta.Money
 import org.junit.Before
 import org.junit.Test

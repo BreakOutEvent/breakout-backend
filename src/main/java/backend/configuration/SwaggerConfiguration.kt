@@ -2,7 +2,8 @@
 
 package backend.configuration
 
-import backend.util.Profiles
+import backend.util.Profiles.DEVELOPMENT
+import backend.util.Profiles.STAGING
 import com.google.common.base.Predicates
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -16,7 +17,7 @@ import springfox.documentation.swagger.web.UiConfiguration
 import springfox.documentation.swagger2.annotations.EnableSwagger2
 
 @Configuration
-@Profile(Profiles.DEVELOPMENT)
+@Profile(DEVELOPMENT, STAGING)
 @EnableSwagger2
 open class SwaggerConfiguration {
 
