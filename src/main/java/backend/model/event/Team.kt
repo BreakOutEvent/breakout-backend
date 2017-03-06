@@ -3,12 +3,17 @@ package backend.model.event
 import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.challenges.Challenge
+import backend.model.challenges.ChallengeStatus.PROOF_ACCEPTED
+import backend.model.challenges.ChallengeStatus.WITH_PROOF
 import backend.model.location.Location
 import backend.model.media.Media
 import backend.model.misc.EmailAddress
 import backend.model.payment.TeamEntryFeeInvoice
+import backend.model.payment.billableAmount
 import backend.model.sponsoring.Sponsoring
 import backend.model.user.Participant
+import backend.util.data.ChallengeDonateSums
+import backend.util.parallelStream
 import org.javamoney.moneta.Money
 import java.math.BigDecimal
 import java.util.*
@@ -155,5 +160,28 @@ class Team : BasicEntity {
      */
     fun getCurrentDistance(): Double {
         return this.locations.maxBy { it.distance }?.distance ?: 0.0
+    }
+
+    fun raisedAmountFromChallenges(): ChallengeDonateSums {
+        return this.challenges.parallelStream()
+                .map { challenge ->
+                    when (challenge.status) {
+                        WITH_PROOF -> ChallengeDonateSums(challenge.amount.numberStripped, BigDecimal.ZERO)
+                        PROOF_ACCEPTED -> ChallengeDonateSums(BigDecimal.ZERO, challenge.amount.numberStripped)
+                        else -> ChallengeDonateSums(BigDecimal.ZERO, BigDecimal.ZERO)
+                    }
+                }
+                .reduce { acc: ChallengeDonateSums, one: ChallengeDonateSums ->
+                    ChallengeDonateSums(
+                            acc.withProofSum + one.withProofSum,
+                            acc.acceptedProofSum + one.acceptedProofSum)
+                }
+                .orElseGet {
+                    ChallengeDonateSums(BigDecimal.ZERO, BigDecimal.ZERO)
+                }
+    }
+
+    fun raisedAmountFromSponsorings(): Money {
+        return this.sponsoring.billableAmount()
     }
 }
