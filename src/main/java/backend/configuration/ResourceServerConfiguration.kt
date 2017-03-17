@@ -28,8 +28,8 @@ open class ResourceServerConfiguration : ResourceServerConfigurerAdapter() {
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity?) {
         http!!.authorizeRequests()
-                .antMatchers("/oauth/*").permitAll()
                 .antMatchers(HttpMethod.PUT, "/user/{id}/*").authenticated()
-                .antMatchers(HttpMethod.GET, "/user/{id}/*").permitAll() //TODO: Add routes which should be secured
+                .antMatchers(HttpMethod.GET, "/user/{id}/*").permitAll()
+                .antMatchers("/oauth/*").permitAll()//TODO: Add routes which should be secured
     }
 }
