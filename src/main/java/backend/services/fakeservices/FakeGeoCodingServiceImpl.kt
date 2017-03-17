@@ -5,6 +5,7 @@ import backend.services.ConfigurationService
 import backend.services.GeoCodingService
 import backend.services.GeoCodingServiceImpl
 import backend.util.Profiles.DEVELOPMENT
+import backend.util.Profiles.STAGING
 import backend.util.Profiles.TEST
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -13,7 +14,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 
 @Service
-@Profile(DEVELOPMENT, TEST)
+@Profile(DEVELOPMENT, TEST , STAGING)
 class FakeGeoCodingServiceImpl @Autowired constructor(configurationService: ConfigurationService) : GeoCodingService by GeoCodingServiceImpl(configurationService) {
 
     val logger: Logger = LoggerFactory.getLogger(FakeGeoCodingServiceImpl::class.java)

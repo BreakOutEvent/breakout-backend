@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 
 @Service
-@Profile(PRODUCTION, STAGING)
+@Profile(PRODUCTION)
 class GeoCodingServiceImpl : GeoCodingService {
 
     private val apiKey: String
