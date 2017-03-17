@@ -4,7 +4,7 @@ echo "TRAVIS_TAG: $TRAVIS_TAG"
 
 if [ ! -z "$TRAVIS_TAG" ]; then
     echo "This will push to docker"
-    openssl aes-256-cbc -K $encrypted_a6989f7c6f70_key -iv $encrypted_a6989f7c6f70_iv -in secrets.zip.enc -out secrets.zip -d
+    openssl aes-256-cbc -K $encrypted_45a186a5bfd7_key -iv $encrypted_45a186a5bfd7_iv -in secrets.zip.enc -out secrets.zip -d
     unzip secrets.zip
     mv application-production.properties src/main/resources/application-production.properties
     mv application-staging.properties src/main/resources/application-staging.properties
