@@ -1,6 +1,9 @@
-[![Stories in Ready](https://badge.waffle.io/BreakOutEvent/breakout-backend.png?label=ready&title=Ready)](https://waffle.io/BreakOutEvent/breakout-backend)
-[![Build Status](https://travis-ci.org/BreakOutEvent/breakout-backend.svg?branch=develop)](https://travis-ci.org/BreakOutEvent/breakout-backend)
+
 ![BreakOut-Logo](https://static.break-out.org/breakout-logo.png "BreakOut")
+
+
+[![Build Status](https://travis-ci.org/BreakOutEvent/breakout-backend.svg?branch=develop)](https://travis-ci.org/BreakOutEvent/breakout-backend)
+
 # breakout-backend
 
 This is the backend application for BreakOut. 
