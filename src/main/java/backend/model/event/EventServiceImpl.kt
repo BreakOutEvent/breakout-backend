@@ -1,6 +1,7 @@
 package backend.model.event
 
 import backend.controller.exceptions.NotFoundException
+import backend.model.cache.CacheService
 import backend.model.location.Location
 import backend.model.misc.Coord
 import backend.util.data.DonateSums
@@ -12,7 +13,16 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 
 @Service
-class EventServiceImpl @Autowired constructor(val repository: EventRepository, val teamService: TeamService) : EventService {
+class EventServiceImpl @Autowired constructor(val repository: EventRepository,
+                                              val teamService: TeamService,
+                                              val cacheService: CacheService) : EventService {
+
+    override fun regenerateCache() {
+        findAll().forEach { event ->
+            cacheService.updateCache("Event_${event.id}_Distance", mapOf("distance" to getDistance(event.id!!)))
+            cacheService.updateCache("Event_${event.id}_DonateSum", getDonateSum(event.id!!))
+        }
+    }
 
     override fun exists(id: Long) = this.repository.exists(id)
 

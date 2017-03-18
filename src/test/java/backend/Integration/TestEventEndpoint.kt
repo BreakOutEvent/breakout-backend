@@ -37,6 +37,8 @@ class TestEventEndpoint : IntegrationTest() {
                 city = "Munich",
                 startingLocation = Coord(0.0, 0.0),
                 duration = 36)
+
+        eventService.regenerateCache()
     }
 
     @Test
@@ -134,7 +136,7 @@ class TestEventEndpoint : IntegrationTest() {
         val request = get("/event/${event.id}/posting/")
 
         //TODO create Users & Posts
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$").isArray)
@@ -151,7 +153,7 @@ class TestEventEndpoint : IntegrationTest() {
         val request = get("/event/${event.id}/distance/")
 
         //TODO check actual values with dummy data
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.distance").exists())
@@ -165,7 +167,7 @@ class TestEventEndpoint : IntegrationTest() {
         val request = get("/event/${event.id}/donatesum/")
 
         //TODO check actual values with dummy data
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.sponsorSum").exists())

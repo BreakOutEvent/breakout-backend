@@ -37,4 +37,6 @@ interface EventService {
     fun getDistance(id: Long): Double
 
     fun getDonateSum(id: Long): DonateSums
+
+    fun regenerateCache()
 }

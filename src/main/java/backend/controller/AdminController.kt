@@ -78,11 +78,7 @@ open class AdminController {
     open fun regenerateCache(): String {
         logger.info("Regenerating caches from admin request")
 
-        eventService.findAll().forEach { event ->
-            cacheService.updateCache("Event_${event.id}_Distance", mapOf("distance" to eventService.getDistance(event.id!!)))
-            cacheService.updateCache("Event_${event.id}_DonateSum", eventService.getDonateSum(event.id!!))
-        }
-
+        eventService.regenerateCache()
         return "done"
     }
 
