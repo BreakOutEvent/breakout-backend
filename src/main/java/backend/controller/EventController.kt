@@ -1,9 +1,9 @@
 package backend.controller
 
 import backend.controller.exceptions.NotFoundException
+import backend.model.cache.CacheService
 import backend.model.event.EventService
 import backend.model.misc.Coord
-import backend.util.data.DonateSums
 import backend.view.EventView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -22,11 +22,13 @@ import javax.validation.Valid
 open class EventController {
 
     open var eventService: EventService
+    open var cacheService: CacheService
     private var logger: Logger
 
     @Autowired
-    constructor(eventService: EventService) {
+    constructor(eventService: EventService, cacheService: CacheService) {
         this.eventService = eventService
+        this.cacheService = cacheService
         this.logger = LoggerFactory.getLogger(EventController::class.java)
     }
 
@@ -83,8 +85,8 @@ open class EventController {
      * Returns the sum of the distance of all teams of the event with {id}
      */
     @RequestMapping("/{id}/distance/", method = arrayOf(GET))
-    open fun getEventDistance(@PathVariable("id") id: Long): Map<String, Double> {
-        return mapOf("distance" to eventService.getDistance(id))
+    open fun getEventDistance(@PathVariable("id") id: Long): Any {
+        return cacheService.getCache("Event_${id}_Distance")
     }
 
     /**
@@ -92,7 +94,7 @@ open class EventController {
      * Returns the sum of the distance of all teams of the event with {id}
      */
     @RequestMapping("/{id}/donatesum/", method = arrayOf(GET))
-    open fun getEventDonateSum(@PathVariable("id") id: Long): DonateSums {
-        return eventService.getDonateSum(id)
+    open fun getEventDonateSum(@PathVariable("id") id: Long): Any {
+        return cacheService.getCache("Event_${id}_DonateSum")
     }
 }

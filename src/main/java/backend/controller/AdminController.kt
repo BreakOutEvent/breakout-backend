@@ -1,9 +1,11 @@
 package backend.controller
 
 import backend.controller.exceptions.NotFoundException
+import backend.model.cache.CacheService
 import backend.model.challenges.Challenge
 import backend.model.challenges.ChallengeService
 import backend.model.challenges.ChallengeStatus
+import backend.model.event.EventService
 import backend.model.event.TeamService
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
@@ -40,6 +42,8 @@ open class AdminController {
     private val userService: UserService
     private val emailRepository: EmailRepository
     private val sponsoringInvoiceService: SponsoringInvoiceService
+    private val eventService: EventService
+    private val cacheService: CacheService
     private val logger: Logger
 
     @Autowired
@@ -49,6 +53,8 @@ open class AdminController {
                 challengeService: ChallengeService,
                 userService: UserService,
                 emailRepository: EmailRepository,
+                eventService: EventService,
+                cacheService: CacheService,
                 sponsoringInvoiceService: SponsoringInvoiceService) {
 
         this.mailService = mailService
@@ -58,7 +64,26 @@ open class AdminController {
         this.challengeService = challengeService
         this.emailRepository = emailRepository
         this.sponsoringInvoiceService = sponsoringInvoiceService
+        this.eventService = eventService
+        this.cacheService = cacheService
         this.logger = LoggerFactory.getLogger(AdminController::class.java)
+    }
+
+
+    /**
+     * GET /admin/regeneratecache/
+     * Allows Admin to resend failed mails
+     */
+    @RequestMapping("/regeneratecache/", method = arrayOf(GET))
+    open fun regenerateCache(): String {
+        logger.info("Regenerating caches from admin request")
+
+        eventService.findAll().forEach { event ->
+            cacheService.updateCache("Event_${event.id}_Distance", mapOf("distance" to eventService.getDistance(event.id!!)))
+            cacheService.updateCache("Event_${event.id}_DonateSum", eventService.getDonateSum(event.id!!))
+        }
+
+        return "done"
     }
 
     /**
