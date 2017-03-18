@@ -17,6 +17,7 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository,
                                               val teamService: TeamService,
                                               val cacheService: CacheService) : EventService {
 
+    @Transactional
     override fun regenerateCache() {
         findAll().forEach { event ->
             cacheService.updateCache("Event_${event.id}_Distance", mapOf("distance" to getDistance(event.id!!)))

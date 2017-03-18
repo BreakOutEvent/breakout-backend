@@ -13,7 +13,6 @@ class Cache {
     @Column(columnDefinition = "TEXT")
     lateinit var cacheData: Any
 
-
     @Column
     var createdAt: LocalDateTime? = null
 
