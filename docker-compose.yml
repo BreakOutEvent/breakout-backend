@@ -16,6 +16,8 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=${BACKEND_PROFILE}
       - CLEARDB_DATABASE_URL=mysql://root:rootpassword@mariadb/breakout?reconnect=true
+    depends_on:
+      - mariadb
   frontend:
     container_name: frontend
     image: docker.breakout.xyz:5000/breakout-frontend:${FRONTEND_VERSION}
@@ -26,6 +28,9 @@ services:
     volumes:
       - ./img:/src/public/img/uploads
       - ./logs/live:/src/logs
+    depends_on:
+      - mongodb
+      - backend
   mongodb:
     container_name: mongodb
     image: mongo
