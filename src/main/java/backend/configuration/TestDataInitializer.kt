@@ -25,7 +25,7 @@ import java.time.LocalDateTime
 import javax.annotation.PostConstruct
 
 @Service
-@Profile(HEROKU, STAGING)
+@Profile(HEROKU)
 class TestDataInitializer {
 
     // Services
