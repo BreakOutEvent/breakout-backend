@@ -1,3 +1,5 @@
+USE `${BREAKOUT}`;
+
 -- A participant can be part of multiple teams (because he could have participated at previous events)
 -- Therefore we need to support that by adding a new join table to show all teams a participant is / was part of
 CREATE TABLE user_role_teams

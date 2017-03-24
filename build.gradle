@@ -8,9 +8,10 @@ buildscript {
         jcenter()
         maven { url "https://jitpack.io" }
     }
+
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.3.5.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE")
 
     }
 }
@@ -19,7 +20,7 @@ apply plugin: 'java'
 apply plugin: 'kotlin'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
 
 jar {
     version = '0.1.0'
@@ -64,6 +65,7 @@ dependencies {
     compile 'com.auth0:java-jwt:2.1.0'
     compile 'com.github.grumlimited:geocalc:v0.5.1'
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.7.4"
+    compile "org.flywaydb:flyway-core:4.1.2"
 
     testCompile "org.powermock:powermock-module-junit4:$powermock_version"
     testCompile "org.powermock:powermock-api-mockito:$powermock_version"

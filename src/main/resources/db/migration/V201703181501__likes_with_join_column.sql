@@ -1,4 +1,6 @@
-CREATE TABLE `posting_likes` (
+USE `${BREAKOUT}`;
+
+CREATE TABLE IF NOT EXISTS `posting_likes` (
   `posting_id` bigint(20) NOT NULL,
   `like_id` bigint(20) NOT NULL,
   PRIMARY KEY (`posting_id`,`like_id`),

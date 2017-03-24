@@ -1,4 +1,6 @@
-CREATE TABLE `posting_comments` (
+USE `${BREAKOUT}`;
+
+CREATE TABLE IF NOT EXISTS `posting_comments` (
   `posting_id` bigint(20) NOT NULL,
   `comments_id` bigint(20) NOT NULL,
   UNIQUE KEY `UK_e24nwt6jvxa7kbxnx5i5qjl64` (`comments_id`),
