@@ -1,5 +1,6 @@
 package backend.model.event
 
+import backend.exceptions.DomainException
 import backend.model.location.Location
 import backend.model.misc.Coord
 import backend.model.misc.EmailAddress
@@ -10,6 +11,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.powermock.api.mockito.PowerMockito.mock
 import org.powermock.core.classloader.annotations.PrepareForTest
@@ -19,7 +21,7 @@ import kotlin.test.assertFails
 import kotlin.test.assertFailsWith
 
 @RunWith(PowerMockRunner::class)
-@PrepareForTest(Location::class)
+@PrepareForTest(Location::class, Event::class)
 class TeamTest {
 
     lateinit var event: Event
@@ -157,6 +159,41 @@ class TeamTest {
         team.locations.addAll(listOf(location1, location2, location3))
 
         assertEquals(20.0, team.getCurrentDistance(), 0.0)
+    }
+
+    @Test
+    fun testUserEventsSetCorrectly() {
+        val user = User.create("firstname@example.com", "pw").addRole(Participant::class)
+        val mockEvent1 = mock(Event::class.java)
+        val mockEvent2 = mock(Event::class.java)
+        val team1 = Team(user, "", "", mockEvent1)
+        val team2 = Team(user, "", "", mockEvent2)
+
+        assertEquals(team2, user.getCurrentTeam())
+        assertTrue(user.getAllTeams().contains(team1))
+        assertTrue(user.getAllTeams().contains(team2))
+    }
+
+    @Test
+    fun testCantJoinMultipleTeamsAtSameEvent() {
+        val user = User.create("firstname@example.com", "pw").addRole(Participant::class)
+        val mockEvent = mock(Event::class.java)
+        val team1 = Team(user, "", "", mockEvent)
+
+        assertFails { Team(user, "", "", mockEvent) }
+        assertEquals(team1, user.getCurrentTeam())
+        assertTrue(user.getAllTeams().contains(team1))
+        assertEquals(1, user.getAllTeams().size)
+    }
+
+    @Test
+    fun givenThatAUserHasBeenInATeamAtAnEvent_whenCreatingANewTeamForThatEvent_thenAnExceptionOccurs() {
+        val anotherEvent = mock(Event::class.java)
+        val anotherTeam = Team(creator, "", "", anotherEvent)
+
+        assertFailsWith(DomainException::class) {
+            Team(creator, "", "", event)
+        }
     }
 
     @Test

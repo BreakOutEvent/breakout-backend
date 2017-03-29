@@ -3,6 +3,7 @@
 package backend.model.user
 
 import backend.exceptions.DomainException
+import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.location.Location
 import java.time.LocalDate
@@ -22,7 +23,7 @@ class Participant : UserRole {
     @ManyToOne
     private var currentTeam: Team? = null
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "members")
     private var teams: MutableSet<Team>
 
     @OneToMany(mappedBy = "uploader")
@@ -78,5 +79,11 @@ class Participant : UserRole {
             throw DomainException("Can't remove team ${team.id} from participant $id. " +
                     "The participant has never been a part of this team")
         }
+    }
+
+    fun participatedAtEvent(event: Event): Boolean {
+        return this.getAllTeams()
+                .filter { it.event == event }
+                .isNotEmpty()
     }
 }
