@@ -10,6 +10,7 @@ import backend.model.payment.TeamEntryFeeService
 import backend.model.user.Admin
 import backend.model.user.Participant
 import backend.model.user.UserService
+import backend.services.ConfigurationService
 import backend.view.PaymentView
 import backend.view.SponsoringInvoiceView
 import backend.view.TeamEntryFeeInvoiceView
@@ -19,12 +20,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RequestMethod.POST
-import org.springframework.web.bind.annotation.RestController
 import java.math.BigDecimal
 import javax.validation.Valid
 
@@ -36,15 +34,23 @@ open class InvoiceController {
     private val sponsoringInvoiceService: SponsoringInvoiceService
     private val teamService: TeamService
     private val userService: UserService
+    private val configurationService: ConfigurationService
     private val logger: Logger
+    private var PAYMENT_AUTH_TOKEN: String
 
     @Autowired
-    constructor(teamEntryFeeService: TeamEntryFeeService, userService: UserService, sponsoringInvoiceService: SponsoringInvoiceService, teamService: TeamService) {
+    constructor(teamEntryFeeService: TeamEntryFeeService,
+                userService: UserService,
+                sponsoringInvoiceService: SponsoringInvoiceService,
+                teamService: TeamService,
+                configurationService: ConfigurationService) {
         this.teamEntryFeeService = teamEntryFeeService
         this.sponsoringInvoiceService = sponsoringInvoiceService
         this.userService = userService
         this.teamService = teamService
         this.logger = LoggerFactory.getLogger(InvoiceController::class.java)
+        this.configurationService = configurationService
+        this.PAYMENT_AUTH_TOKEN = configurationService.getRequired("org.breakout.api.payment_auth_token")
     }
 
     /**
@@ -53,9 +59,9 @@ open class InvoiceController {
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping("/{invoiceId}/payment/", method = arrayOf(POST))
-    open fun createPayment(@PathVariable invoiceId: Long,
-                           @Valid @RequestBody paymentView: PaymentView,
-                           @AuthenticationPrincipal customUserDetails: CustomUserDetails): Any {
+    open fun createAdminPayment(@PathVariable invoiceId: Long,
+                                @Valid @RequestBody paymentView: PaymentView,
+                                @AuthenticationPrincipal customUserDetails: CustomUserDetails): Any {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val teamFeeInvoice = teamEntryFeeService.findById(invoiceId)
@@ -74,6 +80,36 @@ open class InvoiceController {
         }
 
         throw NotFoundException("No invoice with id $invoiceId found")
+    }
+
+
+    /**
+     * POST /invoice/payment/{purposeOfTransferCode}/
+     * Allows admin to add payment to given invoice
+     */
+    @RequestMapping("/payment/{purposeOfTransferCode}/", method = arrayOf(POST))
+    open fun createPayment(@PathVariable purposeOfTransferCode: String,
+                           @RequestHeader("X-AUTH-TOKEN") authToken: String,
+                           @Valid @RequestBody paymentView: PaymentView): Any {
+
+        if (authToken != PAYMENT_AUTH_TOKEN) throw UnauthorizedException("Invalid Payment-Auth Token")
+
+        val teamFeeInvoice = teamEntryFeeService.findByPurposeOfTransferCode(purposeOfTransferCode)
+        val sponsoringInvoice = sponsoringInvoiceService.findByPurposeOfTransferCode(purposeOfTransferCode)
+        val amount = Money.of(BigDecimal.valueOf(paymentView.amount!!), "EUR")
+
+        if (teamFeeInvoice != null) {
+            val savedInvoice = teamEntryFeeService.addPaymentServicePaymentToInvoice(amount, teamFeeInvoice)
+            return TeamEntryFeeInvoiceView(savedInvoice)
+        }
+
+        if (sponsoringInvoice != null) {
+            val savedInvoice = sponsoringInvoiceService.addPaymentServicePaymentToInvoice(amount, sponsoringInvoice)
+            return SponsoringInvoiceView(savedInvoice)
+        }
+
+        throw NotFoundException("No invoice with purpose of transfer code $purposeOfTransferCode found")
+
     }
 
 
@@ -99,7 +135,7 @@ open class InvoiceController {
     open fun getAllSponsorInvoicesForTeam(@PathVariable teamId: Long,
                                           @AuthenticationPrincipal cud: CustomUserDetails): Iterable<SponsoringInvoiceView> {
         val user = userService.getUserFromCustomUserDetails(cud)
-        if(user.hasRole(Admin::class)) {
+        if (user.hasRole(Admin::class)) {
             val invoices = sponsoringInvoiceService.findByTeamId(teamId)
             return invoices.map(::SponsoringInvoiceView)
         }
@@ -107,7 +143,7 @@ open class InvoiceController {
         val team = teamService.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")
         val participant = user.getRole(Participant::class) ?: throw UnauthorizedException("User not admin or member of team")
 
-        if(team.isMember(participant)) {
+        if (team.isMember(participant)) {
             val invoices = sponsoringInvoiceService.findByTeamId(teamId)
             return invoices.map(::SponsoringInvoiceView)
         } else throw UnauthorizedException("User not part of team")

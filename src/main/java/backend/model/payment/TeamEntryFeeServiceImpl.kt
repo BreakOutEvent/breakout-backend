@@ -78,5 +78,14 @@ class TeamEntryFeeServiceImpl : TeamEntryFeeService {
     override fun findById(id: Long): TeamEntryFeeInvoice? {
         return teamEntryFeeInvoiceRepository.findOne(id)
     }
+
+    @Transactional
+    override fun findByPurposeOfTransferCode(purposeOfTransferCode: String): TeamEntryFeeInvoice? {
+        return teamEntryFeeInvoiceRepository.findByPurposeOfTransferCode(purposeOfTransferCode)
+    }
+
+    override fun addPaymentServicePaymentToInvoice(amount: Money, invoice: TeamEntryFeeInvoice): TeamEntryFeeInvoice {
+        TODO("not implemented")
+    }
 }
 

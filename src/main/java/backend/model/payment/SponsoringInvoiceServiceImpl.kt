@@ -81,5 +81,13 @@ class SponsoringInvoiceServiceImpl : SponsoringInvoiceService {
 
         return savedInvoice
     }
+
+    override fun addPaymentServicePaymentToInvoice(amount: Money, invoice: SponsoringInvoice): SponsoringInvoice {
+        TODO("not implemented")
+    }
+
+    override fun findByPurposeOfTransferCode(purposeOfTransferCode: String): SponsoringInvoice? {
+        return sponsoringInvoiceRepository.findByPurposeOfTransferCode(purposeOfTransferCode)
+    }
 }
 

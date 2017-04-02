@@ -10,6 +10,8 @@ interface SponsoringInvoiceService {
 
     fun findById(id: Long): SponsoringInvoice?
 
+    fun findByPurposeOfTransferCode(purposeOfTransferCode:String): SponsoringInvoice?
+
     fun findAll(): Iterable<SponsoringInvoice>
 
     fun findByTeamId(teamId: Long): Iterable<SponsoringInvoice>
@@ -17,6 +19,8 @@ interface SponsoringInvoiceService {
     fun save(invoice: SponsoringInvoice): SponsoringInvoice
 
     fun addAdminPaymentToInvoice(admin: Admin, amount: Money, invoice: SponsoringInvoice): SponsoringInvoice
+
+    fun addPaymentServicePaymentToInvoice(amount: Money, invoice: SponsoringInvoice): SponsoringInvoice
 
     fun createInvoice(team: Team, amount: Money, subject: String, sponsorings: List<Sponsoring>, challenges: List<Challenge>): SponsoringInvoice
 
