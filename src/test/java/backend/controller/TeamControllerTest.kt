@@ -114,7 +114,7 @@ class TeamControllerTest : IntegrationTest() {
         val teamId = response.get("id").intValue
 
         // then the invoice has a purposeOfTransfer containing the teamId, eventId
-        val invoiceRequest = MockMvcRequestBuilders.get("/team/${teamId}/startingfee")
+        val invoiceRequest = MockMvcRequestBuilders.get("/team/$teamId/startingfee")
                 .asUser(mockMvc, participant.email, "test")
 
         val invoiceResponse = mockMvc.perform(invoiceRequest)
@@ -123,9 +123,10 @@ class TeamControllerTest : IntegrationTest() {
 
         val invoiceId = invoiceResponse.get("id").intValue
 
-        val expectedPurpose = "BREAKOUT-EVENT${this.testEvent.id}-TEAM$teamId-INVOICE$invoiceId-ENTRYFREE"
+        val expectedPurposeSuffix = "-BREAKOUT${this.testEvent.id}-TEAM$teamId-INVOICE$invoiceId-ENTRYFREE"
         val actualPurpose = invoiceResponse.get("purposeOfTransfer").asText()
-        assertEquals(expectedPurpose, actualPurpose)
+        assertEquals(actualPurpose.substring(0, actualPurpose.indexOf("-")).length, 6)
+        assert(actualPurpose.endsWith(expectedPurposeSuffix))
 
     }
 

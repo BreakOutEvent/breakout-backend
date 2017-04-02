@@ -20,8 +20,10 @@ class TeamEntryFeeInvoice : Invoice {
     }
 
     override fun checkPaymentEligability(payment: Payment) {
+        val isAdminOrSepa = payment is AdminPayment || payment is SepaPayment
+
         if (exeedsTotalAmount(payment)) throw DomainException("This payment is not eligable because the total necessary amount of $amount would be exeeded")
-        if (payment !is AdminPayment) throw DomainException("Currently only payments via admins can be added to team invoices")
+        if (!isAdminOrSepa) throw DomainException("Currently only payments via admins or sepa can be added to team invoices")
         if (!isHalfOrFullAmount(payment.amount)) throw DomainException("Only the half or full amount of a payment can be added!")
         if (!team!!.isFull()) throw DomainException("Payments can only be added to teams which already have two members")
     }
@@ -45,7 +47,8 @@ class TeamEntryFeeInvoice : Invoice {
         val invoiceId = this.id
                 ?: throw DomainException("Can't generate purposeOfTransfer for unsaved invoice without id")
 
-        this.purposeOfTransfer = "BREAKOUT-EVENT$eventId-TEAM$teamId-INVOICE$invoiceId-ENTRYFREE"
+        this.purposeOfTransferCode = generateRandomPurposeOfTransferCode()
+        this.purposeOfTransfer = "$purposeOfTransferCode-BREAKOUT$eventId-TEAM$teamId-INVOICE$invoiceId-ENTRYFREE"
         return this.purposeOfTransfer
     }
 }

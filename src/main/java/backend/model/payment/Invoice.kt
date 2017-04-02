@@ -1,8 +1,11 @@
 package backend.model.payment
 
 import backend.model.BasicEntity
+import org.apache.commons.codec.binary.Hex
 import org.javamoney.moneta.Money
 import java.math.BigDecimal
+import java.security.MessageDigest
+import java.util.*
 import javax.persistence.CascadeType.MERGE
 import javax.persistence.CascadeType.PERSIST
 import javax.persistence.Column
@@ -19,8 +22,12 @@ abstract class Invoice : BasicEntity {
     lateinit var amount: Money
         private set
 
-    @Column
+    @Column(unique = true)
     lateinit var purposeOfTransfer: String
+        protected set
+
+    @Column(unique = true)
+    lateinit var purposeOfTransferCode: String
         protected set
 
     protected constructor()
@@ -54,4 +61,14 @@ abstract class Invoice : BasicEntity {
     abstract fun checkPaymentEligability(payment: Payment)
 
     abstract fun generatePurposeOfTransfer(): String
+
+    fun generateRandomPurposeOfTransferCode(): String {
+        val messageDigest = MessageDigest.getInstance("SHA-256")
+
+        val randomString = UUID.randomUUID().toString().substring(0, 4).toUpperCase()
+        messageDigest.update(randomString.toByteArray())
+        val randomStringCheckSum = Hex.encodeHexString(messageDigest.digest()).substring(0, 2).toUpperCase()
+
+        return randomString + randomStringCheckSum
+    }
 }
