@@ -10,13 +10,14 @@ import org.junit.Before
 import org.junit.Test
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class TeamServiceImplTest : IntegrationTest() {
+open class TeamServiceImplTest : IntegrationTest() {
 
     private lateinit var event: Event
 
@@ -27,6 +28,7 @@ class TeamServiceImplTest : IntegrationTest() {
     }
 
     @Test
+    @Transactional
     fun testCreate() {
         val participant = User.create("f@x.de", "lorem").addRole(Participant::class)
         userService.save(participant)
@@ -50,14 +52,14 @@ class TeamServiceImplTest : IntegrationTest() {
     @Test
     fun failToInvite() {
         setAuthenticatedUser("user@mail.com", Participant::class.java).getRole(Participant::class)
-        val creator = userService.create("not@mail.com", "password").addRole(Participant::class)
+        val creator = userService.create("not@mail.com", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val team = teamService.create(creator, "name", "description", event)
 
         assertFails { teamService.invite(EmailAddress("test@mail.com"), team) }
     }
 
     private fun setAuthenticatedUser(email: String, role: Class<out UserRole>): User {
-        val user = userService.create(email, "password").addRole(role.kotlin)
+        val user = userService.create(email, "password", {addRole(role.kotlin)}).getRole(role.kotlin)!!
         val details = userDetailsService.loadUserByUsername(email)!! // Not null because otherwise exception is thrown
         val token = UsernamePasswordAuthenticationToken(details.username, details.password, details.authorities)
         SecurityContextHolder.getContext().authentication = token

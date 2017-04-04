@@ -49,4 +49,8 @@ class SponsoringInvoice : Invoice {
     override fun checkPaymentEligability(payment: Payment) {
         if (!team!!.isFull()) throw DomainException("Payments can only be added to teams which already have two members")
     }
+
+    override fun generatePurposeOfTransfer(): String {
+        TODO()
+    }
 }

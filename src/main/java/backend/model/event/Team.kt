@@ -14,6 +14,8 @@ import backend.model.sponsoring.Sponsoring
 import backend.model.user.Participant
 import backend.util.data.ChallengeDonateSums
 import backend.util.parallelStream
+import org.hibernate.annotations.Cascade
+import org.hibernate.annotations.CascadeType
 import org.javamoney.moneta.Money
 import java.math.BigDecimal
 import java.util.*
@@ -54,7 +56,7 @@ class Team : BasicEntity {
     @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true)
     lateinit var profilePic: Media
 
-    @OneToMany(mappedBy = "currentTeam", fetch = FetchType.EAGER)
+    @ManyToMany
     val members: MutableSet<Participant> = HashSet()
 
     @OneToMany(cascade = arrayOf(REMOVE), mappedBy = "team", orphanRemoval = true)
@@ -71,8 +73,8 @@ class Team : BasicEntity {
 
     private fun addMember(participant: Participant) {
 
-        participant.getCurrentTeam()?.let {
-            if (it.event == this.event) throw DomainException("A participant can't join more than one team at the same event")
+        if(participant.participatedAtEvent(event)) {
+            throw DomainException("A participant can't join more than one team at the same event")
         }
 
         if (this.isFull()) throw DomainException("This team already has two members")

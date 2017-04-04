@@ -36,4 +36,16 @@ class TeamEntryFeeInvoice : Invoice {
         val isFullAmount = money.isEqualTo(this.amount)
         return (isHalfAmount || isFullAmount)
     }
+
+    override fun generatePurposeOfTransfer(): String {
+        val teamId = this.team?.id
+                ?: throw DomainException("Can't generate purposeOfTransfer for unsaved team without id")
+        val eventId = this.team?.event?.id
+                ?: throw DomainException("Can't generate purposeOfTransfer for team without event")
+        val invoiceId = this.id
+                ?: throw DomainException("Can't generate purposeOfTransfer for unsaved invoice without id")
+
+        this.purposeOfTransfer = "BREAKOUT-EVENT$eventId-TEAM$teamId-INVOICE$invoiceId-ENTRYFREE"
+        return this.purposeOfTransfer
+    }
 }

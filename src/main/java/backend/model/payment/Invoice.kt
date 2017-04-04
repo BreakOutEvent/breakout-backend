@@ -19,6 +19,10 @@ abstract class Invoice : BasicEntity {
     lateinit var amount: Money
         private set
 
+    @Column
+    lateinit var purposeOfTransfer: String
+        protected set
+
     protected constructor()
 
     constructor(amount: Money) {
@@ -49,4 +53,5 @@ abstract class Invoice : BasicEntity {
     @Throws
     abstract fun checkPaymentEligability(payment: Payment)
 
+    abstract fun generatePurposeOfTransfer(): String
 }

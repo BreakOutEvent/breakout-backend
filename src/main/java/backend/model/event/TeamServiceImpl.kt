@@ -42,6 +42,8 @@ class TeamServiceImpl : TeamService {
         val team = Team(creator, name, description, event)
         // TODO: Maybe use sensible cascading?
         val savedTeam = this.save(team)
+        savedTeam.invoice?.generatePurposeOfTransfer()
+
         userService.save(creator)
         return savedTeam
     }

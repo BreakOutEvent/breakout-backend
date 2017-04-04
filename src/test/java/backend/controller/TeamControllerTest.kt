@@ -1,19 +1,31 @@
 package backend.controller
 
 import backend.Integration.IntegrationTest
+import backend.Integration.toJsonNode
+import backend.model.event.Event
 import backend.model.misc.Coord
 import backend.model.user.Admin
 import backend.model.user.Participant
 import backend.testHelper.asUser
 import backend.testHelper.json
+import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
+import kotlin.test.assertEquals
 
 class TeamControllerTest : IntegrationTest() {
+
+    lateinit var testEvent: Event
+
+    @Before
+    override fun setUp() {
+        super.setUp()
+        this.testEvent = eventService.createEvent("Testevent", LocalDateTime.now(), "Berlin", Coord(0.0, 0.0), 36)
+    }
 
     @Test
     @Ignore
@@ -78,6 +90,43 @@ class TeamControllerTest : IntegrationTest() {
         mockMvc.perform(get("/event/${event.id}/team/${team.id}/"))
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.hasStarted").value(true))
+    }
+
+    @Test
+    fun aPurposeOfTransferIsCreated() {
+        // given an event exists and a participant exist
+        val participant = userService.create("test@example.com", "test", { addRole(Participant::class) }).getRole(Participant::class)!!
+
+        // when creating a team
+        val body = mapOf(
+                "name" to "Testteam",
+                "description" to "Beschreibung"
+        )
+
+        val request = MockMvcRequestBuilders.post("/event/${testEvent.id}/team/")
+                .asUser(mockMvc, participant.email, "test")
+                .json(body)
+
+        val response = mockMvc.perform(request)
+                .andExpect(status().isCreated)
+                .toJsonNode()
+
+        val teamId = response.get("id").intValue
+
+        // then the invoice has a purposeOfTransfer containing the teamId, eventId
+        val invoiceRequest = MockMvcRequestBuilders.get("/team/${teamId}/startingfee")
+                .asUser(mockMvc, participant.email, "test")
+
+        val invoiceResponse = mockMvc.perform(invoiceRequest)
+                .andExpect(status().isOk)
+                .toJsonNode()
+
+        val invoiceId = invoiceResponse.get("id").intValue
+
+        val expectedPurpose = "BREAKOUT-EVENT${this.testEvent.id}-TEAM$teamId-INVOICE$invoiceId-ENTRYFREE"
+        val actualPurpose = invoiceResponse.get("purposeOfTransfer").asText()
+        assertEquals(expectedPurpose, actualPurpose)
+
     }
 
     @Test

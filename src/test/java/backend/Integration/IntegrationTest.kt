@@ -32,6 +32,7 @@ import backend.model.user.UserService
 import backend.services.FeatureFlagService
 import backend.services.FeatureRepository
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.codehaus.jackson.JsonNode
 import org.junit.Before
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -45,6 +46,7 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 import org.springframework.test.context.web.WebAppConfiguration
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
@@ -209,4 +211,8 @@ fun getTokens(mockMvc: MockMvc, email: String, password: String): Pair<String, S
 
 class Credentials(val id: Int, val accessToken: String, val refreshToken: String, val user: User)
 
-
+fun ResultActions.toJsonNode(): JsonNode {
+    val stringResponse = this.andReturn().response.contentAsString
+    val mapper = org.codehaus.jackson.map.ObjectMapper()
+    return mapper.readTree(stringResponse)
+}
