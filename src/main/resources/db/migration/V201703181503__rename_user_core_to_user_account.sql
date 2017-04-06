@@ -1,3 +1,5 @@
+USE `${BREAKOUT}`;
+
 RENAME TABLE user_core TO user_account;
 
 RENAME TABLE user_core_user_roles TO user_account_user_roles;

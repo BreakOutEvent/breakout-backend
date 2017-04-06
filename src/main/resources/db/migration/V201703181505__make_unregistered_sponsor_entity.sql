@@ -1,5 +1,6 @@
--- Create table for UnregisteredSponsor
-CREATE TABLE `unregistered_sponsor` (
+USE `${BREAKOUT}`;
+
+CREATE TABLE IF NOT EXISTS `unregistered_sponsor` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
@@ -74,5 +75,3 @@ DROP company,
 DROP gender,
 DROP url,
 DROP is_hidden;
-
-

@@ -1,3 +1,5 @@
+USE `${BREAKOUT}`;
+
 CREATE TABLE `team_members` (
   `teams_id` bigint(20) NOT NULL,
   `members_id` bigint(20) NOT NULL,
