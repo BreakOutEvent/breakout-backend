@@ -162,6 +162,14 @@ open class UserController {
         this.lastname = userView.lastname ?: this.lastname
         this.gender = userView.gender ?: this.gender
 
+        userView.preferredLanguage?.let {
+            when(it) {
+                "en" -> this.preferredLanguage = Language.EN
+                "de" -> this.preferredLanguage = Language.DE
+                else -> logger.warn("Unsupported language locale $it")
+            }
+        }
+
         userView.participant?.let { this.becomeOrModifyParticipant(it) }
         userView.sponsor?.let { this.becomeOrModifySponsor(it) }
 

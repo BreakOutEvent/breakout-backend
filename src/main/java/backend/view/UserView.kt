@@ -1,9 +1,6 @@
 package backend.view
 
-import backend.model.user.Address
-import backend.model.user.Participant
-import backend.model.user.Sponsor
-import backend.model.user.User
+import backend.model.user.*
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.validator.constraints.Email
 import javax.validation.Valid
@@ -18,6 +15,8 @@ class UserView() {
 
     var firstname: String? = null
     var lastname: String? = null
+
+    var preferredLanguage: String? = null
 
     @Email
     var email: String? = null
@@ -51,6 +50,10 @@ class UserView() {
         this.profilePic = MediaView(user.profilePic)
         this.roles = user.account.getAuthorities().map { it.authority }
         this.groupMessageIds = user.account.groupMessages.map { it.id!! }
+        this.preferredLanguage = when (user.preferredLanguage) {
+            Language.EN -> "en"
+            Language.DE -> "de"
+        }
     }
 
     class ParticipantViewModel() {
@@ -59,7 +62,7 @@ class UserView() {
         var participant: Participant? = null
 
         @NotNull
-        var emergencynumber: String ? = null
+        var emergencynumber: String? = null
 
         @NotNull
         var phonenumber: String? = null

@@ -9,6 +9,7 @@ interface User {
     var email: String
     var passwordHash: String
     var isBlocked: Boolean
+    var preferredLanguage: Language
 
     val account: UserAccount
     var firstname: String?
@@ -36,4 +37,8 @@ interface User {
     fun isActivated(): Boolean
 
     fun setNewPassword(password: String, token: String)
+}
+
+enum class Language {
+    DE, EN
 }

@@ -23,6 +23,7 @@ open class UserAccount : BasicEntity, User {
     constructor() : super() {
         this.isBlocked = true
         this.profilePic = Media("image")
+        this.preferredLanguage = Language.DE
     }
 
     @Email
@@ -39,6 +40,9 @@ open class UserAccount : BasicEntity, User {
     override var isBlocked = false
 
     override var gender: String? = null
+
+    @Enumerated(EnumType.STRING)
+    override var preferredLanguage: Language = Language.DE
 
     @OneToOne(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
     override var profilePic: Media

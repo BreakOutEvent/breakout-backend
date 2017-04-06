@@ -90,6 +90,31 @@ class UserControllerTest : IntegrationTest() {
         println(result)
     }
 
+    @Test
+    fun updateUserSetPreferredLanguage() {
+        val user = userService.create("test1@example.com", "pw")
+
+        val body = mapOf(
+                "preferredLanguage" to "en"
+        )
+
+        val request = put("/user/${user.account.id}/")
+                .asUser(mockMvc, user.email, "pw")
+                .json(body)
+
+        mockMvc.perform(request)
+                .andExpect(jsonPath("$.preferredLanguage").value("en"))
+    }
+
+    @Test
+    fun createUserHasDefaultPreferredLanguageDe() {
+        val user = userService.create("test2@example.com", "pw")
+        val request = get("/me/")
+                .asUser(this.mockMvc, user.email, "pw")
+
+        mockMvc.perform(request)
+                .andExpect(jsonPath("$.preferredLanguage").value("de"))
+    }
 
     @Test
     @Ignore("Needs to be migrated from package integration")
