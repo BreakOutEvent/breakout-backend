@@ -31,4 +31,8 @@ interface TeamRepository : CrudRepository<Team, Long> {
 
     @Query("from Team t where t.name like concat('%',:search,'%')")
     fun searchByString(@Param("search") search: String): List<Team>
+
+    //language=HQL
+    @Query("Select new backend.model.event.TeamSummaryProjection(t.name, t.id, t.event.id, t.event.title) from Team t")
+    fun findAllTeamSummaryProjections(): Iterable<TeamSummaryProjection>
 }

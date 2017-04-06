@@ -224,4 +224,8 @@ class TeamServiceImpl : TeamService {
     override fun findAll(): Iterable<Team> {
         return repository.findAll()
     }
+
+    override fun findAllTeamSummaryProjections(): Iterable<TeamSummaryProjection> {
+        return repository.findAllTeamSummaryProjections()
+    }
 }

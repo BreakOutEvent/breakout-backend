@@ -4,6 +4,7 @@ import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
 import backend.exceptions.DomainException
+import backend.model.event.TeamSummaryProjection
 import backend.model.event.TeamService
 import backend.model.user.Participant
 import backend.model.user.UserService
@@ -13,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -24,9 +26,9 @@ open class TeamControllerV2 @Autowired constructor(
 
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/{teamId}/startingfee")
+    @RequestMapping("/{teamId}/startingfee", method = arrayOf(GET))
     open fun getInvoiceForTeam(@PathVariable teamId: Long,
-                          @AuthenticationPrincipal customUserDetails: CustomUserDetails): TeamEntryFeeInvoiceView {
+                               @AuthenticationPrincipal customUserDetails: CustomUserDetails): TeamEntryFeeInvoiceView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val team = teamService.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")
@@ -41,5 +43,11 @@ open class TeamControllerV2 @Autowired constructor(
         }
 
         throw UnauthorizedException("User is no participant")
+    }
+
+    @RequestMapping("/", method = arrayOf(GET))
+    open fun getAllTeamsOverview(): Iterable<TeamSummaryProjection> {
+        val teams = teamService.findAllTeamSummaryProjections()
+        return teams
     }
 }
