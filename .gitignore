@@ -22,3 +22,4 @@ src/main/resources/application-production.properties
 src/main/resources/application-staging.properties
 secrets
 id_rsa_breakout
+secrets.zip
