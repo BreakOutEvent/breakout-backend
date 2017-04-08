@@ -20,6 +20,8 @@ class BasicLocationView {
 
     var isDuringEvent: Boolean? = null
 
+    var postingId: Long? = null
+
     @NotNull
     val date: Long
 
@@ -31,6 +33,7 @@ class BasicLocationView {
         this.distance = location.distance
         this.date = location.date.toEpochSecond(ZoneOffset.UTC)
         this.isDuringEvent = location.isDuringEvent
+        this.postingId = location.posting?.id
 
         this.locationData = location.locationData
     }
