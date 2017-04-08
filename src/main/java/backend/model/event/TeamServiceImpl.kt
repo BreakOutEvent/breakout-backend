@@ -12,6 +12,7 @@ import backend.util.data.DonateSums
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
@@ -77,7 +78,7 @@ class TeamServiceImpl : TeamService {
 
     override fun findOne(id: Long) = repository.findById(id)
 
-    override fun findPostingsById(id: Long) = repository.findPostingsById(id)
+    override fun findPostingsById(teamId: Long, page: Int, size: Int) = repository.findPostingsByTeamId(teamId, PageRequest(page, size))
 
     override fun findLocationPostingsById(id: Long) = repository.findLocationByTeamId(id)
 

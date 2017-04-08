@@ -1,6 +1,8 @@
 package backend.model.event
 
 import backend.model.location.Location
+import backend.model.posting.Posting
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
@@ -8,8 +10,8 @@ import org.springframework.data.repository.query.Param
 interface TeamRepository : CrudRepository<Team, Long> {
     fun findById(id: Long): Team?
 
-    @Query("Select p.id from Posting p inner join p.user u inner join u.userRoles r where r.currentTeam.id = :id order by p.id desc")
-    fun findPostingsById(@Param("id") id: Long): List<Long>
+    @Query("Select p from Posting p inner join p.user u inner join u.userRoles r where r.currentTeam.id = :teamId order by p.id desc")
+    fun findPostingsByTeamId(@Param("teamId") id: Long, pageable: Pageable): List<Posting>
 
     @Query("Select l from Location l inner join l.team t where t.id = :id order by l.date asc")
     fun findLocationByTeamId(@Param("id") id: Long): List<Location>

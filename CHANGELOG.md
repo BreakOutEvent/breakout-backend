@@ -3,6 +3,7 @@
 ## 1.9.1
 
  - `challenges_with_proof_sum` and `challenges_accepted_proof_sum` combined as `challengeSum`
+ - `GET /event/{eventId}/team/{teamId}/posting/` returns actual postings instead of ids, paginated via `?page={pageNumber}` default is 0, default page size is 50 (but not necessarily)
 
 ## 1.9.0
 

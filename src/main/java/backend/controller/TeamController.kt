@@ -16,6 +16,7 @@ import backend.services.ConfigurationService
 import backend.util.data.DonateSums
 import backend.util.getSignedJwtToken
 import backend.view.InvitationView
+import backend.view.PostingView
 import backend.view.TeamView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -34,6 +35,7 @@ open class TeamController {
     private val teamService: TeamService
     private val eventService: EventService
     private val JWT_SECRET: String
+    private var PAGE_SIZE: Int
     private val configurationService: ConfigurationService
     private val userService: UserService
     private val logger: Logger
@@ -48,6 +50,7 @@ open class TeamController {
         this.eventService = eventService
         this.configurationService = configurationService
         this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
+        this.PAGE_SIZE = configurationService.getRequired("org.breakout.api.page_size").toInt()
         this.userService = userService
         this.logger = LoggerFactory.getLogger(TeamController::class.java)
     }
@@ -225,9 +228,10 @@ open class TeamController {
      * gets all Postings for Team
      */
     @RequestMapping("/{teamId}/posting/", method = arrayOf(GET))
-    open fun getTeamPostingIds(@PathVariable teamId: Long): List<Long> {
-        val postingIds = teamService.findPostingsById(teamId)
-        return postingIds
+    open fun getTeamPostingIds(@PathVariable teamId: Long,
+                               @RequestParam(value = "page", required = false) page: Int?,
+                               @RequestParam(value = "userid", required = false) userId: Long?): List<PostingView> {
+        return teamService.findPostingsById(teamId, page ?: 0, PAGE_SIZE).map { PostingView(it.hasLikesBy(userId)) }
     }
 
     /**

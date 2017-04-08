@@ -3,6 +3,7 @@ package backend.model.event
 import backend.model.location.Location
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
+import backend.model.posting.Posting
 import backend.model.user.Participant
 import backend.model.user.User
 import backend.util.data.DonateSums
@@ -61,7 +62,7 @@ interface TeamService {
      *
      * @return gotten postings list
      */
-    fun findPostingsById(id: Long): List<Long>
+    fun findPostingsById(teamId: Long, page: Int, size: Int): List<Posting>
 
     /**
      * Get Team Postings from database only including location
