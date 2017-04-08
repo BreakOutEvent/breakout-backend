@@ -85,8 +85,6 @@ interface TeamService {
 
     fun join(participant: Participant, team: Team)
 
-    fun getFullTeamMailForMember(participants: Set<Participant>): List<Email>
-
     fun findByEventId(eventId: Long): List<Team>
 
     fun getDonateSum(teamId: Long): DonateSums

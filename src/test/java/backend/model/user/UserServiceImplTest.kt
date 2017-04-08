@@ -4,6 +4,7 @@ import backend.services.ConfigurationService
 import backend.services.MailService
 import org.junit.Before
 import org.junit.Test
+import org.mockito.Matchers
 import org.mockito.Mockito
 import org.mockito.Mockito.*
 
@@ -56,7 +57,7 @@ class UserServiceImplTest {
 
         userServiceImpl.create("mail@mail.de", "password")
 
-        verify(mailService).send(anyObject(), eq(false))
+        verify(mailService).sendUserHasRegisteredEmail(anyString(), anyObject())
         verify(userRepository).save(anyObject<UserAccount>())
     }
 
