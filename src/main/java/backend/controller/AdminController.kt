@@ -74,7 +74,7 @@ open class AdminController {
      * GET /admin/regeneratecache/
      * Allows Admin to resend failed mails
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    //@PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping("/regeneratecache/", method = arrayOf(GET))
     open fun regenerateCache(): String {
         logger.info("Regenerating caches from admin request")
@@ -400,7 +400,7 @@ open class AdminController {
 
                     var sponsorSum = BigDecimal.ZERO
                     var isLimit = false
-                    val distanceKm = BigDecimal.valueOf(teamService.getLinearDistanceForTeam(sponsoring.team!!.id!!)).setScale(2, BigDecimal.ROUND_HALF_UP)
+                    val distanceKm = BigDecimal.valueOf(teamService.getDistanceForTeam(sponsoring.team!!.id!!)).setScale(2, BigDecimal.ROUND_HALF_UP)
 
                     val amount = sponsoring.amountPerKm.numberStripped.multiply(distanceKm)
                     if (amount.compareTo(sponsoring.limit.numberStripped) == 1) {
@@ -503,7 +503,7 @@ open class AdminController {
 
                     var sponsorSum = BigDecimal.ZERO
                     var isLimit = false
-                    val distanceKm = BigDecimal.valueOf(teamService.getLinearDistanceForTeam(sponsoring.team!!.id!!)).setScale(2, BigDecimal.ROUND_HALF_UP)
+                    val distanceKm = BigDecimal.valueOf(teamService.getDistanceForTeam(sponsoring.team!!.id!!)).setScale(2, BigDecimal.ROUND_HALF_UP)
 
                     val amount = sponsoring.amountPerKm.numberStripped.multiply(distanceKm)
                     if (amount.compareTo(sponsoring.limit.numberStripped) == 1) {

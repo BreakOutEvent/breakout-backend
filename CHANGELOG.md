@@ -1,6 +1,8 @@
-## previous
+# BreakOut API Changelog
 
- - no changelog available
+## 1.9.1
+
+ - `challenges_with_proof_sum` and `challenges_accepted_proof_sum` combined as `challengeSum`
 
 ## 1.9.0
 
@@ -11,3 +13,7 @@
  - `GET /event/{eventId}/location/` and `GET /event/{eventId}/team/{teamId}/location/` return an aggregation of 20 locations per Team, configurable via `?perTeam={locationsPerTeam}`
  - `GET /posting/` is now paginated via `?page={pageNumber}` default is 0, default page size is 50 (but not necessarily)
  - `GET /posting/get/since/{sinceId}/` removed
+ 
+ ## previous
+ 
+  - no changelog available

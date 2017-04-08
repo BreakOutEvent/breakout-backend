@@ -10,6 +10,7 @@ import backend.model.payment.Billable
 import backend.model.payment.SponsoringInvoice
 import backend.model.sponsoring.SponsoringStatus.*
 import backend.model.user.Sponsor
+import backend.util.euroOf
 import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -142,15 +143,18 @@ class Sponsoring : BasicEntity, Billable {
         }
     }
 
-    // TODO: Implement billableAmout correctly
     override fun billableAmount(): Money {
 
         val distance: Double = team?.getCurrentDistance() ?: run {
-            logger.warn("No team for current sponsoring found. Using 0.0 for currentDistance")
+            logger.warn("No team for sponsoring $id found. Using 0.0 for currentDistance")
             return@run 0.0
         }
 
-        val raisedSum = amountPerKm.multiply(distance)
+        val raisedSum = when (this.status) {
+            ACCEPTED -> amountPerKm.multiply(distance)
+            PAYED -> amountPerKm.multiply(distance)
+            else -> euroOf(0.0)
+        }
 
         if (raisedSum <= limit) {
             return raisedSum

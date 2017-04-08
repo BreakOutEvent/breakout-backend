@@ -1,7 +1,6 @@
 package backend.model.event
 
 import backend.controller.exceptions.NotFoundException
-import backend.model.location.Location
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
@@ -9,12 +8,10 @@ import backend.model.user.User
 import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.services.MailService
-import backend.util.data.ChallengeDonateSums
 import backend.util.data.DonateSums
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
@@ -84,10 +81,6 @@ class TeamServiceImpl : TeamService {
 
     override fun findLocationPostingsById(id: Long) = repository.findLocationByTeamId(id)
 
-    override fun getLocationMaxDistanceById(id: Long): Location? {
-        return repository.getLocationMaxDistanceById(id, PageRequest(0, 1)).firstOrNull()
-    }
-
     override fun findInvitationsForUser(user: User): List<Invitation> {
         return repository.findInvitationsWithEmail(user.email)
     }
@@ -96,9 +89,8 @@ class TeamServiceImpl : TeamService {
         return repository.findInvitationsWithEmailAndEventId(user.email, eventId)
     }
 
-    override fun getLinearDistanceForTeam(teamId: Long): Double {
-        val locationDistance = this.getLocationMaxDistanceById(teamId)
-        return locationDistance?.distance ?: 0.0
+    override fun getDistanceForTeam(teamId: Long): Double {
+        return this.findOne(teamId)?.getCurrentDistance() ?: 0.0
     }
 
     override fun findInvitationsByInviteCode(code: String): Invitation? {
@@ -122,7 +114,7 @@ class TeamServiceImpl : TeamService {
     }
 
     override fun getDistance(teamId: Long): Double {
-        return this.getLinearDistanceForTeam(teamId)
+        return this.findOne(teamId)?.getCurrentDistance() ?: 0.0
     }
 
     override fun getFullTeamMailForMember(participants: Set<Participant>): List<Email> {
@@ -164,20 +156,15 @@ class TeamServiceImpl : TeamService {
         return team.raisedAmountFromSponsorings().numberStripped
     }
 
-    fun getChallengeSum(team: Team): ChallengeDonateSums {
-        return team.raisedAmountFromChallenges()
+    fun getChallengeSum(team: Team): BigDecimal {
+        return team.raisedAmountFromChallenges().numberStripped
     }
 
     override fun getDonateSum(team: Team): DonateSums {
         val sponsorSum = getSponsoringSum(team)
         val challengesSum = getChallengeSum(team)
 
-        val fullSum = sponsorSum + challengesSum.withProofSum + challengesSum.acceptedProofSum
-
-        return DonateSums(sponsorSum,
-                challengesSum.withProofSum,
-                challengesSum.acceptedProofSum,
-                fullSum)
+        return DonateSums(sponsorSum, challengesSum, sponsorSum + challengesSum)
     }
 
     @Transactional

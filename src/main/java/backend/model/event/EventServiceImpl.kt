@@ -46,9 +46,7 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository,
     override fun getDistance(id: Long): Double {
         val event = this.findById(id) ?: throw NotFoundException("event with id $id does not exist")
 
-        return event.teams.parallelStream().map { team ->
-            teamService.getDistance(team.id!!)
-        }.reduce { acc: Double, distance: Double ->
+        return event.teams.parallelStream().map(Team::getCurrentDistance).reduce { acc: Double, distance: Double ->
             acc + distance
         }.orElseGet { 0.0 }
     }
@@ -58,17 +56,13 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository,
 
         val donateSumTeams = event.teams.parallelStream().map { team ->
             val donateSum = teamService.getDonateSum(team.id!!)
-            return@map DonateSums(donateSum.sponsorSum,
-                    donateSum.withProofSum,
-                    donateSum.acceptedProofSum,
-                    donateSum.fullSum)
+            DonateSums(donateSum.sponsorSum, donateSum.challengeSum, donateSum.fullSum)
         }
 
         return donateSumTeams.parallel().reduce { accSums: DonateSums, donateSums: DonateSums ->
             DonateSums(accSums.sponsorSum + donateSums.sponsorSum,
-                    accSums.withProofSum + donateSums.withProofSum,
-                    accSums.acceptedProofSum + donateSums.acceptedProofSum,
+                    accSums.challengeSum + donateSums.challengeSum,
                     accSums.fullSum + donateSums.fullSum)
-        }.orElseGet { DonateSums(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO) }
+        }.orElseGet { DonateSums(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO) }
     }
 }

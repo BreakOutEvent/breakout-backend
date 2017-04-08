@@ -3,8 +3,6 @@ package backend.model.event
 import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.challenges.Challenge
-import backend.model.challenges.ChallengeStatus.PROOF_ACCEPTED
-import backend.model.challenges.ChallengeStatus.WITH_PROOF
 import backend.model.location.Location
 import backend.model.media.Media
 import backend.model.misc.EmailAddress
@@ -12,10 +10,7 @@ import backend.model.payment.TeamEntryFeeInvoice
 import backend.model.payment.billableAmount
 import backend.model.sponsoring.Sponsoring
 import backend.model.user.Participant
-import backend.util.data.ChallengeDonateSums
-import backend.util.parallelStream
-import org.hibernate.annotations.Cascade
-import org.hibernate.annotations.CascadeType
+import org.hibernate.annotations.Formula
 import org.javamoney.moneta.Money
 import java.math.BigDecimal
 import java.util.*
@@ -71,9 +66,12 @@ class Team : BasicEntity {
     @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "team")
     var challenges: MutableList<Challenge> = ArrayList()
 
+    @Formula("(select max(l.distance) from location l inner join team t on (l.team_id = t.id) where l.is_during_event and t.id = id)")
+    private var currentDistance: Double? = 0.0
+
     private fun addMember(participant: Participant) {
 
-        if(participant.participatedAtEvent(event)) {
+        if (participant.participatedAtEvent(event)) {
             throw DomainException("A participant can't join more than one team at the same event")
         }
 
@@ -157,33 +155,15 @@ class Team : BasicEntity {
         this.challenges.clear()
     }
 
-    /**
-     * Returns the teams current distance in km
-     */
-    fun getCurrentDistance(): Double {
-        return this.locations.maxBy { it.distance }?.distance ?: 0.0
-    }
-
-    fun raisedAmountFromChallenges(): ChallengeDonateSums {
-        return this.challenges.parallelStream()
-                .map { challenge ->
-                    when (challenge.status) {
-                        WITH_PROOF -> ChallengeDonateSums(challenge.amount.numberStripped, BigDecimal.ZERO)
-                        PROOF_ACCEPTED -> ChallengeDonateSums(BigDecimal.ZERO, challenge.amount.numberStripped)
-                        else -> ChallengeDonateSums(BigDecimal.ZERO, BigDecimal.ZERO)
-                    }
-                }
-                .reduce { acc: ChallengeDonateSums, one: ChallengeDonateSums ->
-                    ChallengeDonateSums(
-                            acc.withProofSum + one.withProofSum,
-                            acc.acceptedProofSum + one.acceptedProofSum)
-                }
-                .orElseGet {
-                    ChallengeDonateSums(BigDecimal.ZERO, BigDecimal.ZERO)
-                }
+    fun raisedAmountFromChallenges(): Money {
+        return this.challenges.billableAmount()
     }
 
     fun raisedAmountFromSponsorings(): Money {
         return this.sponsoring.billableAmount()
+    }
+
+    fun getCurrentDistance(): Double {
+        return currentDistance ?: 0.0
     }
 }

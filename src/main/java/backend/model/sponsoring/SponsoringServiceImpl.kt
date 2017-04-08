@@ -191,7 +191,7 @@ class SponsoringServiceImpl : SponsoringService {
     }
 
     fun calculateAmount(sponsoring: Sponsoring): Money {
-        val kilometers = teamService.getLinearDistanceForTeam(sponsoring.team!!.id!!)
+        val kilometers = teamService.getDistanceForTeam(sponsoring.team!!.id!!)
         val amountPerKmAsBigDecimal = sponsoring.amountPerKm.numberStripped
         val total = amountPerKmAsBigDecimal.multiply(BigDecimal.valueOf(kilometers))
 
