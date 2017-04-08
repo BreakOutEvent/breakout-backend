@@ -49,25 +49,8 @@ class TeamServiceImpl : TeamService {
     }
 
     override fun invite(emailAddress: EmailAddress, team: Team) {
-
-        val invitation = team.invite(emailAddress)
-        val email = Email(
-                to = listOf(emailAddress),
-                subject = "BreakOut 2016 - Du wurdest zur Teilnahme eingeladen!",
-                body = "${team.members.first().firstname} ${team.members.first().lastname} möchte mit Dir ein Abenteuer bestreiten!<br><br>" +
-                        "BreakOut ist ein Spendenmarathon, bei dem Geld für das DAFI-Projekt der UNO-Flüchtlingshilfe gesammelt wird.<br><br>" +
-                        "In Zweierteams versucht Ihr, euch ab Startschuss binnen 36 Stunden so weit wie möglich von München zu entfernen. Dabei gilt es, für das Reisen kein Geld auszugeben – vielmehr sammelt Ihr pro zurückgelegtem Kilometer Geld für das DAFI-Programm der UNO-Flüchtlingshilfe.<br>" +
-                        "Das Konzept folgt damit der Idee eines Spendenmarathons: Im Vorfeld akquiriert Ihr eigene Sponsoren, die dann pro gereistem Kilometer einen vorab festgelegten Betrag an die UNO-Flüchtlingshilfe spenden.<br><br>" +
-                        "Wenn Du Lust hast bei BreakOut teilzunehmen, klicke auf den Button am Ende der E-Mail.<br><br>" +
-                        "Du hast Fragen oder benötigst Unterstützung? Schreib uns eine E-Mail an <a href=\"event@break-out.org\">event@break-out.org</a>.<br><br>" +
-                        "Liebe Grüße<br>" +
-                        "Euer BreakOut-Team",
-                buttonText = "EINLADUNG ANNEHMEN",
-                buttonUrl = getInvitationUrl(invitation.invitationToken),
-                campaignCode = "invite"
-        )
-
-        mailService.send(email)
+        team.invite(emailAddress)
+        mailService.sendInvitationEmail(emailAddress, team)
         this.save(team)
     }
 
@@ -116,44 +99,12 @@ class TeamServiceImpl : TeamService {
         val members = team.join(participant)
 
         if (team.isFull()) {
-            val emails = getFullTeamMailForMember(members)
-            emails.forEach { mailService.send(it) }
+            mailService.sendTeamIsCompleteEmail(team.members.toList())
         }
     }
 
     override fun getDistance(teamId: Long): Double {
         return this.getLinearDistanceForTeam(teamId)
-    }
-
-    override fun getFullTeamMailForMember(participants: Set<Participant>): List<Email> {
-        val first = participants.first()
-        val second = participants.last()
-
-        val toFirst = Email(to = listOf(EmailAddress(first.email)),
-                subject = "BreakOut 2016 - Dein Team ist vollständig, bitte zahle die Startgebühr",
-                body = "Hallo ${first.firstname},<br><br>" +
-                        "Herzlichen Glückwunsch Du bist jetzt mit ${second.firstname} in einem Team und Euer Team ist damit vollständig.<br>" +
-                        "Um Eure Anmeldung abzuschließen, müsst Ihr nur noch die Teilnahmegebühr von 30€ pro Person bis spätestens 18. Mai überweisen.<br><br>" +
-                        "Liebe Grüße<br>" +
-                        "Euer BreakOut-Team",
-                buttonText = "JETZT ZAHLEN",
-                buttonUrl = "https://anmeldung.break-out.org/payment?utm_source=backend&utm_medium=email&utm_content=intial&utm_campaign=payment",
-                campaignCode = "payment_initial"
-        )
-
-        val toSecond = Email(to = listOf(EmailAddress(second.email)),
-                subject = "BreakOut 2016 - Dein Team ist vollständig, bitte zahle die Startgebühr",
-                body = "Hallo ${second.firstname},<br><br>" +
-                        "Herzlichen Glückwunsch Du bist jetzt mit ${first.firstname} in einem Team und Euer Team ist damit vollständig.<br>" +
-                        "Um Eure Anmeldung abzuschließen, müsst Ihr nur noch die Teilnahmegebühr von 30€ pro Person bis spätestens 18. Mai überweisen.<br><br>" +
-                        "Liebe Grüße<br>" +
-                        "Euer BreakOut-Team",
-                buttonText = "JETZT ZAHLEN",
-                buttonUrl = "https://anmeldung.break-out.org/payment?utm_source=backend&utm_medium=email&utm_content=intial&utm_campaign=payment",
-                campaignCode = "payment_initial"
-        )
-
-        return listOf(toFirst, toSecond)
     }
 
     override fun findByEventId(eventId: Long): List<Team> {
