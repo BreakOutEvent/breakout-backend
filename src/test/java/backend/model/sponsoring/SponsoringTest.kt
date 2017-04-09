@@ -117,6 +117,7 @@ class SponsoringTest {
         PowerMockito.`when`(team.getCurrentDistance()).thenReturn(10.0)
 
         val sponsoring = Sponsoring(sponsor, team, euroOf(10.0), euroOf(200))
+        sponsoring.accept()
 
         assertEquals(euroOf(100.0), sponsoring.billableAmount())
     }
@@ -129,6 +130,7 @@ class SponsoringTest {
         PowerMockito.`when`(team.getCurrentDistance()).thenReturn(10.0)
 
         val sponsoring = Sponsoring(sponsor, team, euroOf(100.0), euroOf(200))
+        sponsoring.accept()
 
         assertEquals(euroOf(200.0), sponsoring.billableAmount())
     }

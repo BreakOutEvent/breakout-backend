@@ -171,8 +171,6 @@ class TestEventEndpoint : IntegrationTest() {
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.sponsorSum").exists())
-                .andExpect(jsonPath("$.withProofSum").exists())
-                .andExpect(jsonPath("$.acceptedProofSum").exists())
                 .andExpect(jsonPath("$.fullSum").exists())
                 .andReturn().response.contentAsString
 

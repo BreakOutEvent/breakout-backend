@@ -243,8 +243,6 @@ open class TestTeamEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.description").exists())
                 .andExpect(jsonPath("$.distance").exists())
                 .andExpect(jsonPath("$.donateSum.sponsorSum").exists())
-                .andExpect(jsonPath("$.donateSum.withProofSum").exists())
-                .andExpect(jsonPath("$.donateSum.acceptedProofSum").exists())
                 .andExpect(jsonPath("$.donateSum.fullSum").exists())
                 .andExpect(jsonPath("$.members").exists())
                 .andExpect(jsonPath("$.members[0].id").exists())
@@ -320,8 +318,6 @@ open class TestTeamEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$[0].description").exists())
                 .andExpect(jsonPath("$[0].distance").exists())
                 .andExpect(jsonPath("$[0].donateSum.sponsorSum").exists())
-                .andExpect(jsonPath("$[0].donateSum.withProofSum").exists())
-                .andExpect(jsonPath("$[0].donateSum.acceptedProofSum").exists())
                 .andExpect(jsonPath("$[0].donateSum.fullSum").exists())
                 .andExpect(jsonPath("$[0].members").exists())
                 .andExpect(jsonPath("$[0].members[0].id").exists())
@@ -379,8 +375,6 @@ open class TestTeamEndpoint : IntegrationTest() {
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.sponsorSum").exists())
-                .andExpect(jsonPath("$.withProofSum").exists())
-                .andExpect(jsonPath("$.acceptedProofSum").exists())
                 .andExpect(jsonPath("$.fullSum").exists())
                 .andReturn().response.contentAsString
 

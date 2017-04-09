@@ -147,21 +147,6 @@ class TeamTest {
     }
 
     @Test
-    fun getCurrentDistance() {
-        val location1 = mock(Location::class.java)
-        val location2 = mock(Location::class.java)
-        val location3 = mock(Location::class.java)
-
-        `when`(location1.distance).thenReturn(10.0)
-        `when`(location2.distance).thenReturn(20.0)
-        `when`(location3.distance).thenReturn(15.0)
-
-        team.locations.addAll(listOf(location1, location2, location3))
-
-        assertEquals(20.0, team.getCurrentDistance(), 0.0)
-    }
-
-    @Test
     fun testUserEventsSetCorrectly() {
         val user = User.create("firstname@example.com", "pw").addRole(Participant::class)
         val mockEvent1 = mock(Event::class.java)
