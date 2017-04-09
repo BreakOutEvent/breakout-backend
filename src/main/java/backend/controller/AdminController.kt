@@ -15,7 +15,7 @@ import backend.model.sponsoring.Sponsoring
 import backend.model.sponsoring.SponsoringService
 import backend.model.sponsoring.SponsoringStatus
 import backend.model.user.UserService
-import backend.services.MailService
+import backend.services.mail.MailService
 import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

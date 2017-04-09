@@ -6,7 +6,7 @@ import backend.model.event.Team
 import backend.model.sponsoring.Sponsoring
 import backend.model.sponsoring.SponsoringRepository
 import backend.model.user.Admin
-import backend.services.MailService
+import backend.services.mail.MailService
 import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

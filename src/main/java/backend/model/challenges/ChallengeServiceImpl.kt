@@ -6,7 +6,7 @@ import backend.model.posting.Posting
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
 import backend.services.FeatureFlagService
-import backend.services.MailService
+import backend.services.mail.MailService
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service

@@ -1,4 +1,4 @@
-package backend.services
+package backend.services.mail
 
 import backend.model.challenges.Challenge
 import backend.model.event.Team
@@ -10,10 +10,14 @@ import backend.model.user.Participant
 import backend.model.user.User
 
 interface MailService {
+
+    @Deprecated("Use MailSenderService")
     fun send(email: Email, saveToDb: Boolean = false)
 
+    @Deprecated("Use MailSenderService")
     fun resendFailed(): Int
 
+    @Deprecated("Use MailSenderService")
     fun sendAsync(email: Email, saveToDb: Boolean = false)
 
     fun sendUserHasRegisteredEmail(token: String, user: User)

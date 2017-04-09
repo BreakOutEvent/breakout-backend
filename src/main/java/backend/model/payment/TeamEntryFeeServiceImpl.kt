@@ -3,7 +3,7 @@ package backend.model.payment
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.user.Admin
-import backend.services.MailService
+import backend.services.mail.MailService
 import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

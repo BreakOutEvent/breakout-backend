@@ -5,7 +5,7 @@ import backend.controller.exceptions.ConflictException
 import backend.controller.exceptions.NotFoundException
 import backend.exceptions.DomainException
 import backend.services.ConfigurationService
-import backend.services.MailService
+import backend.services.mail.MailService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 

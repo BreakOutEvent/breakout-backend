@@ -5,6 +5,9 @@ import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.misc.EmailRepository
 import backend.model.misc.Url
+import backend.services.mail.MailSenderServiceImpl
+import backend.services.mail.MailService
+import backend.services.mail.MailServiceImpl
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
@@ -34,7 +37,8 @@ class MailServiceImplTest {
         val configurationService = Mockito.mock(ConfigurationService::class.java)
         Mockito.`when`(configurationService.getRequired("org.breakout.mailer.xauthtoken")).thenReturn("randomtoken")
         Mockito.`when`(configurationService.getRequired("org.breakout.mailer.url")).thenReturn(BASE_URL)
-        mailService = MailServiceImpl(restTemplate, configurationService, emailRepository)
+        val mailSenderService = MailSenderServiceImpl(restTemplate, emailRepository, configurationService)
+        mailService = MailServiceImpl(configurationService, mailSenderService)
         mockServer = MockRestServiceServer.createServer(restTemplate)
     }
 

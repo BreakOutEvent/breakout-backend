@@ -1,6 +1,7 @@
 package backend.services
 
 import backend.model.misc.Coord
+import backend.services.mail.MailServiceImpl
 import backend.util.Profiles.PRODUCTION
 import backend.util.Profiles.STAGING
 import com.google.maps.GeoApiContext
