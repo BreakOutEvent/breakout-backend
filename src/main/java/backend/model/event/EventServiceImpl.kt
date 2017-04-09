@@ -18,10 +18,15 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository,
                                               val cacheService: CacheService) : EventService {
 
     @Transactional
-    override fun regenerateCache() {
-        findAll().forEach { event ->
-            cacheService.updateCache("Event_${event.id}_Distance", mapOf("distance" to getDistance(event.id!!)))
-            cacheService.updateCache("Event_${event.id}_DonateSum", getDonateSum(event.id!!))
+    override fun regenerateCache(eventId: Long?) {
+        if (eventId != null) {
+            cacheService.updateCache("Event_${eventId}_Distance", mapOf("distance" to getDistance(eventId)))
+            cacheService.updateCache("Event_${eventId}_DonateSum", getDonateSum(eventId))
+        } else {
+            findAll().forEach { event ->
+                cacheService.updateCache("Event_${event.id}_Distance", mapOf("distance" to getDistance(event.id!!)))
+                cacheService.updateCache("Event_${event.id}_DonateSum", getDonateSum(event.id!!))
+            }
         }
     }
 

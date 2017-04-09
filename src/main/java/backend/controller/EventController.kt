@@ -1,6 +1,7 @@
 package backend.controller
 
 import backend.controller.exceptions.NotFoundException
+import backend.exceptions.CacheNonExistentException
 import backend.model.cache.CacheService
 import backend.model.event.EventService
 import backend.model.misc.Coord
@@ -86,7 +87,13 @@ open class EventController {
      */
     @RequestMapping("/{id}/distance/", method = arrayOf(GET))
     open fun getEventDistance(@PathVariable("id") id: Long): Any {
-        return cacheService.getCache("Event_${id}_Distance")
+        try {
+            return cacheService.getCache("Event_${id}_Distance")
+        } catch(e: CacheNonExistentException) {
+            eventService.regenerateCache(id)
+        } finally {
+            return cacheService.getCache("Event_${id}_DonateSum")
+        }
     }
 
     /**
@@ -95,6 +102,12 @@ open class EventController {
      */
     @RequestMapping("/{id}/donatesum/", method = arrayOf(GET))
     open fun getEventDonateSum(@PathVariable("id") id: Long): Any {
-        return cacheService.getCache("Event_${id}_DonateSum")
+        try {
+            return cacheService.getCache("Event_${id}_DonateSum")
+        } catch(e: CacheNonExistentException) {
+            eventService.regenerateCache(id)
+        } finally {
+            return cacheService.getCache("Event_${id}_DonateSum")
+        }
     }
 }

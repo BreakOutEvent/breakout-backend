@@ -21,6 +21,8 @@ class EventView() {
     @Valid
     lateinit var startingLocation: CoordView
 
+    var isCurrent: Boolean = false
+
     @NotNull
     var duration: Int = 36
 
@@ -31,5 +33,6 @@ class EventView() {
         this.city = event.city
         this.startingLocation = CoordView(event.startingLocation)
         this.duration = event.duration
+        this.isCurrent = event.isCurrent
     }
 }

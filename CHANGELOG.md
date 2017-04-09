@@ -1,5 +1,9 @@
 # BreakOut API Changelog
 
+## 1.9.3
+
+ - events have a flag `current` whether it is a currently main event
+
 ## 1.9.1
 
  - `challenges_with_proof_sum` and `challenges_accepted_proof_sum` combined as `challengeSum`

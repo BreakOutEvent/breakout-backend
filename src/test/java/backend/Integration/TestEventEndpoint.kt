@@ -38,7 +38,7 @@ class TestEventEndpoint : IntegrationTest() {
                 startingLocation = Coord(0.0, 0.0),
                 duration = 36)
 
-        eventService.regenerateCache()
+        eventService.regenerateCache(null)
     }
 
     @Test
@@ -78,6 +78,7 @@ class TestEventEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.startingLocation.latitude").exists())
                 .andExpect(jsonPath("$.startingLocation.longitude").exists())
                 .andExpect(jsonPath("$.duration").exists())
+                .andExpect(jsonPath("$.isCurrent").exists())
                 .andReturn().response.contentAsString
 
         println(response)
@@ -104,12 +105,14 @@ class TestEventEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.[0].startingLocation.latitude").exists())
                 .andExpect(jsonPath("$.[0].startingLocation.longitude").exists())
                 .andExpect(jsonPath("$.[0].duration").exists())
+                .andExpect(jsonPath("$.[0].isCurrent").exists())
                 .andExpect(jsonPath("$.[1].id").exists())
                 .andExpect(jsonPath("$.[1].title").exists())
                 .andExpect(jsonPath("$.[1].city").exists())
                 .andExpect(jsonPath("$.[1].startingLocation.latitude").exists())
                 .andExpect(jsonPath("$.[1].startingLocation.longitude").exists())
                 .andExpect(jsonPath("$.[1].duration").exists())
+                .andExpect(jsonPath("$.[1].isCurrent").exists())
     }
 
     @Test
@@ -128,6 +131,7 @@ class TestEventEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.startingLocation.latitude").exists())
                 .andExpect(jsonPath("$.startingLocation.longitude").exists())
                 .andExpect(jsonPath("$.duration").exists())
+                .andExpect(jsonPath("$.isCurrent").exists())
     }
 
 

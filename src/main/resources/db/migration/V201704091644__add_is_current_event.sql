@@ -1,0 +1,3 @@
+USE `${BREAKOUT}`;
+
+ALTER TABLE `event` ADD `is_current` BOOLEAN DEFAULT FALSE;
