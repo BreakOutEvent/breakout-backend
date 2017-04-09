@@ -91,8 +91,7 @@ open class EventController {
             return cacheService.getCache("Event_${id}_Distance")
         } catch(e: CacheNonExistentException) {
             eventService.regenerateCache(id)
-        } finally {
-            return cacheService.getCache("Event_${id}_DonateSum")
+            throw e
         }
     }
 
@@ -106,8 +105,7 @@ open class EventController {
             return cacheService.getCache("Event_${id}_DonateSum")
         } catch(e: CacheNonExistentException) {
             eventService.regenerateCache(id)
-        } finally {
-            return cacheService.getCache("Event_${id}_DonateSum")
+            throw e
         }
     }
 }
