@@ -74,12 +74,12 @@ open class AdminController {
      * GET /admin/regeneratecache/
      * Allows Admin to resend failed mails
      */
-    //@PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping("/regeneratecache/", method = arrayOf(GET))
-    open fun regenerateCache(): String {
-        logger.info("Regenerating caches from admin request")
+    open fun regenerateCache(@RequestParam(value = "event", required = false) event: Long?): String {
+        logger.info("Regenerating event $event caches from admin request")
 
-        eventService.regenerateCache()
+        eventService.regenerateCache(event)
         return "done"
     }
 
