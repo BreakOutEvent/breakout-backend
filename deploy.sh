@@ -6,8 +6,8 @@ if [ ! -z "$TRAVIS_TAG" ]; then
     echo "This will push to docker"
     openssl aes-256-cbc -K $encrypted_bdbf36a38ce4_key -iv $encrypted_bdbf36a38ce4_iv -in secrets.zip.enc -out secrets.zip -d
     unzip secrets.zip
-    mv secrets/application-production.properties src/main/resources/application-production.properties
-    mv secrets/application-staging.properties src/main/resources/application-staging.properties
+    mv application-production.properties src/main/resources/application-production.properties
+    mv application-staging.properties src/main/resources/application-staging.properties
     docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS $DOCKER_URL
     docker build -f Dockerfile -t $DOCKER_REPO .
     docker tag $DOCKER_REPO $DOCKER_URL/$DOCKER_REPO:$TRAVIS_TAG
