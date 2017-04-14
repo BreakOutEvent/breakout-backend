@@ -15,7 +15,7 @@ interface FeatureFlagService {
 }
 
 @Service
-open class FeatureFlagServiceImpl : FeatureFlagService {
+class FeatureFlagServiceImpl : FeatureFlagService {
 
     private var repository: FeatureRepository
     private var logger: Logger

@@ -18,12 +18,12 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/team")
-open class TeamControllerV2(val userService: UserService, val teamService: TeamService) {
+class TeamControllerV2(val userService: UserService, val teamService: TeamService) {
 
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{teamId}/startingfee")
-    open fun getInvoiceForTeam(@PathVariable teamId: Long,
+    fun getInvoiceForTeam(@PathVariable teamId: Long,
                                @AuthenticationPrincipal customUserDetails: CustomUserDetails): TeamEntryFeeInvoiceView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
@@ -42,7 +42,7 @@ open class TeamControllerV2(val userService: UserService, val teamService: TeamS
     }
 
     @GetMapping("/")
-    open fun getAllTeamsOverview(): Iterable<TeamSummaryProjection> {
+    fun getAllTeamsOverview(): Iterable<TeamSummaryProjection> {
         val teams = teamService.findAllTeamSummaryProjections()
         return teams
     }

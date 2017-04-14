@@ -25,14 +25,19 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/invoice")
-open class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
+class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
                              private val userService: UserService,
                              private val sponsoringInvoiceService: SponsoringInvoiceService,
                              private val teamService: TeamService,
                              private val configurationService: ConfigurationService) {
 
     private val logger: Logger
-    private var PAYMENT_AUTH_TOKEN: String
+    private val PAYMENT_AUTH_TOKEN: String
+
+    init {
+        this.logger = LoggerFactory.getLogger(InvoiceController::class.java)
+        this.PAYMENT_AUTH_TOKEN = configurationService.getRequired("org.breakout.api.payment_auth_token")
+    }
 
     /**
      * POST /invoice/{id}/payment/
@@ -40,7 +45,7 @@ open class InvoiceController(private val teamEntryFeeService: TeamEntryFeeServic
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/{invoiceId}/payment/")
-    open fun createAdminPayment(@PathVariable invoiceId: Long,
+    fun createAdminPayment(@PathVariable invoiceId: Long,
                                 @Valid @RequestBody paymentView: PaymentView,
                                 @AuthenticationPrincipal customUserDetails: CustomUserDetails): Any {
 
@@ -69,7 +74,7 @@ open class InvoiceController(private val teamEntryFeeService: TeamEntryFeeServic
      * Allows admin to add payment to given invoice
      */
     @PostMapping("/payment/{purposeOfTransferCode}/")
-    open fun createPayment(@PathVariable purposeOfTransferCode: String,
+    fun createPayment(@PathVariable purposeOfTransferCode: String,
                            @RequestHeader("X-AUTH-TOKEN") authToken: String,
                            @Valid @RequestBody paymentView: PaymentView): Any {
 
@@ -100,7 +105,7 @@ open class InvoiceController(private val teamEntryFeeService: TeamEntryFeeServic
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/teamfee/{invoiceId}/")
-    open fun getTeamFeeInvoice(@PathVariable invoiceId: Long): TeamEntryFeeInvoiceView {
+    fun getTeamFeeInvoice(@PathVariable invoiceId: Long): TeamEntryFeeInvoiceView {
 
         val invoice = teamEntryFeeService.findById(invoiceId) ?: throw NotFoundException("No invoice with id $invoiceId found")
         return TeamEntryFeeInvoiceView(invoice)
@@ -113,7 +118,7 @@ open class InvoiceController(private val teamEntryFeeService: TeamEntryFeeServic
      */
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/sponsoring/{teamId}/")
-    open fun getAllSponsorInvoicesForTeam(@PathVariable teamId: Long,
+    fun getAllSponsorInvoicesForTeam(@PathVariable teamId: Long,
                                           @AuthenticationPrincipal cud: CustomUserDetails): Iterable<SponsoringInvoiceView> {
         val user = userService.getUserFromCustomUserDetails(cud)
         if (user.hasRole(Admin::class)) {
@@ -136,7 +141,7 @@ open class InvoiceController(private val teamEntryFeeService: TeamEntryFeeServic
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/sponsoring/")
-    open fun getAllSponsorInvoices(): List<SponsoringInvoiceView> {
+    fun getAllSponsorInvoices(): List<SponsoringInvoiceView> {
 
         val invoices = sponsoringInvoiceService.findAll()
         return invoices.map(::SponsoringInvoiceView)
@@ -148,7 +153,7 @@ open class InvoiceController(private val teamEntryFeeService: TeamEntryFeeServic
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/sponsoring/")
-    open fun createSponsorInvoice(@Valid @RequestBody body: Map<String, Any>): SponsoringInvoiceView {
+    fun createSponsorInvoice(@Valid @RequestBody body: Map<String, Any>): SponsoringInvoiceView {
 
         val amount = body["amount"] as? Number ?: throw BadRequestException("body is missing field amount")
         val teamId = body["teamId"] as? Int ?: throw BadRequestException("body is missing field teamId")
@@ -160,10 +165,5 @@ open class InvoiceController(private val teamEntryFeeService: TeamEntryFeeServic
 
         val sponsoringInvoice = sponsoringInvoiceService.createInvoice(team, Money.of(amount, "EUR"), company, firstname, lastname)
         return SponsoringInvoiceView(sponsoringInvoice)
-    }
-
-    init {
-        this.logger = LoggerFactory.getLogger(InvoiceController::class.java)
-        this.PAYMENT_AUTH_TOKEN = configurationService.getRequired("org.breakout.api.payment_auth_token")
     }
 }

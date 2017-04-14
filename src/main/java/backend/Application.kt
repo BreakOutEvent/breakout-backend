@@ -8,7 +8,7 @@ import org.springframework.cache.annotation.EnableCaching
 
 @SpringBootApplication
 @EnableCaching
-open class Application {
+class Application {
     companion object {
         @JvmStatic fun main(args: Array<String>) {
             SpringApplication.run(Application::class.java, *args)

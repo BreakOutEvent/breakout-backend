@@ -24,7 +24,7 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/event/{eventId}")
-open class LocationController(private val locationService: LocationService,
+class LocationController(private val locationService: LocationService,
                               private val teamService: TeamService,
                               private val userService: UserService) {
 
@@ -36,7 +36,7 @@ open class LocationController(private val locationService: LocationService,
      * Return a list of all locations for a specific event
      */
     @GetMapping("/location/")
-    open fun getAllLocationsForEvent(@PathVariable eventId: Long,
+    fun getAllLocationsForEvent(@PathVariable eventId: Long,
                                      @RequestParam(value = "perTeam", required = false) perTeam: Int?): Iterable<TeamLocationView> {
         return locationService.findByEventId(eventId, perTeam ?: 20).map { data ->
             TeamLocationView(data.key, data.value)
@@ -48,7 +48,7 @@ open class LocationController(private val locationService: LocationService,
      * Return a list of all locations for a certain team at a certain event
      */
     @GetMapping("/team/{teamId}/location/")
-    open fun getAllLocationsForEventAndTeam(@PathVariable("eventId") eventId: Long,
+    fun getAllLocationsForEventAndTeam(@PathVariable("eventId") eventId: Long,
                                             @PathVariable("teamId") teamId: Long,
                                             @RequestParam(value = "perTeam", required = false) perTeam: Int?): Iterable<LocationView> {
         return locationService.findByTeamId(teamId, perTeam ?: 20).map(::LocationView)
@@ -61,7 +61,7 @@ open class LocationController(private val locationService: LocationService,
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/team/{teamId}/location/")
     @ResponseStatus(CREATED)
-    open fun createLocation(@PathVariable("eventId") eventId: Long,
+    fun createLocation(@PathVariable("eventId") eventId: Long,
                             @PathVariable("teamId") teamId: Long,
                             @AuthenticationPrincipal customUserDetails: CustomUserDetails,
                             @Valid @RequestBody locationView: LocationView): LocationView {
@@ -84,7 +84,7 @@ open class LocationController(private val locationService: LocationService,
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/team/{teamId}/location/multiple/")
     @ResponseStatus(CREATED)
-    open fun createMultipleLocation(@PathVariable("eventId") eventId: Long,
+    fun createMultipleLocation(@PathVariable("eventId") eventId: Long,
                                     @PathVariable("teamId") teamId: Long,
                                     @AuthenticationPrincipal customUserDetails: CustomUserDetails,
                                     @Valid @RequestBody locationViews: List<LocationView>): List<LocationView> {

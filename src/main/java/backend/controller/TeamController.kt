@@ -28,20 +28,14 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/event/{eventId}/team")
-open class TeamController(private val teamService: TeamService,
+class TeamController(private val teamService: TeamService,
                           private val eventService: EventService,
                           private val configurationService: ConfigurationService,
                           private val userService: UserService) {
 
-    private val JWT_SECRET: String
-    private var PAGE_SIZE: Int
-    private val logger: Logger
-
-    init {
-        this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
-        this.PAGE_SIZE = configurationService.getRequired("org.breakout.api.page_size").toInt()
-        this.logger = LoggerFactory.getLogger(TeamController::class.java)
-    }
+    private val JWT_SECRET: String = configurationService.getRequired("org.breakout.api.jwt_secret")
+    private val PAGE_SIZE: Int = configurationService.getRequired("org.breakout.api.page_size").toInt()
+    private val logger: Logger = LoggerFactory.getLogger(TeamController::class.java)
 
 
     /**
@@ -50,7 +44,7 @@ open class TeamController(private val teamService: TeamService,
      */
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/leave/")
-    open fun leaveTeam(@AuthenticationPrincipal customUserDetails: CustomUserDetails): Map<String, String> {
+    fun leaveTeam(@AuthenticationPrincipal customUserDetails: CustomUserDetails): Map<String, String> {
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val participant = user.getRole(Participant::class) ?: throw BadRequestException("User is no participant")
         val team = participant.getCurrentTeam() ?: throw BadRequestException("User is no part of a team")
@@ -64,7 +58,7 @@ open class TeamController(private val teamService: TeamService,
      */
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/invitation/")
-    open fun showInvitationsForUserAndEvent(@PathVariable eventId: Long,
+    fun showInvitationsForUserAndEvent(@PathVariable eventId: Long,
                                             @AuthenticationPrincipal customUserDetails: CustomUserDetails): Iterable<InvitationView> {
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val invitations = teamService.findInvitationsForUserAndEvent(user, eventId)
@@ -78,7 +72,7 @@ open class TeamController(private val teamService: TeamService,
     @ResponseStatus(CREATED)
     @PostMapping("/")
     @PreAuthorize("isAuthenticated()")
-    open fun createTeam(@PathVariable eventId: Long,
+    fun createTeam(@PathVariable eventId: Long,
                         @AuthenticationPrincipal customUserDetails: CustomUserDetails,
                         @Valid @RequestBody body: TeamView): TeamView {
 
@@ -101,7 +95,7 @@ open class TeamController(private val teamService: TeamService,
      */
     @PutMapping("/{teamId}/")
     @PreAuthorize("isAuthenticated()")
-    open fun editTeam(@PathVariable eventId: Long,
+    fun editTeam(@PathVariable eventId: Long,
                       @PathVariable teamId: Long,
                       @AuthenticationPrincipal customUserDetails: CustomUserDetails,
                       @Valid @RequestBody body: TeamView): TeamView {
@@ -143,7 +137,7 @@ open class TeamController(private val teamService: TeamService,
     @ResponseStatus(CREATED)
     @PostMapping("/{teamId}/invitation/")
     @PreAuthorize("isAuthenticated()")
-    open fun inviteUser(@PathVariable eventId: Long,
+    fun inviteUser(@PathVariable eventId: Long,
                         @PathVariable teamId: Long,
                         @Valid @RequestBody body: Map<String, Any>): Map<String, String> {
 
@@ -164,7 +158,7 @@ open class TeamController(private val teamService: TeamService,
     @ResponseStatus(CREATED)
     @PostMapping("/{teamId}/member/")
     @PreAuthorize("isAuthenticated()")
-    open fun joinTeam(@PathVariable eventId: Long,
+    fun joinTeam(@PathVariable eventId: Long,
                       @PathVariable teamId: Long,
                       @AuthenticationPrincipal customUserDetails: CustomUserDetails,
                       @Valid @RequestBody body: Map<String, String>): TeamView {
@@ -189,7 +183,7 @@ open class TeamController(private val teamService: TeamService,
      * gets a specific Team
      */
     @GetMapping("/{teamId}/")
-    open fun showTeam(@PathVariable teamId: Long): TeamView {
+    fun showTeam(@PathVariable teamId: Long): TeamView {
         val team = teamService.findOne(teamId) ?: throw NotFoundException("team with id $teamId does not exist")
         val teamDonateSum = teamService.getDonateSum(teamId)
         val teamDistance = teamService.getDistance(teamId)
@@ -201,7 +195,7 @@ open class TeamController(private val teamService: TeamService,
      * gets all Teams for Event
      */
     @GetMapping("/")
-    open fun showTeamsByEvent(@PathVariable eventId: Long): Iterable<TeamView> {
+    fun showTeamsByEvent(@PathVariable eventId: Long): Iterable<TeamView> {
         val teams = teamService.findByEventId(eventId)
         return teams.map {
             val teamDonateSum = teamService.getDonateSum(it)
@@ -216,7 +210,7 @@ open class TeamController(private val teamService: TeamService,
      * gets all Postings for Team
      */
     @GetMapping("/{teamId}/posting/")
-    open fun getTeamPostingIds(@PathVariable teamId: Long,
+    fun getTeamPostingIds(@PathVariable teamId: Long,
                                @RequestParam(value = "page", required = false) page: Int?,
                                @RequestParam(value = "userid", required = false) userId: Long?): List<PostingView> {
         return teamService.findPostingsById(teamId, page ?: 0, PAGE_SIZE).map { PostingView(it.hasLikesBy(userId)) }
@@ -231,7 +225,7 @@ open class TeamController(private val teamService: TeamService,
      * Linear distance = |A -> C|
      */
     @GetMapping("/{id}/distance/")
-    open fun getTeamDistance(@PathVariable("id") teamId: Long): Map<String, Double> {
+    fun getTeamDistance(@PathVariable("id") teamId: Long): Map<String, Double> {
         return mapOf("distance" to teamService.getDistance(teamId))
     }
 
@@ -240,7 +234,7 @@ open class TeamController(private val teamService: TeamService,
      * Get the sponsored sums per team
      */
     @GetMapping("/{id}/donatesum/")
-    open fun getTeamDonateSum(@PathVariable("id") teamId: Long): DonateSums {
+    fun getTeamDonateSum(@PathVariable("id") teamId: Long): DonateSums {
         return teamService.getDonateSum(teamId)
     }
 }

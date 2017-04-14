@@ -19,7 +19,7 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/messaging")
-open class MessagingController(private val groupMessageService: GroupMessageService,
+class MessagingController(private val groupMessageService: GroupMessageService,
                                private val userService: UserService) {
 
 
@@ -30,7 +30,7 @@ open class MessagingController(private val groupMessageService: GroupMessageServ
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/")
     @ResponseStatus(CREATED)
-    open fun createGroupMessage(@Valid @RequestBody body: List<Long>,
+    fun createGroupMessage(@Valid @RequestBody body: List<Long>,
                                 @AuthenticationPrincipal customUserDetails: CustomUserDetails): GroupMessageView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
@@ -50,7 +50,7 @@ open class MessagingController(private val groupMessageService: GroupMessageServ
      */
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}/")
-    open fun editGroupMessage(@PathVariable("id") id: Long,
+    fun editGroupMessage(@PathVariable("id") id: Long,
                               @Valid @RequestBody body: List<Long>,
                               @AuthenticationPrincipal customUserDetails: CustomUserDetails): GroupMessageView {
 
@@ -73,7 +73,7 @@ open class MessagingController(private val groupMessageService: GroupMessageServ
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/message/")
     @ResponseStatus(CREATED)
-    open fun addMessage(@PathVariable("id") id: Long,
+    fun addMessage(@PathVariable("id") id: Long,
                         @Valid @RequestBody body: MessageView,
                         @AuthenticationPrincipal customUserDetails: CustomUserDetails): GroupMessageView {
 
@@ -93,7 +93,7 @@ open class MessagingController(private val groupMessageService: GroupMessageServ
      */
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}/")
-    open fun getGroupMessage(@PathVariable("id") id: Long,
+    fun getGroupMessage(@PathVariable("id") id: Long,
                              @AuthenticationPrincipal customUserDetails: CustomUserDetails): GroupMessageView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)

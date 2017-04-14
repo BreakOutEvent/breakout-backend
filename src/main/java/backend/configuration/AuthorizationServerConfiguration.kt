@@ -27,7 +27,7 @@ import javax.sql.DataSource
 
 @Configuration
 @EnableAuthorizationServer
-open class AuthorizationServerConfiguration : AuthorizationServerConfigurerAdapter() {
+class AuthorizationServerConfiguration : AuthorizationServerConfigurerAdapter() {
 
     @Qualifier("authenticationManagerBean")
     @Autowired lateinit private var authenticationManager: AuthenticationManager
@@ -39,19 +39,19 @@ open class AuthorizationServerConfiguration : AuthorizationServerConfigurerAdapt
     private lateinit var clientSecret: String
 
     @Bean
-    open fun tokenStore(): TokenStore {
+    fun tokenStore(): TokenStore {
         return JdbcTokenStore(dataSource)
     }
 
     @PostConstruct
-    open fun setUp() {
+    fun setUp() {
         clientName = configurationService.getRequired("org.breakout.api.client.name")
         clientSecret = configurationService.getRequired("org.breakout.api.client.secret")
     }
 
     @Bean
     @Primary
-    open fun tokenServices(): DefaultTokenServices {
+    fun tokenServices(): DefaultTokenServices {
         return DefaultTokenServices().apply {
             setSupportRefreshToken(true)
             setTokenStore(this@AuthorizationServerConfiguration.tokenStore())

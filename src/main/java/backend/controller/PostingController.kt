@@ -24,14 +24,14 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/posting")
-open class PostingController(private val postingService: PostingService,
+class PostingController(private val postingService: PostingService,
                              private val mediaService: MediaService,
                              private val configurationService: ConfigurationService,
                              private val userService: UserService) {
 
-    private val logger: Logger
-    private var JWT_SECRET: String
-    private var PAGE_SIZE: Int
+    private val logger: Logger = LoggerFactory.getLogger(PostingController::class.java)
+    private val JWT_SECRET: String = configurationService.getRequired("org.breakout.api.jwt_secret")
+    private val PAGE_SIZE: Int = configurationService.getRequired("org.breakout.api.page_size").toInt()
 
 
     /**
@@ -41,7 +41,7 @@ open class PostingController(private val postingService: PostingService,
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/")
     @ResponseStatus(CREATED)
-    open fun createPosting(@Valid @RequestBody body: PostingView,
+    fun createPosting(@Valid @RequestBody body: PostingView,
                            @AuthenticationPrincipal customUserDetails: CustomUserDetails): PostingView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
@@ -65,7 +65,7 @@ open class PostingController(private val postingService: PostingService,
      * Gets posting by id
      */
     @GetMapping("/{id}/")
-    open fun getPosting(@PathVariable("id") id: Long, @RequestParam(value = "userid", required = false) userId: Long?): PostingView {
+    fun getPosting(@PathVariable("id") id: Long, @RequestParam(value = "userid", required = false) userId: Long?): PostingView {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
         return PostingView(posting.hasLikesBy(userId))
     }
@@ -76,7 +76,7 @@ open class PostingController(private val postingService: PostingService,
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping("/{id}/", method = arrayOf(DELETE))
-    open fun adminDeletePosting(@PathVariable("id") id: Long): Map<String, String> {
+    fun adminDeletePosting(@PathVariable("id") id: Long): Map<String, String> {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
         postingService.delete(posting)
         return mapOf("message" to "success")
@@ -88,7 +88,7 @@ open class PostingController(private val postingService: PostingService,
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping("/{id}/comment/{commentId}/", method = arrayOf(DELETE))
-    open fun adminDeleteComment(@PathVariable("id") postingId: Long,
+    fun adminDeleteComment(@PathVariable("id") postingId: Long,
                                 @PathVariable("commentId") commentId: Long): Map<String, String> {
 
         val posting = postingService.getByID(postingId) ?: throw NotFoundException("Posting with id $postingId not found")
@@ -103,7 +103,7 @@ open class PostingController(private val postingService: PostingService,
      * Gets all postings
      */
     @GetMapping("/")
-    open fun getAllPostings(@RequestParam(value = "page", required = false) page: Int?,
+    fun getAllPostings(@RequestParam(value = "page", required = false) page: Int?,
                             @RequestParam(value = "userid", required = false) userId: Long?): Iterable<PostingView> {
         return postingService.findAll(page ?: 0, PAGE_SIZE).map { PostingView(it.hasLikesBy(userId)) }
     }
@@ -115,7 +115,7 @@ open class PostingController(private val postingService: PostingService,
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/comment/")
     @ResponseStatus(CREATED)
-    open fun createComment(@PathVariable("id") id: Long,
+    fun createComment(@PathVariable("id") id: Long,
                            @Valid @RequestBody body: CommentView,
                            @AuthenticationPrincipal customUserDetails: CustomUserDetails): CommentView {
 
@@ -139,7 +139,7 @@ open class PostingController(private val postingService: PostingService,
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/like/")
     @ResponseStatus(CREATED)
-    open fun createLike(@PathVariable("id") id: Long,
+    fun createLike(@PathVariable("id") id: Long,
                         @Valid @RequestBody body: LikeView,
                         @AuthenticationPrincipal customUserDetails: CustomUserDetails): LikeView {
 
@@ -157,7 +157,7 @@ open class PostingController(private val postingService: PostingService,
      */
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/{id}/like/", method = arrayOf(DELETE))
-    open fun deleteLike(@PathVariable("id") id: Long,
+    fun deleteLike(@PathVariable("id") id: Long,
                         @AuthenticationPrincipal customUserDetails: CustomUserDetails): Map<String, String> {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
@@ -172,7 +172,7 @@ open class PostingController(private val postingService: PostingService,
      * Gets Likes for Posting
      */
     @GetMapping("/{id}/like/")
-    open fun getLikesForPosting(@PathVariable("id") id: Long): List<LikeView> {
+    fun getLikesForPosting(@PathVariable("id") id: Long): List<LikeView> {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
         val likes = posting.likes
         return likes.map(::LikeView)
@@ -183,16 +183,11 @@ open class PostingController(private val postingService: PostingService,
      * Gets Likes for Posting
      */
     @GetMapping("/hashtag/{hashtag}/")
-    open fun getPostingsByHashtag(@RequestParam(value = "page", required = false) page: Int?,
+    fun getPostingsByHashtag(@RequestParam(value = "page", required = false) page: Int?,
                                   @PathVariable("hashtag") hashtag: String,
                                   @RequestParam(value = "userid", required = false) userId: Long?): List<PostingView> {
         val posting = postingService.findByHashtag(hashtag, page ?: 0, PAGE_SIZE)
         return posting.map { PostingView(it.hasLikesBy(userId)) }
     }
 
-    init {
-        this.logger = LoggerFactory.getLogger(PostingController::class.java)
-        this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
-        this.PAGE_SIZE = configurationService.getRequired("org.breakout.api.page_size").toInt()
-    }
 }

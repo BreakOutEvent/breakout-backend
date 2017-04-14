@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/me")
-open class AuthenticatedUserController(private val userService: UserService, private val teamService: TeamService) {
+class AuthenticatedUserController(private val userService: UserService, private val teamService: TeamService) {
 
 
     /**
@@ -24,7 +24,7 @@ open class AuthenticatedUserController(private val userService: UserService, pri
      */
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/")
-    open fun getAuthenticatedUser(@AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
+    fun getAuthenticatedUser(@AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         return UserView(user)
     }
@@ -35,7 +35,7 @@ open class AuthenticatedUserController(private val userService: UserService, pri
      */
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/invitation/")
-    open fun showInvitationsForUser(@AuthenticationPrincipal customUserDetails: CustomUserDetails): Iterable<InvitationView> {
+    fun showInvitationsForUser(@AuthenticationPrincipal customUserDetails: CustomUserDetails): Iterable<InvitationView> {
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val invitations = teamService.findInvitationsForUser(user)
         return invitations.map(::InvitationView)

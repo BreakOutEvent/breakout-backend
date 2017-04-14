@@ -1,6 +1,6 @@
 buildscript {
 
-    ext.kotlin_version = '1.0.2'
+    ext.kotlin_version = '1.1.1'
     ext.powermock_version = '1.6.5'
 
     repositories {
@@ -10,6 +10,7 @@ buildscript {
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlin_version"
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE")
 
     }
@@ -20,6 +21,12 @@ apply plugin: 'kotlin'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
+
+/*
+ * Makes all beans annotated with  @Component, @Async,
+ * @Transactional, @Cacheable non-final
+ */
+apply plugin: "kotlin-spring"
 
 jar {
     version = '0.1.0'

@@ -14,7 +14,7 @@ import java.util.concurrent.Executors
 
 @Service
 @Profile(DEVELOPMENT, TEST, STAGING)
-open class SpyMailSenderServiceImpl @Autowired constructor(private val emailRepository: EmailRepository) : MailSenderService {
+class SpyMailSenderServiceImpl @Autowired constructor(private val emailRepository: EmailRepository) : MailSenderService {
 
     private val logger = LoggerFactory.getLogger(SpyMailSenderServiceImpl::class.java)
     private val pool = Executors.newCachedThreadPool()

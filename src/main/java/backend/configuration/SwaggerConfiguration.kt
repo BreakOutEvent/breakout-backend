@@ -19,10 +19,10 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2
 @Configuration
 @Profile(DEVELOPMENT, STAGING)
 @EnableSwagger2
-open class SwaggerConfiguration {
+class SwaggerConfiguration {
 
     @Bean
-    open fun api() = Docket(DocumentationType.SWAGGER_2)
+    fun api() = Docket(DocumentationType.SWAGGER_2)
             .select()
             .apis(RequestHandlerSelectors.any())
             .apis(Predicates.not(RequestHandlerSelectors.basePackage("org.springframework.boot")))
@@ -31,7 +31,7 @@ open class SwaggerConfiguration {
             .apiInfo(apiInfo())
 
     @Bean
-    open fun uiConfiguration() = UiConfiguration.DEFAULT
+    fun uiConfiguration() = UiConfiguration.DEFAULT
 
     private fun apiInfo() = ApiInfoBuilder()
             .title("Breakout Backend REST API")

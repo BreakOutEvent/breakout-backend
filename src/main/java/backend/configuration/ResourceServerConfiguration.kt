@@ -19,7 +19,7 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
 
 @Configuration
 @EnableResourceServer
-open class ResourceServerConfiguration : ResourceServerConfigurerAdapter() {
+class ResourceServerConfiguration : ResourceServerConfigurerAdapter() {
 
     override fun configure(resources: ResourceServerSecurityConfigurer?) {
         resources!!.resourceId("BREAKOUT_BACKEND")

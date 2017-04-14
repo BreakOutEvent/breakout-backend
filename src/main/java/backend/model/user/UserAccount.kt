@@ -18,7 +18,7 @@ import javax.persistence.*
 import kotlin.reflect.KClass
 
 @Entity
-open class UserAccount : BasicEntity, User {
+class UserAccount : BasicEntity, User {
 
     constructor() : super() {
         this.isBlocked = true

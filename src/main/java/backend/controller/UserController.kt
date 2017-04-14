@@ -27,7 +27,7 @@ import javax.validation.Valid
 @Api
 @RestController
 @RequestMapping("/user")
-open class UserController(private val userService: UserService,
+class UserController(private val userService: UserService,
                           private val teamService: TeamService,
                           private val configurationService: ConfigurationService) {
 
@@ -45,7 +45,7 @@ open class UserController(private val userService: UserService,
      */
     @PostMapping("/")
     @ResponseStatus(CREATED)
-    open fun createUser(@Valid @RequestBody body: UserView): UserView {
+    fun createUser(@Valid @RequestBody body: UserView): UserView {
 
         // Validate existence of email and password by hand
         // because UserView has those as optional because of PUT requests
@@ -70,7 +70,7 @@ open class UserController(private val userService: UserService,
      * allows User to request password reset
      */
     @PostMapping("/requestreset/")
-    open fun requestPasswordReset(@Valid @RequestBody body: Map<String, Any>): Map<String, String> {
+    fun requestPasswordReset(@Valid @RequestBody body: Map<String, Any>): Map<String, String> {
 
         val emailString = body["email"] as? String ?: throw BadRequestException("body is missing field email")
         userService.requestReset(emailString)
@@ -84,7 +84,7 @@ open class UserController(private val userService: UserService,
      * Sets a new Password for User with given token
      */
     @PostMapping("/passwordreset/")
-    open fun resetPassword(@Valid @RequestBody body: Map<String, Any>): Map<String, String> {
+    fun resetPassword(@Valid @RequestBody body: Map<String, Any>): Map<String, String> {
 
         val emailString = body["email"] as? String ?: throw BadRequestException("body is missing field email")
         val password = body["password"] as? String ?: throw BadRequestException("body is missing field password")
@@ -101,7 +101,7 @@ open class UserController(private val userService: UserService,
      * Gets all users
      */
     @GetMapping("/")
-    open fun showUsers(): Iterable<BasicUserView> {
+    fun showUsers(): Iterable<BasicUserView> {
         return userService.getAllUsers().map(::BasicUserView)
     }
 
@@ -110,7 +110,7 @@ open class UserController(private val userService: UserService,
      * Searches for User by String greater 2 chars
      */
     @GetMapping("/search/{search}/")
-    open fun searchUsers(@PathVariable("search") search: String): List<SimpleUserView> {
+    fun searchUsers(@PathVariable("search") search: String): List<SimpleUserView> {
         if (search.length < 3) return listOf()
         val users = userService.searchByString(search).take(6).toMutableList()
         users.addAll(teamService.searchByString(search).take(3).flatMap { it.members.map { it.account } })
@@ -123,7 +123,7 @@ open class UserController(private val userService: UserService,
      */
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}/")
-    open fun updateUser(@PathVariable id: Long,
+    fun updateUser(@PathVariable id: Long,
                         @Valid @RequestBody body: UserView,
                         @AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
 
@@ -143,7 +143,7 @@ open class UserController(private val userService: UserService,
      * Gets user with given id
      */
     @GetMapping("/{id}/")
-    open fun showUser(@PathVariable id: Long): BasicUserView {
+    fun showUser(@PathVariable id: Long): BasicUserView {
 
         val user = userService.getUserById(id) ?: throw NotFoundException("user with id $id does not exist")
         return BasicUserView(user)
@@ -202,7 +202,7 @@ open class UserController(private val userService: UserService,
      * Get an invitation including data such as email address via a token
      */
     @GetMapping("/invitation")
-    open fun showInvitation(@RequestParam token: String): DetailedInvitationView {
+    fun showInvitation(@RequestParam token: String): DetailedInvitationView {
         val invitation = teamService.findInvitationsByInviteCode(token) ?: throw NotFoundException("No invitation for code $token")
         return DetailedInvitationView(invitation)
     }

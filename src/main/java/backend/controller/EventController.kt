@@ -18,7 +18,7 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/event")
-open class EventController(open var eventService: EventService,
+class EventController(open var eventService: EventService,
                            open var cacheService: CacheService) {
 
     private var logger: Logger = LoggerFactory.getLogger(EventController::class.java)
@@ -30,7 +30,7 @@ open class EventController(open var eventService: EventService,
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(CREATED)
     @PostMapping("/")
-    open fun createEvent(@Valid @RequestBody body: EventView): EventView {
+    fun createEvent(@Valid @RequestBody body: EventView): EventView {
 
         val event = eventService.createEvent(
                 title = body.title,
@@ -47,7 +47,7 @@ open class EventController(open var eventService: EventService,
      * Gets a list of all events
      */
     @GetMapping("/")
-    open fun getAllEvents(): Iterable<EventView> {
+    fun getAllEvents(): Iterable<EventView> {
         return eventService.findAll().map(::EventView)
     }
 
@@ -56,7 +56,7 @@ open class EventController(open var eventService: EventService,
      * Gets Event by ID
      */
     @GetMapping("/{id}/")
-    open fun getEventById(@PathVariable("id") id: Long): EventView {
+    fun getEventById(@PathVariable("id") id: Long): EventView {
         val event = eventService.findById(id) ?: throw NotFoundException("event with id $id does not exist")
         return EventView(event)
     }
@@ -66,7 +66,7 @@ open class EventController(open var eventService: EventService,
      * Gets all Postings for given event
      */
     @GetMapping("/{id}/posting/")
-    open fun getEventPostings(@PathVariable("id") id: Long): List<Long> {
+    fun getEventPostings(@PathVariable("id") id: Long): List<Long> {
         val postingIds = eventService.findPostingsById(id) ?: throw NotFoundException("event with id $id does not exist")
         return postingIds
     }
@@ -76,7 +76,7 @@ open class EventController(open var eventService: EventService,
      * Returns the sum of the distance of all teams of the event with {id}
      */
     @GetMapping("/{id}/distance/")
-    open fun getEventDistance(@PathVariable("id") id: Long): Any {
+    fun getEventDistance(@PathVariable("id") id: Long): Any {
         return cacheService.getCache("Event_${id}_Distance")
     }
 
@@ -85,7 +85,7 @@ open class EventController(open var eventService: EventService,
      * Returns the sum of the distance of all teams of the event with {id}
      */
     @GetMapping("/{id}/donatesum/")
-    open fun getEventDonateSum(@PathVariable("id") id: Long): Any {
+    fun getEventDonateSum(@PathVariable("id") id: Long): Any {
         return cacheService.getCache("Event_${id}_DonateSum")
     }
 }

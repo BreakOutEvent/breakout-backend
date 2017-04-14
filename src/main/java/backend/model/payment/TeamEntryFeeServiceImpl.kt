@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
 @Service
-open class TeamEntryFeeServiceImpl : TeamEntryFeeService {
+class TeamEntryFeeServiceImpl : TeamEntryFeeService {
 
     private val teamEntryFeeInvoiceRepository: TeamEntryFeeInvoiceRepository
     private val mailService: MailService

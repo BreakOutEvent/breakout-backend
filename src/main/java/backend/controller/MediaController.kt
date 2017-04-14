@@ -19,11 +19,11 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/media")
-open class MediaController(private val mediaSizeService: MediaSizeService,
+class MediaController(private val mediaSizeService: MediaSizeService,
                            private val mediaService: MediaService,
                            private val configurationService: ConfigurationService) {
 
-    private var JWT_SECRET: String
+    private val JWT_SECRET: String
 
     /**
      * POST /media/{id}/
@@ -31,7 +31,7 @@ open class MediaController(private val mediaSizeService: MediaSizeService,
      */
     @PostMapping("/{id}/")
     @ResponseStatus(CREATED)
-    open fun createMediaSize(@PathVariable("id") id: Long,
+    fun createMediaSize(@PathVariable("id") id: Long,
                              @RequestHeader("X-UPLOAD-TOKEN") uploadToken: String,
                              @Valid @RequestBody body: MediaSizeView): MediaSizeView {
 
@@ -48,7 +48,7 @@ open class MediaController(private val mediaSizeService: MediaSizeService,
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping("/{id}/", method = arrayOf(RequestMethod.DELETE))
-    open fun adminDeletePosting(@PathVariable("id") id: Long): Map<String, String> {
+    fun adminDeletePosting(@PathVariable("id") id: Long): Map<String, String> {
         val media = mediaService.getByID(id) ?: throw NotFoundException("media with id $id does not exist")
         mediaService.deleteSizes(media)
         return mapOf("message" to "success")

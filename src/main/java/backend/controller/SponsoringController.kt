@@ -25,23 +25,19 @@ import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
 @RestController
-open class SponsoringController(private var sponsoringService: SponsoringService,
+class SponsoringController(private var sponsoringService: SponsoringService,
                                 private var userService: UserService,
                                 private var teamService: TeamService,
                                 private var configurationService: ConfigurationService) {
 
-    private var jwtSecret: String
-
-    init {
-        this.jwtSecret = configurationService.getRequired("org.breakout.api.jwt_secret")
-    }
+    private val jwtSecret: String = configurationService.getRequired("org.breakout.api.jwt_secret")
 
     /**
      * GET /event/{eventId}/team/{teamId}/sponsoring/
      * Get a list of all sponsorings for the team with teamId
      */
     @GetMapping("/event/{eventId}/team/{teamId}/sponsoring/")
-    open fun getAllSponsorings(@AuthenticationPrincipal customUserDetails: CustomUserDetails?,
+    fun getAllSponsorings(@AuthenticationPrincipal customUserDetails: CustomUserDetails?,
                                @PathVariable teamId: Long): Iterable<SponsoringView> {
 
         val team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId found")
@@ -92,7 +88,7 @@ open class SponsoringController(private var sponsoringService: SponsoringService
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/event/{eventId}/team/{teamId}/sponsoring/")
     @ResponseStatus(CREATED)
-    open fun createSponsoring(@PathVariable teamId: Long,
+    fun createSponsoring(@PathVariable teamId: Long,
                               @Valid @RequestBody body: SponsoringView,
                               @AuthenticationPrincipal customUserDetails: CustomUserDetails): SponsoringView {
 
@@ -140,7 +136,7 @@ open class SponsoringController(private var sponsoringService: SponsoringService
      */
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/user/{userId}/sponsor/sponsoring/")
-    open fun getAllSponsoringsForSponsor(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
+    fun getAllSponsoringsForSponsor(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
                                          @PathVariable userId: Long): Iterable<SponsoringView> {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
@@ -152,7 +148,7 @@ open class SponsoringController(private var sponsoringService: SponsoringService
 
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/event/{eventId}/team/{teamId}/sponsoring/{sponsoringId}/status/")
-    open fun acceptOrRejectSponsoring(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
+    fun acceptOrRejectSponsoring(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
                                       @PathVariable sponsoringId: Long,
                                       @RequestBody body: Map<String, String>): SponsoringView {
 

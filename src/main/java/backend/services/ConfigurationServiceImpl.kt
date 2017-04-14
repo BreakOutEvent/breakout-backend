@@ -5,7 +5,7 @@ import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 
 @Service
-open class ConfigurationServiceImpl : ConfigurationService {
+class ConfigurationServiceImpl : ConfigurationService {
 
     private val environment: Environment
     private val systemWrapper: SystemWrapper
@@ -31,6 +31,6 @@ open class ConfigurationServiceImpl : ConfigurationService {
 }
 
 @Service
-open class SystemWrapper {
-    open fun getenv(key: String): String? = System.getenv(key)
+class SystemWrapper {
+    fun getenv(key: String): String? = System.getenv(key)
 }

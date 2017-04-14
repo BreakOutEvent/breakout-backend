@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service
 
 @Service
 @Profile(PRODUCTION)
-open class GeoCodingServiceImpl : GeoCodingService {
+class GeoCodingServiceImpl : GeoCodingService {
 
     private val apiKey: String
 

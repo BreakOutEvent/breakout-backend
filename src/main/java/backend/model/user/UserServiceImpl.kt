@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-open class UserServiceImpl : UserService {
+class UserServiceImpl : UserService {
 
     private val userRepository: UserRepository
     private val mailService: MailService

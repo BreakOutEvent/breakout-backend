@@ -15,15 +15,15 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Configuration
-open class GeneralConfiguration {
+class GeneralConfiguration {
 
     @Bean
-    open fun restOperations(): RestOperations {
+    fun restOperations(): RestOperations {
         return RestTemplate()
     }
 
     @Bean
-    open fun requestLoggingFilter(): CustomLoggingFilter {
+    fun requestLoggingFilter(): CustomLoggingFilter {
         val crlf = CustomLoggingFilter()
         crlf.setIncludeQueryString(true)
         crlf.setIncludePayload(false)

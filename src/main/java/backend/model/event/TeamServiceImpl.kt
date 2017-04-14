@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 
 @Service
-open class TeamServiceImpl : TeamService {
+class TeamServiceImpl : TeamService {
 
     private val repository: TeamRepository
     private val userService: UserService

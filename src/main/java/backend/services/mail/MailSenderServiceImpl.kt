@@ -19,7 +19,7 @@ import java.util.concurrent.Executors
 
 @Service
 @Profile(PRODUCTION)
-open class MailSenderServiceImpl @Autowired constructor(private val restTemplate: RestOperations,
+class MailSenderServiceImpl @Autowired constructor(private val restTemplate: RestOperations,
                                                    private val emailRepository: EmailRepository,
                                                    configurationService: ConfigurationService) : MailSenderService {
 

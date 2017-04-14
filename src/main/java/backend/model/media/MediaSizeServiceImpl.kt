@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
 @Service
-open class MediaSizeServiceImpl : MediaSizeService {
+class MediaSizeServiceImpl : MediaSizeService {
 
 
     private val repository: MediaSizeRepository

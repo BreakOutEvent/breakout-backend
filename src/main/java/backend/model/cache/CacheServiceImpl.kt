@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-open class CacheServiceImpl : CacheService {
+class CacheServiceImpl : CacheService {
 
     private val cacheRepository: CacheRepository
 

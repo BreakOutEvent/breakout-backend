@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
 @RestController
-open class ChallengeController(private var challengeService: ChallengeService,
+class ChallengeController(private var challengeService: ChallengeService,
                                private var userService: UserService,
                                private var teamService: TeamService,
                                private var postingService: PostingService,
@@ -40,7 +40,7 @@ open class ChallengeController(private var challengeService: ChallengeService,
      */
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/user/{userId}/sponsor/challenge/")
-    open fun getAllChallengesForSponsor(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
+    fun getAllChallengesForSponsor(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
                                         @PathVariable userId: Long): Iterable<ChallengeView> {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
@@ -59,7 +59,7 @@ open class ChallengeController(private var challengeService: ChallengeService,
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/event/{eventId}/team/{teamId}/challenge/")
     @ResponseStatus(CREATED)
-    open fun createChallenge(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
+    fun createChallenge(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
                              @PathVariable teamId: Long,
                              @Valid @RequestBody body: ChallengeView): ChallengeView {
 
@@ -107,7 +107,7 @@ open class ChallengeController(private var challengeService: ChallengeService,
      */
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/event/{eventId}/team/{teamId}/challenge/{challengeId}/status/")
-    open fun changeStatus(@PathVariable challengeId: Long,
+    fun changeStatus(@PathVariable challengeId: Long,
                           @Valid @RequestBody body: ChallengeStatusView): ChallengeView {
 
         val challenge = challengeService.findOne(challengeId) ?: throw NotFoundException("No challenge with id $challengeId found")
@@ -129,7 +129,7 @@ open class ChallengeController(private var challengeService: ChallengeService,
      * Get all challenges for a team
      */
     @GetMapping("/event/{eventId}/team/{teamId}/challenge/")
-    open fun getAllChallengesForTeam(@PathVariable teamId: Long): Iterable<ChallengeView> {
+    fun getAllChallengesForTeam(@PathVariable teamId: Long): Iterable<ChallengeView> {
         return challengeService.findByTeamId(teamId).map {
             val view = ChallengeView(it)
             view.unregisteredSponsor?.address = null // Set address to null to make it non public

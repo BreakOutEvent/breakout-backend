@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
 @Service
-open class ChallengeServiceImpl : ChallengeService {
+class ChallengeServiceImpl : ChallengeService {
 
     private val challengeRepository: ChallengeRepository
     private val mailService: MailService

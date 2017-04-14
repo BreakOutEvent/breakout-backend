@@ -28,7 +28,7 @@ import java.math.RoundingMode
 
 @RestController
 @RequestMapping("/admin")
-open class AdminController(private val mailService: MailService,
+class AdminController(private val mailService: MailService,
                            private val teamService: TeamService,
                            private val sponsoringService: SponsoringService,
                            private val challengeService: ChallengeService,
@@ -47,7 +47,7 @@ open class AdminController(private val mailService: MailService,
      */
     //@PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/regeneratecache/")
-    open fun regenerateCache(): String {
+    fun regenerateCache(): String {
         logger.info("Regenerating caches from admin request")
 
         eventService.regenerateCache()
@@ -60,7 +60,7 @@ open class AdminController(private val mailService: MailService,
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/resendmail/")
-    open fun resendMail(): Map<String, Int> {
+    fun resendMail(): Map<String, Int> {
         val count = mailService.resendFailed()
 
         logger.info("Resent $count mails from admin request")
@@ -73,7 +73,7 @@ open class AdminController(private val mailService: MailService,
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/email/{identifier}/send/")
-    open fun sendEmail(@PathVariable identifier: String): Map<String, String> {
+    fun sendEmail(@PathVariable identifier: String): Map<String, String> {
         when (identifier) {
             "SPONSOR_EVENT_STARTED" -> sponsoringService.sendEmailsToSponsorsWhenEventHasStarted()
             "SPONSOR_EVENT_ENDED" -> sponsoringService.sendEmailsToSponsorsWhenEventHasEnded()
@@ -90,7 +90,7 @@ open class AdminController(private val mailService: MailService,
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/email/{identifier}/generate/")
-    open fun generateEmail(@PathVariable identifier: String,
+    fun generateEmail(@PathVariable identifier: String,
                            @RequestParam(value = "save", required = false) save: String?,
                            @RequestParam(value = "invoices", required = false) invoices: String?): List<Map<String, Any>> {
         when (identifier) {

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-open class GroupMessageServiceImpl @Autowired constructor(val repository: GroupMessageRepository, val userRepository: UserRepository, val mailService: MailService) : GroupMessageService {
+class GroupMessageServiceImpl @Autowired constructor(val repository: GroupMessageRepository, val userRepository: UserRepository, val mailService: MailService) : GroupMessageService {
 
     @Transactional
     override fun createGroupMessage(creator: UserAccount): GroupMessage {
