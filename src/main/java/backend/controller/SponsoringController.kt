@@ -17,33 +17,22 @@ import backend.util.getSignedJwtToken
 import backend.view.SponsoringView
 import backend.view.UnregisteredSponsorView
 import org.javamoney.moneta.Money
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.*
 import javax.validation.Valid
 
 @RestController
-open class SponsoringController {
+open class SponsoringController(private var sponsoringService: SponsoringService,
+                                private var userService: UserService,
+                                private var teamService: TeamService,
+                                private var configurationService: ConfigurationService) {
 
-    private var sponsoringService: SponsoringService
-    private var userService: UserService
-    private var teamService: TeamService
-    private var configurationService: ConfigurationService
     private var jwtSecret: String
 
-    @Autowired
-    constructor(sponsoringService: SponsoringService,
-                userService: UserService,
-                teamService: TeamService,
-                configurationService: ConfigurationService) {
-
-        this.configurationService = configurationService
-        this.sponsoringService = sponsoringService
-        this.userService = userService
-        this.teamService = teamService
+    init {
         this.jwtSecret = configurationService.getRequired("org.breakout.api.jwt_secret")
     }
 
@@ -51,7 +40,7 @@ open class SponsoringController {
      * GET /event/{eventId}/team/{teamId}/sponsoring/
      * Get a list of all sponsorings for the team with teamId
      */
-    @RequestMapping("/event/{eventId}/team/{teamId}/sponsoring/", method = arrayOf(GET))
+    @GetMapping("/event/{eventId}/team/{teamId}/sponsoring/")
     open fun getAllSponsorings(@AuthenticationPrincipal customUserDetails: CustomUserDetails?,
                                @PathVariable teamId: Long): Iterable<SponsoringView> {
 
@@ -101,7 +90,7 @@ open class SponsoringController {
      * This can only done if user is a sponsor
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/event/{eventId}/team/{teamId}/sponsoring/", method = arrayOf(POST))
+    @PostMapping("/event/{eventId}/team/{teamId}/sponsoring/")
     @ResponseStatus(CREATED)
     open fun createSponsoring(@PathVariable teamId: Long,
                               @Valid @RequestBody body: SponsoringView,
@@ -150,7 +139,7 @@ open class SponsoringController {
      * This can only be done if the user is a sponsor
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/user/{userId}/sponsor/sponsoring/", method = arrayOf(GET))
+    @GetMapping("/user/{userId}/sponsor/sponsoring/")
     open fun getAllSponsoringsForSponsor(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
                                          @PathVariable userId: Long): Iterable<SponsoringView> {
 
@@ -162,7 +151,7 @@ open class SponsoringController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/event/{eventId}/team/{teamId}/sponsoring/{sponsoringId}/status/", method = arrayOf(PUT))
+    @PutMapping("/event/{eventId}/team/{teamId}/sponsoring/{sponsoringId}/status/")
     open fun acceptOrRejectSponsoring(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
                                       @PathVariable sponsoringId: Long,
                                       @RequestBody body: Map<String, String>): SponsoringView {

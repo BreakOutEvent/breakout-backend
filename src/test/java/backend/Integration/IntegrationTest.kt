@@ -36,15 +36,14 @@ import org.codehaus.jackson.JsonNode
 import org.junit.Before
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.IntegrationTest
-import org.springframework.boot.test.SpringApplicationConfiguration
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
-import org.springframework.test.context.web.WebAppConfiguration
+import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
@@ -56,10 +55,14 @@ import org.springframework.web.context.WebApplicationContext
 import java.util.*
 import javax.servlet.Filter
 
-@RunWith(SpringJUnit4ClassRunner::class)
-@SpringApplicationConfiguration(classes = arrayOf(TestBackendConfiguration::class, WebSecurityConfiguration::class, ResourceServerConfiguration::class, AuthorizationServerConfiguration::class))
-@WebAppConfiguration
-@IntegrationTest("server.port:0")
+@RunWith(SpringRunner::class)
+@SpringBootTest(
+        webEnvironment = WebEnvironment.RANDOM_PORT,
+        classes = arrayOf(
+                TestBackendConfiguration::class,
+                WebSecurityConfiguration::class,
+                ResourceServerConfiguration::class,
+                AuthorizationServerConfiguration::class))
 abstract class IntegrationTest {
 
     protected val APPLICATION_JSON_UTF_8 = "application/json;charset=UTF-8"

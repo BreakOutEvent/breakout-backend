@@ -17,40 +17,33 @@ import backend.view.UserView
 import io.swagger.annotations.Api
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.*
 import java.time.LocalDate
 import javax.validation.Valid
 
 @Api
 @RestController
 @RequestMapping("/user")
-open class UserController {
+open class UserController(private val userService: UserService,
+                          private val teamService: TeamService,
+                          private val configurationService: ConfigurationService) {
 
-    private val userService: UserService
     private val JWT_SECRET: String
-    private val configurationService: ConfigurationService
-    private val teamService: TeamService
     private val logger: Logger
 
-    @Autowired
-    constructor(userService: UserService, teamService: TeamService, configurationService: ConfigurationService) {
-        this.userService = userService
-        this.configurationService = configurationService
+    init {
         this.logger = LoggerFactory.getLogger(UserController::class.java)
         this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
-        this.teamService = teamService
     }
 
     /**
      * POST /user/
      * Registers a new user
      */
-    @RequestMapping("/", method = arrayOf(POST))
+    @PostMapping("/")
     @ResponseStatus(CREATED)
     open fun createUser(@Valid @RequestBody body: UserView): UserView {
 
@@ -76,7 +69,7 @@ open class UserController {
      * POST /user/requestreset/
      * allows User to request password reset
      */
-    @RequestMapping("/requestreset/", method = arrayOf(POST))
+    @PostMapping("/requestreset/")
     open fun requestPasswordReset(@Valid @RequestBody body: Map<String, Any>): Map<String, String> {
 
         val emailString = body["email"] as? String ?: throw BadRequestException("body is missing field email")
@@ -90,7 +83,7 @@ open class UserController {
      * POST /user/passwordreset/
      * Sets a new Password for User with given token
      */
-    @RequestMapping("/passwordreset/", method = arrayOf(POST))
+    @PostMapping("/passwordreset/")
     open fun resetPassword(@Valid @RequestBody body: Map<String, Any>): Map<String, String> {
 
         val emailString = body["email"] as? String ?: throw BadRequestException("body is missing field email")
@@ -107,7 +100,7 @@ open class UserController {
      * GET /user/
      * Gets all users
      */
-    @RequestMapping("/", method = arrayOf(GET))
+    @GetMapping("/")
     open fun showUsers(): Iterable<BasicUserView> {
         return userService.getAllUsers().map(::BasicUserView)
     }
@@ -116,7 +109,7 @@ open class UserController {
      * GET /user/search/{search}/
      * Searches for User by String greater 2 chars
      */
-    @RequestMapping("/search/{search}/", method = arrayOf(GET))
+    @GetMapping("/search/{search}/")
     open fun searchUsers(@PathVariable("search") search: String): List<SimpleUserView> {
         if (search.length < 3) return listOf()
         val users = userService.searchByString(search).take(6).toMutableList()
@@ -129,7 +122,7 @@ open class UserController {
      * Edits user with given id
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/{id}/", method = arrayOf(PUT))
+    @PutMapping("/{id}/")
     open fun updateUser(@PathVariable id: Long,
                         @Valid @RequestBody body: UserView,
                         @AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
@@ -149,7 +142,7 @@ open class UserController {
      * GET /user/{id}/
      * Gets user with given id
      */
-    @RequestMapping("/{id}/", method = arrayOf(GET))
+    @GetMapping("/{id}/")
     open fun showUser(@PathVariable id: Long): BasicUserView {
 
         val user = userService.getUserById(id) ?: throw NotFoundException("user with id $id does not exist")
@@ -163,7 +156,7 @@ open class UserController {
         this.gender = userView.gender ?: this.gender
 
         userView.preferredLanguage?.let {
-            when(it) {
+            when (it) {
                 "en" -> this.preferredLanguage = Language.EN
                 "de" -> this.preferredLanguage = Language.DE
                 else -> logger.warn("Unsupported language locale $it")
@@ -208,7 +201,7 @@ open class UserController {
      * GET /user/invitation?token=lorem
      * Get an invitation including data such as email address via a token
      */
-    @RequestMapping("/invitation", method = arrayOf(GET))
+    @GetMapping("/invitation")
     open fun showInvitation(@RequestParam token: String): DetailedInvitationView {
         val invitation = teamService.findInvitationsByInviteCode(token) ?: throw NotFoundException("No invitation for code $token")
         return DetailedInvitationView(invitation)

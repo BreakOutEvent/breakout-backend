@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
-class PostingServiceImpl @Autowired constructor(val repository: PostingRepository,
+open class PostingServiceImpl @Autowired constructor(val repository: PostingRepository,
                                                 val locationService: LocationService,
                                                 val mediaRepository: MediaRepository) : PostingService {
 

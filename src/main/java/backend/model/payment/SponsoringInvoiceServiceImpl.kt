@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
 @Service
-class SponsoringInvoiceServiceImpl : SponsoringInvoiceService {
+open class SponsoringInvoiceServiceImpl : SponsoringInvoiceService {
 
     private val sponsoringInvoiceRepository: SponsoringInvoiceRepository
     private val sponsoringRepository: SponsoringRepository

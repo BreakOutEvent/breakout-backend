@@ -15,40 +15,23 @@ import backend.view.LocationView
 import backend.view.PostingView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.*
+import org.springframework.web.bind.annotation.RequestMethod.DELETE
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/posting")
-open class PostingController {
+open class PostingController(private val postingService: PostingService,
+                             private val mediaService: MediaService,
+                             private val configurationService: ConfigurationService,
+                             private val userService: UserService) {
 
-    private val mediaService: MediaService
-    private val postingService: PostingService
-    private val configurationService: ConfigurationService
     private val logger: Logger
     private var JWT_SECRET: String
     private var PAGE_SIZE: Int
-    private val userService: UserService
-
-    @Autowired
-    constructor(postingService: PostingService,
-                mediaService: MediaService,
-                configurationService: ConfigurationService,
-                userService: UserService) {
-
-        this.postingService = postingService
-        this.mediaService = mediaService
-        this.configurationService = configurationService
-        this.logger = LoggerFactory.getLogger(PostingController::class.java)
-        this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
-        this.PAGE_SIZE = configurationService.getRequired("org.breakout.api.page_size").toInt()
-        this.userService = userService
-    }
 
 
     /**
@@ -56,7 +39,7 @@ open class PostingController {
      * Creates new posting
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/", method = arrayOf(POST))
+    @PostMapping("/")
     @ResponseStatus(CREATED)
     open fun createPosting(@Valid @RequestBody body: PostingView,
                            @AuthenticationPrincipal customUserDetails: CustomUserDetails): PostingView {
@@ -81,7 +64,7 @@ open class PostingController {
      * GET /posting/{id}/
      * Gets posting by id
      */
-    @RequestMapping("/{id}/", method = arrayOf(GET))
+    @GetMapping("/{id}/")
     open fun getPosting(@PathVariable("id") id: Long, @RequestParam(value = "userid", required = false) userId: Long?): PostingView {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
         return PostingView(posting.hasLikesBy(userId))
@@ -119,7 +102,7 @@ open class PostingController {
      * GET /posting/
      * Gets all postings
      */
-    @RequestMapping("/", method = arrayOf(GET))
+    @GetMapping("/")
     open fun getAllPostings(@RequestParam(value = "page", required = false) page: Int?,
                             @RequestParam(value = "userid", required = false) userId: Long?): Iterable<PostingView> {
         return postingService.findAll(page ?: 0, PAGE_SIZE).map { PostingView(it.hasLikesBy(userId)) }
@@ -130,7 +113,7 @@ open class PostingController {
      * creates Comment for Posting
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/{id}/comment/", method = arrayOf(POST))
+    @PostMapping("/{id}/comment/")
     @ResponseStatus(CREATED)
     open fun createComment(@PathVariable("id") id: Long,
                            @Valid @RequestBody body: CommentView,
@@ -154,7 +137,7 @@ open class PostingController {
      * creates Like for Posting
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/{id}/like/", method = arrayOf(POST))
+    @PostMapping("/{id}/like/")
     @ResponseStatus(CREATED)
     open fun createLike(@PathVariable("id") id: Long,
                         @Valid @RequestBody body: LikeView,
@@ -188,7 +171,7 @@ open class PostingController {
      * GET /posting/{id}/like/
      * Gets Likes for Posting
      */
-    @RequestMapping("/{id}/like/", method = arrayOf(GET))
+    @GetMapping("/{id}/like/")
     open fun getLikesForPosting(@PathVariable("id") id: Long): List<LikeView> {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
         val likes = posting.likes
@@ -199,11 +182,17 @@ open class PostingController {
      * GET /posting/hashtag/{hashtag}/
      * Gets Likes for Posting
      */
-    @RequestMapping("/hashtag/{hashtag}/", method = arrayOf(GET))
+    @GetMapping("/hashtag/{hashtag}/")
     open fun getPostingsByHashtag(@RequestParam(value = "page", required = false) page: Int?,
                                   @PathVariable("hashtag") hashtag: String,
                                   @RequestParam(value = "userid", required = false) userId: Long?): List<PostingView> {
         val posting = postingService.findByHashtag(hashtag, page ?: 0, PAGE_SIZE)
         return posting.map { PostingView(it.hasLikesBy(userId)) }
+    }
+
+    init {
+        this.logger = LoggerFactory.getLogger(PostingController::class.java)
+        this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
+        this.PAGE_SIZE = configurationService.getRequired("org.breakout.api.page_size").toInt()
     }
 }

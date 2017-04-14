@@ -20,38 +20,26 @@ import backend.view.PostingView
 import backend.view.TeamView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.*
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/event/{eventId}/team")
-open class TeamController {
+open class TeamController(private val teamService: TeamService,
+                          private val eventService: EventService,
+                          private val configurationService: ConfigurationService,
+                          private val userService: UserService) {
 
-    private val teamService: TeamService
-    private val eventService: EventService
     private val JWT_SECRET: String
     private var PAGE_SIZE: Int
-    private val configurationService: ConfigurationService
-    private val userService: UserService
     private val logger: Logger
 
-    @Autowired
-    constructor(teamService: TeamService,
-                eventService: EventService,
-                configurationService: ConfigurationService,
-                userService: UserService) {
-
-        this.teamService = teamService
-        this.eventService = eventService
-        this.configurationService = configurationService
+    init {
         this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
         this.PAGE_SIZE = configurationService.getRequired("org.breakout.api.page_size").toInt()
-        this.userService = userService
         this.logger = LoggerFactory.getLogger(TeamController::class.java)
     }
 
@@ -61,7 +49,7 @@ open class TeamController {
      * The currently authenticated user can leave it's team at this endpoint
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/leave/", method = arrayOf(POST))
+    @PostMapping("/leave/")
     open fun leaveTeam(@AuthenticationPrincipal customUserDetails: CustomUserDetails): Map<String, String> {
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val participant = user.getRole(Participant::class) ?: throw BadRequestException("User is no participant")
@@ -75,7 +63,7 @@ open class TeamController {
      * Show all invitations for the currently authenticated user in requested event
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/invitation/", method = arrayOf(GET))
+    @GetMapping("/invitation/")
     open fun showInvitationsForUserAndEvent(@PathVariable eventId: Long,
                                             @AuthenticationPrincipal customUserDetails: CustomUserDetails): Iterable<InvitationView> {
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
@@ -88,7 +76,7 @@ open class TeamController {
      * creates a new Team, with creator as first member
      */
     @ResponseStatus(CREATED)
-    @RequestMapping("/", method = arrayOf(POST))
+    @PostMapping("/")
     @PreAuthorize("isAuthenticated()")
     open fun createTeam(@PathVariable eventId: Long,
                         @AuthenticationPrincipal customUserDetails: CustomUserDetails,
@@ -111,7 +99,7 @@ open class TeamController {
      * PUT /event/{id}/team/{teamId}/
      * allows teammembers to edit teamname and description
      */
-    @RequestMapping("/{teamId}/", method = arrayOf(PUT))
+    @PutMapping("/{teamId}/")
     @PreAuthorize("isAuthenticated()")
     open fun editTeam(@PathVariable eventId: Long,
                       @PathVariable teamId: Long,
@@ -153,7 +141,7 @@ open class TeamController {
      * invites a user with given email to existing Team
      */
     @ResponseStatus(CREATED)
-    @RequestMapping("/{teamId}/invitation/", method = arrayOf(POST))
+    @PostMapping("/{teamId}/invitation/")
     @PreAuthorize("isAuthenticated()")
     open fun inviteUser(@PathVariable eventId: Long,
                         @PathVariable teamId: Long,
@@ -174,7 +162,7 @@ open class TeamController {
      * allows user with Invitation to join Team
      */
     @ResponseStatus(CREATED)
-    @RequestMapping("/{teamId}/member/", method = arrayOf(POST))
+    @PostMapping("/{teamId}/member/")
     @PreAuthorize("isAuthenticated()")
     open fun joinTeam(@PathVariable eventId: Long,
                       @PathVariable teamId: Long,
@@ -200,7 +188,7 @@ open class TeamController {
      * GET /event/{eventId}/team/{teamId}/
      * gets a specific Team
      */
-    @RequestMapping("/{teamId}/", method = arrayOf(GET))
+    @GetMapping("/{teamId}/")
     open fun showTeam(@PathVariable teamId: Long): TeamView {
         val team = teamService.findOne(teamId) ?: throw NotFoundException("team with id $teamId does not exist")
         val teamDonateSum = teamService.getDonateSum(teamId)
@@ -212,7 +200,7 @@ open class TeamController {
      * GET /event/{eventId}/team/
      * gets all Teams for Event
      */
-    @RequestMapping("/", method = arrayOf(GET))
+    @GetMapping("/")
     open fun showTeamsByEvent(@PathVariable eventId: Long): Iterable<TeamView> {
         val teams = teamService.findByEventId(eventId)
         return teams.map {
@@ -227,7 +215,7 @@ open class TeamController {
      * GET /event/{eventId}/team/{teamId}/posting/
      * gets all Postings for Team
      */
-    @RequestMapping("/{teamId}/posting/", method = arrayOf(GET))
+    @GetMapping("/{teamId}/posting/")
     open fun getTeamPostingIds(@PathVariable teamId: Long,
                                @RequestParam(value = "page", required = false) page: Int?,
                                @RequestParam(value = "userid", required = false) userId: Long?): List<PostingView> {
@@ -242,7 +230,7 @@ open class TeamController {
      * Actual distance = |A -> B| + |B -> C|
      * Linear distance = |A -> C|
      */
-    @RequestMapping("/{id}/distance/", method = arrayOf(GET))
+    @GetMapping("/{id}/distance/")
     open fun getTeamDistance(@PathVariable("id") teamId: Long): Map<String, Double> {
         return mapOf("distance" to teamService.getDistance(teamId))
     }
@@ -251,7 +239,7 @@ open class TeamController {
      * GET /event/{eventId}/team/{id}/donatesum/
      * Get the sponsored sums per team
      */
-    @RequestMapping("/{id}/donatesum/", method = arrayOf(GET))
+    @GetMapping("/{id}/donatesum/")
     open fun getTeamDonateSum(@PathVariable("id") teamId: Long): DonateSums {
         return teamService.getDonateSum(teamId)
     }

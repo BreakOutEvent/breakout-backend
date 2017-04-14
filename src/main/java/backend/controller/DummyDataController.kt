@@ -5,10 +5,9 @@ import backend.model.misc.Coord
 import backend.model.posting.PostingService
 import backend.model.user.UserService
 import backend.util.Profiles
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod.POST
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
 import java.util.*
@@ -16,20 +15,11 @@ import java.util.*
 @Profile(Profiles.DEVELOPMENT)
 @RestController
 @RequestMapping("/createdummydata")
-class DummyDataController {
+class DummyDataController(val userService: UserService,
+                          val eventService: EventService,
+                          val postingService: PostingService) {
 
-    val userService: UserService
-    val eventService: EventService
-    val postingService: PostingService
-
-    @Autowired
-    constructor(userService: UserService, eventService: EventService, postingService: PostingService) {
-        this.userService = userService
-        this.eventService = eventService
-        this.postingService = postingService
-    }
-
-    @RequestMapping("/", method = arrayOf(POST))
+    @PostMapping("/")
     fun createDummyData() {
         createUsers(100)
         createEvent(2)

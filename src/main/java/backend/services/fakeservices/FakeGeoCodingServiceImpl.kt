@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service
 
 @Service
 @Profile(DEVELOPMENT, TEST , STAGING)
-class FakeGeoCodingServiceImpl @Autowired constructor(configurationService: ConfigurationService) : GeoCodingService by GeoCodingServiceImpl(configurationService) {
+open class FakeGeoCodingServiceImpl @Autowired constructor(configurationService: ConfigurationService) : GeoCodingService by GeoCodingServiceImpl(configurationService) {
 
     val logger: Logger = LoggerFactory.getLogger(FakeGeoCodingServiceImpl::class.java)
 

@@ -16,7 +16,7 @@ import java.time.LocalDateTime
 import javax.transaction.Transactional
 
 @Service
-class LocationServiceImpl : LocationService {
+open class LocationServiceImpl : LocationService {
 
     private val locationRepository: LocationRepository
     private val geoCodingService: GeoCodingService

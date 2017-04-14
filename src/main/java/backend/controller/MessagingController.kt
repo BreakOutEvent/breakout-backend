@@ -19,16 +19,8 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/messaging")
-open class MessagingController {
-
-    private val groupMessageService: GroupMessageService
-    private val userService: UserService
-
-    @Autowired
-    constructor(groupMessageService: GroupMessageService, userService: UserService) {
-        this.groupMessageService = groupMessageService
-        this.userService = userService
-    }
+open class MessagingController(private val groupMessageService: GroupMessageService,
+                               private val userService: UserService) {
 
 
     /**
@@ -36,7 +28,7 @@ open class MessagingController {
      * creates new GroupMessage
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/", method = arrayOf(POST))
+    @PostMapping("/")
     @ResponseStatus(CREATED)
     open fun createGroupMessage(@Valid @RequestBody body: List<Long>,
                                 @AuthenticationPrincipal customUserDetails: CustomUserDetails): GroupMessageView {
@@ -57,7 +49,7 @@ open class MessagingController {
      * creates new GroupMessage
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/{id}/", method = arrayOf(PUT))
+    @PutMapping("/{id}/")
     open fun editGroupMessage(@PathVariable("id") id: Long,
                               @Valid @RequestBody body: List<Long>,
                               @AuthenticationPrincipal customUserDetails: CustomUserDetails): GroupMessageView {
@@ -79,7 +71,7 @@ open class MessagingController {
      * creates new Message for GroupMessage
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/{id}/message/", method = arrayOf(POST))
+    @PostMapping("/{id}/message/")
     @ResponseStatus(CREATED)
     open fun addMessage(@PathVariable("id") id: Long,
                         @Valid @RequestBody body: MessageView,
@@ -100,7 +92,7 @@ open class MessagingController {
      * gets a GroupMessage
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/{id}/", method = arrayOf(GET))
+    @GetMapping("/{id}/")
     open fun getGroupMessage(@PathVariable("id") id: Long,
                              @AuthenticationPrincipal customUserDetails: CustomUserDetails): GroupMessageView {
 

@@ -13,7 +13,7 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 
 @Service
-class EventServiceImpl @Autowired constructor(val repository: EventRepository,
+open class EventServiceImpl @Autowired constructor(val repository: EventRepository,
                                               val teamService: TeamService,
                                               val cacheService: CacheService) : EventService {
 

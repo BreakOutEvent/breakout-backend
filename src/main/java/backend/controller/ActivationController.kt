@@ -2,28 +2,20 @@ package backend.controller
 
 import backend.controller.exceptions.NotFoundException
 import backend.model.user.UserService
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/activation")
-class ActivationController {
-
-    private val userService: UserService
-
-    @Autowired
-    constructor(userService: UserService) {
-        this.userService = userService
-    }
+class ActivationController(private val userService: UserService) {
 
     /**
      * GET /activation?={token}
      * Activates account with given token
      */
-    @RequestMapping(method = arrayOf(GET))
+    @GetMapping
     fun activateAccount(@RequestParam token: String): Map<String, String> {
 
         val user = userService.getUserByActivationToken(token) ?:

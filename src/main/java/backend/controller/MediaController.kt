@@ -19,29 +19,17 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/media")
-open class MediaController {
+open class MediaController(private val mediaSizeService: MediaSizeService,
+                           private val mediaService: MediaService,
+                           private val configurationService: ConfigurationService) {
 
-    private val mediaSizeService: MediaSizeService
-    private val mediaService: MediaService
-    private val configurationService: ConfigurationService
     private var JWT_SECRET: String
-
-    @Autowired
-    constructor(mediaSizeService: MediaSizeService,
-                mediaService: MediaService,
-                configurationService: ConfigurationService) {
-
-        this.mediaService = mediaService
-        this.mediaSizeService = mediaSizeService
-        this.configurationService = configurationService
-        this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
-    }
 
     /**
      * POST /media/{id}/
      * Adds single MediaSize to Media
      */
-    @RequestMapping("/{id}/", method = arrayOf(POST))
+    @PostMapping("/{id}/")
     @ResponseStatus(CREATED)
     open fun createMediaSize(@PathVariable("id") id: Long,
                              @RequestHeader("X-UPLOAD-TOKEN") uploadToken: String,
@@ -64,5 +52,9 @@ open class MediaController {
         val media = mediaService.getByID(id) ?: throw NotFoundException("media with id $id does not exist")
         mediaService.deleteSizes(media)
         return mapOf("message" to "success")
+    }
+
+    init {
+        this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
     }
 }

@@ -14,7 +14,6 @@ import backend.view.LocationView
 import backend.view.TeamLocationView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -25,32 +24,18 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/event/{eventId}")
-open class LocationController {
+open class LocationController(private val locationService: LocationService,
+                              private val teamService: TeamService,
+                              private val userService: UserService) {
 
-    private val locationService: LocationService
-    private val teamService: TeamService
-    private val eventService: EventService
-    private val userService: UserService
-    private val logger: Logger
+    private val logger: Logger = LoggerFactory.getLogger(LocationController::class.java)
 
-    @Autowired
-    constructor(locationService: LocationService,
-                teamService: TeamService,
-                eventService: EventService,
-                userService: UserService) {
-
-        this.locationService = locationService
-        this.teamService = teamService
-        this.eventService = eventService
-        this.userService = userService
-        this.logger = LoggerFactory.getLogger(LocationController::class.java)
-    }
 
     /**
      * GET /event/{eventId}/location/
      * Return a list of all locations for a specific event
      */
-    @RequestMapping("/location/", method = arrayOf(GET))
+    @GetMapping("/location/")
     open fun getAllLocationsForEvent(@PathVariable eventId: Long,
                                      @RequestParam(value = "perTeam", required = false) perTeam: Int?): Iterable<TeamLocationView> {
         return locationService.findByEventId(eventId, perTeam ?: 20).map { data ->
@@ -62,7 +47,7 @@ open class LocationController {
      * GET /event/{eventId}/team/{teamId}/location/
      * Return a list of all locations for a certain team at a certain event
      */
-    @RequestMapping("/team/{teamId}/location/", method = arrayOf(GET))
+    @GetMapping("/team/{teamId}/location/")
     open fun getAllLocationsForEventAndTeam(@PathVariable("eventId") eventId: Long,
                                             @PathVariable("teamId") teamId: Long,
                                             @RequestParam(value = "perTeam", required = false) perTeam: Int?): Iterable<LocationView> {
@@ -74,7 +59,7 @@ open class LocationController {
      * Upload a new location for a specific team at a specific event
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/team/{teamId}/location/", method = arrayOf(POST))
+    @PostMapping("/team/{teamId}/location/")
     @ResponseStatus(CREATED)
     open fun createLocation(@PathVariable("eventId") eventId: Long,
                             @PathVariable("teamId") teamId: Long,
@@ -97,7 +82,7 @@ open class LocationController {
      * Upload multiple new locations for a specific team at a specific event
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/team/{teamId}/location/multiple/", method = arrayOf(POST))
+    @PostMapping("/team/{teamId}/location/multiple/")
     @ResponseStatus(CREATED)
     open fun createMultipleLocation(@PathVariable("eventId") eventId: Long,
                                     @PathVariable("teamId") teamId: Long,

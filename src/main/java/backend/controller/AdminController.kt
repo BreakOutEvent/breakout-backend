@@ -19,63 +19,34 @@ import backend.services.mail.MailService
 import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RequestMethod.POST
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
 import java.math.BigDecimal
 import java.math.RoundingMode
 
 @RestController
 @RequestMapping("/admin")
-open class AdminController {
+open class AdminController(private val mailService: MailService,
+                           private val teamService: TeamService,
+                           private val sponsoringService: SponsoringService,
+                           private val challengeService: ChallengeService,
+                           private val userService: UserService,
+                           private val emailRepository: EmailRepository,
+                           private val eventService: EventService,
+                           private val cacheService: CacheService,
+                           private val sponsoringInvoiceService: SponsoringInvoiceService) {
 
 
-    private val mailService: MailService
-    private val teamService: TeamService
-    private val sponsoringService: SponsoringService
-    private val challengeService: ChallengeService
-    private val userService: UserService
-    private val emailRepository: EmailRepository
-    private val sponsoringInvoiceService: SponsoringInvoiceService
-    private val eventService: EventService
-    private val cacheService: CacheService
-    private val logger: Logger
-
-    @Autowired
-    constructor(mailService: MailService,
-                teamService: TeamService,
-                sponsoringService: SponsoringService,
-                challengeService: ChallengeService,
-                userService: UserService,
-                emailRepository: EmailRepository,
-                eventService: EventService,
-                cacheService: CacheService,
-                sponsoringInvoiceService: SponsoringInvoiceService) {
-
-        this.mailService = mailService
-        this.teamService = teamService
-        this.userService = userService
-        this.sponsoringService = sponsoringService
-        this.challengeService = challengeService
-        this.emailRepository = emailRepository
-        this.sponsoringInvoiceService = sponsoringInvoiceService
-        this.eventService = eventService
-        this.cacheService = cacheService
-        this.logger = LoggerFactory.getLogger(AdminController::class.java)
-    }
-
+    private val logger: Logger = LoggerFactory.getLogger(AdminController::class.java)
 
     /**
      * GET /admin/regeneratecache/
      * Allows Admin to resend failed mails
      */
     //@PreAuthorize("hasAuthority('ADMIN')")
-    @RequestMapping("/regeneratecache/", method = arrayOf(GET))
+    @GetMapping("/regeneratecache/")
     open fun regenerateCache(): String {
         logger.info("Regenerating caches from admin request")
 
@@ -88,7 +59,7 @@ open class AdminController {
      * Allows Admin to resend failed mails
      */
     @PreAuthorize("hasAuthority('ADMIN')")
-    @RequestMapping("/resendmail/", method = arrayOf(GET))
+    @GetMapping("/resendmail/")
     open fun resendMail(): Map<String, Int> {
         val count = mailService.resendFailed()
 
@@ -101,7 +72,7 @@ open class AdminController {
      * Send emails for specific identifiers
      */
     @PreAuthorize("hasAuthority('ADMIN')")
-    @RequestMapping("/email/{identifier}/send/", method = arrayOf(POST))
+    @PostMapping("/email/{identifier}/send/")
     open fun sendEmail(@PathVariable identifier: String): Map<String, String> {
         when (identifier) {
             "SPONSOR_EVENT_STARTED" -> sponsoringService.sendEmailsToSponsorsWhenEventHasStarted()
@@ -118,7 +89,7 @@ open class AdminController {
      * Send emails for specific identifiers
      */
     @PreAuthorize("hasAuthority('ADMIN')")
-    @RequestMapping("/email/{identifier}/generate/", method = arrayOf(GET))
+    @GetMapping("/email/{identifier}/generate/")
     open fun generateEmail(@PathVariable identifier: String,
                            @RequestParam(value = "save", required = false) save: String?,
                            @RequestParam(value = "invoices", required = false) invoices: String?): List<Map<String, Any>> {

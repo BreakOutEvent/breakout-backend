@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class MailServiceImpl @Autowired constructor(configurationService: ConfigurationService,
+open class MailServiceImpl @Autowired constructor(configurationService: ConfigurationService,
                                              private val mailSenderService: MailSenderService) : MailService {
 
     private val host: String

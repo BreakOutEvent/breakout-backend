@@ -17,38 +17,21 @@ import backend.util.euroOf
 import backend.view.ChallengeStatusView
 import backend.view.ChallengeView
 import org.javamoney.moneta.Money
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.*
 import javax.validation.Valid
 
 @RestController
-open class ChallengeController {
+open class ChallengeController(private var challengeService: ChallengeService,
+                               private var userService: UserService,
+                               private var teamService: TeamService,
+                               private var postingService: PostingService,
+                               private var configurationService: ConfigurationService) {
 
-    private var challengeService: ChallengeService
-    private var postingService: PostingService
-    private var teamService: TeamService
-    private var userService: UserService
-    private var configurationService: ConfigurationService
-    private var jwtSecret: String
+    private var jwtSecret: String = configurationService.getRequired("org.breakout.api.jwt_secret")
 
-    @Autowired
-    constructor(challengeService: ChallengeService,
-                userService: UserService,
-                teamService: TeamService,
-                postingService: PostingService,
-                configurationService: ConfigurationService) {
-
-        this.challengeService = challengeService
-        this.userService = userService
-        this.teamService = teamService
-        this.postingService = postingService
-        this.configurationService = configurationService
-        this.jwtSecret = configurationService.getRequired("org.breakout.api.jwt_secret")
-    }
 
     /**
      * GET /user/{userId}/sponsor/challenge/
@@ -56,7 +39,7 @@ open class ChallengeController {
      * This can only be done if the user is a sponsor
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/user/{userId}/sponsor/challenge/", method = arrayOf(GET))
+    @GetMapping("/user/{userId}/sponsor/challenge/")
     open fun getAllChallengesForSponsor(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
                                         @PathVariable userId: Long): Iterable<ChallengeView> {
 
@@ -74,7 +57,7 @@ open class ChallengeController {
      * when being a sponsor or when providing data for an unregistered sponsor
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/event/{eventId}/team/{teamId}/challenge/", method = arrayOf(POST))
+    @PostMapping("/event/{eventId}/team/{teamId}/challenge/")
     @ResponseStatus(CREATED)
     open fun createChallenge(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
                              @PathVariable teamId: Long,
@@ -123,7 +106,7 @@ open class ChallengeController {
      * Accept, reject or add proof to a challenge
      */
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/event/{eventId}/team/{teamId}/challenge/{challengeId}/status/", method = arrayOf(PUT))
+    @PutMapping("/event/{eventId}/team/{teamId}/challenge/{challengeId}/status/")
     open fun changeStatus(@PathVariable challengeId: Long,
                           @Valid @RequestBody body: ChallengeStatusView): ChallengeView {
 
@@ -145,7 +128,7 @@ open class ChallengeController {
      * GET /event/{eventId}/team/{teamId}/challenge/
      * Get all challenges for a team
      */
-    @RequestMapping("/event/{eventId}/team/{teamId}/challenge/", method = arrayOf(GET))
+    @GetMapping("/event/{eventId}/team/{teamId}/challenge/")
     open fun getAllChallengesForTeam(@PathVariable teamId: Long): Iterable<ChallengeView> {
         return challengeService.findByTeamId(teamId).map {
             val view = ChallengeView(it)

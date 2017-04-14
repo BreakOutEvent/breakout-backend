@@ -20,7 +20,7 @@ import kotlin.test.assertFails
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 
-class ChallengeServiceImplTest : IntegrationTest() {
+open class ChallengeServiceImplTest : IntegrationTest() {
 
     private lateinit var team: Team
     private lateinit var participant: Participant

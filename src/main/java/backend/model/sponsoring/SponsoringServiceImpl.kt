@@ -16,7 +16,7 @@ import java.math.BigDecimal
 import javax.transaction.Transactional
 
 @Service
-class SponsoringServiceImpl : SponsoringService {
+open class SponsoringServiceImpl : SponsoringService {
 
     private val sponsoringRepository: SponsoringRepository
     private val mailService: MailService
