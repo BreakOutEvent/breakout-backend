@@ -1,6 +1,7 @@
 package backend.view
 
 import backend.model.event.Event
+import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.ZoneOffset
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
@@ -21,6 +22,7 @@ class EventView() {
     @Valid
     lateinit var startingLocation: CoordView
 
+    @JsonProperty("isCurrent")
     var isCurrent: Boolean = false
 
     @NotNull
