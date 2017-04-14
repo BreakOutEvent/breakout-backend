@@ -10,6 +10,7 @@ import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.model.user.UserService
 import backend.util.localDateTimeOf
+import backend.view.BasicLocationView
 import backend.view.LocationView
 import backend.view.TeamLocationView
 import org.slf4j.Logger
@@ -50,8 +51,8 @@ class LocationController(private val locationService: LocationService,
     @GetMapping("/team/{teamId}/location/")
     fun getAllLocationsForEventAndTeam(@PathVariable("eventId") eventId: Long,
                                             @PathVariable("teamId") teamId: Long,
-                                            @RequestParam(value = "perTeam", required = false) perTeam: Int?): Iterable<LocationView> {
-        return locationService.findByTeamId(teamId, perTeam ?: 20).map(::LocationView)
+                                            @RequestParam(value = "perTeam", required = false) perTeam: Int?): Iterable<BasicLocationView> {
+        return locationService.findByTeamId(teamId, perTeam ?: 20).map(::BasicLocationView)
     }
 
     /**

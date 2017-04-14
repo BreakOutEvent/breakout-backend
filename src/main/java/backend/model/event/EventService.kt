@@ -38,5 +38,5 @@ interface EventService {
 
     fun getDonateSum(id: Long): DonateSums
 
-    fun regenerateCache()
+    fun regenerateCache(eventId: Long?)
 }

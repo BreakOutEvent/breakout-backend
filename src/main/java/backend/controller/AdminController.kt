@@ -21,22 +21,20 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.GET
-import org.springframework.web.bind.annotation.RequestMethod.POST
 import java.math.BigDecimal
 import java.math.RoundingMode
 
 @RestController
 @RequestMapping("/admin")
 class AdminController(private val mailService: MailService,
-                           private val teamService: TeamService,
-                           private val sponsoringService: SponsoringService,
-                           private val challengeService: ChallengeService,
-                           private val userService: UserService,
-                           private val emailRepository: EmailRepository,
-                           private val eventService: EventService,
-                           private val cacheService: CacheService,
-                           private val sponsoringInvoiceService: SponsoringInvoiceService) {
+                      private val teamService: TeamService,
+                      private val sponsoringService: SponsoringService,
+                      private val challengeService: ChallengeService,
+                      private val userService: UserService,
+                      private val emailRepository: EmailRepository,
+                      private val eventService: EventService,
+                      private val cacheService: CacheService,
+                      private val sponsoringInvoiceService: SponsoringInvoiceService) {
 
 
     private val logger: Logger = LoggerFactory.getLogger(AdminController::class.java)
@@ -45,12 +43,12 @@ class AdminController(private val mailService: MailService,
      * GET /admin/regeneratecache/
      * Allows Admin to resend failed mails
      */
-    //@PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("/regeneratecache/")
-    fun regenerateCache(): String {
-        logger.info("Regenerating caches from admin request")
 
-        eventService.regenerateCache()
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/regeneratecache/")
+    fun regenerateCache(@RequestParam(value = "event", required = false) event: Long?): String {
+        logger.info("Regenerating event $event caches from admin request")
+        eventService.regenerateCache(event)
         return "done"
     }
 
@@ -91,8 +89,8 @@ class AdminController(private val mailService: MailService,
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/email/{identifier}/generate/")
     fun generateEmail(@PathVariable identifier: String,
-                           @RequestParam(value = "save", required = false) save: String?,
-                           @RequestParam(value = "invoices", required = false) invoices: String?): List<Map<String, Any>> {
+                      @RequestParam(value = "save", required = false) save: String?,
+                      @RequestParam(value = "invoices", required = false) invoices: String?): List<Map<String, Any>> {
         when (identifier) {
             "REGISTERED_SPONSORS_PAYMENT_PROMPT" -> {
                 val data = getRegisteredSponsorsData()

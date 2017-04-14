@@ -10,3 +10,5 @@ class DomainException : RuntimeException {
 
     constructor(message: String, cause: Throwable) : super(message, cause)
 }
+
+class CacheNonExistentException(msg: String) : RuntimeException(msg)

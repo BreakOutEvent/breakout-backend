@@ -1,6 +1,7 @@
 package backend.controller
 
 import backend.controller.exceptions.NotFoundException
+import backend.exceptions.CacheNonExistentException
 import backend.model.cache.CacheService
 import backend.model.event.EventService
 import backend.model.misc.Coord
@@ -10,8 +11,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.GET
-import org.springframework.web.bind.annotation.RequestMethod.POST
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import javax.validation.Valid
@@ -19,7 +18,7 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/event")
 class EventController(open var eventService: EventService,
-                           open var cacheService: CacheService) {
+                      open var cacheService: CacheService) {
 
     private var logger: Logger = LoggerFactory.getLogger(EventController::class.java)
 
@@ -76,8 +75,13 @@ class EventController(open var eventService: EventService,
      * Returns the sum of the distance of all teams of the event with {id}
      */
     @GetMapping("/{id}/distance/")
-    fun getEventDistance(@PathVariable("id") id: Long): Any {
-        return cacheService.getCache("Event_${id}_Distance")
+    open fun getEventDistance(@PathVariable("id") id: Long): Any {
+        try {
+            return cacheService.getCache("Event_${id}_Distance")
+        } catch(e: CacheNonExistentException) {
+            eventService.regenerateCache(id)
+            throw e
+        }
     }
 
     /**
@@ -85,7 +89,12 @@ class EventController(open var eventService: EventService,
      * Returns the sum of the distance of all teams of the event with {id}
      */
     @GetMapping("/{id}/donatesum/")
-    fun getEventDonateSum(@PathVariable("id") id: Long): Any {
-        return cacheService.getCache("Event_${id}_DonateSum")
+    open fun getEventDonateSum(@PathVariable("id") id: Long): Any {
+        try {
+            return cacheService.getCache("Event_${id}_DonateSum")
+        } catch(e: CacheNonExistentException) {
+            eventService.regenerateCache(id)
+            throw e
+        }
     }
 }
