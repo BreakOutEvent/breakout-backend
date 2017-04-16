@@ -1,0 +1,3 @@
+USE `${BREAKOUT}`;
+
+ALTER TABLE `payment` ADD `fidor_id` BIGINT DEFAULT NULL;

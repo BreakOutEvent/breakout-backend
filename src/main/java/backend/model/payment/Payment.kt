@@ -14,17 +14,22 @@ abstract class Payment : BasicEntity {
     lateinit var amount: Money
         private set
 
+    var fidorId: Long? = null
+        private set
+
     @ManyToOne
     var user: UserAccount? = null
 
     @ManyToOne
     var invoice: Invoice? = null
 
+
     constructor()
 
-    constructor(amount: Money, user: User) {
+    constructor(amount: Money, user: User, fidorId: Long? = null) {
         this.amount = amount
         this.user = user.account
+        this.fidorId = fidorId
     }
 
     abstract fun getPaymentMethod(): String

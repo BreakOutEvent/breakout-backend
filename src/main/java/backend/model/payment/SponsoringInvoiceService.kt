@@ -20,10 +20,10 @@ interface SponsoringInvoiceService {
 
     fun addAdminPaymentToInvoice(admin: Admin, amount: Money, invoice: SponsoringInvoice): SponsoringInvoice
 
-    fun addPaymentServicePaymentToInvoice(amount: Money, invoice: SponsoringInvoice): SponsoringInvoice
-
     fun createInvoice(team: Team, amount: Money, subject: String, sponsorings: List<Sponsoring>, challenges: List<Challenge>): SponsoringInvoice
 
     fun createInvoice(team: Team, amount: Money, company: String, firstname: String, lastname: String): SponsoringInvoice
+
+    fun addSepaPaymentToInvoice(admin: Admin,fidorId: Long, amount: Money, invoice: SponsoringInvoice): SponsoringInvoice
 
 }

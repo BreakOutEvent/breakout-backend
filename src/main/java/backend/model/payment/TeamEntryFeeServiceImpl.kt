@@ -1,7 +1,5 @@
 package backend.model.payment
 
-import backend.model.misc.Email
-import backend.model.misc.EmailAddress
 import backend.model.user.Admin
 import backend.services.mail.MailService
 import org.javamoney.moneta.Money
@@ -52,8 +50,17 @@ class TeamEntryFeeServiceImpl : TeamEntryFeeService {
         return teamEntryFeeInvoiceRepository.findByPurposeOfTransferCode(purposeOfTransferCode)
     }
 
-    override fun addPaymentServicePaymentToInvoice(amount: Money, invoice: TeamEntryFeeInvoice): TeamEntryFeeInvoice {
-        TODO("not implemented")
+    @Transactional
+    override fun addSepaPaymentToInvoice(admin: Admin, fidorId: Long, amount: Money, invoice: TeamEntryFeeInvoice): TeamEntryFeeInvoice {
+        val payment = SepaPayment(amount, admin, fidorId)
+        invoice.addPayment(payment)
+
+        if (invoice.isFullyPaid()) {
+            mailService.sendTeamHasPaidEmail(invoice)
+        }
+
+        return invoice
     }
+
 }
 

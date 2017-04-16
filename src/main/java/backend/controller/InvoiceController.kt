@@ -26,10 +26,10 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/invoice")
 class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
-                             private val userService: UserService,
-                             private val sponsoringInvoiceService: SponsoringInvoiceService,
-                             private val teamService: TeamService,
-                             private val configurationService: ConfigurationService) {
+                        private val userService: UserService,
+                        private val sponsoringInvoiceService: SponsoringInvoiceService,
+                        private val teamService: TeamService,
+                        private val configurationService: ConfigurationService) {
 
     private val logger: Logger
     private val PAYMENT_AUTH_TOKEN: String
@@ -46,8 +46,8 @@ class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/{invoiceId}/payment/")
     fun createAdminPayment(@PathVariable invoiceId: Long,
-                                @Valid @RequestBody paymentView: PaymentView,
-                                @AuthenticationPrincipal customUserDetails: CustomUserDetails): Any {
+                           @Valid @RequestBody paymentView: PaymentView,
+                           @AuthenticationPrincipal customUserDetails: CustomUserDetails): Any {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val teamFeeInvoice = teamEntryFeeService.findById(invoiceId)
@@ -75,22 +75,24 @@ class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
      */
     @PostMapping("/payment/{purposeOfTransferCode}/")
     fun createPayment(@PathVariable purposeOfTransferCode: String,
-                           @RequestHeader("X-AUTH-TOKEN") authToken: String,
-                           @Valid @RequestBody paymentView: PaymentView): Any {
+                      @RequestHeader("X-AUTH-TOKEN") authToken: String,
+                      @Valid @RequestBody paymentView: PaymentView): Any {
 
         if (authToken != PAYMENT_AUTH_TOKEN) throw UnauthorizedException("Invalid Payment-Auth Token")
 
         val teamFeeInvoice = teamEntryFeeService.findByPurposeOfTransferCode(purposeOfTransferCode)
         val sponsoringInvoice = sponsoringInvoiceService.findByPurposeOfTransferCode(purposeOfTransferCode)
         val amount = Money.of(BigDecimal.valueOf(paymentView.amount!!), "EUR")
+        val admin = userService.getUserById(1)!!.getRole(Admin::class) ?: throw UnauthorizedException("User is no admin")
+        if (paymentView.fidorId == null) throw RuntimeException("No fidorId is set for automatic payment insertion")
 
         if (teamFeeInvoice != null) {
-            val savedInvoice = teamEntryFeeService.addPaymentServicePaymentToInvoice(amount, teamFeeInvoice)
+            val savedInvoice = teamEntryFeeService.addSepaPaymentToInvoice(admin, paymentView.fidorId!!, amount, teamFeeInvoice)
             return TeamEntryFeeInvoiceView(savedInvoice)
         }
 
         if (sponsoringInvoice != null) {
-            val savedInvoice = sponsoringInvoiceService.addPaymentServicePaymentToInvoice(amount, sponsoringInvoice)
+            val savedInvoice = sponsoringInvoiceService.addSepaPaymentToInvoice(admin, paymentView.fidorId!!, amount, sponsoringInvoice)
             return SponsoringInvoiceView(savedInvoice)
         }
 
@@ -119,7 +121,7 @@ class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/sponsoring/{teamId}/")
     fun getAllSponsorInvoicesForTeam(@PathVariable teamId: Long,
-                                          @AuthenticationPrincipal cud: CustomUserDetails): Iterable<SponsoringInvoiceView> {
+                                     @AuthenticationPrincipal cud: CustomUserDetails): Iterable<SponsoringInvoiceView> {
         val user = userService.getUserFromCustomUserDetails(cud)
         if (user.hasRole(Admin::class)) {
             val invoices = sponsoringInvoiceService.findByTeamId(teamId)

@@ -12,11 +12,14 @@ class PaymentView {
 
     var user: Long? = null
 
+    var fidorId: Long? = null
+
     constructor()
 
     constructor(payment: Payment) {
         this.amount = payment.amount.numberStripped.toDouble()
         this.paymentMethod = payment.getPaymentMethod()
         this.user = payment.user()!!.account.id
+        this.fidorId = payment.fidorId
     }
 }

@@ -40,6 +40,13 @@ class SponsoringInvoiceServiceImpl : SponsoringInvoiceService {
     }
 
     @Transactional
+    override fun addSepaPaymentToInvoice(admin: Admin, fidorId: Long, amount: Money, invoice: SponsoringInvoice): SponsoringInvoice {
+        val payment = SepaPayment(amount, admin, fidorId)
+        invoice.addPayment(payment)
+        return invoice
+    }
+
+    @Transactional
     override fun save(invoice: SponsoringInvoice): SponsoringInvoice {
         return sponsoringInvoiceRepository.save(invoice)
     }
@@ -80,10 +87,6 @@ class SponsoringInvoiceServiceImpl : SponsoringInvoiceService {
         val savedInvoice = sponsoringInvoiceRepository.save(invoice)
 
         return savedInvoice
-    }
-
-    override fun addPaymentServicePaymentToInvoice(amount: Money, invoice: SponsoringInvoice): SponsoringInvoice {
-        TODO("not implemented")
     }
 
     override fun findByPurposeOfTransferCode(purposeOfTransferCode: String): SponsoringInvoice? {

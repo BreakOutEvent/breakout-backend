@@ -10,7 +10,7 @@ class SepaPayment : Payment {
 
     constructor() : super()
 
-    constructor(amount: Money, admin: Admin) : super(amount, admin)
+    constructor(amount: Money, admin: Admin, fidorId: Long) : super(amount, admin, fidorId)
 
     override fun getPaymentMethod() = "Payment added by Payment-Service, received through wire transfer"
 }
