@@ -5,23 +5,14 @@ import backend.services.mail.MailService
 import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
 @Service
-class TeamEntryFeeServiceImpl : TeamEntryFeeService {
+class TeamEntryFeeServiceImpl(private val teamEntryFeeInvoiceRepository: TeamEntryFeeInvoiceRepository,
+                              private val mailService: MailService) : TeamEntryFeeService {
 
-    private val teamEntryFeeInvoiceRepository: TeamEntryFeeInvoiceRepository
-    private val mailService: MailService
-    private val logger: Logger
-
-    @Autowired
-    constructor(teamEntryFeeInvoiceRepository: TeamEntryFeeInvoiceRepository, mailService: MailService) {
-        this.teamEntryFeeInvoiceRepository = teamEntryFeeInvoiceRepository
-        this.logger = LoggerFactory.getLogger(TeamEntryFeeServiceImpl::class.java)
-        this.mailService = mailService
-    }
+    private val logger: Logger = LoggerFactory.getLogger(TeamEntryFeeServiceImpl::class.java)
 
     @Transactional
     override fun addAdminPaymentToInvoice(admin: Admin, amount: Money, invoice: TeamEntryFeeInvoice): TeamEntryFeeInvoice {

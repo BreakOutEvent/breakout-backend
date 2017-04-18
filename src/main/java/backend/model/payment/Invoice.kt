@@ -23,11 +23,11 @@ abstract class Invoice : BasicEntity {
         private set
 
     @Column(unique = true)
-    lateinit var purposeOfTransfer: String
+    var purposeOfTransfer: String? = null
         protected set
 
     @Column(unique = true)
-    lateinit var purposeOfTransferCode: String
+    var purposeOfTransferCode: String? = null
         protected set
 
     protected constructor()

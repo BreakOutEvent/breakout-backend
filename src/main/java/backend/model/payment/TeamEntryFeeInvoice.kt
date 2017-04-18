@@ -24,7 +24,7 @@ class TeamEntryFeeInvoice : Invoice {
 
         if (exeedsTotalAmount(payment)) throw DomainException("This payment is not eligable because the total necessary amount of $amount would be exeeded")
         if (!isAdminOrSepa) throw DomainException("Currently only payments via admins or sepa can be added to team invoices")
-        if (!isHalfOrFullAmount(payment.amount)) throw DomainException("Only the half or full amount of a payment can be added!")
+        if (!isFullAmount(payment.amount)) throw DomainException("Only full amount of a payment can be added!")
         if (!team!!.isFull()) throw DomainException("Payments can only be added to teams which already have two members")
     }
 
@@ -33,10 +33,9 @@ class TeamEntryFeeInvoice : Invoice {
         return after > this.amount
     }
 
-    private fun isHalfOrFullAmount(money: Money): Boolean {
-        val isHalfAmount = money.isEqualTo(this.amount.divide(2))
+    private fun isFullAmount(money: Money): Boolean {
         val isFullAmount = money.isEqualTo(this.amount)
-        return (isHalfAmount || isFullAmount)
+        return isFullAmount
     }
 
     override fun generatePurposeOfTransfer(): String {
@@ -49,6 +48,6 @@ class TeamEntryFeeInvoice : Invoice {
 
         this.purposeOfTransferCode = generateRandomPurposeOfTransferCode()
         this.purposeOfTransfer = "$purposeOfTransferCode-BREAKOUT$eventId-TEAM$teamId-INVOICE$invoiceId-ENTRYFREE"
-        return this.purposeOfTransfer
+        return this.purposeOfTransfer!!
     }
 }
