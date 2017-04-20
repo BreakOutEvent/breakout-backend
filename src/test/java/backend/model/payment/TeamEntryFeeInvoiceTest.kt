@@ -35,7 +35,7 @@ class TeamEntryFeeInvoiceTest {
     @Test
     fun testIsPaymentEligable() {
         val invoice = TeamEntryFeeInvoice(team, euroOf(10))
-        val payment = AdminPayment(euroOf(5), admin)
+        val payment = AdminPayment(euroOf(10), admin)
 
         PowerMockito.`when`(team.isFull()).thenReturn(true)
         // Test passes if this does not throw
@@ -51,7 +51,7 @@ class TeamEntryFeeInvoiceTest {
     @Test
     fun testAddPayment() {
         val invoice = TeamEntryFeeInvoice(team, euroOf(10))
-        val payment = AdminPayment(euroOf(5), admin)
+        val payment = AdminPayment(euroOf(10), admin)
 
         PowerMockito.`when`(team.isFull()).thenReturn(true)
 
@@ -59,15 +59,17 @@ class TeamEntryFeeInvoiceTest {
     }
 
     @Test
-    fun testAddPaymentTwoTimesHalfAmount() {
+    fun testAddPaymentTwoTimesHalfAmountFailsBecauseOnlyFullAmountCanBeAdded() {
         val invoice = TeamEntryFeeInvoice(team, euroOf(10))
         val firstPayment = AdminPayment(euroOf(5), admin)
         val secondPayment = AdminPayment(euroOf(5), admin)
 
         PowerMockito.`when`(team.isFull()).thenReturn(true)
 
-        invoice.addPayment(firstPayment)
-        invoice.addPayment(secondPayment)
+        assertFails {
+            invoice.addPayment(firstPayment)
+            invoice.addPayment(secondPayment)
+        }
     }
 
     @Test
@@ -115,13 +117,11 @@ class TeamEntryFeeInvoiceTest {
     fun testIsFullyPaid() {
         val invoice = TeamEntryFeeInvoice(team, euroOf(10))
 
-        val firstPayment = AdminPayment(euroOf(5), admin)
-        val secondPayment = AdminPayment(euroOf(5), admin)
+        val firstPayment = AdminPayment(euroOf(10), admin)
 
         PowerMockito.`when`(team.isFull()).thenReturn(true)
 
         invoice.addPayment(firstPayment)
-        invoice.addPayment(secondPayment)
 
         assertTrue(invoice.isFullyPaid())
     }
@@ -129,13 +129,11 @@ class TeamEntryFeeInvoiceTest {
     @Test
     fun testAmountOfCurrentPayments() {
         val invoice = TeamEntryFeeInvoice(team, euroOf(10))
-        val firstPayment = AdminPayment(euroOf(5), admin)
-        val secondPayment = AdminPayment(euroOf(5), admin)
+        val firstPayment = AdminPayment(euroOf(10), admin)
 
         PowerMockito.`when`(team.isFull()).thenReturn(true)
 
         invoice.addPayment(firstPayment)
-        invoice.addPayment(secondPayment)
 
         assertEquals(euroOf(10), invoice.amountOfCurrentPayments())
     }
@@ -143,16 +141,14 @@ class TeamEntryFeeInvoiceTest {
     @Test
     fun testGetPayments() {
         val invoice = TeamEntryFeeInvoice(team, euroOf(10))
-        val firstPayment = AdminPayment(euroOf(5), admin)
-        val secondPayment = AdminPayment(euroOf(5), admin)
+        val firstPayment = AdminPayment(euroOf(10), admin)
 
         PowerMockito.`when`(team.isFull()).thenReturn(true)
 
         invoice.addPayment(firstPayment)
-        invoice.addPayment(secondPayment)
 
         val payments = invoice.getPayments()
 
-        assertEquals(2, payments.count())
+        assertEquals(1, payments.count())
     }
 }

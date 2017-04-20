@@ -71,7 +71,7 @@ open class InvoiceControllerTest : IntegrationTest() {
     @Test
     open fun testCreatePayment() {
 
-        val body = mapOf("amount" to 30.0)
+        val body = mapOf("amount" to 60.0)
 
         val request = post("/invoice/${team.invoice!!.id}/payment/")
                 .asUser(mockMvc, admin.email, "password")
