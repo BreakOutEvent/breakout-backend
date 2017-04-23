@@ -11,29 +11,19 @@ import backend.services.mail.MailService
 import backend.util.data.DonateSums
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 
 @Service
-class TeamServiceImpl : TeamService {
+class TeamServiceImpl(teamRepository: TeamRepository,
+                      private val userService: UserService,
+                      private val mailService: MailService,
+                      private val configurationService: ConfigurationService) : TeamService {
 
-    private val repository: TeamRepository
-    private val userService: UserService
-    private val mailService: MailService
-    private val configurationService: ConfigurationService
+    private val repository: TeamRepository = teamRepository
     private val logger: Logger
-
-    @Autowired
-    constructor(teamRepository: TeamRepository, userService: UserService, mailService: MailService, configurationService: ConfigurationService) {
-        this.repository = teamRepository
-        this.userService = userService
-        this.mailService = mailService
-        this.configurationService = configurationService
-        this.logger = LoggerFactory.getLogger(TeamServiceImpl::class.java)
-    }
 
     @Transactional
     override fun create(creator: Participant, name: String, description: String, event: Event): Team {
@@ -45,6 +35,7 @@ class TeamServiceImpl : TeamService {
         userService.save(creator)
         return savedTeam
     }
+
 
     override fun invite(emailAddress: EmailAddress, team: Team) {
         team.invite(emailAddress)
@@ -166,5 +157,9 @@ class TeamServiceImpl : TeamService {
 
     override fun findAllTeamSummaryProjections(): Iterable<TeamSummaryProjection> {
         return repository.findAllTeamSummaryProjections()
+    }
+
+    init {
+        this.logger = LoggerFactory.getLogger(TeamServiceImpl::class.java)
     }
 }

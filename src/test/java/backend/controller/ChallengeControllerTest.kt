@@ -204,14 +204,8 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.date").exists())
                 .andExpect(jsonPath("$.user").exists())
                 .andExpect(jsonPath("$.proves.id").exists())
-                .andExpect(jsonPath("$.proves.eventId").value(team.event.id!!.toInt()))
                 .andExpect(jsonPath("$.proves.description").value(challenge.description))
-                .andExpect(jsonPath("$.proves.sponsorId").value(sponsor.id!!.toInt()))
-                .andExpect(jsonPath("$.proves.userId").value(sponsor.account.id!!.toInt()))
                 .andExpect(jsonPath("$.proves.amount").value(challenge.amount.numberStripped.toDouble()))
-                .andExpect(jsonPath("$.proves.unregisteredSponsor").doesNotExist())
-                .andExpect(jsonPath("$.proves.team").value(team.name))
-                .andExpect(jsonPath("$.proves.teamId").value(team.id!!.toInt()))
                 .andExpect(jsonPath("$.proves.status").value("WITH_PROOF"))
     }
 

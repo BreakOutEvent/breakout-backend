@@ -62,9 +62,9 @@ class PostingController(private val postingService: PostingService,
      * Gets posting by id
      */
     @GetMapping("/{id}/")
-    fun getPosting(@PathVariable("id") id: Long, @RequestParam(value = "userid", required = false) userId: Long?): PostingView {
+    fun getPosting(@PathVariable("id") id: Long, @RequestParam(value = "userid", required = false) userId: Long?): PostingResponseView {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
-        return PostingView(posting.hasLikesBy(userId))
+        return PostingResponseView(posting.hasLikesBy(userId))
     }
 
     /**
@@ -101,8 +101,8 @@ class PostingController(private val postingService: PostingService,
      */
     @GetMapping("/")
     fun getAllPostings(@RequestParam(value = "page", required = false) page: Int?,
-                            @RequestParam(value = "userid", required = false) userId: Long?): Iterable<PostingView> {
-        return postingService.findAll(page ?: 0, PAGE_SIZE).map { PostingView(it.hasLikesBy(userId)) }
+                            @RequestParam(value = "userid", required = false) userId: Long?): Iterable<PostingResponseView> {
+        return postingService.findAll(page ?: 0, PAGE_SIZE).map { PostingResponseView(it.hasLikesBy(userId)) }
     }
 
     /**

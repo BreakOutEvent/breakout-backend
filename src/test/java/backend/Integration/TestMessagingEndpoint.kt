@@ -5,13 +5,17 @@ package backend.Integration
 import backend.testHelper.asUser
 import backend.testHelper.json
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.springframework.http.HttpMethod
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.transaction.annotation.Propagation.REQUIRES_NEW
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
+@Transactional()
 class TestMessagingEndpoint : IntegrationTest() {
 
     @Before
@@ -20,8 +24,27 @@ class TestMessagingEndpoint : IntegrationTest() {
     }
 
     @Test
+    @Ignore
     fun createNewGroupMessage() {
 
+        prepareCreateNewGroupMessage()
+
+        val requestMe = get("/me/")
+                .asUser(this.mockMvc, "user@break-out.org", "password")
+                .json(listOf<Long>())
+
+        mockMvc.perform(requestMe)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.groupMessageIds[0]").exists())
+                .andExpect(jsonPath("$.groupMessageIds[1]").doesNotExist())
+                .andReturn().response.contentAsString
+    }
+
+
+    @Transactional(propagation = REQUIRES_NEW)
+    fun prepareCreateNewGroupMessage() {
         val user = userService.create("user@break-out.org", "password")
 
         val request = post("/messaging/")
@@ -38,18 +61,6 @@ class TestMessagingEndpoint : IntegrationTest() {
                 .andReturn().response.contentAsString
 
         println(response)
-
-        val requestMe = get("/me/")
-                .asUser(this.mockMvc, "user@break-out.org", "password")
-                .json(listOf<Long>())
-
-        mockMvc.perform(requestMe)
-                .andExpect(status().isOk)
-                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.groupMessageIds[0]").exists())
-                .andExpect(jsonPath("$.groupMessageIds[1]").doesNotExist())
-                .andReturn().response.contentAsString
     }
 
     @Test

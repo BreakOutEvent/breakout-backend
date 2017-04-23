@@ -83,10 +83,9 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun adminDeletePostingCascade() {
-        val posting = postingService.savePostingWithLocationAndMedia("hello #breakout", Coord(1.0, 1.0), user.account, listOf("image", "audio"), LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("hello #breakout", Coord(1.0, 1.0), user.account, mutableListOf("image", "audio"), LocalDateTime.now())
         postingService.like(posting, user.account, LocalDateTime.now())
         postingService.addComment(posting, user.account, LocalDateTime.now(), "Hello!")
-//        commentService.createComment("Hello!", LocalDateTime.now(), posting, user.account)
 
         val postData = mapOf(
                 "url" to "https://aws.amazon.com/bla.jpg",
@@ -523,7 +522,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now());
         val media = mediaService.createMedia("image")
-        posting.media = listOf(media) as MutableList<Media>
+        posting.media = mutableListOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
 
         val postData = mapOf(
@@ -553,7 +552,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now());
         val media = mediaService.createMedia("image")
-        posting.media = listOf(media) as MutableList<Media>
+        posting.media = mutableListOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
 
         val postData = mapOf(
@@ -605,7 +604,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now())
         val media = mediaService.createMedia("image")
-        posting.media = listOf(media) as MutableList<Media>
+        posting.media = mutableListOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
 
         val postData = mapOf(
@@ -670,7 +669,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now());
         val media = mediaService.createMedia("image")
-        posting.media = listOf(media) as MutableList<Media>
+        posting.media = mutableListOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
 
         for (i in 0..100) {
@@ -725,7 +724,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now());
         val media = mediaService.createMedia("image")
-        posting.media = listOf(media) as MutableList<Media>
+        posting.media = mutableListOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
 
         var postData = mapOf(
@@ -822,7 +821,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now());
         val media = mediaService.createMedia("image")
-        posting.media = listOf(media) as MutableList<Media>
+        posting.media = mutableListOf(media) as MutableList<Media>
         val savedposting = postingService.save(posting)
 
         var postData = mapOf(
@@ -918,7 +917,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now());
         val media = mediaService.createMedia("image")
-        posting.media = listOf(media) as MutableList<Media>
+        posting.media = mutableListOf(media)
         val savedposting = postingService.save(posting)
 
         var postData = mapOf(

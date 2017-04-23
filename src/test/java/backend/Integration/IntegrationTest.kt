@@ -51,6 +51,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.context.WebApplicationContext
 import java.util.*
 import javax.servlet.Filter
@@ -63,6 +64,7 @@ import javax.servlet.Filter
                 WebSecurityConfiguration::class,
                 ResourceServerConfiguration::class,
                 AuthorizationServerConfiguration::class))
+@Transactional
 abstract class IntegrationTest {
 
     protected val APPLICATION_JSON_UTF_8 = "application/json;charset=UTF-8"
