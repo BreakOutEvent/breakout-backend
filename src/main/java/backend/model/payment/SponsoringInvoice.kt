@@ -5,15 +5,12 @@ import backend.model.challenges.Challenge
 import backend.model.event.Team
 import backend.model.sponsoring.Sponsoring
 import org.javamoney.moneta.Money
-import javax.persistence.CascadeType
-import javax.persistence.Entity
-import javax.persistence.OneToMany
-import javax.persistence.OneToOne
+import javax.persistence.*
 
 @Entity
 class SponsoringInvoice : Invoice {
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     var team: Team? = null
 
     @OneToMany(mappedBy = "invoice", cascade = arrayOf(CascadeType.MERGE, CascadeType.PERSIST))

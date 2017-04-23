@@ -82,7 +82,7 @@ class Challenge : BasicEntity, Billable {
     lateinit var amount: Money
         private set
 
-    // TOOD: Remove after using Join Table
+    // TODO: Remove after using Join Table
     @Deprecated("Used for PreRemove on Sponsor. A Challenge should never exist without a sponsor")
     fun removeSponsor() {
         this.registeredSponsor = null
@@ -110,7 +110,7 @@ class Challenge : BasicEntity, Billable {
             }
         }
 
-    @OneToOne(mappedBy = "challenge")
+    @OneToOne(mappedBy = "challenge", fetch = FetchType.LAZY)
     var proof: Posting? = null
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = arrayOf(PERSIST))
