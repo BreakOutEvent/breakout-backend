@@ -47,7 +47,7 @@ class Posting : BasicEntity {
     @JoinTable(
             joinColumns = arrayOf(JoinColumn(name = "posting_id", referencedColumnName = "id")),
             inverseJoinColumns = arrayOf(JoinColumn(name = "like_id", referencedColumnName = "id"))
-    )
+    ) // explicit annotation because "like" would cause an error as it is an sql keyword
     var likes: MutableSet<Like> = hashSetOf()
 
     @Transient

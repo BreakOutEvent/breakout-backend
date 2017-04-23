@@ -68,7 +68,7 @@ class UserAccount : BasicEntity, User {
      * if it gets removed from Map userRoles and the account is saved!
      * See: http://stackoverflow.com/a/2011546
      */
-    @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
     private var userRoles: MutableMap<Class<out UserRole>, UserRole> = HashMap()
 
     private var activationToken: String? = null

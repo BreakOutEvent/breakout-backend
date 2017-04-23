@@ -15,12 +15,12 @@ class CommentView() {
     var date: Long? = null
 
     @Valid
-    var user: BasicUserView? = null
+    var user: PostingUserView? = null
 
     constructor(comment: Comment) : this() {
         this.id = comment.id
         this.text = comment.text
         this.date = comment.date.toEpochSecond(ZoneOffset.UTC)
-        this.user = BasicUserView(comment.user!!.account)
+        this.user = PostingUserView(comment.user!!.account)
     }
 }
