@@ -106,8 +106,8 @@ abstract class IntegrationTest {
     @Before
     open fun setUp() {
         sponsoringInvoiceRepository.deleteAll()
-        teamRepository.deleteAll()
         postingRepository.deleteAll()
+        teamRepository.deleteAll()
         groupMessageRepository.deleteAll()
         userRepository.deleteAll()
         mediaRepository.deleteAll()

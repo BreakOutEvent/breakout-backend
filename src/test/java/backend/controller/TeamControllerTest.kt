@@ -14,6 +14,8 @@ import org.junit.Test
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
 
@@ -43,6 +45,41 @@ class TeamControllerTest : IntegrationTest() {
     @Ignore
     fun testCreateTeam() {
 
+    }
+
+    @Test
+    fun givenAParticipantIsInMultipleTeams_whenGettingAllPostingsForHisCurrentTeam_thenItOnlyReturnsPostingsForHisCurrentTeam() {
+
+        // given
+        val firstEvent = eventService.createEvent("Event (2017)", LocalDateTime.now(), "Munich", Coord(0.0, 0.0), 36)
+        val secondEvent = eventService.createEvent("Event (2018)", LocalDateTime.now().plusYears(1), "Munich", Coord(0.0, 0.0), 36)
+
+        val participant = userService.create("participant@example.com", "pw", { addRole(Participant::class) })
+                .getRole(Participant::class)!!
+
+        val firstTeam = teamService.create(participant, "firstteam", "description", firstEvent)
+        val firstPosting = postingService.createPosting(participant, "Hello 1", null, null, LocalDateTime.now())
+
+        val secondTeam = teamService.create(participant, "secondteam", "description", secondEvent)
+        val secondPosting = postingService.createPosting(participant, "Hello 2", null, null, LocalDateTime.now().plusYears(1))
+
+        // when
+        val request1 = get("/event/${firstEvent.id}/team/${firstTeam.id}/posting/")
+        val request2 = get("/event/${secondEvent.id}/team/${secondTeam.id}/posting/")
+
+        //then
+        mockMvc.perform(request1)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$.[0].id").value(firstPosting.id))
+
+
+        mockMvc.perform(request2)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$.[0].id").value(secondPosting.id))
     }
 
     @Test
