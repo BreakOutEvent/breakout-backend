@@ -3,10 +3,7 @@ package backend.model.posting
 import backend.model.BasicEntity
 import backend.model.user.UserAccount
 import java.time.LocalDateTime
-import javax.persistence.Entity
-import javax.persistence.ManyToOne
-import javax.persistence.PreRemove
-import javax.persistence.Table
+import javax.persistence.*
 
 @Entity
 
@@ -17,7 +14,7 @@ class Like : BasicEntity {
 
     lateinit var date: LocalDateTime
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     var user: UserAccount? = null
 
     constructor(date: LocalDateTime, user: UserAccount) : this() {

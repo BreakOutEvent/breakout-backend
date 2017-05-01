@@ -15,4 +15,5 @@
     - Nutzung siehe Dokumentation
     - Beispiel: 
         - Ziele in targets.txt schreiben
-        - Ausführen und plotten: `vegeta attack -duration=40s -rate=5 -targets=targets.txt | vegeta report -reporter=plot > test.html && open test.html`
+        - Ausführen und plotten: `echo "GET http://localhost:8082/posting/3452/" | vegeta attack -duration=10s -rate=50 | vegeta report -reporter=plot > test_posting_3452.html && open test_posting_3452.html`
+        - oder: `echo "GET http://localhost:8082/posting/?page=0" | vegeta attack -duration=10s -rate=50 | vegeta report -reporter=plot > test_posting_page_0.html && open test_posting_page_0.html`

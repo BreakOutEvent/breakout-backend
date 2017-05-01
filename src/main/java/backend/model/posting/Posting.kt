@@ -23,6 +23,9 @@ class Posting : BasicEntity {
     @Column(columnDefinition = "TEXT")
     var text: String? = null
 
+    /*
+    TODO: Move hashtags to own entity - github issue #194
+     */
     @ElementCollection
     var hashtags: List<Hashtag> = ArrayList()
 
