@@ -54,6 +54,11 @@ class TeamOverview : BasicEntity {
     @Embedded
     var lastContactWithHeadquarters: LastContactWithHeadquarters? = null
 
+    fun setLastContactWithHeadquarters(comment: String, timestamp: LocalDateTime) {
+        val lastContact = LastContactWithHeadquarters(timestamp, comment)
+        this.lastContactWithHeadquarters = lastContact
+    }
+
 }
 
 @Embeddable
@@ -133,7 +138,19 @@ class LastPosting() {
 }
 
 @Embeddable
-class LastContactWithHeadquarters(var timestamp: LocalDateTime, var comment: String)
+class LastContactWithHeadquarters() {
+
+    @JsonSerialize(using = TimestampSerializer::class)
+    var timestamp: LocalDateTime? = null
+    var comment: String? = null
+
+    constructor(timestamp: LocalDateTime, comment: String) : this() {
+        this.timestamp = timestamp
+        this.comment = comment
+    }
+}
+
+
 class TimestampSerializer: StdSerializer<LocalDateTime> {
 
     constructor(): super(LocalDateTime::class.java)

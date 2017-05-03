@@ -1,5 +1,6 @@
 package backend.Teamoverview
 
+import backend.controller.exceptions.NotFoundException
 import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.event.TeamChangedEvent
@@ -12,6 +13,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class TeamOverviewServiceImpl(private val teamOverviewRepository: TeamoverviewRepository) : TeamOverviewService {
@@ -19,6 +22,16 @@ class TeamOverviewServiceImpl(private val teamOverviewRepository: TeamoverviewRe
     private val logger: Logger = LoggerFactory.getLogger(TeamOverviewServiceImpl::class.java)
 
     override fun findAll(): Iterable<TeamOverview> = teamOverviewRepository.findAll()
+
+    override fun findByTeamId(teamId: Long): TeamOverview? = teamOverviewRepository.findByTeamId(teamId)
+
+    @Transactional
+    override fun addComment(teamId: Long, comment: String) {
+        val teamOverview = this.findByTeamId(teamId)
+                ?: throw NotFoundException("Team with id $teamId not found in TeamOverview")
+
+        teamOverview.setLastContactWithHeadquarters(comment, LocalDateTime.now())
+    }
 
     @EventListener
     fun onTeamCreated(teamCreatedEvent: TeamCreatedEvent) {
