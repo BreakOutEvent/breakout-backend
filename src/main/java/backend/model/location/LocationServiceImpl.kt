@@ -9,31 +9,17 @@ import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.services.FeatureFlagService
 import backend.services.GeoCodingService
-import backend.util.parallelStream
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import javax.transaction.Transactional
 
 @Service
-class LocationServiceImpl : LocationService {
-
-    private val locationRepository: LocationRepository
-    private val geoCodingService: GeoCodingService
-    private val featureFlagService: FeatureFlagService
-    private val eventService: EventService
-
-    @Autowired
-    constructor(locationRepository: LocationRepository,
-                geoCodingService: GeoCodingService,
-                featureFlagService: FeatureFlagService,
-                eventService: EventService) {
-
-        this.locationRepository = locationRepository
-        this.geoCodingService = geoCodingService
-        this.featureFlagService = featureFlagService
-        this.eventService = eventService
-    }
+class LocationServiceImpl(private val locationRepository: LocationRepository,
+                          private val geoCodingService: GeoCodingService,
+                          private val featureFlagService: FeatureFlagService,
+                          private val eventService: EventService,
+                          private val eventPublisher: ApplicationEventPublisher) : LocationService {
 
     override fun findAll(): Iterable<Location> {
         return locationRepository.findAll()
@@ -58,7 +44,10 @@ class LocationServiceImpl : LocationService {
 
         checkAndSetIsDuringEvent(location, participant)
 
-        return locationRepository.save(location)
+        val savedLocation = locationRepository.save(location)
+        val team = location.team ?: throw Exception("Location has no team")
+        eventPublisher.publishEvent(LocationUploadedEvent(location, team))
+        return savedLocation
     }
 
     private fun checkAndSetIsDuringEvent(location: Location, participant: Participant) {
@@ -95,7 +84,6 @@ class LocationServiceImpl : LocationService {
             return@reduce acc
         }.orElseGet { mutableMapOf<Team, Iterable<Location>>() }
     }
-
 }
 
 class LocationUploadedEvent(val location: Location, val team: Team)
