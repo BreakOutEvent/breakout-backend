@@ -168,3 +168,6 @@ class TeamServiceImpl : TeamService {
         return repository.findAllTeamSummaryProjections()
     }
 }
+
+class TeamCreatedEvent(val team: Team)
+class TeamChangedEvent(val team: Team)

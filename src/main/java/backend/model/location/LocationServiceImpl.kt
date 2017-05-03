@@ -98,3 +98,4 @@ class LocationServiceImpl : LocationService {
 
 }
 
+class LocationUploadedEvent(val location: Location, val team: Team)

@@ -97,3 +97,5 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
         repository.delete(posting)
     }
 }
+
+class PostingCreatedEvent(val posting: Posting)
