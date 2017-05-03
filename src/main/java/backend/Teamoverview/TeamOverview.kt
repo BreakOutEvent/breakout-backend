@@ -3,7 +3,14 @@ package backend.Teamoverview
 import backend.model.BasicEntity
 import backend.model.event.Event
 import backend.model.event.Team
+import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.databind.SerializerProvider
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.databind.ser.std.StdSerializer
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 import javax.persistence.*
 
 @Entity
@@ -116,6 +123,7 @@ class LastPosting() {
     var id: Long? = null
 
     @Column(name = "posting_timestamp")
+    @JsonSerialize(using = TimestampSerializer::class)
     var timestamp: LocalDateTime? = null
 
     constructor(id: Long?, timestamp: LocalDateTime) : this() {
@@ -126,3 +134,17 @@ class LastPosting() {
 
 @Embeddable
 class LastContactWithHeadquarters(var timestamp: LocalDateTime, var comment: String)
+class TimestampSerializer: StdSerializer<LocalDateTime> {
+
+    constructor(): super(LocalDateTime::class.java)
+
+    constructor(clazz: Class<LocalDateTime>): super(clazz)
+
+    override fun serialize(value: LocalDateTime, gen: JsonGenerator, provider: SerializerProvider?) {
+        val ts = value
+        val zoneId = ZoneId.systemDefault()
+        val epoch = ts.atZone(zoneId).toInstant().toEpochMilli()
+        gen.writeNumber(epoch)
+    }
+
+}
