@@ -3,10 +3,6 @@ package backend.view
 import backend.model.challenges.Challenge
 import backend.model.location.Location
 import backend.model.posting.Posting
-import backend.model.user.Participant
-import backend.model.user.User
-import backend.model.user.UserAccount
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import java.time.ZoneOffset
 import javax.validation.Valid
@@ -50,7 +46,7 @@ class PostingResponseView() {
         this.hashtags = posting.hashtags.map { it.value }
         this.date = posting.date.toEpochSecond(ZoneOffset.UTC)
         this.postingLocation = posting.location?.let(::PostingLocationView)
-        this.user = PostingUserView(posting.user)
+        this.user = PostingUserView(posting)
         this.media = posting.media.map(::MediaView)
         this.comments = posting.comments.map(::CommentView)
         this.likes = posting.likes.count()
@@ -64,30 +60,17 @@ class PostingUserView() {
     var firstname: String? = null
     var lastname: String? = null
     var profilePic: MediaView? = null
+    var participant: MutableMap<String, Any> = mutableMapOf()
 
-    var participant: PostingParticipantView? = null
-
-    constructor(user: UserAccount?) : this() {
-        firstname = user?.firstname
-        lastname = user?.lastname
-        profilePic = user?.profilePic?.let {
+    constructor(posting: Posting) : this() {
+        firstname = posting.user?.firstname
+        lastname = posting.user?.lastname
+        profilePic = posting.user?.profilePic?.let {
             return@let MediaView(it)
         }
-        participant = user?.let(::PostingParticipantView)
-    }
-
-    class PostingParticipantView() {
-
-        @JsonIgnore
-        var participant: Participant? = null
-
-        var teamId: Long? = null
-        var teamName: String? = null
-
-        constructor(user: User) : this() {
-            this.participant = user.getRole(Participant::class)
-            this.teamId = participant?.getCurrentTeam()?.id
-            this.teamName = participant?.getCurrentTeam()?.name
+        posting.team?.let {
+            participant.put("teamId", it.id as Any)
+            participant.put("teamName", it.name as Any)
         }
     }
 }
