@@ -60,7 +60,7 @@ class PostingUserView() {
     var firstname: String? = null
     var lastname: String? = null
     var profilePic: MediaView? = null
-    var participant: MutableMap<String, Any> = mutableMapOf()
+    var participant: MutableMap<String, Any>? = null
 
     constructor(posting: Posting) : this() {
         firstname = posting.user?.firstname
@@ -69,8 +69,10 @@ class PostingUserView() {
             return@let MediaView(it)
         }
         posting.team?.let {
-            participant.put("teamId", it.id as Any)
-            participant.put("teamName", it.name as Any)
+            participant = mutableMapOf(
+                    "teamId" to it.id as Any,
+                    "teamName" to it.name as Any
+            )
         }
     }
 }
