@@ -5,8 +5,10 @@ import backend.controller.exceptions.ConflictException
 import backend.controller.exceptions.NotFoundException
 import backend.model.BasicEntity
 import backend.model.challenges.Challenge
+import backend.model.event.Team
 import backend.model.location.Location
 import backend.model.media.Media
+import backend.model.user.Participant
 import backend.model.user.UserAccount
 import java.time.LocalDateTime
 import java.util.*
@@ -14,6 +16,7 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 import javax.persistence.*
 import javax.persistence.CascadeType.PERSIST
+import javax.persistence.FetchType.LAZY
 
 @Entity
 class Posting : BasicEntity {
@@ -40,6 +43,9 @@ class Posting : BasicEntity {
     @ManyToOne
     var user: UserAccount? = null
 
+    @ManyToOne(fetch = LAZY)
+    var team: Team? = null
+
     @OneToMany(cascade = arrayOf(CascadeType.ALL))
     var media: MutableList<Media> = arrayListOf()
 
@@ -62,6 +68,7 @@ class Posting : BasicEntity {
         this.location = location
         this.user = user
         this.media = media
+        this.team = user.getRole(Participant::class)?.getCurrentTeam()
         if (text != null) this.hashtags = extractHashtags(text)
     }
 
@@ -118,6 +125,7 @@ class Posting : BasicEntity {
         this.media.clear()
         this.challenge = null
         this.user = null
+        this.team = null
     }
 
     // TODO: Refactor this!
