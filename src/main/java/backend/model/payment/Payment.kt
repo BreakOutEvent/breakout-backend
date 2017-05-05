@@ -4,6 +4,7 @@ import backend.model.BasicEntity
 import backend.model.user.User
 import backend.model.user.UserAccount
 import org.javamoney.moneta.Money
+import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.ManyToOne
 import javax.persistence.PreRemove
@@ -14,6 +15,7 @@ abstract class Payment : BasicEntity {
     lateinit var amount: Money
         private set
 
+    @Column(unique=true)
     var fidorId: Long? = null
         private set
 
