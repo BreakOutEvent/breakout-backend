@@ -3,6 +3,8 @@ package backend.view
 import backend.model.user.*
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.validator.constraints.Email
+import org.hibernate.validator.constraints.SafeHtml
+import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
@@ -13,7 +15,12 @@ class UserView() {
 
     var password: String? = null
 
+    @Valid
+    @SafeHtml(whitelistType = NONE)
     var firstname: String? = null
+
+    @Valid
+    @SafeHtml(whitelistType = NONE)
     var lastname: String? = null
 
     var preferredLanguage: String? = null
@@ -21,8 +28,12 @@ class UserView() {
     @Email
     var email: String? = null
 
+    @Valid
+    @SafeHtml(whitelistType = NONE)
     var gender: String? = null
+
     var id: Long? = null
+
     var isBlocked: Boolean? = null
 
     @Valid
@@ -62,19 +73,31 @@ class UserView() {
         var participant: Participant? = null
 
         @NotNull
+        @SafeHtml(whitelistType = NONE)
         var emergencynumber: String? = null
 
         @NotNull
+        @SafeHtml(whitelistType = NONE)
         var phonenumber: String? = null
 
         @NotNull
+        @SafeHtml(whitelistType = NONE)
         var tshirtsize: String? = null
 
+        @Valid
+        @SafeHtml(whitelistType = NONE)
         var birthdate: String? = null
+
+        @Valid
+        @SafeHtml(whitelistType = NONE)
         var hometown: String? = null
+
         var eventId: Long? = null
+
         var eventCity: String? = null
+
         var teamId: Long? = null
+
         var teamName: String? = null
 
         constructor(user: User) : this() {
@@ -96,8 +119,12 @@ class UserView() {
         @JsonIgnore
         var sponsor: Sponsor? = null
 
+        @Valid
+        @SafeHtml(whitelistType = NONE)
         var company: String? = null
 
+        @Valid
+        @SafeHtml(whitelistType = NONE)
         var url: String? = null
 
         @Valid
@@ -117,18 +144,23 @@ class UserView() {
     class AddressView() {
 
         @NotNull
+        @SafeHtml(whitelistType = NONE)
         var street: String? = null
 
         @NotNull
+        @SafeHtml(whitelistType = NONE)
         var housenumber: String? = null
 
         @NotNull
+        @SafeHtml(whitelistType = NONE)
         var city: String? = null
 
         @NotNull
+        @SafeHtml(whitelistType = NONE)
         var country: String? = null
 
         @NotNull
+        @SafeHtml(whitelistType = NONE)
         var zipcode: String? = null
 
         constructor(address: Address?) : this() {

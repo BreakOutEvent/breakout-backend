@@ -15,6 +15,7 @@ import backend.testHelper.json
 import com.auth0.jwt.Algorithm
 import com.auth0.jwt.JWTSigner
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.intellij.lang.annotations.Language
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -1323,5 +1324,23 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .andReturn().response.contentAsString
 
         println(response)
+    }
+
+    @Test
+    fun postingDoesNotAllowHtmlAsPayload() {
+
+        @Language("HTML")
+        val body = mapOf(
+                "text" to """<script type="text/javascript">alert("Such XSS. Much Wow");</script>""",
+                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+        )
+
+        val request = post("/posting/")
+                .json(body)
+                .asUser(this.mockMvc, user.email, "password")
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest)
+
     }
 }

@@ -2,16 +2,23 @@ package backend.view
 
 import backend.model.event.Team
 import backend.util.data.DonateSums
+import org.hibernate.validator.constraints.SafeHtml
+import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import java.util.*
+import javax.validation.Valid
 
 class TeamView() {
 
     var id: Long? = null
 
+    @Valid
+    @SafeHtml(whitelistType = NONE)
     var name: String? = null
 
     var event: Long? = null
 
+    @Valid
+    @SafeHtml(whitelistType = NONE)
     var description: String? = null
 
     var hasStarted: Boolean? = null

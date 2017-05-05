@@ -2,6 +2,8 @@ package backend.view
 
 import backend.model.event.Event
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.hibernate.validator.constraints.SafeHtml
+import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import java.time.ZoneOffset
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
@@ -11,12 +13,14 @@ class EventView() {
     var id: Long? = null
 
     @NotNull
+    @SafeHtml(whitelistType = NONE)
     lateinit var title: String
 
     @NotNull
     var date: Long? = null
 
     @NotNull
+    @SafeHtml(whitelistType = NONE)
     lateinit var city: String
 
     @Valid

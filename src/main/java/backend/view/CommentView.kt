@@ -1,6 +1,8 @@
 package backend.view
 
 import backend.model.posting.Comment
+import org.hibernate.validator.constraints.SafeHtml
+import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import java.time.ZoneOffset
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
@@ -9,6 +11,8 @@ class CommentView() {
 
     var id: Long? = null
 
+    @Valid
+    @SafeHtml(whitelistType = NONE)
     lateinit var text: String
 
     @NotNull

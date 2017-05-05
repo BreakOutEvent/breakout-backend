@@ -1,6 +1,8 @@
 package backend.view
 
 import backend.model.challenges.Challenge
+import org.hibernate.validator.constraints.SafeHtml
+import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
@@ -31,6 +33,7 @@ class ChallengeView {
 
     @NotNull
     @Size(max = 1000)
+    @SafeHtml(whitelistType = NONE)
     var description: String? = null
 
     var contract: MediaView? = null
