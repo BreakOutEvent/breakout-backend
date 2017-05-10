@@ -31,6 +31,6 @@ interface TeamRepository : CrudRepository<Team, Long> {
     fun searchByString(@Param("search") search: String): List<Team>
 
     //language=HQL
-    @Query("Select new backend.model.event.TeamSummaryProjection(t.name, t.id, t.event.id, t.event.title) from Team t")
+    @Query("Select new backend.model.event.TeamSummaryProjection(t.name, t.id, t.event.id, t.event.title) from Team t where t.event.isCurrent = true order by t.name")
     fun findAllTeamSummaryProjections(): Iterable<TeamSummaryProjection>
 }
