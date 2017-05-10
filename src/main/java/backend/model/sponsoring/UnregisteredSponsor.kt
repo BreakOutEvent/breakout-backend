@@ -40,6 +40,8 @@ class UnregisteredSponsor : BasicEntity, ISponsor {
     override
     var isHidden: Boolean = false
 
+    var email: String? = null
+
     /**
      * private no-args constructor for JPA / Hibernate
      */
@@ -51,7 +53,8 @@ class UnregisteredSponsor : BasicEntity, ISponsor {
                 gender: String,
                 url: String,
                 address: Address,
-                isHidden: Boolean = false) {
+                isHidden: Boolean = false,
+                email: String? = null) {
 
         this.firstname = firstname
         this.lastname = lastname
@@ -60,5 +63,6 @@ class UnregisteredSponsor : BasicEntity, ISponsor {
         this.url = url
         this.address = address
         this.isHidden = isHidden
+        this.email = email
     }
 }

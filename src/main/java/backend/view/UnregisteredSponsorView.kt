@@ -1,6 +1,7 @@
 package backend.view
 
 import backend.model.sponsoring.UnregisteredSponsor
+import org.hibernate.validator.constraints.Email
 import org.hibernate.validator.constraints.SafeHtml
 import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import javax.validation.Valid
@@ -35,6 +36,9 @@ class UnregisteredSponsorView() {
     @NotNull
     var isHidden = false
 
+    @Email
+    var email: String? = null
+
     constructor(unregisteredSponsor: UnregisteredSponsor) : this() {
         this.address = UserView.AddressView(unregisteredSponsor.address)
         this.company = unregisteredSponsor.company
@@ -43,5 +47,6 @@ class UnregisteredSponsorView() {
         this.firstname = unregisteredSponsor.firstname
         this.lastname = unregisteredSponsor.lastname
         this.isHidden = unregisteredSponsor.isHidden
+        this.email = unregisteredSponsor.email
     }
 }

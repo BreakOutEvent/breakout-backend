@@ -122,6 +122,7 @@ class SponsoringController(private var sponsoringService: SponsoringService,
                 gender = sponsor.gender!!,
                 url = sponsor.url!!,
                 address = sponsor.address!!.toAddress()!!,
+                email = sponsor.email,
                 isHidden = sponsor.isHidden)
 
         val sponsoring = sponsoringService.createSponsoringWithOfflineSponsor(team, amount, limit, unregisteredSponsor)

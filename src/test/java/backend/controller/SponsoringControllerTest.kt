@@ -244,6 +244,7 @@ class SponsoringControllerTest : IntegrationTest() {
                         "url" to "www.florianschmidt.me",
                         "gender" to "male",
                         "hidden" to false,
+                        "email" to "sponsor@example.com",
                         "company" to "awesome AG",
                         "address" to mapOf(
                                 "street" to "test",
@@ -278,6 +279,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.unregisteredSponsor.gender").value("male"))
                 .andExpect(jsonPath("$.unregisteredSponsor.hidden").value(false))
                 .andExpect(jsonPath("$.unregisteredSponsor.company").value("awesome AG"))
+                .andExpect(jsonPath("$.unregisteredSponsor.email").value("sponsor@example.com"))
                 .andExpect(jsonPath("$.unregisteredSponsor.address").exists())
                 .andExpect(jsonPath("$.unregisteredSponsor.address.street").value("test"))
                 .andExpect(jsonPath("$.unregisteredSponsor.address.housenumber").value("01"))

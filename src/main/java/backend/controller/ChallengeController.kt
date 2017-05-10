@@ -93,6 +93,7 @@ class ChallengeController(private var challengeService: ChallengeService,
                 company = unregisteredSponsor.company!!,
                 gender = unregisteredSponsor.gender!!,
                 url = unregisteredSponsor.url!!,
+                email = unregisteredSponsor.email,
                 address = unregisteredSponsor.address!!.toAddress()!!,
                 isHidden = unregisteredSponsor.isHidden)
 
