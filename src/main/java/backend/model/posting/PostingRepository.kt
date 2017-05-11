@@ -12,4 +12,6 @@ interface PostingRepository : CrudRepository<Posting, Long> {
     fun findByHashtag(@Param("hashtag") hashtag: String, pageable: Pageable): List<Posting>
 
     fun findAllByOrderByIdDesc(pageable: Pageable): List<Posting>
+
+    fun findByTeamEventIdInOrderByIdDesc(eventIdList: List<Long>, pageable: Pageable): List<Posting>
 }

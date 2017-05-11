@@ -13,6 +13,8 @@ interface PostingService {
 
     fun findAll(page: Int, size: Int): List<Posting>
 
+    fun findByEventIds(events: List<Long>, page: Int, size: Int): List<Posting>
+
     fun getByID(id: Long): Posting?
 
     fun save(posting: Posting): Posting?
