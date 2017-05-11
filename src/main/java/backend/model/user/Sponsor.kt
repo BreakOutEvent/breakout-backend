@@ -4,6 +4,7 @@ package backend.model.user
 
 import backend.model.challenges.Challenge
 import backend.model.media.Media
+import backend.model.misc.EmailAddress
 import backend.model.misc.Url
 import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.Sponsoring
@@ -35,7 +36,7 @@ class Sponsor : UserRole, ISponsor {
     var challenges: MutableList<Challenge> = arrayListOf()
 
     @Embedded
-    var url: Url? = null
+    override var url: Url? = null
 
     @Embedded
     override lateinit var address: Address

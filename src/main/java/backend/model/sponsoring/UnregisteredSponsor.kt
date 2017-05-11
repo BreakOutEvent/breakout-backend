@@ -2,6 +2,7 @@ package backend.model.sponsoring
 
 import backend.model.BasicEntity
 import backend.model.challenges.Challenge
+import backend.model.misc.Url
 import backend.model.user.Address
 import backend.model.user.Sponsor
 import javax.persistence.*
@@ -25,7 +26,9 @@ class UnregisteredSponsor : BasicEntity, ISponsor {
 
     lateinit var gender: String
 
-    lateinit var url: String
+    @Embedded
+    @AttributeOverride(name = "value", column = Column(name = "url"))
+    override var url: Url? = null
 
     @Embedded
     override lateinit var address: Address
@@ -60,7 +63,7 @@ class UnregisteredSponsor : BasicEntity, ISponsor {
         this.lastname = lastname
         this.company = company
         this.gender = gender
-        this.url = url
+        this.url = Url(url)
         this.address = address
         this.isHidden = isHidden
         this.email = email
