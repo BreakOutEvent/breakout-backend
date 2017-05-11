@@ -1,7 +1,5 @@
 package backend.model.misc
 
-import backend.exceptions.DomainException
-import org.apache.commons.validator.routines.UrlValidator
 import org.hibernate.validator.constraints.URL
 import javax.persistence.Embeddable
 
@@ -12,7 +10,6 @@ class Url() {
     private lateinit var value: String
 
     constructor(value: String) : this() {
-        if (!UrlValidator().isValid(value)) throw DomainException("$value is no valid URL")
         this.value = value
     }
 
