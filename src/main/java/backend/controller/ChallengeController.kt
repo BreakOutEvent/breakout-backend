@@ -4,9 +4,12 @@ import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
+import backend.converter.MoneySerializer
+import backend.converter.UrlSerializer
 import backend.model.challenges.ChallengeService
 import backend.model.event.Team
 import backend.model.event.TeamService
+import backend.model.misc.Url
 import backend.model.posting.PostingService
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
@@ -16,6 +19,7 @@ import backend.services.ConfigurationService
 import backend.util.euroOf
 import backend.view.ChallengeStatusView
 import backend.view.ChallengeView
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import org.javamoney.moneta.Money
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
@@ -25,10 +29,10 @@ import javax.validation.Valid
 
 @RestController
 class ChallengeController(private var challengeService: ChallengeService,
-                               private var userService: UserService,
-                               private var teamService: TeamService,
-                               private var postingService: PostingService,
-                               private var configurationService: ConfigurationService) {
+                          private var userService: UserService,
+                          private var teamService: TeamService,
+                          private var postingService: PostingService,
+                          private var configurationService: ConfigurationService) {
 
     private var jwtSecret: String = configurationService.getRequired("org.breakout.api.jwt_secret")
 
@@ -41,7 +45,7 @@ class ChallengeController(private var challengeService: ChallengeService,
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/user/{userId}/sponsor/challenge/")
     fun getAllChallengesForSponsor(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
-                                        @PathVariable userId: Long): Iterable<ChallengeView> {
+                                   @PathVariable userId: Long): Iterable<ChallengeView> {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
 
@@ -60,8 +64,8 @@ class ChallengeController(private var challengeService: ChallengeService,
     @PostMapping("/event/{eventId}/team/{teamId}/challenge/")
     @ResponseStatus(CREATED)
     fun createChallenge(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
-                             @PathVariable teamId: Long,
-                             @Valid @RequestBody body: ChallengeView): ChallengeView {
+                        @PathVariable teamId: Long,
+                        @Valid @RequestBody body: ChallengeView): ChallengeView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId found")
@@ -109,7 +113,7 @@ class ChallengeController(private var challengeService: ChallengeService,
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/event/{eventId}/team/{teamId}/challenge/{challengeId}/status/")
     fun changeStatus(@PathVariable challengeId: Long,
-                          @Valid @RequestBody body: ChallengeStatusView): ChallengeView {
+                     @Valid @RequestBody body: ChallengeStatusView): ChallengeView {
 
         val challenge = challengeService.findOne(challengeId) ?: throw NotFoundException("No challenge with id $challengeId found")
         return when (body.status!!.toLowerCase()) {
@@ -137,5 +141,33 @@ class ChallengeController(private var challengeService: ChallengeService,
             return@map view
         }
     }
+
+    @GetMapping("/team/{teamId}/challenge/")
+    fun getAllChallengesForTeamProfile(@PathVariable teamId: Long): Iterable<ChallengeTeamProfileView> {
+        return challengeService.findByTeamId(teamId).map {
+
+            val sponsor = SponsorTeamProfileView(
+                    it.sponsor.firstname ?: "",
+                    it.sponsor.lastname ?: "",
+                    it.sponsor.company,
+                    it.sponsor.url)
+
+            ChallengeTeamProfileView(it.amount, it.description, it.status.toString(), sponsor)
+        }
+    }
+
+    class ChallengeTeamProfileView(
+            @JsonSerialize(using = MoneySerializer::class)
+            val amount: Money,
+            val description: String,
+            val status: String,
+            val sponsor: SponsorTeamProfileView?)
+
+    class SponsorTeamProfileView(
+            val firstname: String,
+            val lastname: String,
+            val company: String?,
+            @JsonSerialize(using = UrlSerializer::class) val url: Url?)
+
 }
 
