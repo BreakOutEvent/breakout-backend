@@ -7,6 +7,7 @@ import backend.model.challenges.ChallengeService
 import backend.model.challenges.ChallengeStatus
 import backend.model.event.EventService
 import backend.model.event.TeamService
+import backend.model.location.LocationService
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.misc.EmailRepository
@@ -33,7 +34,7 @@ class AdminController(private val mailService: MailService,
                       private val userService: UserService,
                       private val emailRepository: EmailRepository,
                       private val eventService: EventService,
-                      private val cacheService: CacheService,
+                      private val locationService: LocationService,
                       private val sponsoringInvoiceService: SponsoringInvoiceService) {
 
 
@@ -41,7 +42,7 @@ class AdminController(private val mailService: MailService,
 
     /**
      * GET /admin/regeneratecache/
-     * Allows Admin to resend failed mails
+     * Allows admin to regenerate static caches
      */
 
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -49,6 +50,19 @@ class AdminController(private val mailService: MailService,
     fun regenerateCache(@RequestParam(value = "event", required = false) event: Long?): String {
         logger.info("Regenerating event $event caches from admin request")
         eventService.regenerateCache(event)
+        return "done"
+    }
+
+    /**
+     * GET /admin/generatespeedtolocations/
+     * Allows Admin to generate speed to locations where missing
+     */
+
+    //@PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/generatespeedtolocations/")
+    fun generateSpeedToLocations(): String {
+        logger.info("Regenerating speed to locations where missing from admin request")
+        locationService.generateSpeed()
         return "done"
     }
 

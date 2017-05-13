@@ -1,7 +1,10 @@
 package backend.model.location
 
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
+import org.springframework.data.repository.query.Param
+import java.time.LocalDateTime
 
 interface LocationRepository : CrudRepository<Location, Long> {
 
@@ -10,4 +13,9 @@ interface LocationRepository : CrudRepository<Location, Long> {
 
     @Query("Select floor(max(a.id)) as maxId, floor(min(a.id)) as minId, floor(max(a.number)) as modSelector from (Select id, @rownum \\:= @rownum + 1 as number from location join (Select @rownum \\:= 0) r where is_during_event and team_id = ?1) a", nativeQuery = true)
     fun findTeamLocationBounds(id: Long): List<Any>
+
+    fun findBySpeedToLocationAndIsDuringEvent(speedToLocation: Double?, isDuringEvent: Boolean, pageable: Pageable): List<Location>
+
+    @Query("Select l from Location l WHERE l.team.id = :id AND l.date <= :date AND l.id != :locationId order by l.date desc")
+    fun findByTeamIdAndPriorOrderByDateDesc(@Param("id") id: Long?, @Param("locationId") locationId: Long?, @Param("date") date: LocalDateTime): List<Location>
 }

@@ -24,6 +24,12 @@ class GeoToolsTest {
     }
 
     @Test
+    fun testCalculateSpeed() {
+        assertEquals(1.0, calculateSpeed(1.0, 3600 * 1000))
+        assertEquals(0.25, calculateSpeed(0.5, 2 * 3600 * 1000))
+    }
+
+    @Test
     fun testDistanceCoordsListKM() {
         val coordList: List<Coord> = listOf(Coord(1.0, 1.0), Coord(2.0, 2.0), Coord(3.0, 3.0), Coord(4.0, 4.0))
 

@@ -5,11 +5,13 @@ import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
 import backend.model.event.EventService
 import backend.model.event.TeamService
+import backend.model.location.Location
 import backend.model.location.LocationService
 import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.model.user.UserService
 import backend.util.localDateTimeOf
+import backend.util.speedToLocation
 import backend.view.BasicLocationView
 import backend.view.LocationView
 import backend.view.TeamLocationView
@@ -26,8 +28,8 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/event/{eventId}")
 class LocationController(private val locationService: LocationService,
-                              private val teamService: TeamService,
-                              private val userService: UserService) {
+                         private val teamService: TeamService,
+                         private val userService: UserService) {
 
     private val logger: Logger = LoggerFactory.getLogger(LocationController::class.java)
 
@@ -38,7 +40,7 @@ class LocationController(private val locationService: LocationService,
      */
     @GetMapping("/location/")
     fun getAllLocationsForEvent(@PathVariable eventId: Long,
-                                     @RequestParam(value = "perTeam", required = false) perTeam: Int?): Iterable<TeamLocationView> {
+                                @RequestParam(value = "perTeam", required = false) perTeam: Int?): Iterable<TeamLocationView> {
         return locationService.findByEventId(eventId, perTeam ?: 20).map { data ->
             TeamLocationView(data.key, data.value)
         }
@@ -50,9 +52,29 @@ class LocationController(private val locationService: LocationService,
      */
     @GetMapping("/team/{teamId}/location/")
     fun getAllLocationsForEventAndTeam(@PathVariable("eventId") eventId: Long,
-                                            @PathVariable("teamId") teamId: Long,
-                                            @RequestParam(value = "perTeam", required = false) perTeam: Int?): Iterable<BasicLocationView> {
-        return locationService.findByTeamId(teamId, perTeam ?: 20).map(::BasicLocationView)
+                                       @PathVariable("teamId") teamId: Long,
+                                       @RequestParam(value = "perTeam", required = false) perTeam: Int?): Iterable<BasicLocationView> {
+        val teamLocations = locationService.findByTeamId(teamId, perTeam ?: 20)
+
+
+        val locationPairs: MutableList<Pair<Location, Location>> = arrayListOf()
+
+        var lastLocation: Location? = null
+        teamLocations.forEach { thisLocation ->
+            if (lastLocation != null) {
+                locationPairs.add(Pair(lastLocation!!, thisLocation))
+            }
+            lastLocation = thisLocation
+        }
+
+        val speedToLocation = locationPairs.map { (first, second) ->
+            Pair(speedToLocation(first, second), second)
+        }
+
+        return teamLocations.map { location ->
+            BasicLocationView(location, speedToLocation.find { it.second.id == location.id }?.first)
+        }
+
     }
 
     /**
@@ -63,9 +85,9 @@ class LocationController(private val locationService: LocationService,
     @PostMapping("/team/{teamId}/location/")
     @ResponseStatus(CREATED)
     fun createLocation(@PathVariable("eventId") eventId: Long,
-                            @PathVariable("teamId") teamId: Long,
-                            @AuthenticationPrincipal customUserDetails: CustomUserDetails,
-                            @Valid @RequestBody locationView: LocationView): LocationView {
+                       @PathVariable("teamId") teamId: Long,
+                       @AuthenticationPrincipal customUserDetails: CustomUserDetails,
+                       @Valid @RequestBody locationView: LocationView): LocationView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val participant = user.getRole(Participant::class) ?: throw UnauthorizedException("user is no participant")
@@ -86,9 +108,9 @@ class LocationController(private val locationService: LocationService,
     @PostMapping("/team/{teamId}/location/multiple/")
     @ResponseStatus(CREATED)
     fun createMultipleLocation(@PathVariable("eventId") eventId: Long,
-                                    @PathVariable("teamId") teamId: Long,
-                                    @AuthenticationPrincipal customUserDetails: CustomUserDetails,
-                                    @Valid @RequestBody locationViews: List<LocationView>): List<LocationView> {
+                               @PathVariable("teamId") teamId: Long,
+                               @AuthenticationPrincipal customUserDetails: CustomUserDetails,
+                               @Valid @RequestBody locationViews: List<LocationView>): List<LocationView> {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val participant = user.getRole(Participant::class) ?: throw UnauthorizedException("user is no participant")

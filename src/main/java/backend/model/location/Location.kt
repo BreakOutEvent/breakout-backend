@@ -32,6 +32,8 @@ class Location : BasicEntity {
 
     var distance: Double = 0.0
 
+    var speedToLocation: Double? = null
+
     @ElementCollection(fetch = FetchType.EAGER)
     @MapKeyColumn(name = "location_data_key")
     @Column(name = "location_data_value")
