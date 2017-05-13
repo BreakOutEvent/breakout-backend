@@ -26,7 +26,7 @@ class NotificationServiceImpl @Autowired constructor(private val restTemplate: R
     private val pool = Executors.newCachedThreadPool()
     private val logger = LoggerFactory.getLogger(NotificationServiceImpl::class.java)
 
-    override fun send(message: Message, groupId: Long, users: List<UserAccount>) {
+    override fun send(message: Message, groupId: Long?, users: List<UserAccount>) {
 
         val headers = HttpHeaders().apply {
             set("Content-Type", "application/json;charset=utf-8")

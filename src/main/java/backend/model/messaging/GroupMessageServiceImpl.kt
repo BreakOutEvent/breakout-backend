@@ -52,7 +52,7 @@ class GroupMessageServiceImpl @Autowired constructor(val repository: GroupMessag
         userRepository.save(message.creator)
         groupMessage.addMessage(message)
         val notifiedUsers = groupMessage.users.filter { it.id != message.creator.id }
-        notificationServer.send(message, notifiedUsers)
+        notificationServer.send(message, groupMessage.id, notifiedUsers)
         return repository.save(groupMessage)
     }
 }
