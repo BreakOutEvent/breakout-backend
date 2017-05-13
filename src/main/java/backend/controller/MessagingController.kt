@@ -6,6 +6,7 @@ import backend.controller.exceptions.UnauthorizedException
 import backend.model.messaging.GroupMessageService
 import backend.model.messaging.Message
 import backend.model.user.UserService
+import backend.services.NotificationService
 import backend.util.localDateTimeOf
 import backend.view.GroupMessageView
 import backend.view.MessageView
@@ -20,7 +21,8 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/messaging")
 class MessagingController(private val groupMessageService: GroupMessageService,
-                               private val userService: UserService) {
+                               private val userService: UserService,
+                                private val notificationServer: NotificationService) {
 
 
     /**
@@ -84,6 +86,8 @@ class MessagingController(private val groupMessageService: GroupMessageService,
         val message = Message(user.account, body.text!!, localDateTimeOf(body.date!!))
         groupMessageService.addMessage(message, groupMessage)
 
+        val notifiedUsers =  groupMessage.users.filter { it.id != user.account.id }
+        notificationServer.send("New Message", message.text, groupMessage, notifiedUsers)
         return GroupMessageView(groupMessage)
     }
 

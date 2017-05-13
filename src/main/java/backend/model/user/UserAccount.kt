@@ -41,6 +41,8 @@ class UserAccount : BasicEntity, User {
 
     override var gender: String? = null
 
+    override var notificationToken: String? = null
+
     @Enumerated(EnumType.STRING)
     override var preferredLanguage: Language = Language.DE
 
