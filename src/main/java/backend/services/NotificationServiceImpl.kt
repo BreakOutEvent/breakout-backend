@@ -14,7 +14,6 @@ import org.springframework.web.client.RestOperations
 import org.springframework.web.util.UriComponentsBuilder
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
-import org.slf4j.LoggerFactory
 
 @Service
 class NotificationServiceImpl @Autowired constructor(private val restTemplate: RestOperations,
@@ -23,8 +22,6 @@ class NotificationServiceImpl @Autowired constructor(private val restTemplate: R
     private var url: String = configurationService.getRequired("org.breakout.api.notifications.url")
     private var appId: String = configurationService.getRequired("org.breakout.api.notifications.appId")
     private val pool = Executors.newCachedThreadPool()
-
-    private val log = LoggerFactory.getLogger(SimpleCORSFilter::class.java)
 
     override fun send(title: String, subtitle: String?, data: GroupMessage, users: List<UserAccount>) {
 
