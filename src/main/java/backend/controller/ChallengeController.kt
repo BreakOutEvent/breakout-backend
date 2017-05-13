@@ -4,9 +4,12 @@ import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
+import backend.converter.MoneySerializer
+import backend.converter.UrlSerializer
 import backend.model.challenges.ChallengeService
 import backend.model.event.Team
 import backend.model.event.TeamService
+import backend.model.misc.Url
 import backend.model.posting.PostingService
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
@@ -16,6 +19,7 @@ import backend.services.ConfigurationService
 import backend.util.euroOf
 import backend.view.ChallengeStatusView
 import backend.view.ChallengeView
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import org.javamoney.moneta.Money
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
@@ -93,6 +97,7 @@ class ChallengeController(private var challengeService: ChallengeService,
                 company = unregisteredSponsor.company!!,
                 gender = unregisteredSponsor.gender!!,
                 url = unregisteredSponsor.url!!,
+                email = unregisteredSponsor.email,
                 address = unregisteredSponsor.address!!.toAddress()!!,
                 isHidden = unregisteredSponsor.isHidden)
 
@@ -135,5 +140,33 @@ class ChallengeController(private var challengeService: ChallengeService,
             return@map view
         }
     }
+
+    @GetMapping("/team/{teamId}/challenge/")
+    fun getAllChallengesForTeamProfile(@PathVariable teamId: Long): Iterable<ChallengeTeamProfileView> {
+        return challengeService.findByTeamId(teamId).map {
+
+            val sponsor = SponsorTeamProfileView(
+                    it.sponsor.firstname ?: "",
+                    it.sponsor.lastname ?: "",
+                    it.sponsor.company,
+                    it.sponsor.url)
+
+            ChallengeTeamProfileView(it.amount, it.description, it.status.toString(), sponsor)
+        }
+    }
+
+    class ChallengeTeamProfileView(
+            @JsonSerialize(using = MoneySerializer::class)
+            val amount: Money,
+            val description: String,
+            val status: String,
+            val sponsor: SponsorTeamProfileView?)
+
+    class SponsorTeamProfileView(
+            val firstname: String,
+            val lastname: String,
+            val company: String?,
+            @JsonSerialize(using = UrlSerializer::class) val url: Url?)
+
 }
 

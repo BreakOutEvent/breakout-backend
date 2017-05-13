@@ -60,6 +60,8 @@ dependencies {
     compile "io.springfox:springfox-swagger2:2.4.0"
     compile "io.springfox:springfox-swagger-ui:2.4.0"
 
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.10.2'
+
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 

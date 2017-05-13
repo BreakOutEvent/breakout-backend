@@ -109,8 +109,15 @@ class PostingController(private val postingService: PostingService,
      */
     @GetMapping("/")
     fun getAllPostings(@RequestParam(value = "page", required = false) page: Int?,
-                       @RequestParam(value = "userid", required = false) userId: Long?): Iterable<PostingResponseView> {
-        return postingService.findAll(page ?: 0, PAGE_SIZE).map {
+                       @RequestParam(value = "userid", required = false) userId: Long?,
+                       @RequestParam(value = "event", required = false) events: List<Long>?): Iterable<PostingResponseView> {
+        val postings = if(events != null) {
+            postingService.findByEventIds(events, page ?:0 , PAGE_SIZE)
+        } else {
+            postingService.findAll(page ?: 0, PAGE_SIZE)
+        }
+
+        return postings.map {
             PostingResponseView(it.hasLikesBy(userId), it.challenge?.let {
                 challengeService.findChallengeProveProjectionById(it)
             })

@@ -77,6 +77,7 @@ class ChallengeControllerTest : IntegrationTest() {
                         "url" to "",
                         "gender" to "male",
                         "isHidden" to "false",
+                        "email" to "sponsor@example.com",
                         "address" to mapOf(
                                 "street" to "street",
                                 "housenumber" to "123",
@@ -103,6 +104,7 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.teamId").value(team.id!!.toInt()))
                 .andExpect(jsonPath("$.status").value("ACCEPTED"))
                 .andExpect(jsonPath("$.unregisteredSponsor").exists())
+                .andExpect(jsonPath("$.unregisteredSponsor.email").exists())
                 .andExpect(jsonPath("$.unregisteredSponsor.firstname").exists())
                 .andExpect(jsonPath("$.unregisteredSponsor.lastname").exists())
                 .andExpect(jsonPath("$.unregisteredSponsor.company").exists())

@@ -4,6 +4,8 @@ import backend.model.challenges.Challenge
 import backend.model.posting.Posting
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
+import org.hibernate.validator.constraints.SafeHtml
+import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import java.time.ZoneOffset
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
@@ -12,6 +14,8 @@ class PostingView() {
 
     var id: Long? = null
 
+    @Valid
+    @SafeHtml(whitelistType = NONE)
     var text: String? = null
 
     @NotNull

@@ -1,10 +1,9 @@
 package backend.view
 
 import backend.model.posting.Comment
-import backend.model.user.Participant
-import backend.model.user.User
 import backend.model.user.UserAccount
-import com.fasterxml.jackson.annotation.JsonIgnore
+import org.hibernate.validator.constraints.SafeHtml
+import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import java.time.ZoneOffset
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
@@ -13,6 +12,8 @@ class CommentView() {
 
     var id: Long? = null
 
+    @Valid
+    @SafeHtml(whitelistType = NONE)
     lateinit var text: String
 
     @NotNull
@@ -31,12 +32,14 @@ class CommentView() {
 
 class CommentUserView() {
 
+    var id: Long? = null
     var firstname: String? = null
     var lastname: String? = null
     var profilePic: MediaView? = null
 
 
     constructor(user: UserAccount?) : this() {
+        id = user?.id
         firstname = user?.firstname
         lastname = user?.lastname
         profilePic = user?.profilePic?.let {

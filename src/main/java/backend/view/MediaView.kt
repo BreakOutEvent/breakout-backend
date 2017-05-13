@@ -1,11 +1,15 @@
 package backend.view
 
 import backend.model.media.Media
+import org.hibernate.validator.constraints.SafeHtml
+import javax.validation.Valid
 
 class MediaView() {
 
     var id: Long? = null
 
+    @Valid
+    @SafeHtml(whitelistType = SafeHtml.WhiteListType.NONE)
     var type: String? = null
 
     var uploadToken: String? = null

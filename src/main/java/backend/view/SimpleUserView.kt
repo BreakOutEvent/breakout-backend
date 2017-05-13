@@ -2,6 +2,8 @@ package backend.view
 
 import backend.model.user.Participant
 import backend.model.user.User
+import org.hibernate.validator.constraints.SafeHtml
+import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 
 class SimpleUserView() {
 

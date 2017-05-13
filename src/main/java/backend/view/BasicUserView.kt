@@ -3,6 +3,8 @@ package backend.view
 import backend.model.user.Participant
 import backend.model.user.User
 import com.fasterxml.jackson.annotation.JsonIgnore
+import org.hibernate.validator.constraints.SafeHtml
+import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import javax.validation.Valid
 
 class BasicUserView() {
@@ -10,12 +12,20 @@ class BasicUserView() {
     @JsonIgnore
     var user: User? = null
 
+    @Valid
+    @SafeHtml(whitelistType = NONE)
     var firstname: String? = null
+
+    @Valid
+    @SafeHtml(whitelistType = NONE)
     var lastname: String? = null
 
+    @Valid
+    @SafeHtml(whitelistType = NONE)
     var gender: String? = null
 
     var id: Long? = null
+
     var isBlocked: Boolean? = null
 
     @Valid

@@ -49,6 +49,10 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
 
     override fun findAll(page: Int, size: Int): List<Posting> = repository.findAllByOrderByIdDesc(PageRequest(page, size))
 
+    override fun findByEventIds(events: List<Long>, page: Int, size: Int): List<Posting> {
+        return repository.findByTeamEventIdInOrderByIdDesc(events, PageRequest(page, size))
+    }
+
     @Transactional
     override fun savePostingWithLocationAndMedia(text: String?,
                                                  postingLocation: Coord?,

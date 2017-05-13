@@ -6,6 +6,7 @@ import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.media.Media
 import backend.model.misc.Coord
+import backend.model.misc.EmailAddress
 import backend.model.user.Admin
 import backend.model.user.Participant
 import backend.model.user.User
@@ -15,6 +16,7 @@ import backend.testHelper.json
 import com.auth0.jwt.Algorithm
 import com.auth0.jwt.JWTSigner
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.intellij.lang.annotations.Language
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -1008,6 +1010,64 @@ open class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
+    open fun onlyShowPostingsForQueryParamEvent() {
+        val eventMuc = eventService.createEvent("Muc", LocalDateTime.now(), "Muc", Coord(1.1, 2.2), 36)
+        val eventBer = eventService.createEvent("Ber", LocalDateTime.now(), "Berlin", Coord(1.1, 2.2), 36)
+
+        val participant1 = userService.create("part1@example.com", "pw", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val participant2 = userService.create("part2@example.com", "pw", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val participant3 = userService.create("part3@example.com", "pw", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val participant4 = userService.create("part4@example.com", "pw", { addRole(Participant::class) }).getRole(Participant::class)!!
+
+        val teamMuc = teamService.create(participant1, "", "", eventMuc)
+        setAuthenticatedUser(participant1.email)
+        teamService.invite(EmailAddress(participant2.email), teamMuc)
+
+        setAuthenticatedUser(participant2.email)
+        teamService.join(participant2, teamMuc)
+
+        val teamBer = teamService.create(participant3, "", "", eventBer)
+        setAuthenticatedUser(participant3.email)
+        teamService.invite(EmailAddress(participant4.email), teamBer)
+
+        setAuthenticatedUser(participant4.email)
+        teamService.join(participant4, teamBer)
+
+        postingService.createPosting(participant1, "posting for munich", null, null, LocalDateTime.now())
+        postingService.createPosting(participant3, "posting for berlin", null, null, LocalDateTime.now())
+
+        val request = get("/posting/")
+                .param("event", eventMuc.id.toString())
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$.[0].text").value("posting for munich"))
+                .andExpect(jsonPath("$.[0]").exists())
+                .andExpect(jsonPath("$.[1]").doesNotExist())
+
+        val request2 = get("/posting/")
+                .param("event", eventBer.id.toString())
+
+        mockMvc.perform(request2)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$.[0].text").value("posting for berlin"))
+                .andExpect(jsonPath("$.[0]").exists())
+                .andExpect(jsonPath("$.[1]").doesNotExist())
+
+        val request3 = get("/posting/")
+                .param("event", eventMuc.id.toString())
+                .param("event", eventBer.id.toString())
+
+        mockMvc.perform(request3)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.[0]").exists())
+                .andExpect(jsonPath("$.[1]").exists())
+
+    }
+
+    @Test
     open fun getAllPostingsDefaultPageSize() {
 
         for (i in 1..200) {
@@ -1322,5 +1382,23 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .andReturn().response.contentAsString
 
         println(response)
+    }
+
+    @Test
+    fun postingDoesNotAllowHtmlAsPayload() {
+
+        @Language("HTML")
+        val body = mapOf(
+                "text" to """<script type="text/javascript">alert("Such XSS. Much Wow");</script>""",
+                "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+        )
+
+        val request = post("/posting/")
+                .json(body)
+                .asUser(this.mockMvc, user.email, "password")
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest)
+
     }
 }

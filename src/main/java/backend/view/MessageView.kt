@@ -1,6 +1,8 @@
 package backend.view
 
 import backend.model.messaging.Message
+import org.hibernate.validator.constraints.SafeHtml
+import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import java.time.ZoneOffset
 import javax.validation.constraints.NotNull
 
@@ -11,6 +13,7 @@ class MessageView() {
     lateinit var creator: BasicUserView
 
     @NotNull
+    @SafeHtml(whitelistType = NONE)
     var text: String? = null
 
     @NotNull

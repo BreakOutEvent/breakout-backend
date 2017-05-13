@@ -1,6 +1,7 @@
 package backend.controller
 
 import backend.configuration.CustomUserDetails
+import backend.controller.ChallengeController.SponsorTeamProfileView
 import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
@@ -17,7 +18,6 @@ import backend.util.getSignedJwtToken
 import backend.view.SponsoringView
 import backend.view.UnregisteredSponsorView
 import org.javamoney.moneta.Money
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -26,9 +26,9 @@ import javax.validation.Valid
 
 @RestController
 class SponsoringController(private var sponsoringService: SponsoringService,
-                                private var userService: UserService,
-                                private var teamService: TeamService,
-                                private var configurationService: ConfigurationService) {
+                           private var userService: UserService,
+                           private var teamService: TeamService,
+                           private var configurationService: ConfigurationService) {
 
     private val jwtSecret: String = configurationService.getRequired("org.breakout.api.jwt_secret")
 
@@ -38,7 +38,7 @@ class SponsoringController(private var sponsoringService: SponsoringService,
      */
     @GetMapping("/event/{eventId}/team/{teamId}/sponsoring/")
     fun getAllSponsorings(@AuthenticationPrincipal customUserDetails: CustomUserDetails?,
-                               @PathVariable teamId: Long): Iterable<SponsoringView> {
+                          @PathVariable teamId: Long): Iterable<SponsoringView> {
 
         val team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId found")
         if (customUserDetails != null) return getAllSponsoringsAuthenticated(customUserDetails, team)
@@ -89,8 +89,8 @@ class SponsoringController(private var sponsoringService: SponsoringService,
     @PostMapping("/event/{eventId}/team/{teamId}/sponsoring/")
     @ResponseStatus(CREATED)
     fun createSponsoring(@PathVariable teamId: Long,
-                              @Valid @RequestBody body: SponsoringView,
-                              @AuthenticationPrincipal customUserDetails: CustomUserDetails): SponsoringView {
+                         @Valid @RequestBody body: SponsoringView,
+                         @AuthenticationPrincipal customUserDetails: CustomUserDetails): SponsoringView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val team = teamService.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")
@@ -122,6 +122,7 @@ class SponsoringController(private var sponsoringService: SponsoringService,
                 gender = sponsor.gender!!,
                 url = sponsor.url!!,
                 address = sponsor.address!!.toAddress()!!,
+                email = sponsor.email,
                 isHidden = sponsor.isHidden)
 
         val sponsoring = sponsoringService.createSponsoringWithOfflineSponsor(team, amount, limit, unregisteredSponsor)
@@ -137,7 +138,7 @@ class SponsoringController(private var sponsoringService: SponsoringService,
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/user/{userId}/sponsor/sponsoring/")
     fun getAllSponsoringsForSponsor(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
-                                         @PathVariable userId: Long): Iterable<SponsoringView> {
+                                    @PathVariable userId: Long): Iterable<SponsoringView> {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (user.account.id != userId) throw UnauthorizedException("A sponsor can only see it's own sponsorings")
@@ -149,8 +150,8 @@ class SponsoringController(private var sponsoringService: SponsoringService,
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/event/{eventId}/team/{teamId}/sponsoring/{sponsoringId}/status/")
     fun acceptOrRejectSponsoring(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
-                                      @PathVariable sponsoringId: Long,
-                                      @RequestBody body: Map<String, String>): SponsoringView {
+                                 @PathVariable sponsoringId: Long,
+                                 @RequestBody body: Map<String, String>): SponsoringView {
 
         val sponsoring = sponsoringService.findOne(sponsoringId) ?: throw NotFoundException("No sponsoring with id $sponsoringId found")
         val status = body["status"] ?: throw BadRequestException("Missing status in body")
@@ -162,5 +163,21 @@ class SponsoringController(private var sponsoringService: SponsoringService,
             else -> throw BadRequestException("Invalid status $status")
         }
     }
+
+    @GetMapping("/team/{teamId}/sponsoring/")
+    fun getAllSponsoringsForTeamOverview(@PathVariable teamId: Long): Iterable<SponsoringTeamProfileView> {
+        return sponsoringService.findByTeamId(teamId).map {
+            val sponsor = SponsorTeamProfileView(
+                    it.sponsor.firstname ?: "",
+                    it.sponsor.lastname ?: "",
+                    it.sponsor.company,
+                    it.sponsor.url)
+            SponsoringTeamProfileView(sponsor, it.status.toString())
+        }
+    }
+
+    class SponsoringTeamProfileView(
+            val sponsor: SponsorTeamProfileView,
+            val status: String)
 }
 

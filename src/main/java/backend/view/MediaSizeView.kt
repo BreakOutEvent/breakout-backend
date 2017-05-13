@@ -1,6 +1,8 @@
 package backend.view
 
 import backend.model.media.MediaSize
+import org.hibernate.validator.constraints.SafeHtml
+import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import javax.validation.constraints.NotNull
 
 class MediaSizeView() {
@@ -8,6 +10,7 @@ class MediaSizeView() {
     var id: Long? = null
 
     @NotNull
+    @SafeHtml(whitelistType = NONE)
     var url: String? = null
 
     @NotNull
@@ -23,6 +26,7 @@ class MediaSizeView() {
     var size: Long? = null
 
     @NotNull
+    @SafeHtml(whitelistType = NONE)
     var type: String? = null
 
     constructor(mediaSize: MediaSize) : this() {
