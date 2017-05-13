@@ -1,10 +1,9 @@
 package backend.services
 
-import backend.configuration.SimpleCORSFilter
 import backend.model.messaging.GroupMessage
-import backend.model.misc.EmailRepository
 import backend.model.user.UserAccount
-import backend.view.NotificationView
+import com.auth0.jwt.internal.com.fasterxml.jackson.databind.ObjectMapper
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -17,11 +16,12 @@ import java.util.concurrent.Executors
 
 @Service
 class NotificationServiceImpl @Autowired constructor(private val restTemplate: RestOperations,
-                                                     private var configurationService: ConfigurationService): NotificationService {
+                                                     private var configurationService: ConfigurationService) : NotificationService {
 
     private var url: String = configurationService.getRequired("org.breakout.api.notifications.url")
     private var appId: String = configurationService.getRequired("org.breakout.api.notifications.appId")
     private val pool = Executors.newCachedThreadPool()
+    private val logger = LoggerFactory.getLogger(NotificationServiceImpl::class.java)
 
     override fun send(title: String, subtitle: String?, data: GroupMessage, users: List<UserAccount>) {
 
@@ -30,17 +30,21 @@ class NotificationServiceImpl @Autowired constructor(private val restTemplate: R
         }
 
         val tokens = users.mapNotNull { it.notificationToken }
-                            .map { "\"" + it + "\"" }
-        val joined: String
-        if (tokens.isEmpty()) {
-            joined = ""
-        } else {
-            joined = tokens.reduce { acc, s -> acc + ", " + s }
-        }
 
-        val body = "{ \"app_id\": \"" + appId + "\", \"headings\": { \"en\": \"" + title + "\"}, \"contents\": { \"en\": \"" + subtitle + "\"}, \"include_player_ids\": [" + joined + "] }"
+        val body = mapOf(
+                "app_id" to appId,
+                "headings" to mapOf(
+                        "en" to title
+                ),
+                "contents" to mapOf(
+                        "en" to subtitle
+                ),
+                "include_player_ids" to tokens
+        )
 
-        val request = HttpEntity<String>(body, headers)
+        val payload = ObjectMapper().writeValueAsString(body)
+
+        val request = HttpEntity<String>(payload, headers)
 
         try {
             val sendurl = getSendUrl(url)
@@ -48,7 +52,7 @@ class NotificationServiceImpl @Autowired constructor(private val restTemplate: R
                 restTemplate.exchange(sendurl, HttpMethod.POST, request, String::class.java)
             })
         } catch (e: Exception) {
-            // TODO: handle errors
+            logger.error("""Error pushing notification "$title" "$subtitle" to clients $tokens: ${e.message}""")
         }
     }
 
