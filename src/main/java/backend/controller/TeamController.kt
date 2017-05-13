@@ -4,6 +4,7 @@ import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
+import backend.model.challenges.ChallengeService
 import backend.model.event.EventService
 import backend.model.event.Team
 import backend.model.event.TeamService
@@ -29,9 +30,10 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/event/{eventId}/team")
 class TeamController(private val teamService: TeamService,
-                          private val eventService: EventService,
-                          private val configurationService: ConfigurationService,
-                          private val userService: UserService) {
+                     private val eventService: EventService,
+                     private val configurationService: ConfigurationService,
+                     private val userService: UserService,
+                     private val challengeService: ChallengeService) {
 
     private val JWT_SECRET: String = configurationService.getRequired("org.breakout.api.jwt_secret")
     private val PAGE_SIZE: Int = configurationService.getRequired("org.breakout.api.page_size").toInt()
@@ -59,7 +61,7 @@ class TeamController(private val teamService: TeamService,
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/invitation/")
     fun showInvitationsForUserAndEvent(@PathVariable eventId: Long,
-                                            @AuthenticationPrincipal customUserDetails: CustomUserDetails): Iterable<InvitationView> {
+                                       @AuthenticationPrincipal customUserDetails: CustomUserDetails): Iterable<InvitationView> {
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val invitations = teamService.findInvitationsForUserAndEvent(user, eventId)
         return invitations.map(::InvitationView)
@@ -73,8 +75,8 @@ class TeamController(private val teamService: TeamService,
     @PostMapping("/")
     @PreAuthorize("isAuthenticated()")
     fun createTeam(@PathVariable eventId: Long,
-                        @AuthenticationPrincipal customUserDetails: CustomUserDetails,
-                        @Valid @RequestBody body: TeamView): TeamView {
+                   @AuthenticationPrincipal customUserDetails: CustomUserDetails,
+                   @Valid @RequestBody body: TeamView): TeamView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val event = eventService.findById(eventId) ?: throw NotFoundException("No event with id $eventId")
@@ -96,9 +98,9 @@ class TeamController(private val teamService: TeamService,
     @PutMapping("/{teamId}/")
     @PreAuthorize("isAuthenticated()")
     fun editTeam(@PathVariable eventId: Long,
-                      @PathVariable teamId: Long,
-                      @AuthenticationPrincipal customUserDetails: CustomUserDetails,
-                      @Valid @RequestBody body: TeamView): TeamView {
+                 @PathVariable teamId: Long,
+                 @AuthenticationPrincipal customUserDetails: CustomUserDetails,
+                 @Valid @RequestBody body: TeamView): TeamView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId")
@@ -138,8 +140,8 @@ class TeamController(private val teamService: TeamService,
     @PostMapping("/{teamId}/invitation/")
     @PreAuthorize("isAuthenticated()")
     fun inviteUser(@PathVariable eventId: Long,
-                        @PathVariable teamId: Long,
-                        @Valid @RequestBody body: Map<String, Any>): Map<String, String> {
+                   @PathVariable teamId: Long,
+                   @Valid @RequestBody body: Map<String, Any>): Map<String, String> {
 
         if (!eventService.exists(eventId)) throw NotFoundException("No event with id $eventId")
 
@@ -159,9 +161,9 @@ class TeamController(private val teamService: TeamService,
     @PostMapping("/{teamId}/member/")
     @PreAuthorize("isAuthenticated()")
     fun joinTeam(@PathVariable eventId: Long,
-                      @PathVariable teamId: Long,
-                      @AuthenticationPrincipal customUserDetails: CustomUserDetails,
-                      @Valid @RequestBody body: Map<String, String>): TeamView {
+                 @PathVariable teamId: Long,
+                 @AuthenticationPrincipal customUserDetails: CustomUserDetails,
+                 @Valid @RequestBody body: Map<String, String>): TeamView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (!eventService.exists(eventId)) throw NotFoundException("No event with id $eventId")
@@ -211,9 +213,13 @@ class TeamController(private val teamService: TeamService,
      */
     @GetMapping("/{teamId}/posting/")
     fun getTeamPostingIds(@PathVariable teamId: Long,
-                               @RequestParam(value = "page", required = false) page: Int?,
-                               @RequestParam(value = "userid", required = false) userId: Long?): List<PostingView> {
-        return teamService.findPostingsById(teamId, page ?: 0, PAGE_SIZE).map { PostingView(it.hasLikesBy(userId)) }
+                          @RequestParam(value = "page", required = false) page: Int?,
+                          @RequestParam(value = "userid", required = false) userId: Long?): List<PostingView> {
+        return teamService.findPostingsById(teamId, page ?: 0, PAGE_SIZE).map {
+            PostingView(it.hasLikesBy(userId), it.challenge?.let {
+                challengeService.findOne(it)
+            })
+        }
     }
 
     /**

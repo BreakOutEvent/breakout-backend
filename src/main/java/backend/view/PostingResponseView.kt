@@ -1,6 +1,6 @@
 package backend.view
 
-import backend.model.challenges.Challenge
+import backend.model.challenges.ChallengeProofProjection
 import backend.model.location.Location
 import backend.model.posting.Posting
 import com.fasterxml.jackson.annotation.JsonInclude
@@ -40,7 +40,7 @@ class PostingResponseView() {
     var proves: PostingChallengeView? = null
 
 
-    constructor(posting: Posting) : this() {
+    constructor(posting: Posting, challenge: ChallengeProofProjection?) : this() {
         this.id = posting.id
         this.text = posting.text
         this.hashtags = posting.hashtags.map { it.value }
@@ -51,7 +51,7 @@ class PostingResponseView() {
         this.comments = posting.comments.map(::CommentView)
         this.likes = posting.likes.count()
         this.hasLiked = posting.hasLiked
-        this.proves = posting.challenge?.let(::PostingChallengeView)
+        this.proves = challenge?.let(::PostingChallengeView)
     }
 }
 
@@ -80,11 +80,8 @@ class PostingUserView() {
 class PostingChallengeView {
 
     var id: Long? = null
-
     var status: String? = null
-
     var amount: Double? = null
-
     var description: String? = null
 
     /**
@@ -92,11 +89,11 @@ class PostingChallengeView {
      */
     constructor()
 
-    constructor(challenge: Challenge) {
-        this.id = challenge.id!!
-        this.description = challenge.description
-        this.amount = challenge.amount.numberStripped.toDouble()
-        this.status = challenge.status.toString().toUpperCase()
+    constructor(challenge: ChallengeProofProjection) {
+        this.id = challenge.getId()
+        this.status = challenge.getStatus()
+        this.amount = challenge.getAmount().numberStripped.toDouble()
+        this.description = challenge.getDescription()
     }
 }
 

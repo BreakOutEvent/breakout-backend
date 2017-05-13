@@ -25,10 +25,10 @@ import javax.validation.Valid
 
 @RestController
 class ChallengeController(private var challengeService: ChallengeService,
-                               private var userService: UserService,
-                               private var teamService: TeamService,
-                               private var postingService: PostingService,
-                               private var configurationService: ConfigurationService) {
+                          private var userService: UserService,
+                          private var teamService: TeamService,
+                          private var postingService: PostingService,
+                          private var configurationService: ConfigurationService) {
 
     private var jwtSecret: String = configurationService.getRequired("org.breakout.api.jwt_secret")
 
@@ -41,7 +41,7 @@ class ChallengeController(private var challengeService: ChallengeService,
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/user/{userId}/sponsor/challenge/")
     fun getAllChallengesForSponsor(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
-                                        @PathVariable userId: Long): Iterable<ChallengeView> {
+                                   @PathVariable userId: Long): Iterable<ChallengeView> {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
 
@@ -60,8 +60,8 @@ class ChallengeController(private var challengeService: ChallengeService,
     @PostMapping("/event/{eventId}/team/{teamId}/challenge/")
     @ResponseStatus(CREATED)
     fun createChallenge(@AuthenticationPrincipal customUserDetails: CustomUserDetails,
-                             @PathVariable teamId: Long,
-                             @Valid @RequestBody body: ChallengeView): ChallengeView {
+                        @PathVariable teamId: Long,
+                        @Valid @RequestBody body: ChallengeView): ChallengeView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId found")
@@ -108,7 +108,7 @@ class ChallengeController(private var challengeService: ChallengeService,
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/event/{eventId}/team/{teamId}/challenge/{challengeId}/status/")
     fun changeStatus(@PathVariable challengeId: Long,
-                          @Valid @RequestBody body: ChallengeStatusView): ChallengeView {
+                     @Valid @RequestBody body: ChallengeStatusView): ChallengeView {
 
         val challenge = challengeService.findOne(challengeId) ?: throw NotFoundException("No challenge with id $challengeId found")
         return when (body.status!!.toLowerCase()) {
@@ -119,7 +119,6 @@ class ChallengeController(private var challengeService: ChallengeService,
                 val proof = postingService.getByID(body.postingId!!) ?: throw NotFoundException("No posting with id ${body.postingId} found")
                 challengeService.addProof(challenge, proof)
             }
-
             else -> throw BadRequestException("Unknown status for challenge ${body.status}")
         }.let(::ChallengeView)
     }

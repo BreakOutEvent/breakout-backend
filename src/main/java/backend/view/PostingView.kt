@@ -1,5 +1,6 @@
 package backend.view
 
+import backend.model.challenges.Challenge
 import backend.model.posting.Posting
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
@@ -37,8 +38,7 @@ class PostingView() {
 
     var proves: ChallengeView? = null
 
-
-    constructor(posting: Posting) : this() {
+    constructor(posting: Posting, challenge: Challenge?) : this() {
         this.id = posting.id
         this.text = posting.text
         this.hashtags = posting.hashtags.map { it.value }
@@ -49,6 +49,6 @@ class PostingView() {
         this.comments = posting.comments.map(::CommentView)
         this.likes = posting.likes.count()
         this.hasLiked = posting.hasLiked
-        this.proves = posting.challenge?.let(::ChallengeView)
+        this.proves = challenge?.let(::ChallengeView)
     }
 }

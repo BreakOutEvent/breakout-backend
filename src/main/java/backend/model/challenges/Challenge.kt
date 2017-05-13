@@ -9,7 +9,6 @@ import backend.model.media.MediaType.DOCUMENT
 import backend.model.misc.EmailAddress
 import backend.model.payment.Billable
 import backend.model.payment.SponsoringInvoice
-import backend.model.posting.Posting
 import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
@@ -110,9 +109,6 @@ class Challenge : BasicEntity, Billable {
             }
         }
 
-    @OneToOne(mappedBy = "challenge", fetch = FetchType.LAZY)
-    var proof: Posting? = null
-
     @ManyToOne(fetch = FetchType.LAZY, cascade = arrayOf(PERSIST))
     private var unregisteredSponsor: UnregisteredSponsor? = null
         set(value) {
@@ -128,7 +124,7 @@ class Challenge : BasicEntity, Billable {
      */
     private constructor() : super()
 
-    constructor(sponsor: ISponsor, team: Team, amount: Money, description: String) {
+     constructor(sponsor: ISponsor, team: Team, amount: Money, description: String) {
         when (sponsor) {
             is UnregisteredSponsor -> {
                 this.unregisteredSponsor = sponsor
@@ -156,9 +152,8 @@ class Challenge : BasicEntity, Billable {
         this.status = REJECTED
     }
 
-    fun addProof(proof: Posting) {
+    fun addProof() {
         this.status = WITH_PROOF
-        this.proof = proof
     }
 
     fun acceptProof() {

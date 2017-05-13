@@ -7,7 +7,6 @@ import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
 import backend.util.euroOf
 import org.junit.Assert.assertEquals
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.powermock.api.mockito.PowerMockito.`when`
@@ -32,18 +31,6 @@ class ChallengeTest {
 
         assertEquals(sponsor, challenge.sponsor)
         assertNull(challenge.sponsor.unregisteredSponsor)
-    }
-
-    @Test
-    @Ignore("Will not be needed with new ISponsor Interface")
-    fun testFailToSetSponsorWhenUnregisteredSponsorExists() {
-        val sponsor = mock(Sponsor::class.java)
-        val unregistered = mock(UnregisteredSponsor::class.java)
-        val team = mock(Team::class.java)
-
-        val challenge = Challenge(unregistered, team, euroOf(50), "description")
-
-//        assertFailsWith(DomainException::class, { challenge.sponsor = sponsor })
     }
 
     @Test
@@ -103,8 +90,7 @@ class ChallengeTest {
         val challenge = Challenge(sponsor, team, euroOf(50), "description")
         challenge.accept()
 
-        challenge.addProof(proof)
-        assertEquals(proof, challenge.proof)
+        challenge.addProof()
         assertEquals(WITH_PROOF, challenge.status)
     }
 
@@ -116,7 +102,7 @@ class ChallengeTest {
 
         val challenge = Challenge(sponsor, team, euroOf(50), "description")
         challenge.accept()
-        challenge.addProof(proof)
+        challenge.addProof()
         challenge.acceptProof()
         assertEquals(PROOF_ACCEPTED, challenge.status)
     }
@@ -129,7 +115,7 @@ class ChallengeTest {
 
         val challenge = Challenge(sponsor, team, euroOf(50), "description")
         challenge.accept()
-        challenge.addProof(proof)
+        challenge.addProof()
         challenge.rejectProof()
         assertEquals(PROOF_REJECTED, challenge.status)
     }
@@ -185,7 +171,7 @@ class ChallengeTest {
     fun whenChallengeIsFullfilled_thenBillableAmountReturnsAmountOfChallenge() {
         val challenge = Challenge(mock(Sponsor::class.java), mock(Team::class.java), euroOf(50), "description")
 
-        challenge.addProof(mock(Posting::class.java))
+        challenge.addProof()
 
         assertEquals(euroOf(50), challenge.billableAmount())
     }
@@ -228,7 +214,7 @@ class ChallengeTest {
     fun whenChallengeProofIsRejected_thenBillableAmountIsZero() {
         val challenge = Challenge(mock(Sponsor::class.java), mock(Team::class.java), euroOf(50), "description")
 
-        challenge.addProof(mock(Posting::class.java))
+        challenge.addProof()
         challenge.rejectProof()
 
         assertEquals(euroOf(0), challenge.billableAmount())
@@ -238,7 +224,7 @@ class ChallengeTest {
     fun whenChallengeProofIsAccepted_thenBillableAmountIsAmount() {
         val challenge = Challenge(mock(Sponsor::class.java), mock(Team::class.java), euroOf(50), "description")
 
-        challenge.addProof(mock(Posting::class.java))
+        challenge.addProof()
         challenge.acceptProof()
 
         assertEquals(euroOf(50), challenge.billableAmount())

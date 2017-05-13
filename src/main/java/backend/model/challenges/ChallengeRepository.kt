@@ -10,4 +10,6 @@ interface ChallengeRepository : CrudRepository<Challenge, Long> {
 
     @Query("Select c from Challenge c where c.registeredSponsor.account.id = :id")
     fun findBySponsorAccountId(@Param("id") sponsorId: Long): Iterable<Challenge>
+
+    fun findChallengeProveProjectionById(challengeId: Long): ChallengeProofProjection
 }

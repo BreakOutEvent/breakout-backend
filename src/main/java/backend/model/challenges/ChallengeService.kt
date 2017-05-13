@@ -38,5 +38,7 @@ interface ChallengeService {
     fun withdraw(challenge: Challenge): Challenge
 
     fun findBySponsorId(userId: Long): Iterable<Challenge>
+
+    fun findChallengeProveProjectionById(challengeId: Long): ChallengeProofProjection
 }
 
