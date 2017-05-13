@@ -17,6 +17,7 @@ import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 
 @Service
+@Profile(Profiles.PRODUCTION, Profiles.DEVELOPMENT, Profiles.STAGING)
 class NotificationServiceImpl @Autowired constructor(private val restTemplate: RestOperations,
                                                      private var configurationService: ConfigurationService) : NotificationService {
 
@@ -25,7 +26,7 @@ class NotificationServiceImpl @Autowired constructor(private val restTemplate: R
     private val pool = Executors.newCachedThreadPool()
     private val logger = LoggerFactory.getLogger(NotificationServiceImpl::class.java)
 
-    override fun send(title: String, subtitle: String?, data: GroupMessage, users: List<UserAccount>) {
+    override fun send(message: Message, users: List<UserAccount>) {
 
         val headers = HttpHeaders().apply {
             set("Content-Type", "application/json;charset=utf-8")
@@ -36,10 +37,11 @@ class NotificationServiceImpl @Autowired constructor(private val restTemplate: R
         val body = mapOf(
                 "app_id" to appId,
                 "headings" to mapOf(
-                        "en" to title
+                        "en" to "New Message",
+                        "de" to "Neue Nachricht"
                 ),
                 "contents" to mapOf(
-                        "en" to subtitle
+                        "en" to message.text
                 ),
                 "include_player_ids" to tokens
         )
