@@ -19,8 +19,7 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/messaging")
 class MessagingController(private val groupMessageService: GroupMessageService,
-                          private val userService: UserService,
-                          private val notificationServer: NotificationService) {
+                          private val userService: UserService) {
 
 
     /**
@@ -84,8 +83,6 @@ class MessagingController(private val groupMessageService: GroupMessageService,
         val message = Message(user.account, body.text!!, localDateTimeOf(body.date!!))
         groupMessageService.addMessage(message, groupMessage)
 
-        val notifiedUsers = groupMessage.users.filter { it.id != user.account.id }
-        notificationServer.send("New Message", message.text, groupMessage, notifiedUsers)
         return GroupMessageView(groupMessage)
     }
 

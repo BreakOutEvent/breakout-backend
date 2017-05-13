@@ -1,10 +1,12 @@
 package backend.services
 
-import backend.model.messaging.GroupMessage
+import backend.model.messaging.Message
 import backend.model.user.UserAccount
+import backend.util.Profiles
 import com.auth0.jwt.internal.com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -52,7 +54,7 @@ class NotificationServiceImpl @Autowired constructor(private val restTemplate: R
                 restTemplate.exchange(sendurl, HttpMethod.POST, request, String::class.java)
             })
         } catch (e: Exception) {
-            logger.error("""Error pushing notification "$title" "$subtitle" to clients $tokens: ${e.message}""")
+            logger.error("""Error pushing notification "$message.text" to clients $tokens: ${e.message}""")
         }
     }
 
