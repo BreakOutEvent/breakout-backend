@@ -37,5 +37,4 @@ class Cache {
         this.cacheKey = key
         this.cacheData = data
     }
-
 }

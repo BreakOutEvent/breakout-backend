@@ -97,4 +97,18 @@ class EventController(open var eventService: EventService,
             throw e
         }
     }
+
+    /*
+     * GET /event/{id}/highscore/
+     * Calculates and returns the team ranking of the event with {id}
+     */
+    @GetMapping("/{id}/highscore/")
+    open fun getEventHighscore(@PathVariable("id") id: Long): Any {
+        try {
+            return cacheService.getCache("Event_${id}_HighScore")
+        } catch (e: CacheNonExistentException) {
+            eventService.regenerateCache(id)
+            throw e
+        }
+    }
 }
