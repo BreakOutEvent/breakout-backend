@@ -1,5 +1,6 @@
 package backend.model.location
 
+import backend.controller.EventController
 import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.exceptions.DomainException
@@ -9,31 +10,24 @@ import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.services.FeatureFlagService
 import backend.services.GeoCodingService
+import backend.util.distanceCoordsKM
 import backend.util.parallelStream
+import backend.util.speedToLocation
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import javax.transaction.Transactional
 
 @Service
-class LocationServiceImpl : LocationService {
+class LocationServiceImpl @Autowired constructor(private val locationRepository: LocationRepository,
+                                                 private val geoCodingService: GeoCodingService,
+                                                 private val featureFlagService: FeatureFlagService,
+                                                 private val eventService: EventService) : LocationService {
 
-    private val locationRepository: LocationRepository
-    private val geoCodingService: GeoCodingService
-    private val featureFlagService: FeatureFlagService
-    private val eventService: EventService
-
-    @Autowired
-    constructor(locationRepository: LocationRepository,
-                geoCodingService: GeoCodingService,
-                featureFlagService: FeatureFlagService,
-                eventService: EventService) {
-
-        this.locationRepository = locationRepository
-        this.geoCodingService = geoCodingService
-        this.featureFlagService = featureFlagService
-        this.eventService = eventService
-    }
+    private var logger: Logger = LoggerFactory.getLogger(LocationServiceImpl::class.java)
 
     override fun findAll(): Iterable<Location> {
         return locationRepository.findAll()
@@ -95,6 +89,23 @@ class LocationServiceImpl : LocationService {
             return@reduce acc
         }.orElseGet { mutableMapOf<Team, Iterable<Location>>() }
     }
+
+    override fun generateSpeed() {
+        val locationsToDo: Iterable<Location> = locationRepository.findBySpeedToLocationAndIsDuringEvent(null, true)
+        for (location: Location in locationsToDo) {
+            val priorLocation = findPriorLocation(location)
+            if (priorLocation != null && priorLocation.isDuringEvent) {
+                val speed = speedToLocation(priorLocation, location)
+                if (speed != null) {
+                    location.speedToLocation = speed
+                    locationRepository.save(location)
+                }
+            }
+        }
+    }
+
+    private fun findPriorLocation(location: Location): Location? =
+            locationRepository.findByTeamIdAndPriorOrderByDateDesc(location.team?.id, location.id, location.date).firstOrNull()
 
 }
 

@@ -17,4 +17,6 @@ interface LocationService {
 
     fun findByEventId(id: Long, perTeam: Int): Map<Team, Iterable<Location>>
 
+    fun generateSpeed()
+
 }
