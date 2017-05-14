@@ -73,6 +73,12 @@ abstract class UserRole : BasicEntity, User, GrantedAuthority {
             this.account.profilePic = profilePic
         }
 
+    override var notificationToken: String?
+        get() = this.account.notificationToken
+        set(notificationToken) {
+            this.account.notificationToken = notificationToken
+        }
+
     override var preferredLanguage: Language
         get() = this.account.preferredLanguage
         set(value) {

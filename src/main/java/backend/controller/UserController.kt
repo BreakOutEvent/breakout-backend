@@ -10,10 +10,7 @@ import backend.model.misc.Url
 import backend.model.user.*
 import backend.services.ConfigurationService
 import backend.util.getSignedJwtToken
-import backend.view.BasicUserView
-import backend.view.DetailedInvitationView
-import backend.view.SimpleUserView
-import backend.view.UserView
+import backend.view.*
 import io.swagger.annotations.Api
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -137,6 +134,32 @@ class UserController(private val userService: UserService,
         return UserView(user)
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/{id}/notificationtoken")
+    fun updateNotificationToken(@PathVariable id: Long,
+                                @Valid @RequestBody token: NotificationTokenView,
+                                @AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
+
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
+        if (user.account.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")
+
+        user.notificationToken = token.token
+        userService.save(user)
+        return UserView(user) // TODO: maybe a user view is not the most useful response here.
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/{id}/notificationtoken")
+    fun removeNotificationToken(@PathVariable id: Long,
+                                @AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
+
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
+        if (user.account.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")
+
+        user.notificationToken = null
+        userService.save(user)
+        return UserView(user) // TODO: maybe a user view is not the most useful response here.
+    }
 
     /**
      * GET /user/{id}/

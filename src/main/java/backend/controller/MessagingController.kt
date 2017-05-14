@@ -6,21 +6,20 @@ import backend.controller.exceptions.UnauthorizedException
 import backend.model.messaging.GroupMessageService
 import backend.model.messaging.Message
 import backend.model.user.UserService
+import backend.services.NotificationService
 import backend.util.localDateTimeOf
 import backend.view.GroupMessageView
 import backend.view.MessageView
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.*
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/messaging")
 class MessagingController(private val groupMessageService: GroupMessageService,
-                               private val userService: UserService) {
+                          private val userService: UserService) {
 
 
     /**
@@ -31,7 +30,7 @@ class MessagingController(private val groupMessageService: GroupMessageService,
     @PostMapping("/")
     @ResponseStatus(CREATED)
     fun createGroupMessage(@Valid @RequestBody body: List<Long>,
-                                @AuthenticationPrincipal customUserDetails: CustomUserDetails): GroupMessageView {
+                           @AuthenticationPrincipal customUserDetails: CustomUserDetails): GroupMessageView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val groupMessage = groupMessageService.createGroupMessage(user.account)
@@ -51,8 +50,8 @@ class MessagingController(private val groupMessageService: GroupMessageService,
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}/")
     fun editGroupMessage(@PathVariable("id") id: Long,
-                              @Valid @RequestBody body: List<Long>,
-                              @AuthenticationPrincipal customUserDetails: CustomUserDetails): GroupMessageView {
+                         @Valid @RequestBody body: List<Long>,
+                         @AuthenticationPrincipal customUserDetails: CustomUserDetails): GroupMessageView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val groupMessage = groupMessageService.getByID(id) ?: throw NotFoundException("groupmessage with id $id does not exist")
@@ -74,8 +73,8 @@ class MessagingController(private val groupMessageService: GroupMessageService,
     @PostMapping("/{id}/message/")
     @ResponseStatus(CREATED)
     fun addMessage(@PathVariable("id") id: Long,
-                        @Valid @RequestBody body: MessageView,
-                        @AuthenticationPrincipal customUserDetails: CustomUserDetails): GroupMessageView {
+                   @Valid @RequestBody body: MessageView,
+                   @AuthenticationPrincipal customUserDetails: CustomUserDetails): GroupMessageView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val groupMessage = groupMessageService.getByID(id) ?: throw NotFoundException("groupmessage with id $id does not exist")
@@ -94,7 +93,7 @@ class MessagingController(private val groupMessageService: GroupMessageService,
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}/")
     fun getGroupMessage(@PathVariable("id") id: Long,
-                             @AuthenticationPrincipal customUserDetails: CustomUserDetails): GroupMessageView {
+                        @AuthenticationPrincipal customUserDetails: CustomUserDetails): GroupMessageView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val groupMessage = groupMessageService.getByID(id) ?: throw NotFoundException("groupmessage with id $id does not exist")
