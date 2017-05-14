@@ -2,7 +2,8 @@ package backend.services
 
 import backend.model.messaging.Message
 import backend.model.user.UserAccount
-import backend.util.Profiles
+import backend.util.Profiles.PRODUCTION
+import backend.util.Profiles.STAGING
 import com.auth0.jwt.internal.com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,7 +18,7 @@ import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 
 @Service
-@Profile(Profiles.PRODUCTION, Profiles.DEVELOPMENT, Profiles.STAGING)
+@Profile(PRODUCTION, STAGING)
 class NotificationServiceImpl @Autowired constructor(private val restTemplate: RestOperations,
                                                      private var configurationService: ConfigurationService) : NotificationService {
 
@@ -37,7 +38,7 @@ class NotificationServiceImpl @Autowired constructor(private val restTemplate: R
         val body = mapOf(
                 "app_id" to appId,
                 "data" to mapOf(
-                    "id" to groupId
+                        "id" to groupId
                 ),
                 "headings" to mapOf(
                         "en" to "New Message",
