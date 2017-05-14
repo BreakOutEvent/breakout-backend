@@ -1,3 +1,5 @@
 USE `${BREAKOUT}`;
 
-ALTER TABLE `location` ADD COLUMN `speed_to_location` DOUBLE DEFAULT NULL;
+ALTER TABLE `location` ADD COLUMN `speed` DOUBLE DEFAULT NULL;
+ALTER TABLE `location` ADD COLUMN `seconds_difference` BIGINT DEFAULT NULL;
+ALTER TABLE `location` ADD COLUMN `distance_km` DOUBLE DEFAULT NULL;

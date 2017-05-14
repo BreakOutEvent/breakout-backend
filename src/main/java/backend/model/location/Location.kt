@@ -32,7 +32,8 @@ class Location : BasicEntity {
 
     var distance: Double = 0.0
 
-    var speedToLocation: Double? = null
+    @Embedded
+    var speedToLocation: SpeedToLocation? = null
 
     @ElementCollection(fetch = FetchType.EAGER)
     @MapKeyColumn(name = "location_data_key")
@@ -51,3 +52,5 @@ class Location : BasicEntity {
     }
 
 }
+
+class SpeedToLocation(val speed: Double? = null, val secondsDifference: Long? = null, val distanceKm: Double? = null)

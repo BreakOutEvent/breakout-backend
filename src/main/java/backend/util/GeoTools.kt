@@ -1,6 +1,7 @@
 package backend.util
 
 import backend.model.location.Location
+import backend.model.location.SpeedToLocation
 import backend.model.misc.Coord
 import com.grum.geocalc.DegreeCoordinate
 import com.grum.geocalc.EarthCalc
@@ -17,17 +18,17 @@ import java.time.temporal.ChronoUnit
  * Full License Text: https://github.com/grumlimited/geocalc/blob/master/LICENSE.txt
  */
 
-fun speedToLocation(toLocation: Location, fromLocation: Location): Double? {
-    val millisDifference = toLocation.date.until(fromLocation.date, ChronoUnit.MILLIS)
+fun speedToLocation(toLocation: Location, fromLocation: Location): SpeedToLocation? {
+    val secondsDifference = toLocation.date.until(fromLocation.date, ChronoUnit.SECONDS)
     val distanceKm = distanceCoordsKM(fromLocation.coord, toLocation.coord)
-    val speed = calculateSpeed(distanceKm, millisDifference)
+    val speed = calculateSpeed(distanceKm, secondsDifference)
     return speed
 }
 
-fun calculateSpeed(distanceKm: Double, millisDifference: Long): Double? {
-    if (distanceKm > 0 && millisDifference > 0) {
-        val speed = distanceKm / (millisDifference / (3600.0 * 1000.0))
-        return speed
+fun calculateSpeed(distanceKm: Double, secondsDifference: Long): SpeedToLocation? {
+    if (distanceKm > 0 && secondsDifference > 0) {
+        val speed = distanceKm / (secondsDifference / 3600.0 )
+        return SpeedToLocation(speed, secondsDifference, distanceKm)
     } else {
         return null
     }

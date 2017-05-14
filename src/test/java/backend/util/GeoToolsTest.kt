@@ -25,8 +25,8 @@ class GeoToolsTest {
 
     @Test
     fun testCalculateSpeed() {
-        assertEquals(1.0, calculateSpeed(1.0, 3600 * 1000))
-        assertEquals(0.25, calculateSpeed(0.5, 2 * 3600 * 1000))
+        assertEquals(1.0, calculateSpeed(1.0, 3600)!!.speed)
+        assertEquals(0.25, calculateSpeed(0.5, 2 * 3600)!!.speed)
     }
 
     @Test

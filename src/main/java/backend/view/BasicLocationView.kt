@@ -1,6 +1,7 @@
 package backend.view
 
 import backend.model.location.Location
+import backend.model.location.SpeedToLocation
 import java.time.ZoneOffset
 import javax.validation.constraints.NotNull
 
@@ -22,12 +23,16 @@ class BasicLocationView {
 
     var postingId: Long? = null
 
-    var speedToLocation: Double? = null
+    var speed: Double? = null
+
+    var secondsDifference: Long? = null
+
+    var distanceKm: Double? = null
 
     @NotNull
     val date: Long
 
-    constructor(location: Location, speedToLocation: Double?) {
+    constructor(location: Location, speedToLocation: SpeedToLocation?) {
         this.id = location.id
 
         this.latitude = location.coord.latitude
@@ -37,8 +42,9 @@ class BasicLocationView {
         this.isDuringEvent = location.isDuringEvent
         this.postingId = location.posting?.id
 
-        this.locationData = location.locationData
-        this.speedToLocation = speedToLocation
+        this.speed = speedToLocation?.speed
+        this.secondsDifference = speedToLocation?.secondsDifference
+        this.distanceKm = speedToLocation?.distanceKm
     }
 
     constructor(location: Location) {
@@ -52,6 +58,5 @@ class BasicLocationView {
         this.postingId = location.posting?.id
 
         this.locationData = location.locationData
-        this.speedToLocation = null
     }
 }

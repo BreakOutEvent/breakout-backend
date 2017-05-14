@@ -91,7 +91,7 @@ class LocationServiceImpl @Autowired constructor(private val locationRepository:
     }
 
     override fun generateSpeed() {
-        val locationsToDo: Iterable<Location> = locationRepository.findBySpeedToLocationAndIsDuringEvent(null, true, PageRequest(0, 1000))
+        val locationsToDo: Iterable<Location> = locationRepository.findBySpeedToLocationAndIsDuringEvent(null, true)
         for (location: Location in locationsToDo) {
             val priorLocation = findPriorLocation(location)
             if (priorLocation != null && priorLocation.isDuringEvent) {
