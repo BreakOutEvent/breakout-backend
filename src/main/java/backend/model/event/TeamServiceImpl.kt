@@ -156,7 +156,7 @@ class TeamServiceImpl(teamRepository: TeamRepository,
     }
 
     override fun findAllTeamSummaryProjections(): Iterable<TeamSummaryProjection> {
-        return repository.findAllTeamSummaryProjections()
+        return repository.findAllByEventIsCurrentTrueOrderByName()
     }
 
     init {
