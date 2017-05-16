@@ -3,10 +3,7 @@ package backend.model.posting
 import backend.model.BasicEntity
 import backend.model.user.UserAccount
 import java.time.LocalDateTime
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.ManyToOne
-import javax.persistence.PreRemove
+import javax.persistence.*
 
 @Entity
 class Comment : BasicEntity {
@@ -18,7 +15,7 @@ class Comment : BasicEntity {
 
     lateinit var date: LocalDateTime
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY   )
     var user: UserAccount? = null
 
     constructor(text: String, date: LocalDateTime, user: UserAccount) : this() {

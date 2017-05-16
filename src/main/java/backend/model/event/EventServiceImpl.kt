@@ -5,7 +5,6 @@ import backend.model.cache.CacheService
 import backend.model.location.Location
 import backend.model.misc.Coord
 import backend.util.data.DonateSums
-import backend.util.parallelStream
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,14 +19,24 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository,
     @Transactional
     override fun regenerateCache(eventId: Long?) {
         if (eventId != null) {
-            cacheService.updateCache("Event_${eventId}_Distance", mapOf("distance" to getDistance(eventId)))
-            cacheService.updateCache("Event_${eventId}_DonateSum", getDonateSum(eventId))
+            updateCache(eventId)
         } else {
-            findAll().forEach { event ->
-                cacheService.updateCache("Event_${event.id}_Distance", mapOf("distance" to getDistance(event.id!!)))
-                cacheService.updateCache("Event_${event.id}_DonateSum", getDonateSum(event.id!!))
-            }
+            findAll().forEach { event -> updateCache(event.id!!) }
         }
+    }
+
+    fun updateCache(eventId: Long) {
+        cacheService.updateCache("Event_${eventId}_Distance", mapOf("distance" to getDistance(eventId)))
+        cacheService.updateCache("Event_${eventId}_DonateSum", getDonateSum(eventId))
+        cacheService.updateCache("Event_${eventId}_HighScore", teamService.findByEventId(eventId).map {
+            mapOf(
+                    "eventId" to eventId,
+                    "teamId" to it.id,
+                    "teamName" to it.name,
+                    "distance" to teamService.getDistance(it.id!!),
+                    "donatedSum" to teamService.getDonateSum(it.id!!)
+            )
+        })
     }
 
     override fun exists(id: Long) = this.repository.exists(id)

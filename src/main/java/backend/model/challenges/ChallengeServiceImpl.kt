@@ -3,6 +3,7 @@ package backend.model.challenges
 import backend.exceptions.DomainException
 import backend.model.event.Team
 import backend.model.posting.Posting
+import backend.model.posting.PostingService
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
 import backend.services.FeatureFlagService
@@ -13,22 +14,11 @@ import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
 @Service
-class ChallengeServiceImpl : ChallengeService {
-
-    private val challengeRepository: ChallengeRepository
-    private val mailService: MailService
-    private val featureFlagService: FeatureFlagService
-
-
-    @Autowired
-    constructor(challengeRepository: ChallengeRepository,
-                mailService: MailService,
-                featureFlagService: FeatureFlagService) {
-
-        this.challengeRepository = challengeRepository
-        this.mailService = mailService
-        this.featureFlagService = featureFlagService
-    }
+class ChallengeServiceImpl @Autowired constructor(
+        private val challengeRepository: ChallengeRepository,
+        private val mailService: MailService,
+        private val featureFlagService: FeatureFlagService,
+        private val postingService: PostingService) : ChallengeService {
 
     @Transactional
     override fun accept(challenge: Challenge): Challenge {
@@ -45,8 +35,8 @@ class ChallengeServiceImpl : ChallengeService {
     @Transactional
     override fun addProof(challenge: Challenge, proof: Posting): Challenge {
         if (featureFlagService.isEnabled("challenge.addProof")) {
-            proof.challenge = challenge
-            challenge.addProof(proof)
+            proof.challenge = challenge.id
+            challenge.addProof()
             return challengeRepository.save(challenge)
         } else {
             throw DomainException("Can't add proof to challenge. Feature disabled")
@@ -78,7 +68,6 @@ class ChallengeServiceImpl : ChallengeService {
         return challengeRepository.save(challenge)
     }
 
-
     @Transactional
     override fun withdraw(challenge: Challenge): Challenge {
         challenge.withdraw()
@@ -99,5 +88,10 @@ class ChallengeServiceImpl : ChallengeService {
     @Transactional
     override fun findBySponsorId(userId: Long): Iterable<Challenge> {
         return challengeRepository.findBySponsorAccountId(userId)
+    }
+
+    @Transactional
+    override fun findChallengeProveProjectionById(challengeId: Long): ChallengeProofProjection {
+        return challengeRepository.findChallengeProveProjectionById(challengeId)
     }
 }

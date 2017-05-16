@@ -17,13 +17,13 @@ class Location : BasicEntity {
     lateinit var coord: Coord
         private set
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     var uploader: Participant? = null
 
-    @OneToOne(mappedBy = "location", fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "location", fetch = FetchType.LAZY)
     var posting: Posting? = null
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     var team: Team? = null
 
     var isDuringEvent: Boolean = false

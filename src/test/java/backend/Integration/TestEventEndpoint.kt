@@ -9,8 +9,10 @@ import org.junit.Before
 import org.junit.Test
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+
 
 class TestEventEndpoint : IntegrationTest() {
 

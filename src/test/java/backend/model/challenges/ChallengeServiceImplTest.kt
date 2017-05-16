@@ -122,6 +122,6 @@ open class ChallengeServiceImplTest : IntegrationTest() {
         val challenge = challengeService.proposeChallenge(sponsor, team, euroOf(20), "desc")
         setAuthenticatedUser("participant@break-out.org")
 
-        assertFailsWith<DomainException>("Can't add proof to challenge. Feature disabled") { challenge.addProof(posting) }
+        assertFailsWith<DomainException>("Can't add proof to challenge. Feature disabled") { challenge.addProof() }
     }
 }

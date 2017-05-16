@@ -9,18 +9,14 @@ import backend.model.media.MediaType.DOCUMENT
 import backend.model.misc.EmailAddress
 import backend.model.payment.Billable
 import backend.model.payment.SponsoringInvoice
-import backend.model.posting.Posting
 import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
 import backend.util.euroOf
 import org.javamoney.moneta.Money
+import javax.persistence.*
 import javax.persistence.CascadeType.ALL
 import javax.persistence.CascadeType.PERSIST
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.ManyToOne
-import javax.persistence.OneToOne
 
 @Entity
 class Challenge : BasicEntity, Billable {
@@ -28,7 +24,7 @@ class Challenge : BasicEntity, Billable {
     @Column(columnDefinition = "TEXT")
     lateinit var description: String
 
-    @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true)
+    @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true, fetch = FetchType.LAZY)
     lateinit var contract: Media
 
     var status: ChallengeStatus = PROPOSED
@@ -85,7 +81,7 @@ class Challenge : BasicEntity, Billable {
     lateinit var amount: Money
         private set
 
-    // TOOD: Remove after using Join Table
+    // TODO: Remove after using Join Table
     @Deprecated("Used for PreRemove on Sponsor. A Challenge should never exist without a sponsor")
     fun removeSponsor() {
         this.registeredSponsor = null
@@ -97,13 +93,13 @@ class Challenge : BasicEntity, Billable {
                 ?: throw NullPointerException("Neither unregisteredSponsor nor registeredSponsor are set")
         private set(value) {}
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     var team: Team? = null
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     var invoice: SponsoringInvoice? = null
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private var registeredSponsor: Sponsor? = null
         set(value) {
             if (unregisteredSponsor != null) {
@@ -113,10 +109,7 @@ class Challenge : BasicEntity, Billable {
             }
         }
 
-    @OneToOne(mappedBy = "challenge")
-    var proof: Posting? = null
-
-    @ManyToOne(cascade = arrayOf(PERSIST))
+    @ManyToOne(fetch = FetchType.LAZY, cascade = arrayOf(PERSIST))
     private var unregisteredSponsor: UnregisteredSponsor? = null
         set(value) {
             if (registeredSponsor != null) {
@@ -131,7 +124,7 @@ class Challenge : BasicEntity, Billable {
      */
     private constructor() : super()
 
-    constructor(sponsor: ISponsor, team: Team, amount: Money, description: String) {
+     constructor(sponsor: ISponsor, team: Team, amount: Money, description: String) {
         when (sponsor) {
             is UnregisteredSponsor -> {
                 this.unregisteredSponsor = sponsor
@@ -159,9 +152,8 @@ class Challenge : BasicEntity, Billable {
         this.status = REJECTED
     }
 
-    fun addProof(proof: Posting) {
+    fun addProof() {
         this.status = WITH_PROOF
-        this.proof = proof
     }
 
     fun acceptProof() {

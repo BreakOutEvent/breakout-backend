@@ -4,10 +4,7 @@ import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.media.Media
 import backend.model.messaging.GroupMessage
-import backend.model.messaging.Message
 import backend.model.payment.Payment
-import backend.model.posting.Comment
-import backend.model.posting.Posting
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.validator.constraints.Email
 import org.hibernate.validator.constraints.NotEmpty
@@ -49,17 +46,8 @@ class UserAccount : BasicEntity, User {
     @OneToOne(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
     override var profilePic: Media
 
-    @OneToMany(mappedBy = "user", cascade = arrayOf(CascadeType.ALL))
-    val postings: MutableList<Posting> = ArrayList()
-
-    @OneToMany(mappedBy = "user", cascade = arrayOf(CascadeType.ALL))
-    val comments: MutableList<Comment> = ArrayList()
-
     @ManyToMany(mappedBy = "users", cascade = arrayOf(CascadeType.ALL))
     val groupMessages: MutableList<GroupMessage> = ArrayList()
-
-    @OneToMany(mappedBy = "creator", cascade = arrayOf(CascadeType.ALL))
-    val messages: MutableList<Message> = ArrayList()
 
     @OneToMany(mappedBy = "user", cascade = arrayOf(CascadeType.ALL))
     val payments: MutableList<Payment> = ArrayList()
@@ -70,7 +58,7 @@ class UserAccount : BasicEntity, User {
      * if it gets removed from Map userRoles and the account is saved!
      * See: http://stackoverflow.com/a/2011546
      */
-    @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY, orphanRemoval = true)
     private var userRoles: MutableMap<Class<out UserRole>, UserRole> = HashMap()
 
     private var activationToken: String? = null

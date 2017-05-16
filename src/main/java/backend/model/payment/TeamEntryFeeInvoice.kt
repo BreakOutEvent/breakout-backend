@@ -4,12 +4,14 @@ import backend.exceptions.DomainException
 import backend.model.event.Team
 import org.javamoney.moneta.Money
 import javax.persistence.Entity
+import javax.persistence.FetchType
+import javax.persistence.FetchType.LAZY
 import javax.persistence.OneToOne
 
 @Entity
 class TeamEntryFeeInvoice : Invoice {
 
-    @OneToOne
+    @OneToOne(fetch = LAZY)
     var team: Team? = null
 
     private constructor() : super()

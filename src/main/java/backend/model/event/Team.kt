@@ -17,6 +17,7 @@ import java.util.*
 import javax.persistence.*
 import javax.persistence.CascadeType.ALL
 import javax.persistence.CascadeType.REMOVE
+import javax.persistence.FetchType.LAZY
 
 @Entity
 class Team : BasicEntity {
@@ -39,7 +40,7 @@ class Team : BasicEntity {
 
     lateinit var name: String
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     lateinit var event: Event
 
     @Column(columnDefinition = "TEXT")
@@ -48,7 +49,7 @@ class Team : BasicEntity {
     @OneToMany(cascade = arrayOf(ALL), mappedBy = "team", orphanRemoval = true)
     private var invitations: MutableList<Invitation> = ArrayList()
 
-    @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true)
+    @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true, fetch = LAZY)
     lateinit var profilePic: Media
 
     @ManyToMany
@@ -57,7 +58,8 @@ class Team : BasicEntity {
     @OneToMany(cascade = arrayOf(REMOVE), mappedBy = "team", orphanRemoval = true)
     val locations: MutableList<Location> = ArrayList()
 
-    @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "team")
+    // TODO: Performance: Should probably be removed and used with invoiceService
+    @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "team", fetch = LAZY)
     var invoice: TeamEntryFeeInvoice? = null
 
     @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "team")

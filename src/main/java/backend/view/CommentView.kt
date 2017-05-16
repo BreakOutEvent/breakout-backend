@@ -1,6 +1,7 @@
 package backend.view
 
 import backend.model.posting.Comment
+import backend.model.user.UserAccount
 import org.hibernate.validator.constraints.SafeHtml
 import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import java.time.ZoneOffset
@@ -19,12 +20,30 @@ class CommentView() {
     var date: Long? = null
 
     @Valid
-    var user: BasicUserView? = null
+    var user: CommentUserView? = null
 
     constructor(comment: Comment) : this() {
         this.id = comment.id
         this.text = comment.text
         this.date = comment.date.toEpochSecond(ZoneOffset.UTC)
-        this.user = BasicUserView(comment.user!!.account)
+        this.user = CommentUserView(comment.user!!.account)
+    }
+}
+
+class CommentUserView() {
+
+    var id: Long? = null
+    var firstname: String? = null
+    var lastname: String? = null
+    var profilePic: MediaView? = null
+
+
+    constructor(user: UserAccount?) : this() {
+        id = user?.id
+        firstname = user?.firstname
+        lastname = user?.lastname
+        profilePic = user?.profilePic?.let {
+            return@let MediaView(it)
+        }
     }
 }

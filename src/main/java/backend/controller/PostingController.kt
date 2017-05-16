@@ -2,6 +2,7 @@ package backend.controller
 
 import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.NotFoundException
+import backend.model.challenges.ChallengeService
 import backend.model.media.MediaService
 import backend.model.misc.Coord
 import backend.model.posting.PostingService
@@ -9,10 +10,7 @@ import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.util.getSignedJwtToken
 import backend.util.localDateTimeOf
-import backend.view.CommentView
-import backend.view.LikeView
-import backend.view.LocationView
-import backend.view.PostingView
+import backend.view.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.CREATED
@@ -25,9 +23,10 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/posting")
 class PostingController(private val postingService: PostingService,
-                             private val mediaService: MediaService,
-                             private val configurationService: ConfigurationService,
-                             private val userService: UserService) {
+                        private val mediaService: MediaService,
+                        private val configurationService: ConfigurationService,
+                        private val userService: UserService,
+                        private val challengeService: ChallengeService) {
 
     private val logger: Logger = LoggerFactory.getLogger(PostingController::class.java)
     private val JWT_SECRET: String = configurationService.getRequired("org.breakout.api.jwt_secret")
@@ -42,7 +41,7 @@ class PostingController(private val postingService: PostingService,
     @PostMapping("/")
     @ResponseStatus(CREATED)
     fun createPosting(@Valid @RequestBody body: PostingView,
-                           @AuthenticationPrincipal customUserDetails: CustomUserDetails): PostingView {
+                      @AuthenticationPrincipal customUserDetails: CustomUserDetails): PostingView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
 
@@ -57,7 +56,7 @@ class PostingController(private val postingService: PostingService,
         val posting = postingService.createPosting(user, body.text, body.uploadMediaTypes, locationCoord, clientDate)
         posting.media.forEach { it.uploadToken = getSignedJwtToken(JWT_SECRET, it.id.toString()) }
 
-        return PostingView(posting)
+        return PostingView(posting, null)
     }
 
     /**
@@ -65,9 +64,12 @@ class PostingController(private val postingService: PostingService,
      * Gets posting by id
      */
     @GetMapping("/{id}/")
-    fun getPosting(@PathVariable("id") id: Long, @RequestParam(value = "userid", required = false) userId: Long?): PostingView {
+    fun getPosting(@PathVariable("id") id: Long, @RequestParam(value = "userid", required = false) userId: Long?): PostingResponseView {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
-        return PostingView(posting.hasLikesBy(userId))
+        val challengeProveProjection = posting.challenge?.let {
+            challengeService.findChallengeProveProjectionById(posting.challenge!!)
+        }
+        return PostingResponseView(posting.hasLikesBy(userId), challengeProveProjection)
     }
 
     /**
@@ -78,6 +80,9 @@ class PostingController(private val postingService: PostingService,
     @RequestMapping("/{id}/", method = arrayOf(DELETE))
     fun adminDeletePosting(@PathVariable("id") id: Long): Map<String, String> {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
+        posting.challenge?.let {
+            challengeService.rejectProof(challengeService.findOne(posting.challenge!!)!!)
+        }
         postingService.delete(posting)
         return mapOf("message" to "success")
     }
@@ -89,7 +94,7 @@ class PostingController(private val postingService: PostingService,
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping("/{id}/comment/{commentId}/", method = arrayOf(DELETE))
     fun adminDeleteComment(@PathVariable("id") postingId: Long,
-                                @PathVariable("commentId") commentId: Long): Map<String, String> {
+                           @PathVariable("commentId") commentId: Long): Map<String, String> {
 
         val posting = postingService.getByID(postingId) ?: throw NotFoundException("Posting with id $postingId not found")
         postingService.removeComment(from = posting, id = commentId)
@@ -105,15 +110,18 @@ class PostingController(private val postingService: PostingService,
     @GetMapping("/")
     fun getAllPostings(@RequestParam(value = "page", required = false) page: Int?,
                        @RequestParam(value = "userid", required = false) userId: Long?,
-                       @RequestParam(value = "event", required = false) events: List<Long>?): Iterable<PostingView> {
+                       @RequestParam(value = "event", required = false) events: List<Long>?): Iterable<PostingResponseView> {
         val postings = if(events != null) {
             postingService.findByEventIds(events, page ?:0 , PAGE_SIZE)
         } else {
             postingService.findAll(page ?: 0, PAGE_SIZE)
         }
 
-        return postings.map { PostingView(it.hasLikesBy(userId)) }
-
+        return postings.map {
+            PostingResponseView(it.hasLikesBy(userId), it.challenge?.let {
+                challengeService.findChallengeProveProjectionById(it)
+            })
+        }
     }
 
     /**
@@ -124,8 +132,8 @@ class PostingController(private val postingService: PostingService,
     @PostMapping("/{id}/comment/")
     @ResponseStatus(CREATED)
     fun createComment(@PathVariable("id") id: Long,
-                           @Valid @RequestBody body: CommentView,
-                           @AuthenticationPrincipal customUserDetails: CustomUserDetails): CommentView {
+                      @Valid @RequestBody body: CommentView,
+                      @AuthenticationPrincipal customUserDetails: CustomUserDetails): CommentView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
@@ -148,8 +156,8 @@ class PostingController(private val postingService: PostingService,
     @PostMapping("/{id}/like/")
     @ResponseStatus(CREATED)
     fun createLike(@PathVariable("id") id: Long,
-                        @Valid @RequestBody body: LikeView,
-                        @AuthenticationPrincipal customUserDetails: CustomUserDetails): LikeView {
+                   @Valid @RequestBody body: LikeView,
+                   @AuthenticationPrincipal customUserDetails: CustomUserDetails): LikeView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
@@ -166,7 +174,7 @@ class PostingController(private val postingService: PostingService,
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/{id}/like/", method = arrayOf(DELETE))
     fun deleteLike(@PathVariable("id") id: Long,
-                        @AuthenticationPrincipal customUserDetails: CustomUserDetails): Map<String, String> {
+                   @AuthenticationPrincipal customUserDetails: CustomUserDetails): Map<String, String> {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
@@ -192,10 +200,14 @@ class PostingController(private val postingService: PostingService,
      */
     @GetMapping("/hashtag/{hashtag}/")
     fun getPostingsByHashtag(@RequestParam(value = "page", required = false) page: Int?,
-                                  @PathVariable("hashtag") hashtag: String,
-                                  @RequestParam(value = "userid", required = false) userId: Long?): List<PostingView> {
+                             @PathVariable("hashtag") hashtag: String,
+                             @RequestParam(value = "userid", required = false) userId: Long?): List<PostingView> {
         val posting = postingService.findByHashtag(hashtag, page ?: 0, PAGE_SIZE)
-        return posting.map { PostingView(it.hasLikesBy(userId)) }
+        return posting.map {
+            PostingView(it.hasLikesBy(userId), it.challenge?.let {
+                challengeService.findOne(it)
+            })
+        }
     }
 
 }

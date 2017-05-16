@@ -4,7 +4,6 @@ import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.ConflictException
 import backend.controller.exceptions.NotFoundException
 import backend.model.BasicEntity
-import backend.model.challenges.Challenge
 import backend.model.event.Team
 import backend.model.location.Location
 import backend.model.media.Media
@@ -26,6 +25,9 @@ class Posting : BasicEntity {
     @Column(columnDefinition = "TEXT")
     var text: String? = null
 
+    /*
+    TODO: Move hashtags to own entity - github issue #194
+     */
     @ElementCollection
     var hashtags: List<Hashtag> = ArrayList()
 
@@ -34,8 +36,8 @@ class Posting : BasicEntity {
     @OneToOne(cascade = arrayOf(PERSIST))
     var location: Location? = null
 
-    @OneToOne(cascade = arrayOf(PERSIST))
-    var challenge: Challenge? = null
+    @Column(name = "challenge_id")
+    var challenge: Long? = null
 
     @ManyToOne
     var user: UserAccount? = null
@@ -53,7 +55,7 @@ class Posting : BasicEntity {
     @JoinTable(
             joinColumns = arrayOf(JoinColumn(name = "posting_id", referencedColumnName = "id")),
             inverseJoinColumns = arrayOf(JoinColumn(name = "like_id", referencedColumnName = "id"))
-    )
+    ) // explicit annotation because "like" would cause an error as it is an sql keyword
     var likes: MutableSet<Like> = hashSetOf()
 
     @Transient
