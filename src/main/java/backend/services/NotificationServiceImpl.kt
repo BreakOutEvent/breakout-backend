@@ -6,7 +6,7 @@ import backend.util.Profiles.PRODUCTION
 import backend.util.Profiles.STAGING
 import com.auth0.jwt.internal.com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -18,9 +18,10 @@ import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 
 @Service
+@Primary
 @Profile(PRODUCTION, STAGING)
-class NotificationServiceImpl @Autowired constructor(private val restTemplate: RestOperations,
-                                                     private var configurationService: ConfigurationService) : NotificationService {
+class NotificationServiceImpl(private val restTemplate: RestOperations,
+                              configurationService: ConfigurationService) : NotificationService {
 
     private var url: String = configurationService.getRequired("org.breakout.api.notifications.url")
     private var appId: String = configurationService.getRequired("org.breakout.api.notifications.appId")
