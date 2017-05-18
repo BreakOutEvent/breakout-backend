@@ -114,8 +114,8 @@ class LastLocation() {
     constructor(location: Location): this() {
         this.coord = Coord(location.coord.latitude, location.coord.longitude)
         this.id = location.id
-        this.locationData = locationData
-        this.timestamp = timestamp
+        this.locationData = location.locationData.toMutableMap()
+        this.timestamp = location.date
 
     }
 }
