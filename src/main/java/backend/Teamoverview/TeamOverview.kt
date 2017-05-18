@@ -3,14 +3,13 @@ package backend.Teamoverview
 import backend.model.BasicEntity
 import backend.model.event.Event
 import backend.model.event.Team
+import backend.model.location.Location
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.ZoneOffset
 import javax.persistence.*
 
 @Entity
@@ -103,9 +102,21 @@ class LastLocation() {
     @Column(name = "location_id")
     var id: Long? = null
 
-    constructor(coord: Coord, id: Long) : this() {
-        this.coord = coord
-        this.id = id
+    @Column(name = "location_timestamp")
+    @JsonSerialize(using = TimestampSerializer::class)
+    var timestamp: LocalDateTime? = null
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @MapKeyColumn(name = "last_location_data_key")
+    @Column(name = "last_location_data_value")
+    var locationData: MutableMap<String, String> = mutableMapOf()
+
+    constructor(location: Location): this() {
+        this.coord = Coord(location.coord.latitude, location.coord.longitude)
+        this.id = location.id
+        this.locationData = locationData
+        this.timestamp = timestamp
+
     }
 }
 

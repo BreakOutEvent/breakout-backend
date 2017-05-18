@@ -5,9 +5,7 @@ import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.event.TeamChangedEvent
 import backend.model.event.TeamCreatedEvent
-import backend.model.location.Location
 import backend.model.location.LocationUploadedEvent
-import backend.model.posting.Posting
 import backend.model.posting.PostingCreatedEvent
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -51,9 +49,7 @@ class TeamOverviewServiceImpl(private val teamOverviewRepository: TeamoverviewRe
     fun onLocationUploaded(locationUploadedEvent: LocationUploadedEvent) {
         val team = locationUploadedEvent.team
         val overview = teamOverviewRepository.findByTeamId(team.id!!) ?: createOverviewForTeam(team)
-        val coord = Coord(locationUploadedEvent.location.coord.latitude, locationUploadedEvent.location.coord.longitude)
-
-        overview.lastLocation = LastLocation(coord, locationUploadedEvent.location.id!!)
+        overview.lastLocation = LastLocation(locationUploadedEvent.location)
         teamOverviewRepository.save(overview)
     }
 
