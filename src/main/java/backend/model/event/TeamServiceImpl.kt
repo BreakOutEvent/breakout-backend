@@ -11,28 +11,30 @@ import backend.services.mail.MailService
 import backend.util.data.DonateSums
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 
 @Service
-class TeamServiceImpl(teamRepository: TeamRepository,
+class TeamServiceImpl(private val repository: TeamRepository,
                       private val userService: UserService,
                       private val mailService: MailService,
+                      private val eventPublisher: ApplicationEventPublisher,
                       private val configurationService: ConfigurationService) : TeamService {
 
-    private val repository: TeamRepository = teamRepository
-    private val logger: Logger
+    private val logger: Logger = LoggerFactory.getLogger(TeamServiceImpl::class.java)
 
     @Transactional
     override fun create(creator: Participant, name: String, description: String, event: Event): Team {
         val team = Team(creator, name, description, event)
         // TODO: Maybe use sensible cascading?
-        val savedTeam = this.save(team)
+        val savedTeam = this.repository.save(team)
         savedTeam.invoice?.generatePurposeOfTransfer()
 
         userService.save(creator)
+        eventPublisher.publishEvent(TeamCreatedEvent(team))
         return savedTeam
     }
 
@@ -48,7 +50,11 @@ class TeamServiceImpl(teamRepository: TeamRepository,
         return "${baseUrl.replace("CUSTOMTOKEN", token)}?utm_source=backend&utm_medium=email&utm_campaign=invite"
     }
 
-    override fun save(team: Team): Team = repository.save(team)
+    override fun save(team: Team): Team {
+        val saved = repository.save(team)
+        eventPublisher.publishEvent(TeamChangedEvent(saved))
+        return saved
+    }
 
     override fun findOne(id: Long) = repository.findById(id)
 
@@ -75,6 +81,7 @@ class TeamServiceImpl(teamRepository: TeamRepository,
     @Transactional
     override fun leave(team: Team, participant: Participant) {
         team.leave(participant)
+        eventPublisher.publishEvent(TeamChangedEvent(team))
     }
 
     @Transactional
@@ -82,6 +89,7 @@ class TeamServiceImpl(teamRepository: TeamRepository,
 
         val members = team.join(participant)
 
+        eventPublisher.publishEvent(TeamChangedEvent(team))
         if (team.isFull()) {
             mailService.sendTeamIsCompleteEmail(team.members.toList())
         }
@@ -158,8 +166,7 @@ class TeamServiceImpl(teamRepository: TeamRepository,
     override fun findAllTeamSummaryProjections(): Iterable<TeamSummaryProjection> {
         return repository.findAllByEventIsCurrentTrueOrderByName()
     }
-
-    init {
-        this.logger = LoggerFactory.getLogger(TeamServiceImpl::class.java)
-    }
 }
+
+class TeamCreatedEvent(val team: Team)
+class TeamChangedEvent(val team: Team)

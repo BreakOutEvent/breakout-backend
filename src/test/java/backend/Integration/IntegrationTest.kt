@@ -1,6 +1,7 @@
 package backend.Integration
 
 
+import backend.Teamoverview.TeamoverviewRepository
 import backend.TestBackendConfiguration
 import backend.configuration.AuthorizationServerConfiguration
 import backend.configuration.ResourceServerConfiguration
@@ -86,6 +87,7 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var challengeRepository: ChallengeRepository
     @Autowired lateinit protected var featureReposity: FeatureRepository
     @Autowired lateinit protected var sponsoringInvoiceRepository: SponsoringInvoiceRepository
+    @Autowired lateinit protected var teamOverviewRepository: TeamoverviewRepository
 
     // Services
     @Autowired lateinit protected var userService: UserService
@@ -119,6 +121,7 @@ abstract class IntegrationTest {
         challengeRepository.deleteAll()
         sponsoringRepository.deleteAll()
         featureReposity.deleteAll()
+        teamOverviewRepository.deleteAll()
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .addFilters<DefaultMockMvcBuilder>(springSecurityFilterChain)

@@ -10,16 +10,17 @@ import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserAccount
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
-class PostingServiceImpl @Autowired constructor(val repository: PostingRepository,
-                                                val locationService: LocationService,
-                                                val mediaRepository: MediaRepository) : PostingService {
+class PostingServiceImpl(private val repository: PostingRepository,
+                         private val locationService: LocationService,
+                         private val mediaRepository: MediaRepository,
+                         private val applicationEventPublisher: ApplicationEventPublisher) : PostingService {
 
     override fun removeComment(posting: Posting, commentId: Long) {
         posting.removeComment(commentId)
@@ -72,7 +73,9 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
             media.add(Media(it))
         }
 
-        return repository.save(Posting(text, date, location, user, media))
+        val posting = repository.save(Posting(text, date, location, user, media))
+        applicationEventPublisher.publishEvent(PostingCreatedEvent(posting))
+        return posting
     }
 
     override fun createPosting(user: User,
@@ -101,3 +104,5 @@ class PostingServiceImpl @Autowired constructor(val repository: PostingRepositor
         repository.delete(posting)
     }
 }
+
+class PostingCreatedEvent(val posting: Posting)

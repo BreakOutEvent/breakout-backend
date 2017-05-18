@@ -1,6 +1,5 @@
 package backend.model.location
 
-import backend.controller.EventController
 import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.exceptions.DomainException
@@ -10,24 +9,18 @@ import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.services.FeatureFlagService
 import backend.services.GeoCodingService
-import backend.util.distanceCoordsKM
-import backend.util.parallelStream
 import backend.util.speedToLocation
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.domain.PageRequest
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import javax.transaction.Transactional
 
 @Service
-class LocationServiceImpl @Autowired constructor(private val locationRepository: LocationRepository,
-                                                 private val geoCodingService: GeoCodingService,
-                                                 private val featureFlagService: FeatureFlagService,
-                                                 private val eventService: EventService) : LocationService {
-
-    private var logger: Logger = LoggerFactory.getLogger(LocationServiceImpl::class.java)
+class LocationServiceImpl(private val locationRepository: LocationRepository,
+                          private val geoCodingService: GeoCodingService,
+                          private val featureFlagService: FeatureFlagService,
+                          private val eventService: EventService,
+                          private val eventPublisher: ApplicationEventPublisher) : LocationService {
 
     override fun findAll(): Iterable<Location> {
         return locationRepository.findAll()
@@ -52,7 +45,10 @@ class LocationServiceImpl @Autowired constructor(private val locationRepository:
 
         checkAndSetIsDuringEvent(location, participant)
 
-        return locationRepository.save(location)
+        val savedLocation = locationRepository.save(location)
+        val team = location.team ?: throw Exception("Location has no team")
+        eventPublisher.publishEvent(LocationUploadedEvent(location, team))
+        return savedLocation
     }
 
     private fun checkAndSetIsDuringEvent(location: Location, participant: Participant) {
@@ -109,3 +105,4 @@ class LocationServiceImpl @Autowired constructor(private val locationRepository:
 
 }
 
+class LocationUploadedEvent(val location: Location, val team: Team)
