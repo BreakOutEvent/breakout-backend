@@ -30,10 +30,10 @@ class Sponsor : UserRole, ISponsor {
     lateinit var logo: Media
 
     @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "registeredSponsor")
-    var sponsorings: MutableList<Sponsoring> = arrayListOf()
+    override var sponsorings: MutableList<Sponsoring> = arrayListOf()
 
     @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "registeredSponsor")
-    var challenges: MutableList<Challenge> = arrayListOf()
+    override var challenges: MutableList<Challenge> = arrayListOf()
 
     @Embedded
     override var url: Url? = null

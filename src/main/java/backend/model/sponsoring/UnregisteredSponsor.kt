@@ -34,10 +34,10 @@ class UnregisteredSponsor : BasicEntity, ISponsor {
     override lateinit var address: Address
 
     @OneToMany(mappedBy = "unregisteredSponsor")
-    var sponsorings: MutableList<Sponsoring> = mutableListOf()
+    override var sponsorings: MutableList<Sponsoring> = mutableListOf()
 
     @OneToMany(mappedBy = "unregisteredSponsor")
-    var challenges: MutableList<Challenge> = mutableListOf()
+    override var challenges: MutableList<Challenge> = mutableListOf()
 
     @Column(nullable = true) // TODO: Why nullable?
     override

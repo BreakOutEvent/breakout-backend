@@ -1,5 +1,6 @@
 package backend.model.sponsoring
 
+import backend.model.challenges.Challenge
 import backend.model.misc.Url
 import backend.model.user.Address
 import backend.model.user.Sponsor
@@ -24,4 +25,8 @@ interface ISponsor {
 
     @Deprecated("Just a workaround")
     var unregisteredSponsor: UnregisteredSponsor? // TODO: Fix this. Just a workaround!
+
+    var challenges: MutableList<Challenge>
+
+    var sponsorings: MutableList<Sponsoring>
 }
