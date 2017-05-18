@@ -13,10 +13,10 @@ class SponsoringInvoice : Invoice {
     @OneToOne(fetch = FetchType.LAZY)
     var team: Team? = null
 
-    @OneToMany(mappedBy = "invoice", cascade = arrayOf(CascadeType.MERGE, CascadeType.PERSIST))
+    @OneToMany(cascade = arrayOf(CascadeType.MERGE, CascadeType.PERSIST))
     var sponsorings: List<Sponsoring> = listOf()
 
-    @OneToMany(mappedBy = "invoice", cascade = arrayOf(CascadeType.MERGE, CascadeType.PERSIST))
+    @OneToMany(cascade = arrayOf(CascadeType.MERGE, CascadeType.PERSIST))
     var challenges: List<Challenge> = listOf()
 
     var subject: String? = null

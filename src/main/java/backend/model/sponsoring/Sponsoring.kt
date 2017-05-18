@@ -42,9 +42,6 @@ class Sponsoring : BasicEntity, Billable {
     @ManyToOne
     var team: Team? = null
 
-    @ManyToOne
-    var invoice: SponsoringInvoice? = null
-
     @ManyToOne(cascade = arrayOf(PERSIST))
     private var unregisteredSponsor: UnregisteredSponsor? = null
 

@@ -97,9 +97,6 @@ class Challenge : BasicEntity, Billable {
     var team: Team? = null
 
     @ManyToOne(fetch = FetchType.LAZY)
-    var invoice: SponsoringInvoice? = null
-
-    @ManyToOne(fetch = FetchType.LAZY)
     private var registeredSponsor: Sponsor? = null
         set(value) {
             if (unregisteredSponsor != null) {

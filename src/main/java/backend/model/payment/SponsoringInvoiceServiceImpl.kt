@@ -69,15 +69,6 @@ class SponsoringInvoiceServiceImpl : SponsoringInvoiceService {
         val invoice = SponsoringInvoice(team, amount, subject, sponsorings, challanges)
         val savedInvoice = sponsoringInvoiceRepository.save(invoice)
 
-        sponsorings.forEach {
-            it.invoice = savedInvoice
-            sponsoringRepository.save(it)
-        }
-        challanges.forEach {
-            it.invoice = savedInvoice
-            challengeRepository.save(it)
-        }
-
         return savedInvoice
     }
 
