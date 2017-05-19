@@ -10,19 +10,17 @@ import backend.services.mail.MailService
 import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import javax.transaction.Transactional
 
 @Service
-class SponsoringServiceImpl @Autowired constructor(private val sponsoringRepository: SponsoringRepository,
-                                                   private val mailService: MailService,
-                                                   private val teamService: TeamService,
-                                                   private val userService: UserService) : SponsoringService {
+class SponsoringServiceImpl(private val sponsoringRepository: SponsoringRepository,
+                            private val mailService: MailService,
+                            private val teamService: TeamService,
+                            private val userService: UserService) : SponsoringService {
 
     private val logger: Logger = LoggerFactory.getLogger(SponsoringServiceImpl::class.java)
-
 
     @Transactional
     override fun createSponsoring(sponsor: Sponsor, team: Team, amountPerKm: Money, limit: Money): Sponsoring {
@@ -154,4 +152,5 @@ class SponsoringServiceImpl @Autowired constructor(private val sponsoringReposit
 
         return Money.of(total, "EUR")
     }
+
 }
