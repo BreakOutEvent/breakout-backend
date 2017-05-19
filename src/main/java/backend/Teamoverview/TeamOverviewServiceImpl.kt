@@ -28,7 +28,9 @@ class TeamOverviewServiceImpl(private val teamOverviewRepository: TeamoverviewRe
         val teamOverview = this.findByTeamId(teamId)
                 ?: throw NotFoundException("Team with id $teamId not found in TeamOverview")
 
-        teamOverview.setLastContactWithHeadquarters(comment, LocalDateTime.now())
+        val previousComment = teamOverview.lastContactWithHeadquarters?.comment ?: ""
+        val newComment = previousComment + "----" + comment
+        teamOverview.setLastContactWithHeadquarters(newComment, LocalDateTime.now())
     }
 
     @EventListener
