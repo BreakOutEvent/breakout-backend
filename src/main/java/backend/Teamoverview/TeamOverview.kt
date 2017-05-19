@@ -153,6 +153,8 @@ class LastContactWithHeadquarters() {
 
     @JsonSerialize(using = TimestampSerializer::class)
     var timestamp: LocalDateTime? = null
+
+    @Column(columnDefinition = "TEXT")
     var comment: String? = null
 
     constructor(timestamp: LocalDateTime, comment: String) : this() {
