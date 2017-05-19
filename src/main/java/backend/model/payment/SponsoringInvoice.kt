@@ -98,4 +98,34 @@ class SponsoringInvoice : Invoice {
     override fun generatePurposeOfTransfer(): String {
         TODO()
     }
+
+    fun toEmailOverview(): String {
+        return """
+        |<b>Challenges</b><br/>
+        |${this.challenges.toEmailListing()}
+        |<br/><b>Sponsorings</b><br/>
+        |${this.sponsorings.toEmailListing()}<br/>
+        |
+        |<b>Total:</b> $amount<br/>
+        |<b>Already paid:</b> ${amountOfCurrentPayments()}<br/>
+        """.trimMargin("|")
+    }
+
+    @JvmName("sponsoringToEmailListing")
+    private fun List<Sponsoring>.toEmailListing(): String {
+        return this.map { it.toEmailListing() }.foldRight("") { acc, s -> "$acc<br/>\n$s" }
+    }
+
+    private fun Sponsoring.toEmailListing(): String {
+        return "<b>Team-ID</b> ${this.team?.id} <b>Teamname</b> ${this.team?.name} <b>Status</b> ${this.status} <b>Amount Per Km</b> ${this.amountPerKm} <b>Actual Km</b> ${this.team?.getCurrentDistance()} <b>Billed Amount</b> ${this.billableAmount()}"
+    }
+
+    @JvmName("challengeToEmailListing")
+    private fun List<Challenge>.toEmailListing(): String {
+        return this.map { it.toEmailListing() }.foldRight("") { acc, s -> "$acc<br/>\n$s" }
+    }
+
+    private fun Challenge.toEmailListing(): String {
+        return "<b>Team-ID</b> ${this.team?.id} <b>Teamname</b> ${this.team?.name} <b>Description</b> ${this.description.take(50)}... <b>Status</b> ${this.status} <b>Amount</b> ${this.amount} <b>Billed Amount</b> ${this.billableAmount()}"
+    }
 }
