@@ -5,12 +5,12 @@ import backend.model.event.Team
 import backend.model.sponsoring.Sponsoring
 import backend.model.user.Admin
 import org.javamoney.moneta.Money
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
 @Service
-class SponsoringInvoiceServiceImpl @Autowired constructor(private val sponsoringInvoiceRepository: SponsoringInvoiceRepository) : SponsoringInvoiceService {
+class SponsoringInvoiceServiceImpl(
+        private val sponsoringInvoiceRepository: SponsoringInvoiceRepository) : SponsoringInvoiceService {
 
     @Transactional
     override fun addAdminPaymentToInvoice(admin: Admin, amount: Money, invoice: SponsoringInvoice): SponsoringInvoice {
@@ -63,5 +63,6 @@ class SponsoringInvoiceServiceImpl @Autowired constructor(private val sponsoring
     override fun findByPurposeOfTransferCode(purposeOfTransferCode: String): SponsoringInvoice? {
         return sponsoringInvoiceRepository.findByPurposeOfTransferCode(purposeOfTransferCode)
     }
+
 }
 
