@@ -255,6 +255,6 @@ open class TestTeamOverview : IntegrationTest() {
                 .andExpect(jsonPath("$").isArray)
                 .andExpect(jsonPath("$.[0].teamId").value(team.id))
                 .andExpect(jsonPath("$.[0].lastContactWithHeadquarters.timestamp").isNumber)
-                .andExpect(jsonPath("$.[0].lastContactWithHeadquarters.comment").value("Alles gut, weitermachen"))
+                .andExpect(jsonPath("$.[0].lastContactWithHeadquarters.comment").value("----Alles gut, weitermachen"))
     }
 }
