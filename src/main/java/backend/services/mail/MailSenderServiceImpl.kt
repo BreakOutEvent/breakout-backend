@@ -23,18 +23,12 @@ class MailSenderServiceImpl @Autowired constructor(private val restTemplate: Res
                                                    private val emailRepository: EmailRepository,
                                                    configurationService: ConfigurationService) : MailSenderService {
 
-    private val url: String
-    private val token: String
-    private val host: String
+    private val url: String = configurationService.getRequired("org.breakout.mailer.url")
+    private val token: String = configurationService.getRequired("org.breakout.mailer.xauthtoken")
+    private val host: String = configurationService.getRequired("org.breakout.api.host")
 
     private val logger = LoggerFactory.getLogger(MailSenderServiceImpl::class.java)
     private val pool = Executors.newCachedThreadPool()
-
-    init {
-        this.token = configurationService.getRequired("org.breakout.mailer.xauthtoken")
-        this.url = configurationService.getRequired("org.breakout.mailer.url")
-        this.host = configurationService.getRequired("org.breakout.api.host")
-    }
 
     override fun send(email: Email, saveToDb: Boolean) {
         val headers = HttpHeaders().apply {

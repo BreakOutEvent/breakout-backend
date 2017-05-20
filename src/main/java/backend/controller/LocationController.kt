@@ -3,7 +3,6 @@ package backend.controller
 import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
-import backend.model.event.EventService
 import backend.model.event.TeamService
 import backend.model.location.Location
 import backend.model.location.LocationService
@@ -21,8 +20,6 @@ import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.GET
-import org.springframework.web.bind.annotation.RequestMethod.POST
 import javax.validation.Valid
 
 @RestController

@@ -6,7 +6,6 @@ import backend.model.user.UserAccount
 import backend.model.user.UserRepository
 import backend.services.NotificationService
 import backend.services.mail.MailService
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

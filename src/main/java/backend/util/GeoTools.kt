@@ -27,7 +27,7 @@ fun speedToLocation(toLocation: Location, fromLocation: Location): SpeedToLocati
 
 fun calculateSpeed(distanceKm: Double, secondsDifference: Long): SpeedToLocation? {
     if (distanceKm > 0 && secondsDifference > 0) {
-        val speed = distanceKm / (secondsDifference / 3600.0 )
+        val speed = distanceKm / (secondsDifference / 3600.0)
         return SpeedToLocation(speed, secondsDifference, distanceKm)
     } else {
         return null

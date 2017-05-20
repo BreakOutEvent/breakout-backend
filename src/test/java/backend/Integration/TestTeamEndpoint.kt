@@ -169,7 +169,7 @@ open class TestTeamEndpoint : IntegrationTest() {
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to team.profilePic.id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .content(postData)
 
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -188,7 +188,7 @@ open class TestTeamEndpoint : IntegrationTest() {
                 .request(HttpMethod.GET, "/event/${event.id}/team/${team.id}/")
                 .contentType(MediaType.APPLICATION_JSON)
 
-        val responseMedia = mockMvc.perform (requestMedia)
+        val responseMedia = mockMvc.perform(requestMedia)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -233,7 +233,7 @@ open class TestTeamEndpoint : IntegrationTest() {
                 .request(HttpMethod.GET, "/event/${event.id}/team/${team.id}/")
                 .contentType(MediaType.APPLICATION_JSON)
 
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -309,7 +309,7 @@ open class TestTeamEndpoint : IntegrationTest() {
                 .request(HttpMethod.GET, "/event/${event.id}/team/")
                 .contentType(MediaType.APPLICATION_JSON)
 
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$").isArray)
                 .andExpect(jsonPath("$[0].name").exists())
@@ -333,7 +333,7 @@ open class TestTeamEndpoint : IntegrationTest() {
                 .request(HttpMethod.GET, "/event/${event.id}/team/${team.id}/posting/")
                 .contentType(MediaType.APPLICATION_JSON)
 
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$").isArray)
@@ -352,7 +352,7 @@ open class TestTeamEndpoint : IntegrationTest() {
                 .request(HttpMethod.GET, "/event/${event.id}/team/${team.id}/distance/")
                 .contentType(MediaType.APPLICATION_JSON)
 
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.distance").exists())
@@ -368,7 +368,7 @@ open class TestTeamEndpoint : IntegrationTest() {
                 .request(HttpMethod.GET, "/event/${event.id}/team/${team.id}/donatesum/")
                 .contentType(MediaType.APPLICATION_JSON)
 
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.sponsorSum").exists())
@@ -424,7 +424,7 @@ open class TestTeamEndpoint : IntegrationTest() {
                 .request(HttpMethod.GET, "/event/${event.id}/team/${team.id}/")
                 .contentType(MediaType.APPLICATION_JSON)
 
-        mockMvc.perform (request)
+        mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())

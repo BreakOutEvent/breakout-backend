@@ -5,16 +5,8 @@ import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 
 @Service
-class ConfigurationServiceImpl : ConfigurationService {
-
-    private val environment: Environment
-    private val systemWrapper: SystemWrapper
-
-    @Autowired
-    constructor(environment: Environment, systemWrapper: SystemWrapper) {
-        this.environment = environment
-        this.systemWrapper = systemWrapper
-    }
+class ConfigurationServiceImpl @Autowired constructor(private val environment: Environment,
+                                                      private val systemWrapper: SystemWrapper) : ConfigurationService {
 
     override fun get(key: String): String? {
         val envKey = propertiesToEnv(key)

@@ -3,7 +3,6 @@ package backend.model.challenges
 import backend.exceptions.DomainException
 import backend.model.event.Team
 import backend.model.posting.Posting
-import backend.model.posting.PostingService
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
 import backend.services.FeatureFlagService
@@ -17,8 +16,7 @@ import javax.transaction.Transactional
 class ChallengeServiceImpl @Autowired constructor(
         private val challengeRepository: ChallengeRepository,
         private val mailService: MailService,
-        private val featureFlagService: FeatureFlagService,
-        private val postingService: PostingService) : ChallengeService {
+        private val featureFlagService: FeatureFlagService) : ChallengeService {
 
     @Transactional
     override fun accept(challenge: Challenge): Challenge {

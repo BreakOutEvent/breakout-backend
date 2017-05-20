@@ -11,16 +11,9 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class CustomUserDetailsService : UserDetailsService {
+class CustomUserDetailsService @Autowired constructor(private val userService: UserService) : UserDetailsService {
 
-    private val userService: UserService
-    private val logger: Logger
-
-    @Autowired
-    constructor(userService: UserService) {
-        this.userService = userService
-        this.logger = LoggerFactory.getLogger(CustomUserDetailsService::class.java)
-    }
+    private val logger: Logger = LoggerFactory.getLogger(CustomUserDetailsService::class.java)
 
     @Transactional
     override fun loadUserByUsername(username: String): UserDetails? {

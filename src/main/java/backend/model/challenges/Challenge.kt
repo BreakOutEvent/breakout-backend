@@ -8,7 +8,6 @@ import backend.model.media.Media
 import backend.model.media.MediaType.DOCUMENT
 import backend.model.misc.EmailAddress
 import backend.model.payment.Billable
-import backend.model.payment.SponsoringInvoice
 import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
@@ -121,7 +120,7 @@ class Challenge : BasicEntity, Billable {
      */
     private constructor() : super()
 
-     constructor(sponsor: ISponsor, team: Team, amount: Money, description: String) {
+    constructor(sponsor: ISponsor, team: Team, amount: Money, description: String) {
         when (sponsor) {
             is UnregisteredSponsor -> {
                 this.unregisteredSponsor = sponsor

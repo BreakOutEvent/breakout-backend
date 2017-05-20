@@ -15,16 +15,10 @@ interface FeatureFlagService {
 }
 
 @Service
-class FeatureFlagServiceImpl : FeatureFlagService {
+class FeatureFlagServiceImpl @Autowired constructor(featureRepository: FeatureRepository) : FeatureFlagService {
 
-    private var repository: FeatureRepository
-    private var logger: Logger
-
-    @Autowired
-    constructor(featureRepository: FeatureRepository) {
-        this.repository = featureRepository
-        this.logger = LoggerFactory.getLogger(FeatureFlagServiceImpl::class.java)
-    }
+    private var repository: FeatureRepository = featureRepository
+    private var logger: Logger = LoggerFactory.getLogger(FeatureFlagServiceImpl::class.java)
 
     override fun isEnabled(key: String): Boolean {
         try {

@@ -18,7 +18,7 @@ class PostingLocationView() {
     @NotNull
     var date: Long? = null
 
-    constructor(location: Location): this() {
+    constructor(location: Location) : this() {
         this.latitude = location.coord.latitude
         this.longitude = location.coord.longitude
         this.distance = location.distance

@@ -6,11 +6,9 @@ import backend.model.media.MediaSizeService
 import backend.services.ConfigurationService
 import backend.util.verifyJwtClaim
 import backend.view.MediaSizeView
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.POST
 import javax.validation.Valid
 
 /**
@@ -20,10 +18,10 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/media")
 class MediaController(private val mediaSizeService: MediaSizeService,
-                           private val mediaService: MediaService,
-                           private val configurationService: ConfigurationService) {
+                      private val mediaService: MediaService,
+                      private val configurationService: ConfigurationService) {
 
-    private val JWT_SECRET: String
+    private val JWT_SECRET: String = configurationService.getRequired("org.breakout.api.jwt_secret")
 
     /**
      * POST /media/{id}/
@@ -32,8 +30,8 @@ class MediaController(private val mediaSizeService: MediaSizeService,
     @PostMapping("/{id}/")
     @ResponseStatus(CREATED)
     fun createMediaSize(@PathVariable("id") id: Long,
-                             @RequestHeader("X-UPLOAD-TOKEN") uploadToken: String,
-                             @Valid @RequestBody body: MediaSizeView): MediaSizeView {
+                        @RequestHeader("X-UPLOAD-TOKEN") uploadToken: String,
+                        @Valid @RequestBody body: MediaSizeView): MediaSizeView {
 
         verifyJwtClaim(JWT_SECRET, uploadToken, id.toString())
         val media = mediaService.getByID(id) ?: throw NotFoundException("No media with id $id")
@@ -54,7 +52,4 @@ class MediaController(private val mediaSizeService: MediaSizeService,
         return mapOf("message" to "success")
     }
 
-    init {
-        this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
-    }
 }

@@ -15,7 +15,7 @@ class Comment : BasicEntity {
 
     lateinit var date: LocalDateTime
 
-    @ManyToOne(fetch = FetchType.LAZY   )
+    @ManyToOne(fetch = FetchType.LAZY)
     var user: UserAccount? = null
 
     constructor(text: String, date: LocalDateTime, user: UserAccount) : this() {

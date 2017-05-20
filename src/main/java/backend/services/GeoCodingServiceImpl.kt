@@ -3,7 +3,6 @@ package backend.services
 import backend.model.misc.Coord
 import backend.services.mail.MailServiceImpl
 import backend.util.Profiles.PRODUCTION
-import backend.util.Profiles.STAGING
 import com.google.maps.GeoApiContext
 import com.google.maps.GeocodingApi
 import com.google.maps.model.AddressComponent
@@ -16,16 +15,11 @@ import org.springframework.stereotype.Service
 
 @Service
 @Profile(PRODUCTION)
-class GeoCodingServiceImpl : GeoCodingService {
+class GeoCodingServiceImpl @Autowired constructor(configurationService: ConfigurationService) : GeoCodingService {
 
-    private val apiKey: String
+    private val apiKey: String = configurationService.getRequired("org.breakout.google.apikey")
 
     private val logger = LoggerFactory.getLogger(MailServiceImpl::class.java)
-
-    @Autowired
-    constructor(configurationService: ConfigurationService) {
-        this.apiKey = configurationService.getRequired("org.breakout.google.apikey")
-    }
 
     private fun toGoogleLatLng(coord: Coord): LatLng {
         return LatLng(coord.latitude, coord.longitude)
@@ -38,7 +32,7 @@ class GeoCodingServiceImpl : GeoCodingService {
 
         val geoCodeMap = mutableMapOf<String, String>()
 
-        if (results.size > 0) {
+        if (results.isNotEmpty()) {
             results[0].addressComponents.forEach { comp: AddressComponent ->
                 comp.types.forEach {
                     geoCodeMap[it.name] = comp.longName

@@ -15,7 +15,7 @@ abstract class Payment : BasicEntity {
     lateinit var amount: Money
         private set
 
-    @Column(unique=true)
+    @Column(unique = true)
     var fidorId: Long? = null
         private set
 

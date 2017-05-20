@@ -111,9 +111,8 @@ class UserAccount : BasicEntity, User {
     @Throws(Exception::class)
     @Suppress("UNCHECKED_CAST")
     override fun <T : UserRole> addRole(clazz: KClass<T>): T {
-        val role: UserRole
         if (userRoles.containsKey(clazz.java)) throw DomainException("User already has role $clazz")
-        role = UserRole.createFor(clazz.java, this)
+        val role: UserRole = UserRole.createFor(clazz.java, this)
         userRoles.put(clazz.java, role)
         return role as T
     }
@@ -142,15 +141,12 @@ class UserAccount : BasicEntity, User {
     }
 }
 
-class BasicGrantedAuthority : GrantedAuthority {
+class BasicGrantedAuthority(userRole: UserRole) : GrantedAuthority {
 
-    private val internal: String
-
-    constructor(userRole: UserRole) {
-        this.internal = userRole.authority
-    }
+    private val internal: String = userRole.authority
 
     override fun getAuthority(): String? {
         return internal
     }
+
 }

@@ -59,7 +59,7 @@ open class TeamServiceImplTest : IntegrationTest() {
     }
 
     private fun setAuthenticatedUser(email: String, role: Class<out UserRole>): User {
-        val user = userService.create(email, "password", {addRole(role.kotlin)}).getRole(role.kotlin)!!
+        val user = userService.create(email, "password", { addRole(role.kotlin) }).getRole(role.kotlin)!!
         val details = userDetailsService.loadUserByUsername(email)!! // Not null because otherwise exception is thrown
         val token = UsernamePasswordAuthenticationToken(details.username, details.password, details.authorities)
         SecurityContextHolder.getContext().authentication = token

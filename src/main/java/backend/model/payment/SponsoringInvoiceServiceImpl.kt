@@ -1,36 +1,16 @@
 package backend.model.payment
 
 import backend.model.challenges.Challenge
-import backend.model.challenges.ChallengeRepository
 import backend.model.event.Team
 import backend.model.sponsoring.Sponsoring
-import backend.model.sponsoring.SponsoringRepository
 import backend.model.user.Admin
-import backend.services.mail.MailService
 import org.javamoney.moneta.Money
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
 @Service
-class SponsoringInvoiceServiceImpl : SponsoringInvoiceService {
-
-    private val sponsoringInvoiceRepository: SponsoringInvoiceRepository
-    private val sponsoringRepository: SponsoringRepository
-    private val challengeRepository: ChallengeRepository
-    private val mailService: MailService
-    private val logger: Logger
-
-    @Autowired
-    constructor(sponsoringInvoiceRepository: SponsoringInvoiceRepository, mailService: MailService, sponsoringRepository: SponsoringRepository, challengeRepository: ChallengeRepository) {
-        this.sponsoringInvoiceRepository = sponsoringInvoiceRepository
-        this.sponsoringRepository = sponsoringRepository
-        this.challengeRepository = challengeRepository
-        this.logger = LoggerFactory.getLogger(TeamEntryFeeServiceImpl::class.java)
-        this.mailService = mailService
-    }
+class SponsoringInvoiceServiceImpl @Autowired constructor(private val sponsoringInvoiceRepository: SponsoringInvoiceRepository) : SponsoringInvoiceService {
 
     @Transactional
     override fun addAdminPaymentToInvoice(admin: Admin, amount: Money, invoice: SponsoringInvoice): SponsoringInvoice {

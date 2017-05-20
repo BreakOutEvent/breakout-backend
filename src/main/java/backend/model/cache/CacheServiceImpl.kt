@@ -5,14 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class CacheServiceImpl : CacheService {
-
-    private val cacheRepository: CacheRepository
-
-    @Autowired
-    constructor(cacheRepository: CacheRepository) {
-        this.cacheRepository = cacheRepository
-    }
+class CacheServiceImpl @Autowired constructor(private val cacheRepository: CacheRepository) : CacheService {
 
     override fun updateCache(key: String, data: Any) {
         val cache = cacheRepository.findOneByCacheKey(key)

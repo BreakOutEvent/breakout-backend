@@ -199,7 +199,7 @@ class TeamController(private val teamService: TeamService,
     @GetMapping("/")
     fun showTeamsByEvent(@PathVariable eventId: Long): Iterable<TeamView> {
         val teams = teamService.findByEventId(eventId)
-        return teams.map (::TeamView)
+        return teams.map(::TeamView)
     }
 
     /**

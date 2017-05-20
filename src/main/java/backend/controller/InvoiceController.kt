@@ -31,13 +31,8 @@ class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
                         private val teamService: TeamService,
                         private val configurationService: ConfigurationService) {
 
-    private val logger: Logger
-    private val PAYMENT_AUTH_TOKEN: String
-
-    init {
-        this.logger = LoggerFactory.getLogger(InvoiceController::class.java)
-        this.PAYMENT_AUTH_TOKEN = configurationService.getRequired("org.breakout.api.payment_auth_token")
-    }
+    private val logger: Logger = LoggerFactory.getLogger(InvoiceController::class.java)
+    private val PAYMENT_AUTH_TOKEN: String = configurationService.getRequired("org.breakout.api.payment_auth_token")
 
     /**
      * POST /invoice/{id}/payment/

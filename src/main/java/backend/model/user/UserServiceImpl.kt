@@ -10,18 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class UserServiceImpl : UserService {
+class UserServiceImpl @Autowired constructor(private val userRepository: UserRepository,
+                                             private val mailService: MailService,
+                                             configurationService: ConfigurationService) : UserService {
 
-    private val userRepository: UserRepository
-    private val mailService: MailService
-    private val host: String
-
-    @Autowired
-    constructor(userRepository: UserRepository, mailService: MailService, configurationService: ConfigurationService) {
-        this.userRepository = userRepository
-        this.mailService = mailService
-        this.host = configurationService.getRequired("org.breakout.api.host")
-    }
+    private val host: String = configurationService.getRequired("org.breakout.api.host")
 
     override fun getUserFromCustomUserDetails(customUserDetails: CustomUserDetails): User {
         val user = userRepository.findOne(customUserDetails.id) ?: throw Exception("User could be authenticated but data was not found")

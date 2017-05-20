@@ -6,7 +6,6 @@ import backend.controller.exceptions.UnauthorizedException
 import backend.model.messaging.GroupMessageService
 import backend.model.messaging.Message
 import backend.model.user.UserService
-import backend.services.NotificationService
 import backend.util.localDateTimeOf
 import backend.view.GroupMessageView
 import backend.view.MessageView

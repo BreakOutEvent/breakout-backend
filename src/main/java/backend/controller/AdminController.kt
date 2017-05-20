@@ -1,7 +1,6 @@
 package backend.controller
 
 import backend.controller.exceptions.NotFoundException
-import backend.model.cache.CacheService
 import backend.model.challenges.Challenge
 import backend.model.challenges.ChallengeService
 import backend.model.challenges.ChallengeStatus

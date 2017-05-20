@@ -4,7 +4,6 @@ import backend.services.ConfigurationService
 import backend.services.mail.MailService
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Matchers
 import org.mockito.Mockito
 import org.mockito.Mockito.*
 

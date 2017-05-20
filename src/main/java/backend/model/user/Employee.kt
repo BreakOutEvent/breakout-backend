@@ -24,8 +24,7 @@ class Employee : UserRole {
      */
     private constructor() : super()
 
-    constructor(account: UserAccount) : super(account) {
-    }
+    constructor(account: UserAccount) : super(account)
 
     override fun getAuthority(): String = "EMPLOYEE"
 }

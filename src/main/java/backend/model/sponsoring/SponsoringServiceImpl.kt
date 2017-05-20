@@ -16,27 +16,13 @@ import java.math.BigDecimal
 import javax.transaction.Transactional
 
 @Service
-class SponsoringServiceImpl : SponsoringService {
+class SponsoringServiceImpl @Autowired constructor(private val sponsoringRepository: SponsoringRepository,
+                                                   private val mailService: MailService,
+                                                   private val teamService: TeamService,
+                                                   private val userService: UserService) : SponsoringService {
 
-    private val sponsoringRepository: SponsoringRepository
-    private val mailService: MailService
-    private val teamService: TeamService
-    private val userService: UserService
-    private val logger: Logger
+    private val logger: Logger = LoggerFactory.getLogger(SponsoringServiceImpl::class.java)
 
-
-    @Autowired
-    constructor(sponsoringRepository: SponsoringRepository,
-                mailService: MailService,
-                teamService: TeamService,
-                userService: UserService) {
-
-        this.sponsoringRepository = sponsoringRepository
-        this.mailService = mailService
-        this.teamService = teamService
-        this.userService = userService
-        this.logger = LoggerFactory.getLogger(SponsoringServiceImpl::class.java)
-    }
 
     @Transactional
     override fun createSponsoring(sponsor: Sponsor, team: Team, amountPerKm: Money, limit: Money): Sponsoring {

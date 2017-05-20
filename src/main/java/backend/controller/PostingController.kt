@@ -3,7 +3,6 @@ package backend.controller
 import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.NotFoundException
 import backend.model.challenges.ChallengeService
-import backend.model.media.MediaService
 import backend.model.misc.Coord
 import backend.model.posting.PostingService
 import backend.model.user.UserService
@@ -15,8 +14,6 @@ import backend.view.LikeView
 import backend.view.LocationView
 import backend.view.posting.PostingResponseView
 import backend.view.posting.PostingView
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -27,12 +24,10 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/posting")
 class PostingController(private val postingService: PostingService,
-                        private val mediaService: MediaService,
                         private val configurationService: ConfigurationService,
                         private val userService: UserService,
                         private val challengeService: ChallengeService) {
 
-    private val logger: Logger = LoggerFactory.getLogger(PostingController::class.java)
     private val JWT_SECRET: String = configurationService.getRequired("org.breakout.api.jwt_secret")
     private val PAGE_SIZE: Int = configurationService.getRequired("org.breakout.api.page_size").toInt()
 
@@ -115,8 +110,8 @@ class PostingController(private val postingService: PostingService,
     fun getAllPostings(@RequestParam(value = "page", required = false) page: Int?,
                        @RequestParam(value = "userid", required = false) userId: Long?,
                        @RequestParam(value = "event", required = false) events: List<Long>?): Iterable<PostingResponseView> {
-        val postings = if(events != null) {
-            postingService.findByEventIds(events, page ?:0 , PAGE_SIZE)
+        val postings = if (events != null) {
+            postingService.findByEventIds(events, page ?: 0, PAGE_SIZE)
         } else {
             postingService.findAll(page ?: 0, PAGE_SIZE)
         }

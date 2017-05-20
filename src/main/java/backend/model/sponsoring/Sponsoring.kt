@@ -7,7 +7,6 @@ import backend.model.media.Media
 import backend.model.media.MediaType.DOCUMENT
 import backend.model.misc.EmailAddress
 import backend.model.payment.Billable
-import backend.model.payment.SponsoringInvoice
 import backend.model.sponsoring.SponsoringStatus.*
 import backend.model.user.Sponsor
 import backend.util.euroOf
@@ -21,7 +20,7 @@ import javax.persistence.CascadeType.PERSIST
 class Sponsoring : BasicEntity, Billable {
 
     @Transient
-    private val logger: Logger
+    private val logger: Logger = LoggerFactory.getLogger(Sponsoring::class.java)
 
     @OneToOne(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
     lateinit var contract: Media
@@ -56,9 +55,7 @@ class Sponsoring : BasicEntity, Billable {
     /**
      * private no-args constructor for JPA / Hibernate
      */
-    private constructor() : super() {
-        this.logger = LoggerFactory.getLogger(Sponsoring::class.java)
-    }
+    private constructor() : super()
 
     constructor(sponsor: Sponsor, team: Team, amountPerKm: Money, limit: Money) : this() {
         this.registeredSponsor = sponsor

@@ -111,7 +111,7 @@ class LastLocation() {
     @Column(name = "last_location_data_value")
     var locationData: MutableMap<String, String> = mutableMapOf()
 
-    constructor(location: Location): this() {
+    constructor(location: Location) : this() {
         this.coord = Coord(location.coord.latitude, location.coord.longitude)
         this.id = location.id
         this.locationData = location.locationData.toMutableMap()
@@ -164,11 +164,11 @@ class LastContactWithHeadquarters() {
 }
 
 
-class TimestampSerializer: StdSerializer<LocalDateTime> {
+class TimestampSerializer : StdSerializer<LocalDateTime> {
 
-    constructor(): super(LocalDateTime::class.java)
+    constructor() : super(LocalDateTime::class.java)
 
-    constructor(clazz: Class<LocalDateTime>): super(clazz)
+    constructor(clazz: Class<LocalDateTime>) : super(clazz)
 
     override fun serialize(value: LocalDateTime, gen: JsonGenerator, provider: SerializerProvider?) {
         val ts = value

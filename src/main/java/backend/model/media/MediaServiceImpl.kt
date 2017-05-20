@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class MediaServiceImpl @Autowired constructor(val repository: MediaRepository, val mediaSizeRepository: MediaSizeRepository) : MediaService {
+class MediaServiceImpl @Autowired constructor(val repository: MediaRepository) : MediaService {
 
     override fun save(media: Media): Media = repository.save(media)
 

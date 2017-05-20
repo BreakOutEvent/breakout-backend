@@ -5,31 +5,20 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import java.io.Serializable
 
-class CustomUserDetails : UserDetails, Serializable {
+class CustomUserDetails(user: User) : UserDetails, Serializable {
 
     companion object {
         private const val serialVersionUid: Long = 1L
     }
 
-    val id: Long
-    private val username: String
-    private val isCredentialsNonExpired: Boolean
-    private val isAccountNonExpired: Boolean
-    private val isAccountNonLocked: Boolean
-    private val authorities: Collection<GrantedAuthority>
-    private val isEnabled: Boolean
-    private val passwordHash: String
-
-    constructor(user: User) {
-        this.id = user.account.id!!
-        this.username = user.email
-        this.isCredentialsNonExpired = true
-        this.isAccountNonExpired = true
-        this.isAccountNonLocked = true
-        this.authorities = user.account.getAuthorities().toMutableList()
-        this.isEnabled = true
-        this.passwordHash = user.passwordHash
-    }
+    val id: Long = user.account.id!!
+    private val username: String = user.email
+    private val isCredentialsNonExpired: Boolean = true
+    private val isAccountNonExpired: Boolean = true
+    private val isAccountNonLocked: Boolean = true
+    private val authorities: Collection<GrantedAuthority> = user.account.getAuthorities().toMutableList()
+    private val isEnabled: Boolean = true
+    private val passwordHash: String = user.passwordHash
 
 
     override fun getUsername() = username

@@ -5,17 +5,11 @@ import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
 @Service
-class MediaSizeServiceImpl : MediaSizeService {
+class MediaSizeServiceImpl @Autowired constructor(mediaSizeRepository: MediaSizeRepository,
+                                                  private val mediaRepository: MediaRepository) : MediaSizeService {
 
 
-    private val repository: MediaSizeRepository
-    private val mediaRepository: MediaRepository
-
-    @Autowired
-    constructor(mediaSizeRepository: MediaSizeRepository, mediaRepository: MediaRepository) {
-        this.repository = mediaSizeRepository
-        this.mediaRepository = mediaRepository
-    }
+    private val repository: MediaSizeRepository = mediaSizeRepository
 
     override fun save(mediaSize: MediaSize): MediaSize = repository.save(mediaSize)
 

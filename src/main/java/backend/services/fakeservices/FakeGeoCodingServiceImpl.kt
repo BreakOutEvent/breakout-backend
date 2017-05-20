@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 
 @Service
-@Profile(DEVELOPMENT, TEST , STAGING)
+@Profile(DEVELOPMENT, TEST, STAGING)
 class FakeGeoCodingServiceImpl @Autowired constructor(configurationService: ConfigurationService) : GeoCodingService by GeoCodingServiceImpl(configurationService) {
 
     val logger: Logger = LoggerFactory.getLogger(FakeGeoCodingServiceImpl::class.java)

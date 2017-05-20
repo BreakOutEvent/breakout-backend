@@ -24,7 +24,7 @@ class TeamControllerV2(val userService: UserService, val teamService: TeamServic
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{teamId}/startingfee")
     fun getInvoiceForTeam(@PathVariable teamId: Long,
-                               @AuthenticationPrincipal customUserDetails: CustomUserDetails): TeamEntryFeeInvoiceView {
+                          @AuthenticationPrincipal customUserDetails: CustomUserDetails): TeamEntryFeeInvoiceView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val team = teamService.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")

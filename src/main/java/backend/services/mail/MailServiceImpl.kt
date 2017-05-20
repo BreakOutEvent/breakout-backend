@@ -16,11 +16,7 @@ import org.springframework.stereotype.Service
 class MailServiceImpl @Autowired constructor(configurationService: ConfigurationService,
                                              private val mailSenderService: MailSenderService) : MailService {
 
-    private val host: String
-
-    init {
-        this.host = configurationService.getRequired("org.breakout.api.host")
-    }
+    private val host: String = configurationService.getRequired("org.breakout.api.host")
 
     override fun send(email: Email, saveToDb: Boolean) {
         this.mailSenderService.send(email, saveToDb)

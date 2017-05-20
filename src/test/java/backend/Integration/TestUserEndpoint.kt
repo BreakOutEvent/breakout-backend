@@ -162,7 +162,7 @@ class TestUserEndpoint : IntegrationTest() {
                 .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to user.profilePic.id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
                 .content(postData)
 
-        val response = mockMvc.perform (request)
+        val response = mockMvc.perform(request)
                 .andExpect(status().isCreated)
                 .andExpect(MockMvcResultMatchers.content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
@@ -181,7 +181,7 @@ class TestUserEndpoint : IntegrationTest() {
                 .request(HttpMethod.GET, "/user/${user.account.id}/")
                 .contentType(MediaType.APPLICATION_JSON)
 
-        val responseMedia = mockMvc.perform (requestMedia)
+        val responseMedia = mockMvc.perform(requestMedia)
                 .andExpect(status().isOk)
                 .andExpect(MockMvcResultMatchers.content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
