@@ -1,6 +1,7 @@
 package backend.view
 
 import backend.model.messaging.GroupMessage
+import backend.view.user.BasicUserView
 import java.util.*
 
 class GroupMessageView() {

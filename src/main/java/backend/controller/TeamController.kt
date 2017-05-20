@@ -17,8 +17,8 @@ import backend.services.ConfigurationService
 import backend.util.data.DonateSums
 import backend.util.getSignedJwtToken
 import backend.view.InvitationView
-import backend.view.PostingView
 import backend.view.TeamView
+import backend.view.posting.PostingView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.CREATED

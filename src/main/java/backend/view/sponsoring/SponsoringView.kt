@@ -1,10 +1,12 @@
-package backend.view
+package backend.view.sponsoring
 
 import backend.model.sponsoring.Sponsoring
+import backend.view.MediaView
+import backend.view.UnregisteredSponsorView
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
-class DetailedSponsoringView() {
+class SponsoringView() {
 
     var id: Long? = null
 
@@ -23,12 +25,6 @@ class DetailedSponsoringView() {
     var sponsorId: Long? = null
 
     var userId: Long? = null
-
-    var firstname: String? = null
-
-    var lastname: String? = null
-
-    var company: String? = null
 
     var status: String? = null
 
@@ -59,10 +55,6 @@ class DetailedSponsoringView() {
             } else {
                 this.userId = sponsoring.sponsor.registeredSponsor?.account?.id
                 this.sponsorId = sponsoring.sponsor.registeredSponsor?.id
-
-                this.firstname = sponsoring.sponsor.firstname
-                this.lastname = sponsoring.sponsor.lastname
-                this.company = sponsoring.sponsor.company
             }
         }
 

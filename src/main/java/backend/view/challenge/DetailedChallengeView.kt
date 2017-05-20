@@ -1,13 +1,13 @@
-package backend.view
+package backend.view.challenge
 
 import backend.model.challenges.Challenge
-import org.hibernate.validator.constraints.SafeHtml
-import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
+import backend.view.MediaView
+import backend.view.UnregisteredSponsorView
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 
-class ChallengeView {
+class DetailedChallengeView {
 
     var id: Long? = null
 
@@ -23,6 +23,12 @@ class ChallengeView {
 
     var userId: Long? = null
 
+    var firstname: String? = null
+
+    var lastname: String? = null
+
+    var company: String? = null
+
     var sponsorIsHidden: Boolean = false
 
     @Valid
@@ -33,7 +39,6 @@ class ChallengeView {
 
     @NotNull
     @Size(max = 1000)
-    @SafeHtml(whitelistType = NONE)
     var description: String? = null
 
     var contract: MediaView? = null
@@ -55,6 +60,7 @@ class ChallengeView {
 
         // Add information about registered sponsor
         // if he exists and isHidden is false
+        // TODO: Make this view "smaller" and refactor by using ISponsor
         challenge.sponsor.registeredSponsor?.isHidden?.let {
             if (it) {
                 this.sponsorIsHidden = true
@@ -62,12 +68,15 @@ class ChallengeView {
             } else {
                 this.userId = challenge.sponsor.registeredSponsor?.account?.id
                 this.sponsorId = challenge.sponsor.registeredSponsor?.id
+                this.firstname = challenge.sponsor.registeredSponsor?.firstname
+                this.lastname = challenge.sponsor.registeredSponsor?.lastname
+                this.company = challenge.sponsor.registeredSponsor?.company
             }
         }
 
         // Add information about unregistered sponsor
         // if he exists and isHidden is false
-        challenge.sponsor?.unregisteredSponsor?.isHidden?.let {
+        challenge.sponsor.unregisteredSponsor?.isHidden?.let {
             if (it) {
                 this.sponsorIsHidden = true
                 this.contract = null

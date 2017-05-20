@@ -1,6 +1,7 @@
 package backend.view
 
 import backend.model.messaging.Message
+import backend.view.user.BasicUserView
 import org.hibernate.validator.constraints.SafeHtml
 import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import java.time.ZoneOffset

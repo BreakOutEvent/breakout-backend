@@ -4,13 +4,11 @@ import backend.configuration.CustomUserDetails
 import backend.model.event.TeamService
 import backend.model.user.UserService
 import backend.view.InvitationView
-import backend.view.UserView
-import org.springframework.beans.factory.annotation.Autowired
+import backend.view.user.UserView
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RestController
 
 @RestController

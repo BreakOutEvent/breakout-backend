@@ -1,6 +1,7 @@
 package backend.view
 
 import backend.model.sponsoring.UnregisteredSponsor
+import backend.view.user.UserView
 import org.hibernate.validator.constraints.Email
 import org.hibernate.validator.constraints.SafeHtml
 import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE

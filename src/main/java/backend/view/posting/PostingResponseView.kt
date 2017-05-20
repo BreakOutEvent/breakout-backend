@@ -1,36 +1,34 @@
-package backend.view
+package backend.view.posting
 
-import backend.model.challenges.Challenge
+import backend.model.challenges.ChallengeProofProjection
 import backend.model.posting.Posting
+import backend.view.CommentView
+import backend.view.MediaView
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
-import org.hibernate.validator.constraints.SafeHtml
-import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
-import java.time.ZoneOffset
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
-class PostingView() {
+
+class PostingResponseView() {
 
     var id: Long? = null
 
-    @Valid
-    @SafeHtml(whitelistType = NONE)
     var text: String? = null
 
     @NotNull
     var date: Long? = null
 
     @Valid
-    var postingLocation: LocationView? = null
+    var postingLocation: PostingLocationView? = null
 
-    var media: List<MediaView>? = null
+    var media: List<backend.view.MediaView>? = null
 
     @JsonInclude(NON_NULL)
     var uploadMediaTypes: List<String>? = null
 
     @Valid
-    var user: BasicUserView? = null
+    var user: PostingUserView? = null
 
     var comments: List<CommentView>? = null
 
@@ -40,19 +38,22 @@ class PostingView() {
 
     var hashtags: List<String> = arrayListOf()
 
-    var proves: ChallengeView? = null
+    var proves: PostingChallengeView? = null
 
-    constructor(posting: Posting, challenge: Challenge?) : this() {
+
+    constructor(posting: Posting, challenge: ChallengeProofProjection?) : this() {
         this.id = posting.id
         this.text = posting.text
         this.hashtags = posting.hashtags.map { it.value }
-        this.date = posting.date.toEpochSecond(ZoneOffset.UTC)
-        this.postingLocation = posting.location?.let(::LocationView)
-        this.user = BasicUserView(posting.user!!.account)
+        this.date = posting.date.toEpochSecond(java.time.ZoneOffset.UTC)
+        this.postingLocation = posting.location?.let(::PostingLocationView)
+        this.user = PostingUserView(posting)
         this.media = posting.media.map(::MediaView)
         this.comments = posting.comments.map(::CommentView)
         this.likes = posting.likes.count()
         this.hasLiked = posting.hasLiked
-        this.proves = challenge?.let(::ChallengeView)
+        this.proves = challenge?.let(::PostingChallengeView)
     }
 }
+
+

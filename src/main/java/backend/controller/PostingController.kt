@@ -10,7 +10,11 @@ import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.util.getSignedJwtToken
 import backend.util.localDateTimeOf
-import backend.view.*
+import backend.view.CommentView
+import backend.view.LikeView
+import backend.view.LocationView
+import backend.view.posting.PostingResponseView
+import backend.view.posting.PostingView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.CREATED

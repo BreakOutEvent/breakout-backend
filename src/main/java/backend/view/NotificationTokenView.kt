@@ -1,3 +1,3 @@
 package backend.view
 
-class NotificationTokenView(var token: String) {}
+class NotificationTokenView(var token: String)

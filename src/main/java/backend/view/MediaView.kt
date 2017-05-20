@@ -2,6 +2,7 @@ package backend.view
 
 import backend.model.media.Media
 import org.hibernate.validator.constraints.SafeHtml
+import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import javax.validation.Valid
 
 class MediaView() {
@@ -9,7 +10,7 @@ class MediaView() {
     var id: Long? = null
 
     @Valid
-    @SafeHtml(whitelistType = SafeHtml.WhiteListType.NONE)
+    @SafeHtml(whitelistType = NONE)
     var type: String? = null
 
     var uploadToken: String? = null

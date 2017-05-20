@@ -10,7 +10,11 @@ import backend.model.misc.Url
 import backend.model.user.*
 import backend.services.ConfigurationService
 import backend.util.getSignedJwtToken
-import backend.view.*
+import backend.view.DetailedInvitationView
+import backend.view.NotificationTokenView
+import backend.view.user.BasicUserView
+import backend.view.user.SimpleUserView
+import backend.view.user.UserView
 import io.swagger.annotations.Api
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -25,16 +29,11 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/user")
 class UserController(private val userService: UserService,
-                          private val teamService: TeamService,
-                          private val configurationService: ConfigurationService) {
+                     private val teamService: TeamService,
+                     configurationService: ConfigurationService) {
 
-    private val JWT_SECRET: String
-    private val logger: Logger
-
-    init {
-        this.logger = LoggerFactory.getLogger(UserController::class.java)
-        this.JWT_SECRET = configurationService.getRequired("org.breakout.api.jwt_secret")
-    }
+    private val JWT_SECRET: String = configurationService.getRequired("org.breakout.api.jwt_secret")
+    private val logger: Logger = LoggerFactory.getLogger(UserController::class.java)
 
     /**
      * POST /user/
@@ -121,8 +120,8 @@ class UserController(private val userService: UserService,
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}/")
     fun updateUser(@PathVariable id: Long,
-                        @Valid @RequestBody body: UserView,
-                        @AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
+                   @Valid @RequestBody body: UserView,
+                   @AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (user.account.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")
@@ -229,8 +228,4 @@ class UserController(private val userService: UserService,
         val invitation = teamService.findInvitationsByInviteCode(token) ?: throw NotFoundException("No invitation for code $token")
         return DetailedInvitationView(invitation)
     }
-}
-
-fun UserView.AddressView.toAddress(): Address? {
-    return Address(this.street!!, this.housenumber!!, this.city!!, this.country!!, this.zipcode!!)
 }

@@ -1,7 +1,7 @@
 package backend.view
 
 import backend.model.posting.Comment
-import backend.model.user.UserAccount
+import backend.view.user.CommentUserView
 import org.hibernate.validator.constraints.SafeHtml
 import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import java.time.ZoneOffset
@@ -30,20 +30,3 @@ class CommentView() {
     }
 }
 
-class CommentUserView() {
-
-    var id: Long? = null
-    var firstname: String? = null
-    var lastname: String? = null
-    var profilePic: MediaView? = null
-
-
-    constructor(user: UserAccount?) : this() {
-        id = user?.id
-        firstname = user?.firstname
-        lastname = user?.lastname
-        profilePic = user?.profilePic?.let {
-            return@let MediaView(it)
-        }
-    }
-}

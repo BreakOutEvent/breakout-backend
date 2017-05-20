@@ -2,6 +2,7 @@ package backend.view
 
 import backend.model.event.Team
 import backend.util.data.DonateSums
+import backend.view.user.BasicUserView
 import org.hibernate.validator.constraints.SafeHtml
 import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import java.util.*

@@ -1,6 +1,7 @@
-package backend.view
+package backend.view.user
 
 import backend.model.user.*
+import backend.view.MediaView
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.validator.constraints.Email
 import org.hibernate.validator.constraints.SafeHtml
@@ -169,6 +170,10 @@ class UserView() {
             this.city = address?.city
             this.country = address?.country
             this.zipcode = address?.zipcode
+        }
+
+        fun toAddress(): Address? {
+            return Address(this.street!!, this.housenumber!!, this.city!!, this.country!!, this.zipcode!!)
         }
     }
 }

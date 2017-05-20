@@ -1,6 +1,8 @@
-package backend.view
+package backend.view.sponsoring
 
 import backend.model.payment.SponsoringInvoice
+import backend.view.PaymentView
+import backend.view.challenge.DetailedChallengeView
 
 class SponsoringInvoiceView {
 

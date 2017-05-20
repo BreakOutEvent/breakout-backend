@@ -2,6 +2,7 @@ package backend.view
 
 import backend.model.event.Team
 import backend.model.location.Location
+import backend.view.user.BasicUserView
 import java.util.*
 
 class TeamLocationView {

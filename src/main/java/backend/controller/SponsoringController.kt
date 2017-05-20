@@ -1,7 +1,6 @@
 package backend.controller
 
 import backend.configuration.CustomUserDetails
-import backend.controller.ChallengeController.SponsorTeamProfileView
 import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
@@ -15,8 +14,10 @@ import backend.model.user.Sponsor
 import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.util.getSignedJwtToken
-import backend.view.SponsoringView
+import backend.view.SponsorTeamProfileView
 import backend.view.UnregisteredSponsorView
+import backend.view.sponsoring.SponsoringTeamProfileView
+import backend.view.sponsoring.SponsoringView
 import org.javamoney.moneta.Money
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
@@ -167,17 +168,24 @@ class SponsoringController(private var sponsoringService: SponsoringService,
     @GetMapping("/team/{teamId}/sponsoring/")
     fun getAllSponsoringsForTeamOverview(@PathVariable teamId: Long): Iterable<SponsoringTeamProfileView> {
         return sponsoringService.findByTeamId(teamId).map {
-            val sponsor = SponsorTeamProfileView(
-                    it.sponsor.firstname ?: "",
-                    it.sponsor.lastname ?: "",
-                    it.sponsor.company,
-                    it.sponsor.url)
+            val sponsor = when (it.sponsor.isHidden) {
+                true -> SponsorTeamProfileView(
+                        firstname = "",
+                        lastname = "",
+                        company = null,
+                        sponsorIsHidden = it.sponsor.isHidden,
+                        url = null)
+                false -> SponsorTeamProfileView(
+                        firstname = it.sponsor.firstname ?: "",
+                        lastname = it.sponsor.lastname ?: "",
+                        company = it.sponsor.company,
+                        sponsorIsHidden = it.sponsor.isHidden,
+                        url = it.sponsor.url)
+            }
+
             SponsoringTeamProfileView(sponsor, it.status.toString())
         }
     }
 
-    class SponsoringTeamProfileView(
-            val sponsor: SponsorTeamProfileView,
-            val status: String)
 }
 

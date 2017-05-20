@@ -1,6 +1,7 @@
 package backend.view
 
 import backend.model.posting.Like
+import backend.view.user.BasicUserView
 import java.time.ZoneOffset
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
