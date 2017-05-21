@@ -16,6 +16,7 @@ import backend.view.LocationView
 import backend.view.TeamLocationView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -78,6 +79,7 @@ class LocationController(private val locationService: LocationService,
      * POST /event/{eventId}/team/{teamId}/location/
      * Upload a new location for a specific team at a specific event
      */
+    @CacheEvict("postings")
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/team/{teamId}/location/")
     @ResponseStatus(CREATED)
@@ -101,6 +103,7 @@ class LocationController(private val locationService: LocationService,
      * POST /event/{eventId}/team/{teamId}/location/multiple/
      * Upload multiple new locations for a specific team at a specific event
      */
+    @CacheEvict("postings")
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/team/{teamId}/location/multiple/")
     @ResponseStatus(CREATED)

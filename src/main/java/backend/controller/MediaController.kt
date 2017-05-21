@@ -6,6 +6,8 @@ import backend.model.media.MediaSizeService
 import backend.services.ConfigurationService
 import backend.util.verifyJwtClaim
 import backend.view.MediaSizeView
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -27,6 +29,7 @@ class MediaController(private val mediaSizeService: MediaSizeService,
      * POST /media/{id}/
      * Adds single MediaSize to Media
      */
+    @CacheEvict("postings")
     @PostMapping("/{id}/")
     @ResponseStatus(CREATED)
     fun createMediaSize(@PathVariable("id") id: Long,
@@ -44,6 +47,7 @@ class MediaController(private val mediaSizeService: MediaSizeService,
      * DELETE /media/{id}/
      * Allows Admin to delete all mediaSizes for media
      */
+    @CacheEvict("postings")
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping("/{id}/", method = arrayOf(RequestMethod.DELETE))
     fun adminDeletePosting(@PathVariable("id") id: Long): Map<String, String> {

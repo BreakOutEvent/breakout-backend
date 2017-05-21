@@ -21,6 +21,7 @@ import backend.view.TeamView
 import backend.view.posting.PostingView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -44,6 +45,7 @@ class TeamController(private val teamService: TeamService,
      * POST /event/{eventId}/team/leave/
      * The currently authenticated user can leave it's team at this endpoint
      */
+    @CacheEvict("postings")
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/leave/")
     fun leaveTeam(@AuthenticationPrincipal customUserDetails: CustomUserDetails): Map<String, String> {
@@ -95,6 +97,7 @@ class TeamController(private val teamService: TeamService,
      * PUT /event/{id}/team/{teamId}/
      * allows teammembers to edit teamname and description
      */
+    @CacheEvict("postings")
     @PutMapping("/{teamId}/")
     @PreAuthorize("isAuthenticated()")
     fun editTeam(@PathVariable eventId: Long,
@@ -157,6 +160,7 @@ class TeamController(private val teamService: TeamService,
      * POST /event/{eventId}/team/{teamId}/member/
      * allows user with Invitation to join Team
      */
+    @CacheEvict("postings")
     @ResponseStatus(CREATED)
     @PostMapping("/{teamId}/member/")
     @PreAuthorize("isAuthenticated()")
