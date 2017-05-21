@@ -8,6 +8,7 @@ import backend.model.misc.Coord
 import backend.model.posting.PostingService
 import backend.model.user.UserService
 import backend.services.ConfigurationService
+import backend.util.CacheNames.POSTINGS
 import backend.util.getSignedJwtToken
 import backend.util.localDateTimeOf
 import backend.view.*
@@ -39,7 +40,7 @@ class PostingController(private val postingService: PostingService,
      * POST /posting/
      * Creates new posting
      */
-    @CacheEvict("postings")
+    @CacheEvict(value = POSTINGS, allEntries = true)
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/")
     @ResponseStatus(CREATED)
@@ -79,7 +80,7 @@ class PostingController(private val postingService: PostingService,
      * DELETE /posting/{id}/
      * Allows Admin to delete Posting
      */
-    @CacheEvict("postings")
+    @CacheEvict(value = POSTINGS, allEntries = true)
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping("/{id}/", method = arrayOf(DELETE))
     fun adminDeletePosting(@PathVariable("id") id: Long): Map<String, String> {
@@ -95,7 +96,7 @@ class PostingController(private val postingService: PostingService,
      * DELETE /posting/{id}/comment/{commentId}/
      * Allows Admin to delete Comment
      */
-    @CacheEvict("postings")
+    @CacheEvict(value = POSTINGS, allEntries = true)
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping("/{id}/comment/{commentId}/", method = arrayOf(DELETE))
     fun adminDeleteComment(@PathVariable("id") postingId: Long,
@@ -134,7 +135,7 @@ class PostingController(private val postingService: PostingService,
      * POST /posting/{id}/comment/
      * creates Comment for Posting
      */
-    @CacheEvict("postings")
+    @CacheEvict(value = POSTINGS, allEntries = true)
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/comment/")
     @ResponseStatus(CREATED)
@@ -159,7 +160,7 @@ class PostingController(private val postingService: PostingService,
      * POST /posting/{id}/like/
      * creates Like for Posting
      */
-    @CacheEvict("postings")
+    @CacheEvict(value = POSTINGS, allEntries = true)
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/like/")
     @ResponseStatus(CREATED)
@@ -179,7 +180,7 @@ class PostingController(private val postingService: PostingService,
      * DELETE /posting/{id}/like/
      * creates Like for Posting
      */
-    @CacheEvict("postings")
+    @CacheEvict(value = POSTINGS, allEntries = true)
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/{id}/like/", method = arrayOf(DELETE))
     fun deleteLike(@PathVariable("id") id: Long,
@@ -218,4 +219,5 @@ class PostingController(private val postingService: PostingService,
             })
         }
     }
+
 }

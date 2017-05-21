@@ -9,12 +9,15 @@ import backend.model.event.TeamService
 import backend.model.misc.Url
 import backend.model.user.*
 import backend.services.ConfigurationService
+import backend.util.CacheNames.POSTINGS
+import backend.util.CacheNames.TEAMS
 import backend.util.getSignedJwtToken
 import backend.view.*
 import io.swagger.annotations.Api
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Caching
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -119,7 +122,7 @@ class UserController(private val userService: UserService,
      * PUT /user/{id}/
      * Edits user with given id
      */
-    @CacheEvict("postings")
+    @Caching(evict = arrayOf(CacheEvict(POSTINGS, allEntries = true), CacheEvict(TEAMS, allEntries = true)))
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}/")
     fun updateUser(@PathVariable id: Long,

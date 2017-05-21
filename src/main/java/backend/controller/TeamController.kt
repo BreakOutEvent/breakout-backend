@@ -14,6 +14,8 @@ import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserService
 import backend.services.ConfigurationService
+import backend.util.CacheNames.POSTINGS
+import backend.util.CacheNames.TEAMS
 import backend.util.data.DonateSums
 import backend.util.getSignedJwtToken
 import backend.view.InvitationView
@@ -22,6 +24,8 @@ import backend.view.TeamView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
+import org.springframework.cache.annotation.Caching
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -45,7 +49,7 @@ class TeamController(private val teamService: TeamService,
      * POST /event/{eventId}/team/leave/
      * The currently authenticated user can leave it's team at this endpoint
      */
-    @CacheEvict("postings")
+    @Caching(evict = arrayOf(CacheEvict(POSTINGS, allEntries = true), CacheEvict(TEAMS, allEntries = true)))
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/leave/")
     fun leaveTeam(@AuthenticationPrincipal customUserDetails: CustomUserDetails): Map<String, String> {
@@ -73,6 +77,7 @@ class TeamController(private val teamService: TeamService,
      * POST /event/{id}/team/
      * creates a new Team, with creator as first member
      */
+    @CacheEvict(TEAMS, allEntries = true)
     @ResponseStatus(CREATED)
     @PostMapping("/")
     @PreAuthorize("isAuthenticated()")
@@ -97,7 +102,7 @@ class TeamController(private val teamService: TeamService,
      * PUT /event/{id}/team/{teamId}/
      * allows teammembers to edit teamname and description
      */
-    @CacheEvict("postings")
+    @Caching(evict = arrayOf(CacheEvict(POSTINGS, allEntries = true), CacheEvict(TEAMS, allEntries = true)))
     @PutMapping("/{teamId}/")
     @PreAuthorize("isAuthenticated()")
     fun editTeam(@PathVariable eventId: Long,
@@ -160,7 +165,7 @@ class TeamController(private val teamService: TeamService,
      * POST /event/{eventId}/team/{teamId}/member/
      * allows user with Invitation to join Team
      */
-    @CacheEvict("postings")
+    @Caching(evict = arrayOf(CacheEvict(POSTINGS, allEntries = true), CacheEvict(TEAMS, allEntries = true)))
     @ResponseStatus(CREATED)
     @PostMapping("/{teamId}/member/")
     @PreAuthorize("isAuthenticated()")
@@ -200,6 +205,7 @@ class TeamController(private val teamService: TeamService,
      * GET /event/{eventId}/team/
      * gets all Teams for Event
      */
+    @Cacheable(TEAMS)
     @GetMapping("/")
     fun showTeamsByEvent(@PathVariable eventId: Long): Iterable<TeamView> {
         val teams = teamService.findByEventId(eventId)

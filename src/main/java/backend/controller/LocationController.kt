@@ -3,13 +3,13 @@ package backend.controller
 import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
-import backend.model.event.EventService
 import backend.model.event.TeamService
 import backend.model.location.Location
 import backend.model.location.LocationService
 import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.model.user.UserService
+import backend.util.CacheNames.POSTINGS
 import backend.util.localDateTimeOf
 import backend.util.speedToLocation
 import backend.view.BasicLocationView
@@ -22,8 +22,6 @@ import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestMethod.GET
-import org.springframework.web.bind.annotation.RequestMethod.POST
 import javax.validation.Valid
 
 @RestController
@@ -82,7 +80,7 @@ class LocationController(private val locationService: LocationService,
      * POST /event/{eventId}/team/{teamId}/location/
      * Upload a new location for a specific team at a specific event
      */
-    @CacheEvict("postings")
+    @CacheEvict(value = POSTINGS, allEntries = true)
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/team/{teamId}/location/")
     @ResponseStatus(CREATED)
@@ -106,7 +104,7 @@ class LocationController(private val locationService: LocationService,
      * POST /event/{eventId}/team/{teamId}/location/multiple/
      * Upload multiple new locations for a specific team at a specific event
      */
-    @CacheEvict("postings")
+    @CacheEvict(value = POSTINGS, allEntries = true)
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/team/{teamId}/location/multiple/")
     @ResponseStatus(CREATED)
