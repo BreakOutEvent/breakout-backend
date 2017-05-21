@@ -86,8 +86,8 @@ class SponsoringInvoice : Invoice {
 
     // TODO: Add unit test, so that only those with this specific event are added!
     constructor(sponsor: ISponsor, eventId: Long) : super(sponsor.challenges.billableAmount().add(sponsor.sponsorings.billableAmount())) {
-        this.challenges = sponsor.challenges.toMutableList().filter { it.team!!.event.id == eventId}
-        this.sponsorings = sponsor.sponsorings.toMutableList().filter { it.team!!.event.id == eventId}
+        this.challenges = sponsor.challenges.toMutableList().filter { it.belongsToEvent(eventId) }
+        this.sponsorings = sponsor.sponsorings.toMutableList().filter { it.belongsToEvent(eventId)}
         print(sponsor.company)
         this.sponsor = sponsor
     }

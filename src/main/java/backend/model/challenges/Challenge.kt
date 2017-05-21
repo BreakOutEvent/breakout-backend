@@ -188,5 +188,9 @@ class Challenge : BasicEntity, Billable {
             PROOF_REJECTED -> euroOf(0.0)
         }
     }
+
+    fun belongsToEvent(eventId: Long): Boolean {
+        return this.team?.event?.id == eventId
+    }
 }
 

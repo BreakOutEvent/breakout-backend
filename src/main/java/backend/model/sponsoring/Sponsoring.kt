@@ -156,4 +156,8 @@ class Sponsoring : BasicEntity, Billable {
             return limit
         }
     }
+
+    fun belongsToEvent(eventId: Long): Boolean {
+        return this.team?.event?.id == eventId
+    }
 }

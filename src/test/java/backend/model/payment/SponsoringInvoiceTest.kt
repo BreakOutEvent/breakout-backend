@@ -30,10 +30,19 @@ class SponsoringInvoiceTest {
         val sponsorings = mutableListOf(sponsoring1, sponsoring2, sponsoring3)
         val sponsor = mock(Sponsor::class.java)
 
+        `when`(sponsoring1.billableAmount()).thenReturn(euroOf(1))
+        `when`(sponsoring2.billableAmount()).thenReturn(euroOf(2))
+        `when`(sponsoring3.billableAmount()).thenReturn(euroOf(3))
+
+        `when`(sponsoring1.belongsToEvent(1)).thenReturn(true)
+        `when`(sponsoring2.belongsToEvent(1)).thenReturn(true)
+        `when`(sponsoring3.belongsToEvent(1)).thenReturn(true)
+
         `when`(sponsor.sponsorings).thenReturn(sponsorings)
+        `when`(sponsor.challenges).thenReturn(mutableListOf<Challenge>())
 
         // when creating the invoice for this sponsor
-        val invoice = SponsoringInvoice(sponsor)
+        val invoice = SponsoringInvoice(sponsor, eventId = 1)
 
         // then it has exactly those 3 sponsorings
         assertEquals(sponsorings, invoice.sponsorings)
@@ -46,13 +55,20 @@ class SponsoringInvoiceTest {
         // given a sponsor with 2 challenges
         val challenge1 = mock(Challenge::class.java)
         val challenge2 = mock(Challenge::class.java)
+
+        `when`(challenge1.billableAmount()).thenReturn(euroOf(1))
+        `when`(challenge2.billableAmount()).thenReturn(euroOf(1))
+
+        `when`(challenge1.belongsToEvent(1)).thenReturn(true)
+        `when`(challenge2.belongsToEvent(1)).thenReturn(true)
+
         val challenges = mutableListOf(challenge1, challenge2)
         val sponsor = mock(Sponsor::class.java)
 
         `when`(sponsor.challenges).thenReturn(challenges)
 
         // when creating this invoice
-        val invoice = SponsoringInvoice(sponsor)
+        val invoice = SponsoringInvoice(sponsor, eventId = 1)
 
         // then it contains exactly those two challenges
         assertEquals(challenges, invoice.challenges)
@@ -61,14 +77,14 @@ class SponsoringInvoiceTest {
     @Test
     fun getSponsorRegistered() {
         val sponsor = mock(Sponsor::class.java)
-        val invoice = SponsoringInvoice(sponsor)
+        val invoice = SponsoringInvoice(sponsor, eventId = 1)
         assertTrue(invoice.sponsor is Sponsor)
     }
 
     @Test
     fun getSponsorUnregistered() {
         val sponsor = mock(UnregisteredSponsor::class.java)
-        val invoice = SponsoringInvoice(sponsor)
+        val invoice = SponsoringInvoice(sponsor, eventId = 1)
         assertTrue(invoice.sponsor is UnregisteredSponsor)
     }
 
@@ -93,6 +109,12 @@ class SponsoringInvoiceTest {
         `when`(sponsor.challenges).thenReturn(mutableListOf(firstChallenge, secondChallenge))
         `when`(sponsor.sponsorings).thenReturn(mutableListOf(firstSponsoring, secondSponsoring))
 
+        `when`(firstChallenge.belongsToEvent(1)).thenReturn(true)
+        `when`(secondChallenge.belongsToEvent(1)).thenReturn(true)
+
+        `when`(firstSponsoring.belongsToEvent(1)).thenReturn(true)
+        `when`(secondSponsoring.belongsToEvent(1)).thenReturn(true)
+
         `when`(firstChallenge.amount).thenReturn(euroOf(10))
         `when`(firstChallenge.description).thenReturn("a potentially very long text a potentially very long texta potentially very long texta potentially very long texta potentially very long texta potentially very long texta potentially very long texta potentially very long texta potentially very long texta potentially very long texta potentially very long text")
         `when`(firstChallenge.status).thenReturn(ChallengeStatus.WITH_PROOF)
@@ -112,7 +134,7 @@ class SponsoringInvoiceTest {
         `when`(secondSponsoring.limit).thenReturn(euroOf(100))
         `when`(secondSponsoring.billableAmount()).thenReturn(euroOf(28.70))
 
-        val invoice = SponsoringInvoice(sponsor)
+        val invoice = SponsoringInvoice(sponsor, 1)
 
         assertEquals("""
         <b>Challenges</b><br/>
