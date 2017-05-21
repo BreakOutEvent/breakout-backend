@@ -2,6 +2,7 @@ package backend.model.payment
 
 import backend.exceptions.DomainException
 import backend.model.challenges.Challenge
+import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.Sponsoring
@@ -21,10 +22,10 @@ class SponsoringInvoice : Invoice {
     var challenges: List<Challenge> = listOf()
         private set
 
-    @OneToOne
+    @ManyToOne
     private var unregisteredSponsor: UnregisteredSponsor? = null
 
-    @OneToOne
+    @ManyToOne
     private var registeredSponsor: Sponsor? = null
 
     var sponsor: ISponsor
@@ -83,9 +84,11 @@ class SponsoringInvoice : Invoice {
      * End deprecated properties
      */
 
-    constructor(sponsor: ISponsor) : super(sponsor.challenges.billableAmount().add(sponsor.sponsorings.billableAmount())) {
-        this.challenges = sponsor.challenges
-        this.sponsorings = sponsor.sponsorings
+    // TODO: Add unit test, so that only those with this specific event are added!
+    constructor(sponsor: ISponsor, eventId: Long) : super(sponsor.challenges.billableAmount().add(sponsor.sponsorings.billableAmount())) {
+        this.challenges = sponsor.challenges.toMutableList().filter { it.team!!.event.id == eventId}
+        this.sponsorings = sponsor.sponsorings.toMutableList().filter { it.team!!.event.id == eventId}
+        print(sponsor.company)
         this.sponsor = sponsor
     }
 

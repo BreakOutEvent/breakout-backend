@@ -1,16 +1,20 @@
 package backend.model.payment
 
 import backend.model.challenges.Challenge
+import backend.model.challenges.ChallengeService
 import backend.model.event.Team
+import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.Sponsoring
+import backend.model.sponsoring.SponsoringService
 import backend.model.user.Admin
 import org.javamoney.moneta.Money
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
 @Service
-class SponsoringInvoiceServiceImpl(
-        private val sponsoringInvoiceRepository: SponsoringInvoiceRepository) : SponsoringInvoiceService {
+class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: SponsoringInvoiceRepository,
+                                   private val challengeService: ChallengeService,
+                                   private val sponsoringService: SponsoringService) : SponsoringInvoiceService {
 
     @Transactional
     override fun addAdminPaymentToInvoice(admin: Admin, amount: Money, invoice: SponsoringInvoice): SponsoringInvoice {
@@ -62,6 +66,31 @@ class SponsoringInvoiceServiceImpl(
 
     override fun findByPurposeOfTransferCode(purposeOfTransferCode: String): SponsoringInvoice? {
         return sponsoringInvoiceRepository.findByPurposeOfTransferCode(purposeOfTransferCode)
+    }
+
+
+    override fun createInvoicesForEvent(eventId: Long): Int {
+        val sponsors = this.findAllSponsorsAtEvent(eventId)
+        return sponsors.map { SponsoringInvoice(it, eventId) }.map { this.save(it) }.count()
+    }
+
+    private fun findAllSponsorsAtEvent(eventId: Long): Iterable<ISponsor> {
+
+        val registeredFromChallenges = challengeService.findAllRegisteredSponsorsWithChallengesAtEvent(eventId)
+        val unregisteredFromChallenges = challengeService.findAllUnregisteredSponsorsWithChallengesAtEvent(eventId)
+
+        val registeredFromSponsorings = sponsoringService.findAllRegisteredSponsorsWithSponsoringAtEvent(eventId)
+        val unregisteredFromSponsorings = sponsoringService.findAllUnregisteredSponsorsWithSponsoringAtEvent(eventId)
+
+        val set = mutableSetOf<ISponsor>()
+
+        set.addAll(registeredFromSponsorings)
+        set.addAll(unregisteredFromSponsorings)
+
+        set.addAll(registeredFromChallenges)
+        set.addAll(unregisteredFromChallenges)
+
+        return set
     }
 
 }

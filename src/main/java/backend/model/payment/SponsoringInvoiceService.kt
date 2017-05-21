@@ -26,6 +26,8 @@ interface SponsoringInvoiceService {
     @Deprecated("Legacy method used for previous versions, where SponsoringInvoices where generated on a per team basis")
     fun createInvoice(team: Team, amount: Money, company: String, firstname: String, lastname: String): SponsoringInvoice
 
-    fun addSepaPaymentToInvoice(admin: Admin, fidorId: Long, amount: Money, invoice: SponsoringInvoice): SponsoringInvoice
+    fun createInvoicesForEvent(eventId: Long): Int
+
+    fun addSepaPaymentToInvoice(admin: Admin,fidorId: Long, amount: Money, invoice: SponsoringInvoice): SponsoringInvoice
 
 }
