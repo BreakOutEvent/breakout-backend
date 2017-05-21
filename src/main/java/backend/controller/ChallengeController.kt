@@ -21,6 +21,7 @@ import backend.view.ChallengeStatusView
 import backend.view.ChallengeView
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import org.javamoney.moneta.Money
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -60,6 +61,7 @@ class ChallengeController(private var challengeService: ChallengeService,
      * Propose a challenge to a team. This can only be done
      * when being a sponsor or when providing data for an unregistered sponsor
      */
+    @CacheEvict("postings")
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/event/{eventId}/team/{teamId}/challenge/")
     @ResponseStatus(CREATED)
@@ -110,6 +112,7 @@ class ChallengeController(private var challengeService: ChallengeService,
      * PUT /event/{eventId}/team/{teamId}/challenge/{challengeId}/status/
      * Accept, reject or add proof to a challenge
      */
+    @CacheEvict("postings")
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/event/{eventId}/team/{teamId}/challenge/{challengeId}/status/")
     fun changeStatus(@PathVariable challengeId: Long,
