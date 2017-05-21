@@ -13,6 +13,7 @@ import backend.model.user.Sponsor
 import backend.model.user.User
 import backend.model.user.UserService
 import backend.services.ConfigurationService
+import backend.util.CacheNames.POSTINGS
 import backend.util.euroOf
 import backend.view.SponsorTeamProfileView
 import backend.view.challenge.ChallengeStatusView
@@ -59,7 +60,7 @@ class ChallengeController(private var challengeService: ChallengeService,
      * Propose a challenge to a team. This can only be done
      * when being a sponsor or when providing data for an unregistered sponsor
      */
-    @CacheEvict("postings")
+    @CacheEvict(value = POSTINGS, allEntries = true)
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/event/{eventId}/team/{teamId}/challenge/")
     @ResponseStatus(CREATED)
@@ -110,7 +111,7 @@ class ChallengeController(private var challengeService: ChallengeService,
      * PUT /event/{eventId}/team/{teamId}/challenge/{challengeId}/status/
      * Accept, reject or add proof to a challenge
      */
-    @CacheEvict("postings")
+    @CacheEvict(value = POSTINGS, allEntries = true)
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/event/{eventId}/team/{teamId}/challenge/{challengeId}/status/")
     fun changeStatus(@PathVariable challengeId: Long,
