@@ -28,5 +28,9 @@ interface SponsoringService {
     fun sendEmailsToSponsorsWhenEventHasStarted()
 
     fun sendEmailsToSponsorsWhenEventHasEnded()
+
+    fun findAllRegisteredSponsorsWithSponsoringAtEvent(eventId: Long): Iterable<Sponsor>
+
+    fun findAllUnregisteredSponsorsWithSponsoringAtEvent(eventId: Long): Iterable<UnregisteredSponsor>
 }
 

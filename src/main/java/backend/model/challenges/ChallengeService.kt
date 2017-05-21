@@ -40,5 +40,9 @@ interface ChallengeService {
     fun findBySponsorId(userId: Long): Iterable<Challenge>
 
     fun findChallengeProveProjectionById(challengeId: Long): ChallengeProofProjection
+
+    fun findAllRegisteredSponsorsWithChallengesAtEvent(eventId: Long): Iterable<Sponsor>
+
+    fun findAllUnregisteredSponsorsWithChallengesAtEvent(eventId: Long): Iterable<UnregisteredSponsor>
 }
 

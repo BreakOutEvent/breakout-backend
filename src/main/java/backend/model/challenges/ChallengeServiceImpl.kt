@@ -18,6 +18,14 @@ class ChallengeServiceImpl @Autowired constructor(
         private val mailService: MailService,
         private val featureFlagService: FeatureFlagService) : ChallengeService {
 
+    override fun findAllRegisteredSponsorsWithChallengesAtEvent(eventId: Long): Iterable<Sponsor> {
+        return this.challengeRepository.findAllRegisteredSponsorsWithChallengesAtEvent(eventId)
+    }
+
+    override fun findAllUnregisteredSponsorsWithChallengesAtEvent(eventId: Long): Iterable<UnregisteredSponsor> {
+        return this.challengeRepository.findAllUnregisteredSponsorsWithChallengesAtEvent(eventId)
+    }
+
     @Transactional
     override fun accept(challenge: Challenge): Challenge {
         challenge.accept()

@@ -10,6 +10,8 @@ import backend.services.mail.MailService
 import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.data.repository.CrudRepository
+import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import javax.transaction.Transactional
@@ -19,6 +21,14 @@ class SponsoringServiceImpl(private val sponsoringRepository: SponsoringReposito
                             private val mailService: MailService,
                             private val teamService: TeamService,
                             private val userService: UserService) : SponsoringService {
+
+    override fun findAllRegisteredSponsorsWithSponsoringAtEvent(eventId: Long): Iterable<Sponsor> {
+        return sponsoringRepository.findAllRegisteredSponsorsWithSponsoringsAtEvent(eventId)
+    }
+
+    override fun findAllUnregisteredSponsorsWithSponsoringAtEvent(eventId: Long): Iterable<UnregisteredSponsor> {
+        return sponsoringRepository.findAllUnregisteredSponsorsWithSponsoringsAtEvent(eventId)
+    }
 
     private val logger: Logger = LoggerFactory.getLogger(SponsoringServiceImpl::class.java)
 
