@@ -205,9 +205,10 @@ class TeamController(private val teamService: TeamService,
      * GET /event/{eventId}/team/
      * gets all Teams for Event
      */
-    @Cacheable(TEAMS)
+    @Cacheable(TEAMS, sync = true)
     @GetMapping("/")
     fun showTeamsByEvent(@PathVariable eventId: Long): Iterable<TeamView> {
+        logger.info("Cache miss on /event/$eventId/team/")
         val teams = teamService.findByEventId(eventId)
         return teams.map(::TeamView)
     }
