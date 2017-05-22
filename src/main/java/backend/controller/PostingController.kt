@@ -7,6 +7,7 @@ import backend.model.misc.Coord
 import backend.model.posting.PostingService
 import backend.model.user.UserService
 import backend.services.ConfigurationService
+import backend.util.CacheNames
 import backend.util.CacheNames.POSTINGS
 import backend.util.getSignedJwtToken
 import backend.util.localDateTimeOf
@@ -112,13 +113,16 @@ class PostingController(private val postingService: PostingService,
      * GET /posting/
      * Gets all postings
      */
-    @Cacheable("postings")
+    @Cacheable(POSTINGS, sync = true)
     @GetMapping("/")
     fun getAllPostings(@RequestParam(value = "page", required = false) page: Int?,
                        @RequestParam(value = "userid", required = false) userId: Long?,
                        @RequestParam(value = "event", required = false) events: List<Long>?): Iterable<PostingResponseView> {
-        val postings = if (events != null) {
-            postingService.findByEventIds(events, page ?: 0, PAGE_SIZE)
+
+        logger.info("Cache miss on /posting for page $page userId $userId events $events")
+
+        val postings = if(events != null) {
+            postingService.findByEventIds(events, page ?:0 , PAGE_SIZE)
         } else {
             postingService.findAll(page ?: 0, PAGE_SIZE)
         }
