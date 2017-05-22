@@ -14,6 +14,8 @@ import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserService
 import backend.services.ConfigurationService
+import backend.util.CacheNames
+import backend.util.CacheNames.LOCATIONS
 import backend.util.CacheNames.POSTINGS
 import backend.util.CacheNames.TEAMS
 import backend.util.data.DonateSums
@@ -77,7 +79,9 @@ class TeamController(private val teamService: TeamService,
      * POST /event/{id}/team/
      * creates a new Team, with creator as first member
      */
-    @CacheEvict(TEAMS, allEntries = true)
+    @Caching(evict = arrayOf(
+            CacheEvict(TEAMS, allEntries = true),
+            CacheEvict(LOCATIONS, allEntries = true)))
     @ResponseStatus(CREATED)
     @PostMapping("/")
     @PreAuthorize("isAuthenticated()")

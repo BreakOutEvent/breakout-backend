@@ -9,6 +9,7 @@ import backend.model.location.LocationService
 import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.model.user.UserService
+import backend.util.CacheNames.LOCATIONS
 import backend.util.CacheNames.POSTINGS
 import backend.util.localDateTimeOf
 import backend.util.speedToLocation
@@ -18,6 +19,8 @@ import backend.view.TeamLocationView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
+import org.springframework.cache.annotation.Caching
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -37,6 +40,7 @@ class LocationController(private val locationService: LocationService,
      * GET /event/{eventId}/location/
      * Return a list of all locations for a specific event
      */
+    @Cacheable(LOCATIONS, sync = true)
     @GetMapping("/location/")
     fun getAllLocationsForEvent(@PathVariable eventId: Long,
                                 @RequestParam(value = "perTeam", required = false) perTeam: Int?): Iterable<TeamLocationView> {
@@ -80,7 +84,7 @@ class LocationController(private val locationService: LocationService,
      * POST /event/{eventId}/team/{teamId}/location/
      * Upload a new location for a specific team at a specific event
      */
-    @CacheEvict(value = POSTINGS, allEntries = true)
+    @Caching(evict = arrayOf(CacheEvict(POSTINGS, allEntries = true), CacheEvict(LOCATIONS, allEntries = true)))
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/team/{teamId}/location/")
     @ResponseStatus(CREATED)
@@ -104,7 +108,7 @@ class LocationController(private val locationService: LocationService,
      * POST /event/{eventId}/team/{teamId}/location/multiple/
      * Upload multiple new locations for a specific team at a specific event
      */
-    @CacheEvict(value = POSTINGS, allEntries = true)
+    @Caching(evict = arrayOf(CacheEvict(POSTINGS, allEntries = true), CacheEvict(LOCATIONS, allEntries = true)))
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/team/{teamId}/location/multiple/")
     @ResponseStatus(CREATED)

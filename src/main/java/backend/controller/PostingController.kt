@@ -8,6 +8,7 @@ import backend.model.posting.PostingService
 import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.util.CacheNames
+import backend.util.CacheNames.LOCATIONS
 import backend.util.CacheNames.POSTINGS
 import backend.util.getSignedJwtToken
 import backend.util.localDateTimeOf
@@ -18,6 +19,7 @@ import backend.view.posting.PostingResponseView
 import backend.view.posting.PostingView
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.cache.annotation.Caching
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -40,7 +42,9 @@ class PostingController(private val postingService: PostingService,
      * POST /posting/
      * Creates new posting
      */
-    @CacheEvict(value = POSTINGS, allEntries = true)
+    @Caching(evict = arrayOf(
+            CacheEvict(POSTINGS, allEntries = true),
+            CacheEvict(LOCATIONS, allEntries = true)))
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/")
     @ResponseStatus(CREATED)
@@ -80,7 +84,9 @@ class PostingController(private val postingService: PostingService,
      * DELETE /posting/{id}/
      * Allows Admin to delete Posting
      */
-    @CacheEvict(value = POSTINGS, allEntries = true)
+    @Caching(evict = arrayOf(
+            CacheEvict(POSTINGS, allEntries = true),
+            CacheEvict(LOCATIONS, allEntries = true)))
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping("/{id}/", method = arrayOf(DELETE))
     fun adminDeletePosting(@PathVariable("id") id: Long): Map<String, String> {

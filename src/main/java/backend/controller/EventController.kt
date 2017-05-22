@@ -5,9 +5,12 @@ import backend.exceptions.CacheNonExistentException
 import backend.model.cache.CacheService
 import backend.model.event.EventService
 import backend.model.misc.Coord
+import backend.util.CacheNames
+import backend.util.CacheNames.LOCATIONS
 import backend.view.EventView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -29,6 +32,7 @@ class EventController(open var eventService: EventService,
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(CREATED)
     @PostMapping("/")
+    @CacheEvict(LOCATIONS, allEntries = true)
     fun createEvent(@Valid @RequestBody body: EventView): EventView {
 
         val event = eventService.createEvent(
