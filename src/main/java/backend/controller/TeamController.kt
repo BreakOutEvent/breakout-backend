@@ -106,7 +106,10 @@ class TeamController(private val teamService: TeamService,
      * PUT /event/{id}/team/{teamId}/
      * allows teammembers to edit teamname and description
      */
-    @Caching(evict = arrayOf(CacheEvict(POSTINGS, allEntries = true), CacheEvict(TEAMS, allEntries = true)))
+    @Caching(evict = arrayOf(
+            CacheEvict(POSTINGS, allEntries = true),
+            CacheEvict(LOCATIONS, allEntries = true),
+            CacheEvict(TEAMS, allEntries = true)))
     @PutMapping("/{teamId}/")
     @PreAuthorize("isAuthenticated()")
     fun editTeam(@PathVariable eventId: Long,
