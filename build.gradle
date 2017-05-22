@@ -53,6 +53,8 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-web"
     compile "org.springframework.boot:spring-boot-starter-security"
     compile "org.springframework.boot:spring-boot-starter-data-jpa"
+    compile "org.springframework.boot:spring-boot-starter-cache"
+
     compile "org.springframework.security.oauth:spring-security-oauth2:2.0.9.RELEASE"
     compile("org.springframework:spring-web")
     compile 'org.springframework:spring-context-support:4.2.6.RELEASE'
@@ -65,7 +67,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
-    compile 'com.google.guava:guava:19.0'
+//    compile 'com.google.guava:guava:19.0'
     compile 'com.google.maps:google-maps-services:0.1.12'
     compile "org.javamoney:moneta:1.0"
 
