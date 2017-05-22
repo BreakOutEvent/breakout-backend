@@ -17,6 +17,7 @@ import backend.view.LikeView
 import backend.view.LocationView
 import backend.view.posting.PostingResponseView
 import backend.view.posting.PostingView
+import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.cache.annotation.Caching
@@ -34,6 +35,8 @@ class PostingController(private val postingService: PostingService,
                         private val userService: UserService,
                         private val challengeService: ChallengeService) {
 
+    private val logger = LoggerFactory.getLogger(PostingController::class.java)
+    
     private val JWT_SECRET: String = configurationService.getRequired("org.breakout.api.jwt_secret")
     private val PAGE_SIZE: Int = configurationService.getRequired("org.breakout.api.page_size").toInt()
 
