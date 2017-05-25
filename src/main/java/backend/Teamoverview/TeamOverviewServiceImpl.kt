@@ -13,6 +13,7 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
+import javax.persistence.NonUniqueResultException
 
 @Service
 class TeamOverviewServiceImpl(private val teamOverviewRepository: TeamoverviewRepository) : TeamOverviewService {
@@ -50,9 +51,14 @@ class TeamOverviewServiceImpl(private val teamOverviewRepository: TeamoverviewRe
     @EventListener
     fun onLocationUploaded(locationUploadedEvent: LocationUploadedEvent) {
         val team = locationUploadedEvent.team
-        val overview = teamOverviewRepository.findByTeamId(team.id!!) ?: createOverviewForTeam(team)
-        overview.lastLocation = LastLocation(locationUploadedEvent.location)
-        teamOverviewRepository.save(overview)
+        try {
+            val overview = teamOverviewRepository.findByTeamId(team.id!!) ?: createOverviewForTeam(team)
+            overview.lastLocation = LastLocation(locationUploadedEvent.location)
+            teamOverviewRepository.save(overview)
+        } catch (e: NonUniqueResultException) {
+            logger.error("Failed to update TeamOverview for Team with ID ${team.id!!}\n" +
+                    e.message)
+        }
     }
 
     @EventListener
