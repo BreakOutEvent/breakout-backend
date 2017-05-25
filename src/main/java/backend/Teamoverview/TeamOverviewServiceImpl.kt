@@ -50,13 +50,13 @@ class TeamOverviewServiceImpl(private val teamOverviewRepository: TeamoverviewRe
 
     @EventListener
     fun onLocationUploaded(locationUploadedEvent: LocationUploadedEvent) {
-        val team = locationUploadedEvent.team
         try {
+            val team = locationUploadedEvent.team
             val overview = teamOverviewRepository.findByTeamId(team.id!!) ?: createOverviewForTeam(team)
             overview.lastLocation = LastLocation(locationUploadedEvent.location)
             teamOverviewRepository.save(overview)
         } catch (e: NonUniqueResultException) {
-            logger.error("Failed to update TeamOverview for Team with ID ${team.id!!}\n" +
+            logger.error("Failed to update TeamOverview" +
                     e.message)
         }
     }
