@@ -34,13 +34,13 @@ class TeamOverviewServiceImpl(private val teamOverviewRepository: TeamoverviewRe
         teamOverview.setLastContactWithHeadquarters(newComment, LocalDateTime.now())
     }
 
-    @EventListener
+    //@EventListener
     fun onTeamCreated(teamCreatedEvent: TeamCreatedEvent) {
         val overview = TeamOverview(teamCreatedEvent.team, teamCreatedEvent.team.event)
         teamOverviewRepository.save(overview)
     }
 
-    @EventListener
+    //@EventListener
     fun onTeamChanged(teamChangedEvent: TeamChangedEvent) {
         val team = teamChangedEvent.team
         val overview = teamOverviewRepository.findByTeamId(team.id!!) ?: createOverviewForTeam(team)
@@ -61,7 +61,7 @@ class TeamOverviewServiceImpl(private val teamOverviewRepository: TeamoverviewRe
         }
     }
 
-    @EventListener
+    //@EventListener
     fun onPostingCreated(postingCreatedEvent: PostingCreatedEvent) {
         val posting = postingCreatedEvent.posting
         val team = posting.team ?: run {
