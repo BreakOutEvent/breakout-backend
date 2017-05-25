@@ -48,7 +48,7 @@ class LocationServiceImpl(private val locationRepository: LocationRepository,
 
         val savedLocation = locationRepository.save(location)
         val team = location.team ?: throw Exception("Location has no team")
-        eventPublisher.publishEvent(LocationUploadedEvent(location, team))
+        //eventPublisher.publishEvent(LocationUploadedEvent(location, team))
         return savedLocation
     }
 

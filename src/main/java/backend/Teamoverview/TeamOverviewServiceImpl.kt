@@ -48,7 +48,7 @@ class TeamOverviewServiceImpl(private val teamOverviewRepository: TeamoverviewRe
         teamOverviewRepository.save(overview)
     }
 
-    @EventListener
+    //@EventListener
     fun onLocationUploaded(locationUploadedEvent: LocationUploadedEvent) {
         try {
             val team = locationUploadedEvent.team
