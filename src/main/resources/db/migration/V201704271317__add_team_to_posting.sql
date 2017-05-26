@@ -1,3 +1,5 @@
+USE `${BREAKOUT}`;
+
 alter table posting add COLUMN `team_id` bigint(20) DEFAULT NULL;
 alter table posting add KEY `FK8cbm596j5qvj2eve2j0j0kr9d` (`team_id`);
 alter table posting add CONSTRAINT `FK8cbm596j5qvj2eve2j0j0kr9d` FOREIGN KEY (`team_id`) REFERENCES `team` (`id`);

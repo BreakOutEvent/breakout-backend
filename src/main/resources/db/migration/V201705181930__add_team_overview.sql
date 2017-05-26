@@ -1,3 +1,5 @@
+USE `${BREAKOUT}`;
+
 CREATE TABLE `team_overview` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `created_at` datetime DEFAULT NULL,

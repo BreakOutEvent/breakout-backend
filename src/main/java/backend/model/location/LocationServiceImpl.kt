@@ -52,6 +52,25 @@ class LocationServiceImpl(private val locationRepository: LocationRepository,
         return savedLocation
     }
 
+    @Transactional
+    override fun adminCreate(coord: Coord, participant: Participant, date: LocalDateTime, doGeoCode: Boolean): Location {
+
+        if (coord.latitude == 0.0 || coord.longitude == 0.0)
+            throw BadRequestException("0.0, 0.0 locations not allowed")
+
+        val locationData = when (doGeoCode) {
+            true -> geoCodingService.getGeoCoded(coord)
+            else -> mapOf()
+        }
+
+        val location = Location(coord, participant, date, locationData)
+        location.isDuringEvent = true
+
+        val savedLocation = locationRepository.save(location)
+        val team = location.team ?: throw Exception("Location has no team")
+        return savedLocation
+    }
+
     private fun checkAndSetIsDuringEvent(location: Location, participant: Participant) {
         val teamHasStarted = participant.getCurrentTeam()?.hasStarted ?: throw DomainException("User has no team")
 

@@ -9,6 +9,8 @@ interface LocationService {
 
     fun create(coord: Coord, participant: Participant, date: LocalDateTime, doGeoCode: Boolean = false): Location
 
+    fun adminCreate(coord: Coord, participant: Participant, date: LocalDateTime, doGeoCode: Boolean): Location
+
     fun save(location: Location): Location
 
     fun findAll(): Iterable<Location>

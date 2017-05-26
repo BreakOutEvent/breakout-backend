@@ -9,7 +9,11 @@ interface PostingService {
 
     fun savePostingWithLocationAndMedia(text: String?, postingLocation: Coord?, user: UserAccount, mediaTypes: List<String>?, date: LocalDateTime): Posting
 
+    fun adminSavePostingWithLocationAndMedia(text: String?, postingLocation: Coord?, user: UserAccount, mediaTypes: List<String>?, date: LocalDateTime): Posting
+
     fun createPosting(user: User, text: String?, uploadMediaTypes: List<String>?, locationCoord: Coord?, clientDate: LocalDateTime): Posting
+
+    fun adminCreatePosting(user: User, text: String?, uploadMediaTypes: List<String>?, locationCoord: Coord?, clientDate: LocalDateTime): Posting
 
     fun findAll(page: Int, size: Int): List<Posting>
 

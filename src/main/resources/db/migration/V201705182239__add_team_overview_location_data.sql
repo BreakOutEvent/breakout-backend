@@ -1,3 +1,5 @@
+USE `${BREAKOUT}`;
+
 CREATE TABLE team_overview_location_data
 (
   team_overview_id         BIGINT       NOT NULL,
