@@ -1,5 +1,3 @@
-USE `${BREAKOUT}`;
-
 -- Create new join table for invoice -->* challenges since mappedBy has been removed
 CREATE TABLE invoice_challenges
 (
@@ -47,3 +45,4 @@ alter table challenge drop FOREIGN KEY FK_challenge_invoice;
 ALTER TABLE challenge DROP COLUMN invoice_id;
 ALTER TABLE sponsoring drop FOREIGN KEY FK_sponsoring_invoice;
 ALTER TABLE sponsoring DROP COLUMN invoice_id;
+
