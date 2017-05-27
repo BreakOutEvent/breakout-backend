@@ -228,7 +228,8 @@ class TeamController(private val teamService: TeamService,
     fun getTeamPostingIds(@PathVariable teamId: Long,
                           @RequestParam(value = "page", required = false) page: Int?,
                           @RequestParam(value = "userid", required = false) userId: Long?): List<PostingView> {
-        return teamService.findPostingsById(teamId, page ?: 0, PAGE_SIZE).map {
+        // TODO: Remove hardcoded page size of 150
+        return teamService.findPostingsById(teamId, page ?: 0, 150).map {
             PostingView(it.hasLikesBy(userId), it.challenge?.let {
                 challengeService.findOne(it)
             })
