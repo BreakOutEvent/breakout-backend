@@ -4,9 +4,13 @@ import backend.controller.exceptions.NotFoundException
 import backend.model.cache.CacheService
 import backend.model.location.Location
 import backend.model.misc.Coord
+import backend.services.FeatureFlagService
 import backend.util.data.DonateSums
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -14,14 +18,28 @@ import java.time.LocalDateTime
 @Service
 class EventServiceImpl @Autowired constructor(val repository: EventRepository,
                                               val teamService: TeamService,
-                                              val cacheService: CacheService) : EventService {
+                                              val cacheService: CacheService,
+                                              val featureFlagService: FeatureFlagService) : EventService {
+
+    val logger = LoggerFactory.getLogger(EventServiceImpl::class.java)
+
+    @Scheduled(cron = "0 */2 * * * ?")
+    @Transactional(propagation = Propagation.REQUIRED)
+    fun scheduleRegenerateScores() {
+        if (featureFlagService.isEnabled("event.scheduleRegenerateScores"))
+        regenerateCache(null)
+        logger.info("Recalculated event scores!"
+        )
+    }
 
     @Transactional
     override fun regenerateCache(eventId: Long?) {
         if (eventId != null) {
             updateCache(eventId)
         } else {
-            findAll().forEach { event -> updateCache(event.id!!) }
+            if (featureFlagService.isEnabled("event.updateScores")) {
+                findAll().forEach { event -> updateCache(event.id!!) }
+            }
         }
     }
 
