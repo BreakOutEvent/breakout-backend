@@ -13,6 +13,7 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
+import javax.persistence.NonUniqueResultException
 
 @Service
 class TeamOverviewServiceImpl(private val teamOverviewRepository: TeamoverviewRepository) : TeamOverviewService {
@@ -33,13 +34,13 @@ class TeamOverviewServiceImpl(private val teamOverviewRepository: TeamoverviewRe
         teamOverview.setLastContactWithHeadquarters(newComment, LocalDateTime.now())
     }
 
-    @EventListener
+    //@EventListener
     fun onTeamCreated(teamCreatedEvent: TeamCreatedEvent) {
         val overview = TeamOverview(teamCreatedEvent.team, teamCreatedEvent.team.event)
         teamOverviewRepository.save(overview)
     }
 
-    @EventListener
+    //@EventListener
     fun onTeamChanged(teamChangedEvent: TeamChangedEvent) {
         val team = teamChangedEvent.team
         val overview = teamOverviewRepository.findByTeamId(team.id!!) ?: createOverviewForTeam(team)
@@ -47,15 +48,20 @@ class TeamOverviewServiceImpl(private val teamOverviewRepository: TeamoverviewRe
         teamOverviewRepository.save(overview)
     }
 
-    @EventListener
+    //@EventListener
     fun onLocationUploaded(locationUploadedEvent: LocationUploadedEvent) {
-        val team = locationUploadedEvent.team
-        val overview = teamOverviewRepository.findByTeamId(team.id!!) ?: createOverviewForTeam(team)
-        overview.lastLocation = LastLocation(locationUploadedEvent.location)
-        teamOverviewRepository.save(overview)
+        try {
+            val team = locationUploadedEvent.team
+            val overview = teamOverviewRepository.findByTeamId(team.id!!) ?: createOverviewForTeam(team)
+            overview.lastLocation = LastLocation(locationUploadedEvent.location)
+            teamOverviewRepository.save(overview)
+        } catch (e: NonUniqueResultException) {
+            logger.error("Failed to update TeamOverview" +
+                    e.message)
+        }
     }
 
-    @EventListener
+    //@EventListener
     fun onPostingCreated(postingCreatedEvent: PostingCreatedEvent) {
         val posting = postingCreatedEvent.posting
         val team = posting.team ?: run {

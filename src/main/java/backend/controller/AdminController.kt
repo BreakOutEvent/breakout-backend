@@ -7,15 +7,19 @@ import backend.model.challenges.ChallengeStatus
 import backend.model.event.EventService
 import backend.model.event.TeamService
 import backend.model.location.LocationService
+import backend.model.misc.Coord
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.misc.EmailRepository
 import backend.model.payment.SponsoringInvoiceService
+import backend.model.posting.PostingService
 import backend.model.sponsoring.Sponsoring
 import backend.model.sponsoring.SponsoringService
 import backend.model.sponsoring.SponsoringStatus
 import backend.model.user.UserService
 import backend.services.mail.MailService
+import backend.view.posting.PostingView
+import backend.view.user.AdminTeamLocationView
 import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -23,6 +27,8 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.time.LocalDateTime
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/admin")
@@ -34,7 +40,8 @@ class AdminController(private val mailService: MailService,
                       private val emailRepository: EmailRepository,
                       private val eventService: EventService,
                       private val locationService: LocationService,
-                      private val sponsoringInvoiceService: SponsoringInvoiceService) {
+                      private val sponsoringInvoiceService: SponsoringInvoiceService,
+                      private val postingService: PostingService) {
 
 
     private val logger: Logger = LoggerFactory.getLogger(AdminController::class.java)
@@ -121,6 +128,18 @@ class AdminController(private val mailService: MailService,
         }
     }
 
+    /**
+     * POST /admin/postteamlocation/
+     * Generate a team-posting to set a team-location
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/postteamlocation/")
+    fun postTeamLocation(@Valid @RequestBody body: AdminTeamLocationView): PostingView {
+        val team = teamService.findOne(body.teamId) ?: throw NotFoundException("Team with ID ${body.teamId} not found")
+        return PostingView(
+                postingService.adminCreatePosting(
+                        team.members.elementAt(0), "Current Location: ${body.city}", null, Coord(body.latitude, body.longitude), LocalDateTime.now()), null)
+    }
 
     private fun generateUnregisteredSponsorInvoices(data: List<Map<String, Any>>) {
 

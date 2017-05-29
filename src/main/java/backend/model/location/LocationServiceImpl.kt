@@ -9,6 +9,7 @@ import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.services.FeatureFlagService
 import backend.services.GeoCodingService
+import backend.util.parallelStream
 import backend.util.speedToLocation
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
@@ -47,7 +48,26 @@ class LocationServiceImpl(private val locationRepository: LocationRepository,
 
         val savedLocation = locationRepository.save(location)
         val team = location.team ?: throw Exception("Location has no team")
-        eventPublisher.publishEvent(LocationUploadedEvent(location, team))
+        //eventPublisher.publishEvent(LocationUploadedEvent(location, team))
+        return savedLocation
+    }
+
+    @Transactional
+    override fun adminCreate(coord: Coord, participant: Participant, date: LocalDateTime, doGeoCode: Boolean): Location {
+
+        if (coord.latitude == 0.0 || coord.longitude == 0.0)
+            throw BadRequestException("0.0, 0.0 locations not allowed")
+
+        val locationData = when (doGeoCode) {
+            true -> geoCodingService.getGeoCoded(coord)
+            else -> mapOf()
+        }
+
+        val location = Location(coord, participant, date, locationData)
+        location.isDuringEvent = true
+
+        val savedLocation = locationRepository.save(location)
+        val team = location.team ?: throw Exception("Location has no team")
         return savedLocation
     }
 

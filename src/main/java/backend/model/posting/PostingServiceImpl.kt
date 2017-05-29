@@ -74,9 +74,34 @@ class PostingServiceImpl(private val repository: PostingRepository,
         }
 
         val posting = repository.save(Posting(text, date, location, user, media))
-        applicationEventPublisher.publishEvent(PostingCreatedEvent(posting))
+        //applicationEventPublisher.publishEvent(PostingCreatedEvent(posting))
         return posting
     }
+
+    @Transactional
+    override fun adminSavePostingWithLocationAndMedia(text: String?,
+                                                 postingLocation: Coord?,
+                                                 user: UserAccount,
+                                                 mediaTypes: List<String>?,
+                                                 date: LocalDateTime): Posting {
+
+        var location: Location? = null
+        if (postingLocation != null) {
+            val uploader = user.getRole(Participant::class) ?: throw DomainException("user is no participant and can therefor not upload location")
+            location = locationService.adminCreate(postingLocation, uploader, date, true)
+        }
+
+        //Create Media-Objects for each media item requested to add
+        val media: MutableList<Media> = arrayListOf()
+        mediaTypes?.forEach {
+            media.add(Media(it))
+        }
+
+        val posting = repository.save(Posting(text, date, location, user, media))
+        return posting
+    }
+
+
 
     override fun createPosting(user: User,
                                text: String?,
@@ -89,6 +114,19 @@ class PostingServiceImpl(private val repository: PostingRepository,
             throw BadRequestException("empty postings not allowed")
 
         return this.savePostingWithLocationAndMedia(text, locationCoord, user.account, uploadMediaTypes, clientDate)
+    }
+
+    override fun adminCreatePosting(user: User,
+                               text: String?,
+                               uploadMediaTypes: List<String>?,
+                               locationCoord: Coord?,
+                               clientDate: LocalDateTime): Posting {
+
+        //check if any of the optional posting types is available
+        if (uploadMediaTypes == null && (text == null || text.trim() == "") && locationCoord == null)
+            throw BadRequestException("empty postings not allowed")
+
+        return this.adminSavePostingWithLocationAndMedia(text, locationCoord, user.account, uploadMediaTypes, clientDate)
     }
 
     override fun getByID(id: Long): Posting? = repository.findById(id)

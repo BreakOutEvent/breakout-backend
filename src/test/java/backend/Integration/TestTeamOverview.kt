@@ -7,13 +7,14 @@ import backend.model.user.Participant
 import backend.testHelper.asUser
 import backend.testHelper.json
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
 
-
+@Ignore
 open class TestTeamOverview : IntegrationTest() {
 
     @Before
