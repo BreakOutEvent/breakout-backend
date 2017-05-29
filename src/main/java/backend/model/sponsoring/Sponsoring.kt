@@ -63,6 +63,7 @@ class Sponsoring : BasicEntity, Billable {
         this.amountPerKm = amountPerKm
         this.limit = limit
         this.contract = Media(DOCUMENT)
+        this.sponsor.sponsorings.add(this)
     }
 
     constructor(unregisteredSponsor: UnregisteredSponsor, team: Team, amountPerKm: Money, limit: Money) : this() {
@@ -72,6 +73,7 @@ class Sponsoring : BasicEntity, Billable {
         this.limit = limit
         this.status = ACCEPTED
         this.contract = Media(DOCUMENT)
+        this.sponsor.sponsorings.add(this)
     }
 
     fun accept() {
