@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 
 @Service
 @Profile(DEVELOPMENT, TEST, STAGING)
@@ -18,9 +19,10 @@ class SpyMailSenderServiceImpl @Autowired constructor(private val emailRepositor
 
     private val logger = LoggerFactory.getLogger(SpyMailSenderServiceImpl::class.java)
     private val pool = Executors.newCachedThreadPool()
+    private var count = AtomicInteger(0)
 
     override fun send(email: Email, saveToDb: Boolean) {
-        logger.info("Email to ${email.to} with subject \"${email.subject}\" and body \"${email.body}\" would be sent now")
+        logger.info("Nr.${count.getAndIncrement()} - Email to ${email.to} with subject \"${email.subject}\" and body \"${email.body}\" would be sent now")
         if (email.buttonUrl != null) logger.info("Email Button ${email.buttonUrl}")
     }
 
