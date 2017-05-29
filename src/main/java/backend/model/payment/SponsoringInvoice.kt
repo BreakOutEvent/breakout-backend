@@ -4,12 +4,15 @@ import backend.exceptions.DomainException
 import backend.model.challenges.Challenge
 import backend.model.event.Event
 import backend.model.event.Team
+import backend.model.misc.EmailAddress
 import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.Sponsoring
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
 import backend.util.euroOf
 import org.javamoney.moneta.Money
+import org.springframework.format.number.money.MonetaryAmountFormatter
+import java.util.*
 import javax.persistence.*
 
 @Entity
@@ -118,8 +121,8 @@ class SponsoringInvoice : Invoice {
         |<b>Sponsorings</b>
         |${this.sponsorings.toEmailListing()}
         |
-        |<b>Total:</b> $amount
-        |<b>Already paid:</b> ${amountOfCurrentPayments()}
+        |<b>Total:</b> ${amount.display()}
+        |<b>Already paid:</b> ${amountOfCurrentPayments().display()}
         """.trimMargin("|")
     }
 
@@ -129,7 +132,7 @@ class SponsoringInvoice : Invoice {
     }
 
     private fun Sponsoring.toEmailListing(): String {
-        return "<b>Team-ID</b> ${this.team?.id} <b>Teamname</b> ${this.team?.name} <b>Status</b> ${this.status} <b>Amount Per Km</b> ${this.amountPerKm} <b>Limit</b> ${this.limit} <b>Actual Km</b> ${this.team?.getCurrentDistance()} <b>Billed Amount</b> ${this.billableAmount()}"
+        return "<b>Team-ID</b> ${this.team?.id} <b>Teamname</b> ${this.team?.name} <b>Status</b> ${this.status} <b>Amount Per Km</b> ${this.amountPerKm.display()} <b>Limit</b> ${this.limit.display()} <b>Actual Km</b> ${this.team?.getCurrentDistance()} <b>Billed Amount</b> ${this.billableAmount().display()}"
     }
 
     @JvmName("challengeToEmailListing")
@@ -138,6 +141,25 @@ class SponsoringInvoice : Invoice {
     }
 
     private fun Challenge.toEmailListing(): String {
-        return "<b>Team-ID</b> ${this.team?.id} <b>Teamname</b> ${this.team?.name} <b>Description</b> ${this.description.take(50)}... <b>Status</b> ${this.status} <b>Amount</b> ${this.amount} <b>Billed Amount</b> ${this.billableAmount()}"
+        println()
+        return "<b>Team-ID</b> ${this.team?.id} <b>Teamname</b> ${this.team?.name} <b>Description</b> ${this.description.take(50)}... <b>Status</b> ${this.status} <b>Amount</b> ${this.amount.display()} <b>Billed Amount</b> ${this.billableAmount().display()}"
     }
+
+    fun getContactEmails(): List<EmailAddress> {
+        return when (sponsor) {
+            is UnregisteredSponsor -> {
+                val fromChallenges = this.challenges.flatMap { it.team?.members?.map { EmailAddress(it.email) } ?: listOf() }
+                val fromSponsorings = this.sponsorings.flatMap { it.team?.members?.map { EmailAddress(it.email) } ?: listOf() }
+                val total = fromChallenges.union(fromSponsorings).distinct()
+                if(total.size > 3) throw Exception("There should be at max 3 emails to contact per invoice")
+                return total
+            }
+            is Sponsor -> listOf(EmailAddress(registeredSponsor!!.email))
+            else -> throw Exception("No sponsor email found for invoice $id")
+        }
+    }
+}
+
+fun Money.display(): String {
+    return MonetaryAmountFormatter().print(this, Locale.GERMANY)
 }

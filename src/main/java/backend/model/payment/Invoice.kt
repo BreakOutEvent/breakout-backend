@@ -1,6 +1,7 @@
 package backend.model.payment
 
 import backend.model.BasicEntity
+import backend.model.misc.EmailAddress
 import org.apache.commons.codec.binary.Hex
 import org.javamoney.moneta.Money
 import java.math.BigDecimal
