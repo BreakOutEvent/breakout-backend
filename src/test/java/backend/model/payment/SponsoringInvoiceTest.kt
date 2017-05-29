@@ -2,6 +2,7 @@ package backend.model.payment
 
 import backend.model.challenges.Challenge
 import backend.model.challenges.ChallengeStatus
+import backend.model.event.Event
 import backend.model.sponsoring.Sponsoring
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
@@ -17,7 +18,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @RunWith(PowerMockRunner::class)
-@PrepareForTest(Challenge::class, Sponsoring::class, Sponsor::class, UnregisteredSponsor::class)
+@PrepareForTest(Challenge::class, Sponsoring::class, Sponsor::class, UnregisteredSponsor::class, Event::class)
 class SponsoringInvoiceTest {
 
     @Test
@@ -29,6 +30,9 @@ class SponsoringInvoiceTest {
         val sponsoring3 = mock(Sponsoring::class.java)
         val sponsorings = mutableListOf(sponsoring1, sponsoring2, sponsoring3)
         val sponsor = mock(Sponsor::class.java)
+        val event= mock(Event::class.java)
+
+        `when`(event.id).thenReturn(1)
 
         `when`(sponsoring1.billableAmount()).thenReturn(euroOf(1))
         `when`(sponsoring2.billableAmount()).thenReturn(euroOf(2))
@@ -42,7 +46,7 @@ class SponsoringInvoiceTest {
         `when`(sponsor.challenges).thenReturn(mutableListOf<Challenge>())
 
         // when creating the invoice for this sponsor
-        val invoice = SponsoringInvoice(sponsor, eventId = 1)
+        val invoice = SponsoringInvoice(sponsor, event)
 
         // then it has exactly those 3 sponsorings
         assertEquals(sponsorings, invoice.sponsorings)
@@ -68,7 +72,10 @@ class SponsoringInvoiceTest {
         `when`(sponsor.challenges).thenReturn(challenges)
 
         // when creating this invoice
-        val invoice = SponsoringInvoice(sponsor, eventId = 1)
+        val event= mock(Event::class.java)
+
+        `when`(event.id).thenReturn(1)
+        val invoice = SponsoringInvoice(sponsor, event)
 
         // then it contains exactly those two challenges
         assertEquals(challenges, invoice.challenges)
@@ -77,14 +84,20 @@ class SponsoringInvoiceTest {
     @Test
     fun getSponsorRegistered() {
         val sponsor = mock(Sponsor::class.java)
-        val invoice = SponsoringInvoice(sponsor, eventId = 1)
+        val event= mock(Event::class.java)
+
+        `when`(event.id).thenReturn(1)
+        val invoice = SponsoringInvoice(sponsor, event)
         assertTrue(invoice.sponsor is Sponsor)
     }
 
     @Test
     fun getSponsorUnregistered() {
         val sponsor = mock(UnregisteredSponsor::class.java)
-        val invoice = SponsoringInvoice(sponsor, eventId = 1)
+        val event= mock(Event::class.java)
+
+        `when`(event.id).thenReturn(1)
+        val invoice = SponsoringInvoice(sponsor, event)
         assertTrue(invoice.sponsor is UnregisteredSponsor)
     }
 
@@ -134,20 +147,22 @@ class SponsoringInvoiceTest {
         `when`(secondSponsoring.limit).thenReturn(euroOf(100))
         `when`(secondSponsoring.billableAmount()).thenReturn(euroOf(28.70))
 
-        val invoice = SponsoringInvoice(sponsor, 1)
+        val event= mock(Event::class.java)
+        `when`(event.id).thenReturn(1)
+        val invoice = SponsoringInvoice(sponsor, event)
 
         assertEquals("""
-        <b>Challenges</b><br/>
-        <b>Team-ID</b> null <b>Teamname</b> null <b>Description</b> a potentially very long text a potentially very lo... <b>Status</b> WITH_PROOF <b>Amount</b> EUR 10 <b>Billed Amount</b> EUR 10<br/>
-        <b>Team-ID</b> null <b>Teamname</b> null <b>Description</b> Take a photo... <b>Status</b> WITH_PROOF <b>Amount</b> EUR 80 <b>Billed Amount</b> EUR 80<br/>
+        <b>Challenges</b>
+        <b>Team-ID</b> null <b>Teamname</b> null <b>Description</b> a potentially very long text a potentially very lo... <b>Status</b> WITH_PROOF <b>Amount</b> EUR 10 <b>Billed Amount</b> EUR 10
+        <b>Team-ID</b> null <b>Teamname</b> null <b>Description</b> Take a photo... <b>Status</b> WITH_PROOF <b>Amount</b> EUR 80 <b>Billed Amount</b> EUR 80
 
-        <br/><b>Sponsorings</b><br/>
-        <b>Team-ID</b> null <b>Teamname</b> null <b>Status</b> null <b>Amount Per Km</b> EUR 2 <b>Actual Km</b> null <b>Billed Amount</b> EUR 33.9<br/>
-        <b>Team-ID</b> null <b>Teamname</b> null <b>Status</b> null <b>Amount Per Km</b> EUR 0.01 <b>Actual Km</b> null <b>Billed Amount</b> EUR 28.7<br/>
-        <br/>
+        <b>Sponsorings</b>
+        <b>Team-ID</b> null <b>Teamname</b> null <b>Status</b> null <b>Amount Per Km</b> EUR 2 <b>Limit</b> EUR 100 <b>Actual Km</b> null <b>Billed Amount</b> EUR 33.9
+        <b>Team-ID</b> null <b>Teamname</b> null <b>Status</b> null <b>Amount Per Km</b> EUR 0.01 <b>Limit</b> EUR 100 <b>Actual Km</b> null <b>Billed Amount</b> EUR 28.7
 
-        <b>Total:</b> EUR 152.6<br/>
-        <b>Already paid:</b> EUR 0<br/>""".trimIndent(), invoice.toEmailOverview())
+
+        <b>Total:</b> EUR 152.6
+        <b>Already paid:</b> EUR 0""".trimIndent(), invoice.toEmailOverview())
     }
 
 }
