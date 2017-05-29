@@ -3,14 +3,16 @@ package backend.model.payment
 import backend.model.challenges.Challenge
 import backend.model.challenges.ChallengeService
 import backend.model.event.Event
+import backend.model.event.EventService
 import backend.model.event.Team
 import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.Sponsoring
 import backend.model.sponsoring.SponsoringService
 import backend.model.user.Admin
-import backend.services.mail.MailSenderService
 import backend.services.mail.MailService
+import backend.util.euroOf
 import org.javamoney.moneta.Money
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
@@ -18,7 +20,10 @@ import javax.transaction.Transactional
 class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: SponsoringInvoiceRepository,
                                    private val challengeService: ChallengeService,
                                    private val sponsoringService: SponsoringService,
-                                   private val mailService: MailService) : SponsoringInvoiceService {
+                                   private val mailService: MailService,
+                                   private val eventService: EventService) : SponsoringInvoiceService {
+
+    private val  logger = LoggerFactory.getLogger(SponsoringInvoiceServiceImpl::class.java)
 
     @Transactional
     override fun addAdminPaymentToInvoice(admin: Admin, amount: Money, invoice: SponsoringInvoice): SponsoringInvoice {
@@ -75,13 +80,28 @@ class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: Spon
 
     override fun createInvoicesForEvent(event: Event): Int {
         val sponsors = this.findAllSponsorsAtEvent(event.id!!)
-        return sponsors.map { SponsoringInvoice(it, event) }.map { this.save(it) }.count()
+        return sponsors
+                .map { SponsoringInvoice(it, event) }
+                .apply { sanityCheck(this, event) }
+                .map { this.save(it) }.count()
+    }
+
+    private fun sanityCheck(invoices: Iterable<SponsoringInvoice>, event: Event) {
+        val total = invoices.fold(euroOf(0.0)) { a, b -> a.add(b.amount) }
+        val highscore = eventService.getDonateSum(event.id!!)
+
+        if(total.numberStripped != highscore.fullSum) {
+            throw Exception("Sanity check failed. Amount in invoices (${total.numberStripped}) and highscore (${highscore.fullSum}) don't match")
+        } else {
+            logger.info("Sanity check succeeded. Creating invoices for a total of ${total.numberStripped}€")
+        }
     }
 
     override fun sendInvoiceEmailsToSponsorsForEvent(event: Event) {
         val invoices = sponsoringInvoiceRepository.findByEventId(event.id!!)
         invoices.forEach {
             mailService.sendGeneratedDonationPromiseSponsor(it)
+            Thread.sleep(100) // We otherwise might kill our own email server this way
         }
     }
 
