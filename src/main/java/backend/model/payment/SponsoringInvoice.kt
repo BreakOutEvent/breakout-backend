@@ -8,6 +8,7 @@ import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.Sponsoring
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
+import backend.util.euroOf
 import org.javamoney.moneta.Money
 import javax.persistence.*
 
@@ -88,9 +89,10 @@ class SponsoringInvoice : Invoice {
      */
 
     // TODO: Add unit test, so that only those with this specific event are added!
-    constructor(sponsor: ISponsor, event: Event) : super(sponsor.challenges.billableAmount().add(sponsor.sponsorings.billableAmount())) {
-        this.challenges = sponsor.challenges.toMutableList().filter { it.belongsToEvent(event.id!!) }
-        this.sponsorings = sponsor.sponsorings.toMutableList().filter { it.belongsToEvent(event.id!!) }
+    constructor(sponsor: ISponsor, event: Event) : super(euroOf(0.0)) {
+        this.challenges = sponsor.challenges.filter { it.belongsToEvent(event.id!!) }
+        this.sponsorings = sponsor.sponsorings.filter { it.belongsToEvent(event.id!!) }
+        this.amount = this.challenges.billableAmount().add(this.sponsorings.billableAmount())
         this.sponsor = sponsor
         this.event = event
         this.purposeOfTransfer = generatePurposeOfTransfer()

@@ -20,7 +20,7 @@ abstract class Invoice : BasicEntity {
 
     @Column
     lateinit var amount: Money
-        private set
+        protected set
 
     @Column(unique = true)
     var purposeOfTransfer: String? = null
