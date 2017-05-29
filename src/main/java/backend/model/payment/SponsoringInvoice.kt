@@ -93,6 +93,7 @@ class SponsoringInvoice : Invoice {
         this.sponsorings = sponsor.sponsorings.toMutableList().filter { it.belongsToEvent(event.id!!) }
         this.sponsor = sponsor
         this.event = event
+        this.purposeOfTransfer = generatePurposeOfTransfer()
     }
 
     private constructor() : super()
@@ -102,7 +103,10 @@ class SponsoringInvoice : Invoice {
     }
 
     override fun generatePurposeOfTransfer(): String {
-        TODO()
+        this.purposeOfTransferCode = generateRandomPurposeOfTransferCode()
+        this.purposeOfTransfer = "Spende $purposeOfTransferCode-BREAKOUT-${sponsor.lastname}"
+
+        return this.purposeOfTransfer!!
     }
 
     fun toEmailOverview(): String {

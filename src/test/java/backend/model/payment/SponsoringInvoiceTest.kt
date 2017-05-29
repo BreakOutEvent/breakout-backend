@@ -15,6 +15,7 @@ import org.powermock.api.mockito.PowerMockito.mock
 import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.PowerMockRunner
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 @RunWith(PowerMockRunner::class)
@@ -107,6 +108,15 @@ class SponsoringInvoiceTest {
 
     @Test
     fun generatePurposeOfTransfer() {
+        val sponsor = mock(UnregisteredSponsor::class.java)
+        val event= mock(Event::class.java)
+
+        `when`(event.id).thenReturn(1)
+        `when`(sponsor.lastname).thenReturn("samsamsam")
+        val invoice = SponsoringInvoice(sponsor, event)
+
+        assertNotNull(invoice.purposeOfTransfer)
+        println(invoice.purposeOfTransfer)
     }
 
     @Test
