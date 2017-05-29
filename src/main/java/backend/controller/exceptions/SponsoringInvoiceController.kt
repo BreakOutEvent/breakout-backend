@@ -35,7 +35,7 @@ class SponsoringInvoiceController(private val sponsoringInvoiceService: Sponsori
         return ResponseEntity.created(URI.create("/sponsoringinvoice/")).body(mapOf("message" to "created"))
     }
 
-    @PostMapping("/sendemails")
+    @PostMapping("/sendmails")
     fun sendInvoiceEmailsToSponsors(@Param("eventId") eventId: Long): ResponseEntity<Any> {
 
         val event = eventService.findById(eventId) ?: throw NotFoundException("event $eventId not found")
