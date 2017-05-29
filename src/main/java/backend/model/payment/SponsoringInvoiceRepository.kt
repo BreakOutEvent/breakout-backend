@@ -6,6 +6,8 @@ interface SponsoringInvoiceRepository : CrudRepository<SponsoringInvoice, Long> 
 
     fun findByTeamId(teamId: Long): Iterable<SponsoringInvoice>
 
+    fun findByEventId(eventId:Long): Iterable<SponsoringInvoice>
+
     fun findByPurposeOfTransferCode(purposeOfTransferCode: String): SponsoringInvoice?
 
 }

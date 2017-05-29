@@ -4,6 +4,7 @@ import backend.model.challenges.Challenge
 import backend.model.event.Team
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
+import backend.model.payment.SponsoringInvoice
 import backend.model.payment.TeamEntryFeeInvoice
 import backend.model.sponsoring.Sponsoring
 import backend.model.user.Participant
@@ -529,6 +530,70 @@ class MailServiceImpl @Autowired constructor(configurationService: Configuration
         this.send(mail)
     }
 
+    override fun sendGeneratedDonationPromiseSponsor(invoice: SponsoringInvoice) {
+//        TODO("Hier fehlen noch stellen, kann so noch nicht verwendet werden")
+
+        val germanText = """
+            |Liebe(r) ${invoice.sponsor.firstname} ${invoice.sponsor.lastname},
+            |
+            |vielen herzlichen Dank für Ihre Unterstützung! Insgesamt wurden von den BreakOut Teams viele Kilometer zurückgelegt und unzählige Challenges gemeistert.
+            |Doch ohne Ihre Hilfe als Sponsor wäre der soziale Gedanke hinter diesem Projekt nicht umzusetzen. Deswegen freuen wir uns, wenn Sie Ihr Spendenversprechen bis zum 26.06.2017 erfüllen.
+            |Hier eine Aufschlüsselung Ihres Spendenversprechens:
+            |
+            |${invoice.toEmailOverview()}
+            |
+            |Insgesamt ergibt sich aus den eingetragenen Sponsorings und Challenges ein Spendenversprechen von ${invoice.amount}.
+            |
+            |BETRAG: ${invoice.amount}
+            |VERWENDUNGSZWECK: ${invoice.purposeOfTransfer}
+            |
+            |KONTOINHABER: XXX
+            |BANKNAME: XXX
+            |IBAN: XXX
+            |BIC: XXX
+            |
+            |
+            |Besonders wichtig ist der Verwendungszweck, denn nur so können Ihre Spenden dem richtigen Team zugeordnet werden. Darüber hinaus können wir Ihnen nur bei Eingabe Ihrer Adresse eine offizielle Spendenquittung zusenden.
+            |
+            |Bei Fragen können Sie sich gerne an Ihr Team oder auch an uns wenden.
+            |
+            |Wir wünschen Ihnen eine schöne Woche,
+            |Ihr BreakOut-Team""".trimMargin("|").addHtmlNewlines()
+
+        val englishText = """
+            |Dear Sponsor,
+            |
+            |Many, many thanks for your support! Overall, the BreakOut teams covered many kilometers and mastered countless challenges.
+            |But without your help as a sponsor the social thought behind this project would not have been realized. That is why we are kindly asking you you to fulfill your donation promise until the XXX.
+            |Here is a breakdown of your donation promise:
+            |
+            |${invoice.toEmailOverview()}
+            |
+            |All in all, the sponsorship and the challenge of a XXX donation. If you have supported multiple teams, you will see several uses. Please make these transfers one by one so that we can assign the donations to each team correctly.
+            |
+            |AMOUNT: ${invoice.amount}
+            |INTENDED USE: ${invoice.purposeOfTransfer}
+            |
+            |AMOUNT: XXX
+            |XXX
+            |
+            |CONTRACTORS: XXX
+            |BANKNAME: XXX
+            |IBAN: XXX
+            |BIC: XXX
+            |
+            |
+            |Especially important is the purpose of the donation, because we can only assign your donations to the right team with the correct porpuse. In addition, we can only send you an official donation receipt when you enter your address.
+            |
+            |If you have any questions, please do not hesitate to contact your team or us.
+            |
+            |We wish you a great week,
+            |Your BreakOut team""".trimMargin("|")
+
+        println(germanText)
+
+    }
+
     private fun mergeEmailBody(germanText: String, englishText: String): String {
         return germanText + "<br><br><hr><br><br>" + englishText
     }
@@ -536,4 +601,8 @@ class MailServiceImpl @Autowired constructor(configurationService: Configuration
     private fun mergeEmailSubject(germanSubject: String, englishSubject: String): String {
         return germanSubject + " / " + englishSubject
     }
+}
+
+fun String.addHtmlNewlines(): String {
+    return this.replace("\n", "\n<br />")
 }

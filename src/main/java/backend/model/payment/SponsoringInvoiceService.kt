@@ -1,6 +1,7 @@
 package backend.model.payment
 
 import backend.model.challenges.Challenge
+import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.sponsoring.Sponsoring
 import backend.model.user.Admin
@@ -26,8 +27,10 @@ interface SponsoringInvoiceService {
     @Deprecated("Legacy method used for previous versions, where SponsoringInvoices where generated on a per team basis")
     fun createInvoice(team: Team, amount: Money, company: String, firstname: String, lastname: String): SponsoringInvoice
 
-    fun createInvoicesForEvent(eventId: Long): Int
+    fun createInvoicesForEvent(event: Event): Int
 
     fun addSepaPaymentToInvoice(admin: Admin,fidorId: Long, amount: Money, invoice: SponsoringInvoice): SponsoringInvoice
+
+    fun sendInvoiceEmailsToSponsorsForEvent(event: Event)
 
 }

@@ -23,6 +23,9 @@ class SponsoringInvoice : Invoice {
         private set
 
     @ManyToOne
+    var event: Event? = null
+
+    @ManyToOne
     private var unregisteredSponsor: UnregisteredSponsor? = null
 
     @ManyToOne
@@ -85,11 +88,11 @@ class SponsoringInvoice : Invoice {
      */
 
     // TODO: Add unit test, so that only those with this specific event are added!
-    constructor(sponsor: ISponsor, eventId: Long) : super(sponsor.challenges.billableAmount().add(sponsor.sponsorings.billableAmount())) {
-        this.challenges = sponsor.challenges.toMutableList().filter { it.belongsToEvent(eventId) }
-        this.sponsorings = sponsor.sponsorings.toMutableList().filter { it.belongsToEvent(eventId)}
-        print(sponsor.company)
+    constructor(sponsor: ISponsor, event: Event) : super(sponsor.challenges.billableAmount().add(sponsor.sponsorings.billableAmount())) {
+        this.challenges = sponsor.challenges.toMutableList().filter { it.belongsToEvent(event.id!!) }
+        this.sponsorings = sponsor.sponsorings.toMutableList().filter { it.belongsToEvent(event.id!!) }
         this.sponsor = sponsor
+        this.event = event
     }
 
     private constructor() : super()
@@ -104,28 +107,28 @@ class SponsoringInvoice : Invoice {
 
     fun toEmailOverview(): String {
         return """
-        |<b>Challenges</b><br/>
+        |<b>Challenges</b>
         |${this.challenges.toEmailListing()}
-        |<br/><b>Sponsorings</b><br/>
-        |${this.sponsorings.toEmailListing()}<br/>
+        |<b>Sponsorings</b>
+        |${this.sponsorings.toEmailListing()}
         |
-        |<b>Total:</b> $amount<br/>
-        |<b>Already paid:</b> ${amountOfCurrentPayments()}<br/>
+        |<b>Total:</b> $amount
+        |<b>Already paid:</b> ${amountOfCurrentPayments()}
         """.trimMargin("|")
     }
 
     @JvmName("sponsoringToEmailListing")
     private fun List<Sponsoring>.toEmailListing(): String {
-        return this.map { it.toEmailListing() }.foldRight("") { acc, s -> "$acc<br/>\n$s" }
+        return this.map { it.toEmailListing() }.foldRight("") { acc, s -> "$acc\n$s" }
     }
 
     private fun Sponsoring.toEmailListing(): String {
-        return "<b>Team-ID</b> ${this.team?.id} <b>Teamname</b> ${this.team?.name} <b>Status</b> ${this.status} <b>Amount Per Km</b> ${this.amountPerKm} <b>Actual Km</b> ${this.team?.getCurrentDistance()} <b>Billed Amount</b> ${this.billableAmount()}"
+        return "<b>Team-ID</b> ${this.team?.id} <b>Teamname</b> ${this.team?.name} <b>Status</b> ${this.status} <b>Amount Per Km</b> ${this.amountPerKm} <b>Limit</b> ${this.limit} <b>Actual Km</b> ${this.team?.getCurrentDistance()} <b>Billed Amount</b> ${this.billableAmount()}"
     }
 
     @JvmName("challengeToEmailListing")
     private fun List<Challenge>.toEmailListing(): String {
-        return this.map { it.toEmailListing() }.foldRight("") { acc, s -> "$acc<br/>\n$s" }
+        return this.map { it.toEmailListing() }.foldRight("") { acc, s -> "$acc\n$s" }
     }
 
     private fun Challenge.toEmailListing(): String {

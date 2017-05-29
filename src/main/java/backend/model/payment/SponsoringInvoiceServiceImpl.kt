@@ -2,11 +2,14 @@ package backend.model.payment
 
 import backend.model.challenges.Challenge
 import backend.model.challenges.ChallengeService
+import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.Sponsoring
 import backend.model.sponsoring.SponsoringService
 import backend.model.user.Admin
+import backend.services.mail.MailSenderService
+import backend.services.mail.MailService
 import org.javamoney.moneta.Money
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
@@ -14,7 +17,8 @@ import javax.transaction.Transactional
 @Service
 class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: SponsoringInvoiceRepository,
                                    private val challengeService: ChallengeService,
-                                   private val sponsoringService: SponsoringService) : SponsoringInvoiceService {
+                                   private val sponsoringService: SponsoringService,
+                                   private val mailService: MailService) : SponsoringInvoiceService {
 
     @Transactional
     override fun addAdminPaymentToInvoice(admin: Admin, amount: Money, invoice: SponsoringInvoice): SponsoringInvoice {
@@ -69,9 +73,16 @@ class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: Spon
     }
 
 
-    override fun createInvoicesForEvent(eventId: Long): Int {
-        val sponsors = this.findAllSponsorsAtEvent(eventId)
-        return sponsors.map { SponsoringInvoice(it, eventId) }.map { this.save(it) }.count()
+    override fun createInvoicesForEvent(event: Event): Int {
+        val sponsors = this.findAllSponsorsAtEvent(event.id!!)
+        return sponsors.map { SponsoringInvoice(it, event) }.map { this.save(it) }.count()
+    }
+
+    override fun sendInvoiceEmailsToSponsorsForEvent(event: Event) {
+        val invoices = sponsoringInvoiceRepository.findByEventId(event.id!!)
+        invoices.forEach {
+            mailService.sendGeneratedDonationPromiseSponsor(it)
+        }
     }
 
     private fun findAllSponsorsAtEvent(eventId: Long): Iterable<ISponsor> {
