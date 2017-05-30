@@ -117,7 +117,7 @@ class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: Spon
     }
 
     override fun sendInvoiceEmailsToSponsorsForEvent(event: Event) {
-        val invoices = sponsoringInvoiceRepository.findByEventId(event.id!!)
+        val invoices = sponsoringInvoiceRepository.findByEventIdWhereInitialVersionSentIsFalse(event.id!!)
         invoices.forEach {
             mailService.sendGeneratedDonationPromiseSponsor(it)
             Thread.sleep(1000) // We otherwise might kill our own email server this way
