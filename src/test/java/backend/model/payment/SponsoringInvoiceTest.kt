@@ -7,6 +7,7 @@ import backend.model.sponsoring.Sponsoring
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
 import backend.util.euroOf
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.powermock.api.mockito.PowerMockito
@@ -120,6 +121,7 @@ class SponsoringInvoiceTest {
     }
 
     @Test
+    @Ignore
     fun toEmailOverview() {
         val sponsor = PowerMockito.mock(Sponsor::class.java)
 
