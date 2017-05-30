@@ -118,11 +118,11 @@ class SponsoringInvoice : Invoice {
         return """
         |<b>Challenges</b>
         |${this.challenges.toEmailListing()}
-        |<b>Sponsorings</b>
+        |<b>Kilometerspenden / Donations per km</b>
         |${this.sponsorings.toEmailListing()}
         |
         |<b>Total:</b> ${amount.display()}
-        |<b>Already paid:</b> ${amountOfCurrentPayments().display()}
+        |<b>Bereits bezahlt:</b> ${amountOfCurrentPayments().display()}
         """.trimMargin("|")
     }
 
@@ -132,7 +132,7 @@ class SponsoringInvoice : Invoice {
     }
 
     private fun Sponsoring.toEmailListing(): String {
-        return "<b>Team-ID</b> ${this.team?.id} <b>Teamname</b> ${this.team?.name} <b>Status</b> ${this.status} <b>Amount Per Km</b> ${this.amountPerKm.display()} <b>Limit</b> ${this.limit.display()} <b>Actual Km</b> ${this.team?.getCurrentDistance()} <b>Billed Amount</b> ${this.billableAmount().display()}"
+        return "<b>Team-ID</b> ${this.team?.id} <b>Teamname</b> ${this.team?.name} <b>Status</b> ${this.status} <b>Betrag pro km</b> ${this.amountPerKm.display()} <b>Limit</b> ${this.limit.display()} <b>Gereiste KM</b> ${this.team?.getCurrentDistance()} <b>Spendenversprechen</b> ${this.billableAmount().display()}"
     }
 
     @JvmName("challengeToEmailListing")
@@ -142,7 +142,7 @@ class SponsoringInvoice : Invoice {
 
     private fun Challenge.toEmailListing(): String {
         println()
-        return "<b>Team-ID</b> ${this.team?.id} <b>Teamname</b> ${this.team?.name} <b>Description</b> ${this.description.take(50)}... <b>Status</b> ${this.status} <b>Amount</b> ${this.amount.display()} <b>Billed Amount</b> ${this.billableAmount().display()}"
+        return "<b>Team-ID</b> ${this.team?.id} <b>Teamname</b> ${this.team?.name} <b>Beschreibung</b> ${this.description.take(50)}... <b>Challengebetrag</b> ${this.amount.display()} <b>Spendenversprechen</b> ${this.billableAmount().display()}"
     }
 
     fun getContactEmails(): List<EmailAddress> {
