@@ -18,11 +18,11 @@ import javax.persistence.*
 @Entity
 class SponsoringInvoice : Invoice {
 
-    @OneToMany(cascade = arrayOf(CascadeType.MERGE, CascadeType.PERSIST))
+    @OneToMany(cascade = arrayOf(CascadeType.MERGE))
     var sponsorings: List<Sponsoring> = listOf()
         private set
 
-    @OneToMany(cascade = arrayOf(CascadeType.MERGE, CascadeType.PERSIST))
+    @OneToMany(cascade = arrayOf(CascadeType.MERGE))
     var challenges: List<Challenge> = listOf()
         private set
 
@@ -30,10 +30,10 @@ class SponsoringInvoice : Invoice {
     var event: Event? = null
 
     @ManyToOne
-    private var unregisteredSponsor: UnregisteredSponsor? = null
+    public var unregisteredSponsor: UnregisteredSponsor? = null
 
     @ManyToOne
-    private var registeredSponsor: Sponsor? = null
+    public var registeredSponsor: Sponsor? = null
 
     var sponsor: ISponsor
         private set(value) {

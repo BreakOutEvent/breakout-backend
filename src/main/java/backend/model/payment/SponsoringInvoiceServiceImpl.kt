@@ -23,7 +23,7 @@ class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: Spon
                                    private val mailService: MailService,
                                    private val eventService: EventService) : SponsoringInvoiceService {
 
-    private val  logger = LoggerFactory.getLogger(SponsoringInvoiceServiceImpl::class.java)
+    private val logger = LoggerFactory.getLogger(SponsoringInvoiceServiceImpl::class.java)
 
     @Transactional
     override fun addAdminPaymentToInvoice(admin: Admin, amount: Money, invoice: SponsoringInvoice): SponsoringInvoice {
@@ -42,6 +42,10 @@ class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: Spon
     @Transactional
     override fun save(invoice: SponsoringInvoice): SponsoringInvoice {
         return sponsoringInvoiceRepository.save(invoice)
+    }
+
+    override fun saveAll(invoices: Iterable<SponsoringInvoice>): Iterable<SponsoringInvoice> {
+        return sponsoringInvoiceRepository.save(invoices)
     }
 
     @Transactional
@@ -80,17 +84,32 @@ class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: Spon
 
     override fun createInvoicesForEvent(event: Event): Int {
         val sponsors = this.findAllSponsorsAtEvent(event.id!!)
-        return sponsors
-                .map { SponsoringInvoice(it, event) }
+        return sponsors.map { SponsoringInvoice(it, event) }
                 .apply { sanityCheck(this, event) }
-                .map { this.save(it) }.count()
+                .map { tryRetryAndLogFailure(it) }.count()
+
+    }
+
+    private fun tryRetryAndLogFailure(invoice: SponsoringInvoice) {
+        // TODO: Fix this, but our shortened UUID sometimes has collisions right now
+        try {
+            this.save(invoice)
+        } catch (e: Exception) {
+            try {
+                invoice.generatePurposeOfTransfer()
+                this.save(invoice)
+            } catch (e: Exception) {
+                logger.error("Could not save invoice for sponsor ${invoice.registeredSponsor?.id} ${invoice.registeredSponsor?.email} ${invoice.unregisteredSponsor?.id} ${invoice.unregisteredSponsor?.firstname} ${invoice.unregisteredSponsor?.firstname} ${e.message}")
+                e.printStackTrace()
+            }
+        }
     }
 
     private fun sanityCheck(invoices: Iterable<SponsoringInvoice>, event: Event) {
         val total = invoices.fold(euroOf(0.0)) { a, b -> a.add(b.amount) }
         val highscore = eventService.getDonateSum(event.id!!)
 
-        if(total.numberStripped != highscore.fullSum) {
+        if (total.numberStripped != highscore.fullSum) {
             throw Exception("Sanity check failed. Amount in invoices (${total.numberStripped}) and highscore (${highscore.fullSum}) don't match")
         } else {
             logger.info("Sanity check succeeded. Creating invoices for a total of ${total.numberStripped}€")

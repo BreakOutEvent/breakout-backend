@@ -33,4 +33,5 @@ interface SponsoringInvoiceService {
 
     fun sendInvoiceEmailsToSponsorsForEvent(event: Event)
 
+    fun saveAll(invoices: Iterable<SponsoringInvoice>): Iterable<SponsoringInvoice>
 }
