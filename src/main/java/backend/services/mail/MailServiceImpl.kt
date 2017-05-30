@@ -532,12 +532,13 @@ class MailServiceImpl @Autowired constructor(configurationService: Configuration
     }
 
     override fun sendGeneratedDonationPromiseSponsor(invoice: SponsoringInvoice) {
-//        TODO("Hier fehlen noch stellen, kann so noch nicht verwendet werden")
 
         val germanText = """
             |Liebe(r) ${invoice.sponsor.firstname} ${invoice.sponsor.lastname},
             |
             |vielen herzlichen Dank, dass Sie beim BreakOut 2017 ein Team unterstützen! Ihre Spende wird von BreakOut e. V. an Jambo Bukoba e. V. weitergeleitet. So unterstützen Sie den Bau von Regenwassertanks an tansanischen Schulen. Wir bitten Sie herzlich, Ihre Spende bis zum 6. Juni an das unten angegebene Konto zu überweisen, damit wir das Geld rechtzeitig zur Siegerehrung des diesjährigen BreakOuts erhalten.
+            |Bei Challenges, für die Ihr Spendenversprechen 0€ beträgt, wurde die Challenge vom Team leider während des BreakOuts 2017 nicht erfüllt.
+            |Bitte beachten Sie: wenn Sie Teams in mehreren Städten unterstützt haben, erhalten Sie pro Stadt eine Email mit der Auflistung Ihres Spendenversprechens für diese Stadt.
             |
             |Hier eine Aufschlüsselung Ihres Spendenversprechens:
             |
@@ -569,6 +570,8 @@ class MailServiceImpl @Autowired constructor(configurationService: Configuration
             |Dear ${invoice.sponsor.firstname} ${invoice.sponsor.lastname},
             |
             |Many, many thanks for supporting a team during BreakOut 2017! Your donation will allow Jambo Bukoba build water tanks at Tanzanian schools and make an important contribution to improving students' lives. We would kindly ask you to transfer your donation by June 6th so that we will receive the payment in time for our awards party.
+            |If your donation promise for a given challenge is 0€, the team has unfortunately not mastered the challenge during BreakOut 2017.
+            |If you supported teams in different cities, you will receive on email per city showing your donation promise for the given city.
             |
             |${invoice.toEmailOverview()}
             |
