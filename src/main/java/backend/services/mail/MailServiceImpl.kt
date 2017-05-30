@@ -534,6 +534,8 @@ class MailServiceImpl @Autowired constructor(configurationService: Configuration
     override fun sendGeneratedDonationPromiseSponsor(invoice: SponsoringInvoice) {
 
         val germanText = """
+            |Sollten Sie bereits eine Email mit Ihrem Spendenversprechen erhalten haben, können Sie diese ignorieren
+            |
             |Liebe(r) ${invoice.sponsor.firstname} ${invoice.sponsor.lastname},
             |
             |vielen herzlichen Dank, dass Sie beim BreakOut 2017 ein Team unterstützen! Ihre Spende wird von BreakOut e. V. an Jambo Bukoba e. V. weitergeleitet. So unterstützen Sie den Bau von Regenwassertanks an tansanischen Schulen. Wir bitten Sie herzlich, Ihre Spende bis zum 6. Juni an das unten angegebene Konto zu überweisen, damit wir das Geld rechtzeitig zur Siegerehrung des diesjährigen BreakOuts erhalten.
@@ -567,6 +569,8 @@ class MailServiceImpl @Autowired constructor(configurationService: Configuration
             """.trimMargin("|").addHtmlNewlines()
 
         val englishText = """
+            |Should you have received an email stating your donation promise before, please ignore this email
+            |
             |Dear ${invoice.sponsor.firstname} ${invoice.sponsor.lastname},
             |
             |Many, many thanks for supporting a team during BreakOut 2017! Your donation will allow Jambo Bukoba build water tanks at Tanzanian schools and make an important contribution to improving students' lives. We would kindly ask you to transfer your donation by June 6th so that we will receive the payment in time for our awards party.
