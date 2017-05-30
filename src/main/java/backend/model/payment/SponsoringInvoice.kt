@@ -4,6 +4,7 @@ import backend.exceptions.DomainException
 import backend.model.challenges.Challenge
 import backend.model.event.Event
 import backend.model.event.Team
+import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.Sponsoring
@@ -150,7 +151,24 @@ class SponsoringInvoice : Invoice {
             is UnregisteredSponsor -> {
                 val fromChallenges = this.challenges.flatMap { it.team?.members?.map { EmailAddress(it.email) } ?: listOf() }
                 val fromSponsorings = this.sponsorings.flatMap { it.team?.members?.map { EmailAddress(it.email) } ?: listOf() }
-                val total = fromChallenges.union(fromSponsorings).distinct()
+                var fromUnregistered: Iterable<EmailAddress>
+
+                if(this.unregisteredSponsor?.email != null) {
+                    try {
+                        fromUnregistered = listOf(EmailAddress(this.unregisteredSponsor!!.email!!))
+                    } catch (e: Exception) {
+                        fromUnregistered = listOf<EmailAddress>()
+                    }
+
+                } else {
+                    fromUnregistered = listOf<EmailAddress>()
+                }
+
+                val total = fromChallenges
+                        .union(fromSponsorings)
+                        .union(fromUnregistered)
+                        .distinct()
+
                 if(total.size > 3) throw Exception("There should be at max 3 emails to contact per invoice")
                 return total
             }
