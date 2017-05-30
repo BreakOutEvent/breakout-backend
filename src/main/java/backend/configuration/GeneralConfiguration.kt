@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
+import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestOperations
 import org.springframework.web.client.RestTemplate
@@ -14,6 +15,7 @@ import javax.servlet.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
+@EnableScheduling
 @Configuration
 class GeneralConfiguration {
 

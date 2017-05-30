@@ -4,7 +4,6 @@ import backend.controller.exceptions.NotFoundException
 import backend.model.challenges.Challenge
 import backend.model.challenges.ChallengeService
 import backend.model.challenges.ChallengeStatus
-import backend.model.event.EventService
 import backend.model.event.TeamService
 import backend.model.location.LocationService
 import backend.model.misc.Coord
@@ -38,31 +37,12 @@ class AdminController(private val mailService: MailService,
                       private val challengeService: ChallengeService,
                       private val userService: UserService,
                       private val emailRepository: EmailRepository,
-                      private val eventService: EventService,
                       private val locationService: LocationService,
                       private val sponsoringInvoiceService: SponsoringInvoiceService,
                       private val postingService: PostingService) {
 
 
     private val logger: Logger = LoggerFactory.getLogger(AdminController::class.java)
-
-    /**
-     * GET /admin/regeneratecache/
-     * Allows admin to regenerate static caches
-     */
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("/regeneratecache/")
-    fun regenerateCache(@RequestParam(value = "event", required = false) event: Long?): String {
-        logger.info("Regenerating event $event caches from admin request")
-        eventService.regenerateCache(event)
-        return "done"
-    }
-
-    /**
-     * GET /admin/generatespeedtolocations/
-     * Allows Admin to generate speed to locations where missing
-     */
 
     //@PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/generatespeedtolocations/")
