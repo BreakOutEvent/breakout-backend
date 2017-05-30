@@ -120,7 +120,7 @@ class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: Spon
         val invoices = sponsoringInvoiceRepository.findByEventId(event.id!!)
         invoices.forEach {
             mailService.sendGeneratedDonationPromiseSponsor(it)
-            Thread.sleep(100) // We otherwise might kill our own email server this way
+            Thread.sleep(1000) // We otherwise might kill our own email server this way
         }
     }
 
