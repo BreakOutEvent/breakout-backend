@@ -70,7 +70,7 @@ class Email : BasicEntity {
     var buttonUrl: String? = null
 
     @JsonProperty("html")
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "LONGTEXT")
     lateinit var body: String
 
     @JsonProperty("campaign_code")
