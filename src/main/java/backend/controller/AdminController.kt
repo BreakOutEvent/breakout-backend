@@ -44,7 +44,7 @@ class AdminController(private val mailService: MailService,
 
     private val logger: Logger = LoggerFactory.getLogger(AdminController::class.java)
 
-    //@PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/generatespeedtolocations/")
     fun generateSpeedToLocations(): String {
         logger.info("Regenerating speed to locations where missing from admin request")
