@@ -50,9 +50,17 @@ class MailSenderServiceImpl @Autowired constructor(private val restTemplate: Res
             }
         } catch (e: Exception) {
             logger.error(e.message)
-            email.isSent = false
-            emailRepository.save(email)
-            logger.error("Mailer not available at this time, saved mail")
+
+            try {
+                email.isSent = false
+                emailRepository.save(email)
+                logger.error("Can't send email via mailer. Saving to database. Cause: ${e.message}")
+            } catch (e: Exception) {
+                logger.error("Mailer rejected email and could also not be saved ${e.message}")
+                logger.error("Content of failed email TO ${email.toAsString()} BCC ${email.bccAsString()} BODY:${email.body}")
+            }
+
+
         }
     }
 
