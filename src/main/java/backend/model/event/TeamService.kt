@@ -97,4 +97,6 @@ interface TeamService {
     fun findAll(): Iterable<Team>
 
     fun findAllTeamSummaryProjections(): Iterable<TeamSummaryProjection>
+
+    fun sendEmailsToTeamsWithDonationOverview(event: Event): Int
 }

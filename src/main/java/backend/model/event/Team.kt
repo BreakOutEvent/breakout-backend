@@ -3,11 +3,13 @@ package backend.model.event
 import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.challenges.Challenge
+import backend.model.challenges.ChallengeStatus
 import backend.model.location.Location
 import backend.model.media.Media
 import backend.model.misc.EmailAddress
 import backend.model.payment.TeamEntryFeeInvoice
 import backend.model.payment.billableAmount
+import backend.model.payment.display
 import backend.model.sponsoring.Sponsoring
 import backend.model.user.Participant
 import org.hibernate.annotations.Formula
@@ -165,7 +167,37 @@ class Team : BasicEntity {
         return this.sponsoring.billableAmount()
     }
 
+    @Deprecated("The naming on this is bad as the current distance is actually the farthest distance during the event. This will be renamed")
     fun getCurrentDistance(): Double {
         return currentDistance ?: 0.0
+    }
+
+    fun toEmailOverview(): String {
+        val challenges = this.challenges.filter { it.status == ChallengeStatus.ACCEPTED || it.status == ChallengeStatus.WITH_PROOF }
+        return """
+        |<b>Challenges</b>
+        |${challenges.toEmailListing()}
+        |<b>Kilometerspenden / Donations per km</b>
+        |${this.sponsoring.toEmailListing()}
+        """.trimMargin("|")
+    }
+
+    @JvmName("sponsoringToEmailListing")
+    private fun List<Sponsoring>.toEmailListing(): String {
+        return this.map { it.toEmailListing() }.foldRight("") { acc, s -> "$acc\n$s" }
+    }
+
+    private fun Sponsoring.toEmailListing(): String {
+        return "<b>Name</b> ${this.sponsor.firstname} ${this.sponsor.lastname} <b>Status</b> ${this.status} <b>Betrag pro km</b> ${this.amountPerKm.display()} <b>Limit</b> ${this.limit.display()} <b>Gereiste KM</b> ${this.team?.getCurrentDistance()} <b>Spendenversprechen</b> ${this.billableAmount().display()}"
+    }
+
+    @JvmName("challengeToEmailListing")
+    private fun List<Challenge>.toEmailListing(): String {
+        return this.map { it.toEmailListing() }.foldRight("") { acc, s -> "$acc\n$s" }
+    }
+
+    private fun Challenge.toEmailListing(): String {
+        println()
+        return "<b>Name</b> ${this.sponsor.firstname} ${this.sponsor.lastname} <b>Beschreibung</b> ${this.description.take(50)}... <b>Challengebetrag</b> ${this.amount.display()} <b>Spendenversprechen</b> ${this.billableAmount().display()}"
     }
 }

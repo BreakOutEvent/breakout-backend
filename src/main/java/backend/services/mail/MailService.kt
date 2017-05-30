@@ -44,4 +44,6 @@ interface MailService {
     fun sendSponsoringWasWithdrawnEmail(sponsoring: Sponsoring)
 
     fun sendGeneratedDonationPromiseSponsor(invoice: SponsoringInvoice)
+
+    fun sendTeamWithDonationOverviewEmail(team: Team)
 }

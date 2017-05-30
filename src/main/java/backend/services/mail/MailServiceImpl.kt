@@ -1,6 +1,7 @@
 package backend.services.mail
 
 import backend.model.challenges.Challenge
+import backend.model.challenges.ChallengeStatus
 import backend.model.event.Team
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
@@ -529,6 +530,59 @@ class MailServiceImpl @Autowired constructor(configurationService: Configuration
                 buttonText = "Nächste Schritte / Next steps",
                 campaignCode = "payment_full")
         this.send(mail)
+    }
+
+    override fun sendTeamWithDonationOverviewEmail(team: Team) {
+        val raisedAmount = team.raisedAmountFromChallenges().add(team.raisedAmountFromSponsorings())
+        val numberFulfilled = team.challenges.filter { it.status == ChallengeStatus.WITH_PROOF }.count()
+        val distance = team.getCurrentDistance()
+
+        val germanText = """
+            |Liebes Team ${team.name},
+            |
+            |Ihr seid der Wahnsinn! Ihr habt dieses Jahr eine Strecke von $distance km zurückgelegt, dabei $numberFulfilled Challenges erfüllt und $raisedAmount € an Spendenversprechen generiert. Chapeau!
+            |Bei Challenges, für die das Spendenversprechen 0€ beträgt, wurde die Challenge leider während des BreakOuts 2017 nicht erfüllt.
+            |
+            |Diese Spenden setzen sich wie folgt zusammen:
+            |
+            |${team.toEmailOverview()}
+            |
+            |Wenn eure Kilometerspenden auf "ACCEPTED" stehen, habt ihr sie akzeptiert und sie werden eurem Spendenversprechen angerechnet.
+            |Wenn eure Kilometerspenden auf "WITHDRAWN" stehen, dann hat euer Sponsor dieses Spendenversprechen zurückgezogen.
+            |
+            |Bitte erinnert eure Sponsoren an die Bezahlung des Spendenversprechens bis 6. Juni, damit euer Geld bis zur Siegerehrung da ist.
+            |
+            |Haben wir schon erwähnt, wie großartig Ihr seid ;-)
+            |
+            |Cheerio,
+            |Euer BreakOut Team """.trimMargin("|").addHtmlNewlines()
+
+        val englishText = """
+            |Dear Team ${team.name},
+            |
+            |You are madness! You covered a distance of $distance km this year, fulfilled $numberFulfilled Challenges and generated a donations promise of $raisedAmount. Chapeau!
+            |If your donation promise for a given challenge is 0€, you have unfortunately not mastered the challenge during BreakOut 2017.
+            |
+            |These donations are made up as follows:
+            |
+            |${team.toEmailOverview()}
+            |
+            |Please remind your sponsors of the payment of the donation by June 6th so that we'll receive the payment by the victory party.
+            |
+            |Have we already mentioned how awesome you are? ;-)
+            |
+            |Cheerio,
+            |Your BreakOut Team""".trimMargin("|").addHtmlNewlines()
+
+        val germanSubject = "So viele Spenden habt ihr gesammelt"
+        val englishSubject = "You have raised so many donations"
+        val email = Email (
+                to = team.members.map { EmailAddress(it.email) },
+                subject = mergeEmailSubject(germanSubject, englishSubject),
+                body = mergeEmailBody(germanText, englishText),
+                campaignCode = "team_generated_donations"
+        )
+        mailSenderService.send(email)
     }
 
     override fun sendGeneratedDonationPromiseSponsor(invoice: SponsoringInvoice) {

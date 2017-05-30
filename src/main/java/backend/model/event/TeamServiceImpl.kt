@@ -166,6 +166,16 @@ class TeamServiceImpl(private val repository: TeamRepository,
     override fun findAllTeamSummaryProjections(): Iterable<TeamSummaryProjection> {
         return repository.findAllByEventIsCurrentTrueOrderByName()
     }
+
+    override fun sendEmailsToTeamsWithDonationOverview(event: Event): Int {
+        val teams = this.findByEventId(event.id!!).filter { it.hasStarted }
+        teams.forEach {
+            mailService.sendTeamWithDonationOverviewEmail(it)
+            Thread.sleep(1000) // Needed in order not to kill our mailserver
+        }
+
+        return teams.size
+    }
 }
 
 class TeamCreatedEvent(val team: Team)

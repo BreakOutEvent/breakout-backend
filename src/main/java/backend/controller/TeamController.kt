@@ -14,7 +14,6 @@ import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserService
 import backend.services.ConfigurationService
-import backend.util.CacheNames
 import backend.util.CacheNames.LOCATIONS
 import backend.util.CacheNames.POSTINGS
 import backend.util.CacheNames.TEAMS
@@ -29,6 +28,7 @@ import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.cache.annotation.Caching
 import org.springframework.http.HttpStatus.CREATED
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
@@ -46,6 +46,16 @@ class TeamController(private val teamService: TeamService,
     private val PAGE_SIZE: Int = configurationService.getRequired("org.breakout.api.page_size").toInt()
     private val logger: Logger = LoggerFactory.getLogger(TeamController::class.java)
 
+
+    /**
+     * POST /event/{eventId}/team/sendDonationPromise/
+     */
+    @PostMapping("/sendDonationPromise")
+    fun sendGeneratedDonationPromiseToTeams(@PathVariable eventId: Long): ResponseEntity<Any> {
+        val event = eventService.findById(eventId) ?: throw NotFoundException("Event with id $eventId does not exist")
+        teamService.sendEmailsToTeamsWithDonationOverview(event)
+        return ResponseEntity.ok(mapOf("message" to "ok"))
+    }
 
     /**
      * POST /event/{eventId}/team/leave/
