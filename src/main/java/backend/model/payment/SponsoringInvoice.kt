@@ -36,6 +36,8 @@ class SponsoringInvoice : Invoice {
     @ManyToOne
     public var registeredSponsor: Sponsor? = null
 
+    public var initialVersionSent: Boolean = false
+
     var sponsor: ISponsor
         private set(value) {
             when (value) {
