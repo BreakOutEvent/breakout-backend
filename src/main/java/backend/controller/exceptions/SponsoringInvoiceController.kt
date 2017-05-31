@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.repository.query.Param
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.ok
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -22,6 +23,7 @@ class SponsoringInvoiceController(private val sponsoringInvoiceService: Sponsori
     private val logger = LoggerFactory.getLogger(SponsoringInvoiceController::class.java)
 
     @PostMapping("/create/")
+    @PreAuthorize("hasAuthority('ADMIN')")
     fun test(@RequestParam("eventId") eventId: Long): ResponseEntity<Any> {
 
         val event = eventService.findById(eventId) ?: throw NotFoundException("event $eventId not found")
@@ -36,6 +38,7 @@ class SponsoringInvoiceController(private val sponsoringInvoiceService: Sponsori
     }
 
     @PostMapping("/sendmails")
+    @PreAuthorize("hasAuthority('ADMIN')")
     fun sendInvoiceEmailsToSponsors(@Param("eventId") eventId: Long): ResponseEntity<Any> {
 
         val event = eventService.findById(eventId) ?: throw NotFoundException("event $eventId not found")
