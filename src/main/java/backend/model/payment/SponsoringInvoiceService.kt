@@ -17,6 +17,8 @@ interface SponsoringInvoiceService {
 
     fun findByTeamId(teamId: Long): Iterable<SponsoringInvoice>
 
+    fun findByEventId(eventId: Long): Iterable<SponsoringInvoice>
+
     fun save(invoice: SponsoringInvoice): SponsoringInvoice
 
     fun addAdminPaymentToInvoice(admin: Admin, amount: Money, invoice: SponsoringInvoice): SponsoringInvoice

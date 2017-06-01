@@ -8,7 +8,7 @@ interface SponsoringInvoiceRepository : CrudRepository<SponsoringInvoice, Long> 
 
     fun findByTeamId(teamId: Long): Iterable<SponsoringInvoice>
 
-    fun findByEventId(eventId:Long): Iterable<SponsoringInvoice>
+    fun findAllByEventId(eventId:Long): Iterable<SponsoringInvoice>
 
     @Query("from SponsoringInvoice where initialVersionSent = false and event.id = :eventId")
     fun findByEventIdWhereInitialVersionSentIsFalse(@Param("eventId") eventId: Long): Iterable<SponsoringInvoice>

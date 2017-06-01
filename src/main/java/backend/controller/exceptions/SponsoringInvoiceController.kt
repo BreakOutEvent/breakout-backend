@@ -2,16 +2,13 @@ package backend.controller.exceptions
 
 import backend.model.event.EventService
 import backend.model.payment.SponsoringInvoiceService
-import org.omg.CosNaming.NamingContextPackage.NotFound
+import backend.view.sponsoring.SponsoringInvoiceView
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.query.Param
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.ok
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.net.URI
 import kotlin.system.measureTimeMillis
 
@@ -39,6 +36,7 @@ class SponsoringInvoiceController(private val sponsoringInvoiceService: Sponsori
 
     @PostMapping("/sendmails")
     @PreAuthorize("hasAuthority('ADMIN')")
+            // TODO: Why does @Param work here?
     fun sendInvoiceEmailsToSponsors(@Param("eventId") eventId: Long): ResponseEntity<Any> {
 
         val event = eventService.findById(eventId) ?: throw NotFoundException("event $eventId not found")
@@ -47,5 +45,15 @@ class SponsoringInvoiceController(private val sponsoringInvoiceService: Sponsori
         sponsoringInvoiceService.sendInvoiceEmailsToSponsorsForEvent(event)
 
         return ok(mapOf("message" to "ok"))
+    }
+
+    @GetMapping("/{eventId}/")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    fun getInvoicesByEvent(@PathVariable("eventId") eventId: Long): Iterable<SponsoringInvoiceView> {
+
+        eventService.findById(eventId) ?: throw NotFoundException("Event with id $eventId not found")
+        return sponsoringInvoiceService.findByEventId(eventId).map {
+            SponsoringInvoiceView(it)
+        }
     }
 }

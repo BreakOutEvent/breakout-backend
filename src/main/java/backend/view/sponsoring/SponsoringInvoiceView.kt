@@ -1,34 +1,45 @@
 package backend.view.sponsoring
 
 import backend.model.payment.SponsoringInvoice
-import backend.view.PaymentView
-import backend.view.challenge.DetailedChallengeView
+import backend.model.sponsoring.ISponsor
+import backend.view.user.UserView
 
 class SponsoringInvoiceView {
 
     var id: Long? = null
     var amount: Double? = null
-    var teamId: Long? = null
-    var subject: String? = null
-    var firstname: String? = null
-    var lastname: String? = null
-    var company: String? = null
-    var payments: List<PaymentView> = listOf()
-    var sponsorings: List<DetailedSponsoringView> = listOf()
-    var challenges: List<DetailedChallengeView> = listOf()
+    var payed: Double? = null
+    var sponsor: SponsorView? = null
+    var purposeOfTransfer: String? = null
 
     constructor()
 
     constructor(invoice: SponsoringInvoice) {
         this.id = invoice.id
         this.amount = invoice.amount.numberStripped.toDouble()
-        this.teamId = invoice.team?.id
-        this.subject = invoice.subject
-        this.firstname = invoice.firstname
-        this.lastname = invoice.lastname
-        this.company = invoice.company
-        this.payments = invoice.getPayments().map(::PaymentView)
-        this.challenges = invoice.challenges.map(::DetailedChallengeView)
-        this.sponsorings = invoice.sponsorings.map(::DetailedSponsoringView)
+        this.payed = invoice.amountOfCurrentPayments().numberStripped.toDouble()
+        this.sponsor = SponsorView(invoice.sponsor)
+        this.purposeOfTransfer = invoice.purposeOfTransfer
+    }
+}
+
+class SponsorView {
+
+    var firstname: String? = null
+    var lastname: String? = null
+    var address: UserView.AddressView? = null
+    var company: String? = null
+    var email: String? = null
+    var url: String? = null
+
+    constructor()
+
+    constructor(sponsor: ISponsor) {
+        this.firstname = sponsor.firstname
+        this.lastname = sponsor.lastname
+        this.address = UserView.AddressView(sponsor.address)
+        this.company = sponsor.company
+        this.email = sponsor.registeredSponsor?.email ?: sponsor.unregisteredSponsor?.email
+        this.url = sponsor.url.toString()
     }
 }

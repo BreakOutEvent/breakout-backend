@@ -61,6 +61,10 @@ class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: Spon
         return sponsoringInvoiceRepository.findByTeamId(teamId)
     }
 
+    override fun findByEventId(eventId: Long): Iterable<SponsoringInvoice> {
+        return sponsoringInvoiceRepository.findAllByEventId(eventId)
+    }
+
     @Transactional
     override fun createInvoice(team: Team, amount: Money, subject: String, sponsorings: List<Sponsoring>, challenges: List<Challenge>): SponsoringInvoice {
         val invoice = SponsoringInvoice(team, amount, subject, sponsorings, challenges)
