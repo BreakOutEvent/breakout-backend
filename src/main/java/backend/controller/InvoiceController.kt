@@ -143,24 +143,4 @@ class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
         val invoices = sponsoringInvoiceService.findAll()
         return invoices.map(::SponsoringInvoiceView)
     }
-
-    /**
-     * POST /invoice/sponsoring/
-     * Allows admin to get all sponsoring invoices
-     */
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("/sponsoring/")
-    fun createSponsorInvoice(@Valid @RequestBody body: Map<String, Any>): SponsoringInvoiceView {
-
-        val amount = body["amount"] as? Number ?: throw BadRequestException("body is missing field amount")
-        val teamId = body["teamId"] as? Int ?: throw BadRequestException("body is missing field teamId")
-        val firstname = body["firstname"] as? String ?: throw BadRequestException("body is missing field firstname")
-        val lastname = body["lastname"] as? String ?: throw BadRequestException("body is missing field lastname")
-        val company = body["company"] as? String ?: throw BadRequestException("body is missing field company")
-
-        val team = teamService.findOne(teamId.toLong()) ?: throw BadRequestException("team not found")
-
-        val sponsoringInvoice = sponsoringInvoiceService.createInvoice(team, Money.of(amount, "EUR"), company, firstname, lastname)
-        return SponsoringInvoiceView(sponsoringInvoice)
-    }
 }

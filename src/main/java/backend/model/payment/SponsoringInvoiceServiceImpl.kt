@@ -1,12 +1,9 @@
 package backend.model.payment
 
-import backend.model.challenges.Challenge
 import backend.model.challenges.ChallengeService
 import backend.model.event.Event
 import backend.model.event.EventService
-import backend.model.event.Team
 import backend.model.sponsoring.ISponsor
-import backend.model.sponsoring.Sponsoring
 import backend.model.sponsoring.SponsoringService
 import backend.model.user.Admin
 import backend.services.mail.MailService
@@ -63,22 +60,6 @@ class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: Spon
 
     override fun findByEventId(eventId: Long): Iterable<SponsoringInvoice> {
         return sponsoringInvoiceRepository.findAllByEventId(eventId)
-    }
-
-    @Transactional
-    override fun createInvoice(team: Team, amount: Money, subject: String, sponsorings: List<Sponsoring>, challenges: List<Challenge>): SponsoringInvoice {
-        val invoice = SponsoringInvoice(team, amount, subject, sponsorings, challenges)
-        val savedInvoice = sponsoringInvoiceRepository.save(invoice)
-
-        return savedInvoice
-    }
-
-    @Transactional
-    override fun createInvoice(team: Team, amount: Money, company: String, firstname: String, lastname: String): SponsoringInvoice {
-        val invoice = SponsoringInvoice(team, amount, company, firstname, lastname)
-        val savedInvoice = sponsoringInvoiceRepository.save(invoice)
-
-        return savedInvoice
     }
 
     override fun findByPurposeOfTransferCode(purposeOfTransferCode: String): SponsoringInvoice? {

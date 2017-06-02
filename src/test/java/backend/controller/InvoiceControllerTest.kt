@@ -3,26 +3,23 @@ package backend.controller
 import backend.Integration.IntegrationTest
 import backend.model.event.Team
 import backend.model.misc.Coord
-import backend.model.payment.SponsoringInvoice
 import backend.model.user.Admin
 import backend.model.user.Participant
 import backend.model.user.User
 import backend.testHelper.asUser
 import backend.testHelper.json
-import org.javamoney.moneta.Money
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
 
+// Currently only tests TeamEntryFeeInvoices, not SponsoringInvoices!
 open class InvoiceControllerTest : IntegrationTest() {
 
     private lateinit var team: Team
     private lateinit var admin: Admin
-    private lateinit var sponsoringInvoice: SponsoringInvoice
     private lateinit var creator: User
 
     @Before
@@ -37,8 +34,6 @@ open class InvoiceControllerTest : IntegrationTest() {
         invitee.getRole(Participant::class)!!.setCurrentTeam(team)
         teamService.save(team)
         userService.save(invitee)
-
-        sponsoringInvoice = sponsoringInvoiceService.createInvoice(team, Money.of(20, "EUR"), "", "test", "test2")
     }
 
     @Test

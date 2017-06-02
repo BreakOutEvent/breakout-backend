@@ -60,36 +60,20 @@ class SponsoringInvoice : Invoice {
      * not be used actively anymore.
      */
     @Deprecated("Older invoices used this as their subject. This property allows to access this information")
-    var subject: String? = null
+    private var subject: String? = null
 
     @Deprecated("Older invoices stored the sponsor company 'inline'. This property allows to access this information")
-    var company: String? = null
+    private var company: String? = null
 
     @Deprecated("Older invoices stored the sponsor company 'inline'. This property allows to access this information")
-    var firstname: String? = null
+    private var firstname: String? = null
 
     @Deprecated("Older invoices stored the sponsor company 'inline'. This property allows to access this information")
-    var lastname: String? = null
+    private var lastname: String? = null
 
     @Deprecated("Older invoices were built on a per team basis. This property allows to access this information")
     @OneToOne(fetch = FetchType.LAZY)
-    var team: Team? = null
-
-    @Deprecated("Older invoices were built on a per team basis. This constructor allowed one to do so")
-    constructor(team: Team, amount: Money, subject: String, sponsorings: List<Sponsoring>, challenges: List<Challenge>) : super(amount) {
-        this.team = team
-        this.subject = subject
-        this.sponsorings = sponsorings
-        this.challenges = challenges
-    }
-
-    @Deprecated("Older invoices were built on a per team basis. This constructor allowed one to do so")
-    constructor(team: Team, amount: Money, company: String, firstname: String, lastname: String) : super(amount) {
-        this.team = team
-        this.company = company
-        this.firstname = firstname
-        this.lastname = lastname
-    }
+    private var team: Team? = null
     /*
      * End deprecated properties
      */
@@ -107,7 +91,7 @@ class SponsoringInvoice : Invoice {
     private constructor() : super()
 
     override fun checkPaymentEligability(payment: Payment) {
-        if (!team!!.isFull()) throw DomainException("Payments can only be added to teams which already have two members")
+        // Payments will be accepted no matter what!
     }
 
     override fun generatePurposeOfTransfer(): String {
