@@ -10,7 +10,7 @@ class AdminPayment : Payment {
 
     constructor() : super()
 
-    constructor(amount: Money, admin: Admin) : super(amount, admin)
+    constructor(amount: Money, admin: Admin, fidorId: Long? = null) : super(amount, admin, fidorId)
 
     override fun getPaymentMethod() = "Payment added by Admin"
 }

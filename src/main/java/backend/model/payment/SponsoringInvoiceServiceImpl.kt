@@ -23,8 +23,11 @@ class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: Spon
     private val logger = LoggerFactory.getLogger(SponsoringInvoiceServiceImpl::class.java)
 
     @Transactional
-    override fun addAdminPaymentToInvoice(admin: Admin, amount: Money, invoice: SponsoringInvoice): SponsoringInvoice {
-        val payment = AdminPayment(amount, admin)
+    override fun addAdminPaymentToInvoice(admin: Admin,
+                                          amount: Money,
+                                          invoice: SponsoringInvoice,
+                                          fidorId: Long?): SponsoringInvoice {
+        val payment = AdminPayment(amount, admin, fidorId)
         invoice.addPayment(payment)
         return invoice
     }
