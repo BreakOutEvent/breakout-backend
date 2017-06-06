@@ -5,8 +5,10 @@ import backend.model.challenges.ChallengeStatus
 import backend.model.event.Event
 import backend.model.sponsoring.Sponsoring
 import backend.model.sponsoring.UnregisteredSponsor
+import backend.model.user.Admin
 import backend.model.user.Sponsor
 import backend.util.euroOf
+import org.junit.Assert.assertFalse
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,7 +22,12 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 @RunWith(PowerMockRunner::class)
-@PrepareForTest(Challenge::class, Sponsoring::class, Sponsor::class, UnregisteredSponsor::class, Event::class)
+@PrepareForTest(Challenge::class,
+        Sponsoring::class,
+        Sponsor::class,
+        UnregisteredSponsor::class,
+        Event::class,
+        Admin::class)
 class SponsoringInvoiceTest {
 
     @Test
@@ -32,7 +39,7 @@ class SponsoringInvoiceTest {
         val sponsoring3 = mock(Sponsoring::class.java)
         val sponsorings = mutableListOf(sponsoring1, sponsoring2, sponsoring3)
         val sponsor = mock(Sponsor::class.java)
-        val event= mock(Event::class.java)
+        val event = mock(Event::class.java)
 
         `when`(event.id).thenReturn(1)
 
@@ -74,7 +81,7 @@ class SponsoringInvoiceTest {
         `when`(sponsor.challenges).thenReturn(challenges)
 
         // when creating this invoice
-        val event= mock(Event::class.java)
+        val event = mock(Event::class.java)
 
         `when`(event.id).thenReturn(1)
         val invoice = SponsoringInvoice(sponsor, event)
@@ -86,7 +93,7 @@ class SponsoringInvoiceTest {
     @Test
     fun getSponsorRegistered() {
         val sponsor = mock(Sponsor::class.java)
-        val event= mock(Event::class.java)
+        val event = mock(Event::class.java)
 
         `when`(event.id).thenReturn(1)
         val invoice = SponsoringInvoice(sponsor, event)
@@ -96,7 +103,7 @@ class SponsoringInvoiceTest {
     @Test
     fun getSponsorUnregistered() {
         val sponsor = mock(UnregisteredSponsor::class.java)
-        val event= mock(Event::class.java)
+        val event = mock(Event::class.java)
 
         `when`(event.id).thenReturn(1)
         val invoice = SponsoringInvoice(sponsor, event)
@@ -110,7 +117,7 @@ class SponsoringInvoiceTest {
     @Test
     fun generatePurposeOfTransfer() {
         val sponsor = mock(UnregisteredSponsor::class.java)
-        val event= mock(Event::class.java)
+        val event = mock(Event::class.java)
 
         `when`(event.id).thenReturn(1)
         `when`(sponsor.lastname).thenReturn("samsamsam")
@@ -159,7 +166,7 @@ class SponsoringInvoiceTest {
         `when`(secondSponsoring.limit).thenReturn(euroOf(100))
         `when`(secondSponsoring.billableAmount()).thenReturn(euroOf(28.70))
 
-        val event= mock(Event::class.java)
+        val event = mock(Event::class.java)
         `when`(event.id).thenReturn(1)
         val invoice = SponsoringInvoice(sponsor, event)
 
@@ -175,6 +182,72 @@ class SponsoringInvoiceTest {
 
         <b>Total:</b> EUR 152.6
         <b>Already paid:</b> EUR 0""".trimIndent(), invoice.toEmailOverview())
+    }
+
+    @Test
+    fun testRoundingInIsFullyPaid() {
+
+        // given a sponsor with 3 sponsorings
+        val sponsoring1 = mock(Sponsoring::class.java)
+        val sponsoring2 = mock(Sponsoring::class.java)
+        val sponsoring3 = mock(Sponsoring::class.java)
+        val sponsorings = mutableListOf(sponsoring1, sponsoring2, sponsoring3)
+
+        val sponsor = mock(Sponsor::class.java)
+        val event = mock(Event::class.java)
+
+        `when`(event.id).thenReturn(1)
+
+        `when`(sponsoring1.billableAmount()).thenReturn(euroOf(1.1))
+        `when`(sponsoring2.billableAmount()).thenReturn(euroOf(2.2))
+        `when`(sponsoring3.billableAmount()).thenReturn(euroOf(3.3))
+
+        `when`(sponsoring1.belongsToEvent(1)).thenReturn(true)
+        `when`(sponsoring2.belongsToEvent(1)).thenReturn(true)
+        `when`(sponsoring3.belongsToEvent(1)).thenReturn(true)
+
+        `when`(sponsor.sponsorings).thenReturn(sponsorings)
+        `when`(sponsor.challenges).thenReturn(mutableListOf<Challenge>())
+
+        // when creating the invoice for this sponsor
+        val invoice = SponsoringInvoice(sponsor, event)
+
+        invoice.addPayment(AdminPayment(euroOf(6.0), mock(Admin::class.java), null))
+        // then it has exactly those 3 sponsorings
+        assertTrue(invoice.isFullyPaid())
+    }
+
+    @Test
+    fun testRoundingInIsNotFullyPaid() {
+
+        // given a sponsor with 3 sponsorings
+        val sponsoring1 = mock(Sponsoring::class.java)
+        val sponsoring2 = mock(Sponsoring::class.java)
+        val sponsoring3 = mock(Sponsoring::class.java)
+        val sponsorings = mutableListOf(sponsoring1, sponsoring2, sponsoring3)
+
+        val sponsor = mock(Sponsor::class.java)
+        val event = mock(Event::class.java)
+
+        `when`(event.id).thenReturn(1)
+
+        `when`(sponsoring1.billableAmount()).thenReturn(euroOf(1.1))
+        `when`(sponsoring2.billableAmount()).thenReturn(euroOf(2.2))
+        `when`(sponsoring3.billableAmount()).thenReturn(euroOf(3.3))
+
+        `when`(sponsoring1.belongsToEvent(1)).thenReturn(true)
+        `when`(sponsoring2.belongsToEvent(1)).thenReturn(true)
+        `when`(sponsoring3.belongsToEvent(1)).thenReturn(true)
+
+        `when`(sponsor.sponsorings).thenReturn(sponsorings)
+        `when`(sponsor.challenges).thenReturn(mutableListOf<Challenge>())
+
+        // when creating the invoice for this sponsor with too little payments
+        val invoice = SponsoringInvoice(sponsor, event)
+        invoice.addPayment(AdminPayment(euroOf(5.0), mock(Admin::class.java), null))
+
+        // then it is not fully paid
+        assertFalse(invoice.isFullyPaid())
     }
 
 }
