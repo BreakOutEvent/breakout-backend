@@ -97,7 +97,8 @@ class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: Spon
         val total = invoices.fold(euroOf(0.0)) { a, b -> a.add(b.amount) }
         val highscore = eventService.getDonateSum(event.id!!)
 
-        if (total.numberStripped != highscore.fullSum) {
+        val amountsMatch = total.numberStripped.compareTo(highscore.fullSum) == 0
+        if (!amountsMatch) {
             throw Exception("Sanity check failed. Amount in invoices (${total.numberStripped}) and highscore (${highscore.fullSum}) don't match")
         } else {
             logger.info("Sanity check succeeded. Creating invoices for a total of ${total.numberStripped}€")
@@ -110,6 +111,23 @@ class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: Spon
             mailService.sendGeneratedDonationPromiseSponsor(it)
             Thread.sleep(1000) // We otherwise might kill our own email server this way
         }
+    }
+
+    override fun sendInvoiceReminderEmailsToSponsorsForEvent(event: Event) {
+
+        val invoices = findAllNotFullyPaidInvoicesForEvent(event)
+
+        invoices.forEach {
+            mailService.sendGeneratedDonationPromiseReminderSponsor(it)
+            Thread.sleep(1000)
+        }
+
+        logger.info("Sent payment reminder emails for event ${event.id} to ${invoices.count()} sponsors")
+    }
+
+    override fun findAllNotFullyPaidInvoicesForEvent(event: Event): Iterable<SponsoringInvoice> {
+        return sponsoringInvoiceRepository.findAllByEventId(event.id!!)
+                .filter { !it.isFullyPaid() }
     }
 
     private fun findAllSponsorsAtEvent(eventId: Long): Iterable<ISponsor> {

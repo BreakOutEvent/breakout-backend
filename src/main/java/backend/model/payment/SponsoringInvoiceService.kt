@@ -1,9 +1,6 @@
 package backend.model.payment
 
-import backend.model.challenges.Challenge
 import backend.model.event.Event
-import backend.model.event.Team
-import backend.model.sponsoring.Sponsoring
 import backend.model.user.Admin
 import org.javamoney.moneta.Money
 
@@ -29,5 +26,8 @@ interface SponsoringInvoiceService {
 
     fun sendInvoiceEmailsToSponsorsForEvent(event: Event)
 
+    fun sendInvoiceReminderEmailsToSponsorsForEvent(event: Event)
+
     fun saveAll(invoices: Iterable<SponsoringInvoice>): Iterable<SponsoringInvoice>
+    fun findAllNotFullyPaidInvoicesForEvent(event: Event): Iterable<SponsoringInvoice>
 }

@@ -31,6 +31,7 @@ class Team : BasicEntity {
 
     constructor(creator: Participant, name: String, description: String, event: Event) : this() {
         this.event = event
+        this.event.teams.add(this)
         this.addMember(creator)
         this.name = name
         this.description = description

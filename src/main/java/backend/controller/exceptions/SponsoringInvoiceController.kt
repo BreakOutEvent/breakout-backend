@@ -47,6 +47,21 @@ class SponsoringInvoiceController(private val sponsoringInvoiceService: Sponsori
         return ok(mapOf("message" to "ok"))
     }
 
+    /**
+     * POST /sponsoringinvoice/sendsponsorreminder/?eventId=XYZ
+     *
+     * Send an email reminder to all sponsors at event EVENT_ID that have not yet fully paid
+     * their sponsoring invoice
+     */
+    @PostMapping("/sendsponsorreminder/")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    fun sendInvoiceEmailsToSponsorsWhereEmailUnpaid(@RequestParam eventId: Long): ResponseEntity<Any> {
+        val event = eventService.findById(eventId) ?: throw NotFoundException("event $eventId not found")
+        logger.info("Received request to send sponsoring invoice emails for event $eventId where sponsors have not yet fully paid")
+        sponsoringInvoiceService.sendInvoiceReminderEmailsToSponsorsForEvent(event)
+        return ok(mapOf("message" to "ok"))
+    }
+
     @GetMapping("/{eventId}/")
     @PreAuthorize("hasAuthority('ADMIN')")
     fun getInvoicesByEvent(@PathVariable("eventId") eventId: Long): Iterable<SponsoringInvoiceView> {

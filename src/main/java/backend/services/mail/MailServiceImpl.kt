@@ -662,6 +662,87 @@ class MailServiceImpl @Autowired constructor(configurationService: Configuration
 
     }
 
+    override fun sendGeneratedDonationPromiseReminderSponsor(invoice: SponsoringInvoice) {
+
+
+
+
+
+        val germanText = """
+            |Liebe(r) ${invoice.sponsor.firstname} ${invoice.sponsor.lastname},
+            |
+            |vielen herzlichen Dank, dass Sie beim BreakOut 2017 ein Team unterstützen! Ihre Spende wird von BreakOut e. V. an Jambo Bukoba e. V. weitergeleitet. So unterstützen Sie den Bau von Regenwassertanks an tansanischen Schulen. Daher möchten wir Sie gern daran erinnern, Ihr Spendenversprechen baldmöglichst einzulösen.
+            |Sollten Sie Ihre Überweisung bereits veranlasst haben, können Sie diese Email einfach ignorieren.
+            |
+            |Bei Challenges, für die Ihr Spendenversprechen 0€ beträgt, wurde die Challenge vom Team leider während des BreakOuts 2017 nicht erfüllt.
+            |Bitte beachten Sie: wenn Sie Teams in mehreren Städten unterstützt haben, erhalten Sie pro Stadt eine Email mit der Auflistung Ihres Spendenversprechens für diese Stadt.
+            |
+            |Hier eine Aufschlüsselung Ihres Spendenversprechens:
+            |
+            |${invoice.toEmailOverview()}
+            |
+            |
+            |BETRAG: ${invoice.amount.display()}
+            |VERWENDUNGSZWECK: ${invoice.purposeOfTransfer}
+            |
+            |KONTOINHABER: BreakOut e.V.
+            |BANKNAME: Fidor Bank
+            |IBAN: DE85700222000020241837
+            |BIC: FDDODEMMXXX
+            |
+            |Besonders wichtig ist der Verwendungszweck, denn nur so können Ihre Spenden dem richtigen Team zugeordnet werden. Darüber hinaus können wir Ihnen nur bei Hinterlegung Ihrer Adresse in Ihrem Account eine offizielle Zuwendungsbescheinigung zusenden. Bei Rückfragen zur Adressänderung wenden Sie sich bitte an event@break-out.org.
+            |Sie erhalten am Ende des Kalenderjahres eine Zuwendungsbescheinigung von uns, wenn Sie einen Betrag von mehr als 200€ gespendet haben. Bei Beträgen von weniger als 200€ reicht es aus bei Ihrem Finanzamt eine vereinfachte Spendenbescheinigung einzureichen. Bitte beachten Sie dazu das Dokument unter folgendem <a href="http://assets.contentful.com/i8fp6rw03mps/2LEqetuxOMCc4wciskMgwO/9e8448c32314de24cd099888a0ae3125/VereinfachterZuwendungsnachweis.pdf">Link</a> [1].
+            |
+            |Bei Fragen wenden Sie sich gerne an die von Ihnen unterstützten Teams oder direkt an uns unter event@break-out.org.
+            |
+            |Herzlichen Dank für Ihre Unterstützung.
+            |
+            |Wir wünschen Ihnen eine schöne Woche,
+            |Ihr BreakOut-Team
+            |
+            |[1] http://assets.contentful.com/i8fp6rw03mps/2LEqetuxOMCc4wciskMgwO/9e8448c32314de24cd099888a0ae3125/VereinfachterZuwendungsnachweis.pdf
+            """.trimMargin("|").addHtmlNewlines()
+
+        val englishText = """
+            |
+            |Dear ${invoice.sponsor.firstname} ${invoice.sponsor.lastname},
+            |
+            |Many, many thanks for supporting a team during BreakOut 2017! Your donation will allow Jambo Bukoba build water tanks at Tanzanian schools and make an important contribution to improving students' lives. We would like to kindly remind you to fulfill your donation promise as soon as possible. If you have already transferred your donation, you can simply ignore this email.
+            |If your donation promise for a given challenge is 0€, the team has unfortunately not mastered the challenge during BreakOut 2017.
+            |If you supported teams in different cities, you will receive on email per city showing your donation promise for the given city.
+            |
+            |${invoice.toEmailOverview()}
+            |
+            |
+            |Amount: ${invoice.amount.display()}
+            |Payment reference: ${invoice.purposeOfTransfer}
+            |
+            |Account holder: BreakOut e.V.
+            |Bank: Fidor Bank
+            |IBAN: DE85700222000020241837
+            |BIC: FDDODEMMXXX
+            |
+            |Please pay close attention to using the correct payment reference, because we can only assign your donation to the right team with the correct purpose. In addition, we can only send you an official donation receipt when you've saved your address in your BreakOut account. Feel free to contact us under event@break-out.org if you need any assistance. We will send you an official donation receipt by the end of 2017 if your donation amounts to more than 200€. Under German law, it is otherwise sufficient for you to provide a simplified donation receipt. For more info, please consult this <a href="http://assets.contentful.com/i8fp6rw03mps/2LEqetuxOMCc4wciskMgwO/9e8448c32314de24cd099888a0ae3125/VereinfachterZuwendungsnachweis.pdf">Link</a>.[1]
+            |
+            |If you have any questions, please do not hesitate to contact the team you are supporting or us at event@break-out.org.
+            |
+            |Thank you so much for your support.
+            |
+            |We wish you a great week,
+            |Your BreakOut team
+            |[1] http://assets.contentful.com/i8fp6rw03mps/2LEqetuxOMCc4wciskMgwO/9e8448c32314de24cd099888a0ae3125/VereinfachterZuwendungsnachweis.pdf
+            """.trimMargin("|").addHtmlNewlines()
+
+        val email = Email(
+                to = invoice.getContactEmails(),
+                subject = mergeEmailSubject("Ihr Spendenversprechen für BreakOut 2017", "Your donation promise for BreakOut 2017"),
+                body = mergeEmailBody(germanText, englishText))
+
+        mailSenderService.send(email)
+
+    }
+
+
     private fun mergeEmailBody(germanText: String, englishText: String): String {
         return germanText + "<br><br><hr><br><br>" + englishText
     }

@@ -46,4 +46,6 @@ interface MailService {
     fun sendGeneratedDonationPromiseSponsor(invoice: SponsoringInvoice)
 
     fun sendTeamWithDonationOverviewEmail(team: Team)
+
+    fun sendGeneratedDonationPromiseReminderSponsor(invoice: SponsoringInvoice)
 }

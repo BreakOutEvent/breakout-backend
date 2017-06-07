@@ -126,10 +126,12 @@ class Challenge : BasicEntity, Billable {
                 this.unregisteredSponsor = sponsor
                 this.status = ACCEPTED
                 sponsor.challenges.add(this)
+                team.challenges.add(this)
             }
             is Sponsor -> {
                 this.registeredSponsor = sponsor
                 sponsor.challenges.add(this)
+                team.challenges.add(this)
             }
             else -> throw Exception("sponsor: ISponsor does not Sponsor or UnregisteredSponsor")
         }
