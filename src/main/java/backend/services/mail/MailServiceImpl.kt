@@ -8,6 +8,7 @@ import backend.model.misc.EmailAddress
 import backend.model.payment.SponsoringInvoice
 import backend.model.payment.TeamEntryFeeInvoice
 import backend.model.payment.display
+import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.Sponsoring
 import backend.model.user.Participant
 import backend.model.user.User
@@ -593,11 +594,11 @@ class MailServiceImpl(configurationService: ConfigurationService,
         |Wir hoffen, ihr seid gut wieder im Alltag angekommen.
         |
         |Unten findet ihr eine Auflistung aller Sponsoren, bei denen noch nicht das vollständige Spendenversprechen bei uns
-        |eingegangen ist. Bitte erinnert Eure Spender nochmal, die noch offen Beträge zu überweisen.
+        |eingegangen ist. Bitte erinnert Eure Spender nochmal, die noch offenen Beträge zu überweisen.
         |
         |Bitte beachtet, dass eure Sponsoren auch mehrere Teams unterstützt haben könnten. Sponsoren, die hier gelistet sind, können auch noch offene Spendenversprechen bei anderen Teams haben und daher hier auftauchen.
         |
-        |${invoice.foldRight("") { a, b -> b + "Sponsor ${a.sponsor.firstname} ${a.sponsor.lastname} – ${a.sponsor.company ?: ""}\n" }}
+        |${invoice.foldRight("") { a, b -> b + "${a.sponsor.firstname} ${a.sponsor.lastname} ${buildSponsorCompanyText(a.sponsor)}\n" }}
         |
         |Die offenen Spenden sollten bitte wie folgt überwiesen werden:
         |
@@ -625,7 +626,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
         |
         |Beware that your sponsors might have supported other teams as well. The sponsors being listed below might also be a result of unpaid donation promises for other teams.
         |
-        |${invoice.foldRight("") { a, b -> b + "Sponsor ${a.sponsor.firstname} ${a.sponsor.lastname} – ${a.sponsor.company ?: ""}\n" }}
+        |${invoice.foldRight("") { a, b -> b + "${a.sponsor.firstname} ${a.sponsor.lastname} ${buildSponsorCompanyText(a.sponsor)}\n" }}
         |
         |The open donations should be transferred to following bank account:
         |
@@ -650,6 +651,13 @@ class MailServiceImpl(configurationService: ConfigurationService,
         )
 
         mailSenderService.send(email)
+    }
+
+    private fun buildSponsorCompanyText(sponsor: ISponsor): String {
+        sponsor.company?.let {
+            return "- $it"
+        }
+        return ""
     }
 
     override fun sendGeneratedDonationPromiseSponsor(invoice: SponsoringInvoice) {
