@@ -12,12 +12,11 @@ import backend.model.sponsoring.Sponsoring
 import backend.model.user.Participant
 import backend.model.user.User
 import backend.services.ConfigurationService
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class MailServiceImpl @Autowired constructor(configurationService: ConfigurationService,
-                                             private val mailSenderService: MailSenderService) : MailService {
+class MailServiceImpl(configurationService: ConfigurationService,
+                      private val mailSenderService: MailSenderService) : MailService {
 
     private val host: String = configurationService.getRequired("org.breakout.api.host")
 
