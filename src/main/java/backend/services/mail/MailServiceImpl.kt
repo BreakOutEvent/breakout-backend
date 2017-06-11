@@ -8,6 +8,7 @@ import backend.model.misc.EmailAddress
 import backend.model.payment.SponsoringInvoice
 import backend.model.payment.TeamEntryFeeInvoice
 import backend.model.payment.display
+import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.Sponsoring
 import backend.model.user.Participant
 import backend.model.user.User
@@ -575,12 +576,76 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
         val germanSubject = "So viele Spenden habt ihr gesammelt"
         val englishSubject = "You have raised so many donations"
-        val email = Email (
+        val email = Email(
                 to = team.members.map { EmailAddress(it.email) },
                 subject = mergeEmailSubject(germanSubject, englishSubject),
                 body = mergeEmailBody(germanText, englishText),
                 campaignCode = "team_generated_donations"
         )
+        mailSenderService.send(email)
+    }
+
+    override fun sendInvoiceReminderEmailsToTeam(team: Team, sponsors: List<SponsoringInvoice>) {
+        val germanText = """
+        |Eure Spendenübersicht
+        |
+        |Liebe BreakOutler,
+        |
+        |Wir hoffen, ihr seid gut wieder im Alltag angekommen.
+        |
+        |Unten findet ihr eine Auflistung aller Sponsoren, bei denen noch nicht das vollständige Spendenversprechen bei uns
+        |eingegangen ist. Bitte erinnert Eure Spender nochmal, die noch offen Beträge zu überweisen.
+        |
+        |${sponsors.map { "Sponsor ${it.sponsor.firstname} ${it.sponsor.lastname} Betrag ${it.amount} Bezahlt ${it.amountOfCurrentPayments()}\n" }}
+        |
+        |Die offenen Spenden sollten bitte wie folgt überwiesen werden:
+        |
+        |KONTOINHABER: BreakOut e.V.
+        |BANKNAME: Fidor Bank
+        |IBAN: DE85700222000020241837
+        |BIC: FDDODEMMXXX
+        |
+        |VERWENDUNGSZWECK: bitte der Spendenübersicht des Sponsors entnehmen.
+        |
+        |Bei Fragen meldet euch gerne unter event@break-out.org.
+        |Liebe Grüße,
+        |
+        |Euer BreakOut-Team""".trimMargin("|").addHtmlNewlines()
+
+        val englishText = """
+        |Your donation overview
+        |
+        |Dear BreakOut Team,
+        |
+        |We hope you have happily returned to your everyday life.
+        |
+        |Here you find a listing of all your sponsors where we have not yet received the full donation promise.
+        |Please remind your supporters again to transfer their donations.
+        |
+        |${sponsors.map { "Sponsor ${it.sponsor.firstname} ${it.sponsor.lastname} Amount ${it.amount} Already paid ${it.amountOfCurrentPayments()}\n" }}
+        |
+        |The open donations should be transferred to following bank account:
+        |
+        |Account owner: BreakOut e.V.
+        |IBAN: DE85700222000020241837
+        |BIC: FDDODEMMXXX
+        |Payment referencer: See donation overview of each sponsor.
+        |
+        |Please contact us at event@break-out.org if you have any questions.
+        |Best regards,
+        |
+        |Your BreakOut Team""".trimMargin("|").addHtmlNewlines()
+
+        val germanSubject = "Eure Spendenübersicht"
+        val englishSubject = "Your donation overview"
+
+        val email = Email(
+                to = team.members.map { EmailAddress(it.email) },
+                subject = mergeEmailSubject(germanSubject, englishSubject),
+                body = mergeEmailBody(germanText, englishText),
+                campaignCode = "team_generated_donations"
+        )
+
         mailSenderService.send(email)
     }
 
@@ -662,9 +727,6 @@ class MailServiceImpl(configurationService: ConfigurationService,
     }
 
     override fun sendGeneratedDonationPromiseReminderSponsor(invoice: SponsoringInvoice) {
-
-
-
 
 
         val germanText = """
