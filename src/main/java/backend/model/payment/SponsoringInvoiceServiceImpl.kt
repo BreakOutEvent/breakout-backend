@@ -3,6 +3,7 @@ package backend.model.payment
 import backend.model.challenges.ChallengeService
 import backend.model.event.Event
 import backend.model.event.EventService
+import backend.model.event.Team
 import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.SponsoringService
 import backend.model.user.Admin
@@ -128,6 +129,39 @@ class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: Spon
     override fun findAllNotFullyPaidInvoicesForEvent(event: Event): Iterable<SponsoringInvoice> {
         return sponsoringInvoiceRepository.findAllByEventId(event.id!!)
                 .filter { !it.isFullyPaid() }
+    }
+
+    override fun sendInvoiceReminderEmailsToTeamsForEvent(event: Event) {
+        val grouped = findTeamInvoicePairs(event)
+        // Send emails to all teams with an overview which sponsor has not fully paid yet
+        grouped.forEach { team, invoices ->
+            mailService.sendInvoiceReminderEmailsToTeam(team, invoices)
+            Thread.sleep(1000)
+        }
+    }
+
+    override fun findTeamInvoicePairs(event: Event): Map<Team, List<SponsoringInvoice>> {
+        // Find all not fully paid invoices for a team
+        val invoices = sponsoringInvoiceRepository
+                .findAllByEventId(event.id!!)
+                .filter { !it.isFullyPaid() }
+
+        // Transform each invoice into a combination of List<Team, List<ISponsor>>
+        val grouped: Map<Team, List<SponsoringInvoice>> = invoices
+                .map(this::invoiceToTeamSponsorPairs)
+                .flatten()
+                .groupBy { it.first }
+                .mapValues { it.value.map { value -> value.second } }
+                .filter { it.key.hasStarted }
+
+        return grouped
+    }
+
+    private fun invoiceToTeamSponsorPairs(invoice: SponsoringInvoice): List<Pair<Team, SponsoringInvoice>> {
+        val teamsFromChallenges = invoice.challenges.map { it.team }
+        val teamsFromSponsorings = invoice.sponsorings.map { it.team }
+        val teamsFromBoth = teamsFromChallenges.union(teamsFromSponsorings).distinct()
+        return teamsFromBoth.filterNotNull().map { it to invoice }
     }
 
     private fun findAllSponsorsAtEvent(eventId: Long): Iterable<ISponsor> {

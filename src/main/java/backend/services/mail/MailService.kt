@@ -50,5 +50,5 @@ interface MailService {
 
     fun sendGeneratedDonationPromiseReminderSponsor(invoice: SponsoringInvoice)
 
-    fun sendInvoiceReminderEmailsToTeam(team: Team, sponsors: List<SponsoringInvoice>)
+    fun sendInvoiceReminderEmailsToTeam(team: Team, invoice: List<SponsoringInvoice>)
 }

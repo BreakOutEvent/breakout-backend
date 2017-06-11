@@ -1,6 +1,7 @@
 package backend.model.payment
 
 import backend.model.event.Event
+import backend.model.event.Team
 import backend.model.user.Admin
 import org.javamoney.moneta.Money
 
@@ -29,5 +30,9 @@ interface SponsoringInvoiceService {
     fun sendInvoiceReminderEmailsToSponsorsForEvent(event: Event)
 
     fun saveAll(invoices: Iterable<SponsoringInvoice>): Iterable<SponsoringInvoice>
+
     fun findAllNotFullyPaidInvoicesForEvent(event: Event): Iterable<SponsoringInvoice>
+
+    fun sendInvoiceReminderEmailsToTeamsForEvent(event: Event)
+    fun findTeamInvoicePairs(event: Event): Map<Team, List<SponsoringInvoice>>
 }
