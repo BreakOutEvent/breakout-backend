@@ -35,6 +35,10 @@ class SponsoringView() {
 
     var sponsorIsHidden: Boolean = false
 
+    var billableAmount: Double? = null
+
+    var teamDistance: Double? = null
+
     constructor(sponsoring: Sponsoring) : this() {
         this.id = sponsoring.id
         this.eventId = sponsoring.team?.event?.id
@@ -43,8 +47,9 @@ class SponsoringView() {
         this.amountPerKm = sponsoring.amountPerKm.numberStripped.toDouble()
         this.limit = sponsoring.limit.numberStripped.toDouble()
         this.status = sponsoring.status.toString().toUpperCase()
-
+        this.billableAmount = sponsoring.billableAmount().numberStripped.toDouble()
         this.contract = sponsoring.contract.let(::MediaView)
+        this.teamDistance = sponsoring.team?.getCurrentDistance()
 
         // Add information about registered sponsor
         // if he exists and isHidden is false

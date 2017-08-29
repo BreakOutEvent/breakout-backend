@@ -1,10 +1,8 @@
 package backend.model.payment
 
-import backend.exceptions.DomainException
 import backend.model.challenges.Challenge
 import backend.model.event.Event
 import backend.model.event.Team
-import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.Sponsoring
@@ -29,6 +27,9 @@ class SponsoringInvoice : Invoice {
 
     @ManyToOne
     var event: Event? = null
+
+    @Enumerated(EnumType.STRING)
+    var type: SponsoringInvoiceType? = null
 
     @ManyToOne
     public var unregisteredSponsor: UnregisteredSponsor? = null

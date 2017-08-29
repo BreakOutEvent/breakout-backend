@@ -2,9 +2,10 @@ package backend.view.sponsoring
 
 import backend.model.payment.SponsoringInvoice
 import backend.model.sponsoring.ISponsor
+import backend.view.challenge.ChallengeView
 import backend.view.user.UserView
 
-class SponsoringInvoiceView {
+open class SponsoringInvoiceView {
 
     var id: Long? = null
     var amount: Double? = null
@@ -20,6 +21,23 @@ class SponsoringInvoiceView {
         this.payed = invoice.amountOfCurrentPayments().numberStripped.toDouble()
         this.sponsor = SponsorView(invoice.sponsor)
         this.purposeOfTransfer = invoice.purposeOfTransfer
+    }
+}
+
+class DetailedSponsoringInvoiceView : SponsoringInvoiceView {
+
+    var challenges: List<ChallengeView>? = null
+    var sponsorings: List<SponsoringView>? = null
+    var type: String? = null
+    var contactEmails: List<String> = listOf()
+
+    constructor() : super()
+
+    constructor(invoice: SponsoringInvoice) : super(invoice) {
+        this.challenges = invoice.challenges.map { ChallengeView(it) }
+        this.sponsorings = invoice.sponsorings.map { SponsoringView(it) }
+        this.type = invoice.type?.toString()
+        this.contactEmails = invoice.getContactEmails().map { email -> email.toString() }
     }
 }
 

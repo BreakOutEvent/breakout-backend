@@ -33,6 +33,8 @@ class ChallengeView {
     @NotNull
     var amount: Double? = null
 
+    var billableAmount: Double? = null
+
     @NotNull
     @Size(max = 1000)
     @SafeHtml(whitelistType = NONE)
@@ -54,6 +56,7 @@ class ChallengeView {
         this.team = challenge.team!!.name
         this.status = challenge.status.toString().toUpperCase()
         this.contract = MediaView(challenge.contract)
+        this.billableAmount = challenge.billableAmount().numberStripped.toDouble()
 
         // Add information about registered sponsor
         // if he exists and isHidden is false

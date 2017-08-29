@@ -2,6 +2,7 @@ package backend.controller.exceptions
 
 import backend.model.event.EventService
 import backend.model.payment.SponsoringInvoiceService
+import backend.view.sponsoring.DetailedSponsoringInvoiceView
 import backend.view.sponsoring.SponsoringInvoiceView
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.query.Param
@@ -79,11 +80,20 @@ class SponsoringInvoiceController(private val sponsoringInvoiceService: Sponsori
 
     @GetMapping("/{eventId}/")
     @PreAuthorize("hasAuthority('ADMIN')")
-    fun getInvoicesByEvent(@PathVariable("eventId") eventId: Long): Iterable<SponsoringInvoiceView> {
+    fun getInvoicesByEvent(@PathVariable("eventId") eventId: Long,
+                           @RequestParam(required = false) detailed: Boolean = false): Iterable<SponsoringInvoiceView> {
 
         eventService.findById(eventId) ?: throw NotFoundException("Event with id $eventId not found")
-        return sponsoringInvoiceService.findByEventId(eventId).map {
-            SponsoringInvoiceView(it)
+
+        if (detailed) {
+            return sponsoringInvoiceService.findByEventId(eventId).map {
+                SponsoringInvoiceView(it)
+            }
+        } else {
+            return sponsoringInvoiceService.findByEventId(eventId).map {
+                DetailedSponsoringInvoiceView(it)
+            }
         }
+
     }
 }
