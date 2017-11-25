@@ -16,6 +16,7 @@ import backend.view.LikeView
 import backend.view.LocationView
 import backend.view.posting.PostingResponseView
 import backend.view.posting.PostingView
+import backend.view.posting.filterBlockedUsers
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
@@ -127,14 +128,18 @@ class PostingController(private val postingService: PostingService,
 
         logger.info("Cache miss on /posting for page $page userId $userId events $events")
 
-        val postings = if (events != null) {
-            postingService.findByEventIds(events, page ?: 0, PAGE_SIZE)
+        // TODO: Add Blocking Controller with endpoints
+        // TODO: Add Blocking Service to fetch this list.
+        val usersBlocked = List<Long>(0, { 0 }) // TODO: Fetch list of blocked users
+
+        val postings = if(events != null) {
+            postingService.findByEventIds(events, page ?:0 , PAGE_SIZE)
         } else {
             postingService.findAll(page ?: 0, PAGE_SIZE)
         }
 
-        return postings.map {
-            PostingResponseView(it.hasLikesBy(userId), it.challenge?.let {
+        return postings.filterBlockedUsers(usersBlocked, { it.user }).map {
+            PostingResponseView(it.hasLikesBy(userId), usersBlocked, it.challenge?.let {
                 challengeService.findChallengeProveProjectionById(it)
             })
         }
@@ -208,6 +213,9 @@ class PostingController(private val postingService: PostingService,
      */
     @GetMapping("/{id}/like/")
     fun getLikesForPosting(@PathVariable("id") id: Long): List<LikeView> {
+
+        // TODO: filter blocked
+
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
         val likes = posting.likes
         return likes.map(::LikeView)
@@ -221,6 +229,9 @@ class PostingController(private val postingService: PostingService,
     fun getPostingsByHashtag(@RequestParam(value = "page", required = false) page: Int?,
                              @PathVariable("hashtag") hashtag: String,
                              @RequestParam(value = "userid", required = false) userId: Long?): List<PostingView> {
+
+        // TODO: filter blocked
+
         val posting = postingService.findByHashtag(hashtag, page ?: 0, PAGE_SIZE)
         return posting.map {
             PostingView(it.hasLikesBy(userId), it.challenge?.let {
