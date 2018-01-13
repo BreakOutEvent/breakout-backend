@@ -22,7 +22,7 @@ class PostingResponseView() {
     @Valid
     var postingLocation: PostingLocationView? = null
 
-    var media: List<backend.view.MediaView>? = null
+    var media: MediaView? = null
 
     @JsonInclude(NON_NULL)
     var uploadMediaTypes: List<String>? = null
@@ -48,7 +48,7 @@ class PostingResponseView() {
         this.date = posting.date.toEpochSecond(java.time.ZoneOffset.UTC)
         this.postingLocation = posting.location?.let(::PostingLocationView)
         this.user = PostingUserView(posting)
-        this.media = posting.media.map(::MediaView)
+        this.media = posting.media?.let(::MediaView)
         this.comments = posting.comments.map(::CommentView)
         this.likes = posting.likes.count()
         this.hasLiked = posting.hasLiked

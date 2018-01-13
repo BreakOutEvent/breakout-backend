@@ -24,7 +24,7 @@ class SponsoringControllerTest : IntegrationTest() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val sponsor = userService.create("sponsor@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
-        val team = teamService.create(participant, "name", "description", event)
+        val team = teamService.create(participant, "name", "description", event, null)
         val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(1), euroOf(200))
 
         val request = get("/event/${event.id}/team/${team.id}/sponsoring/")
@@ -50,7 +50,7 @@ class SponsoringControllerTest : IntegrationTest() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val sponsor = userService.create("sponsor@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
-        val team = teamService.create(participant, "name", "description", event)
+        val team = teamService.create(participant, "name", "description", event, null)
         val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(1), euroOf(200))
 
         val request = get("/event/${event.id}/team/${team.id}/sponsoring/")
@@ -88,7 +88,7 @@ class SponsoringControllerTest : IntegrationTest() {
                         country = "Germany"
                 )
         )
-        val team = teamService.create(participant, "name", "description", event)
+        val team = teamService.create(participant, "name", "description", event, null)
 
         setAuthenticatedUser(participant.email)
         val sponsoring = sponsoringService.createSponsoringWithOfflineSponsor(team, euroOf(1), euroOf(200), sponsor)
@@ -138,7 +138,7 @@ class SponsoringControllerTest : IntegrationTest() {
         }).getRole(Sponsor::class)!!
 
         setAuthenticatedUser(registeredSponsor.email)
-        val team = teamService.create(participant, "name", "description", event)
+        val team = teamService.create(participant, "name", "description", event, null)
 
         val sponsoring1 = sponsoringService.createSponsoring(registeredSponsor, team, euroOf(1), euroOf(200))
         setAuthenticatedUser(participant.email)
@@ -179,7 +179,7 @@ class SponsoringControllerTest : IntegrationTest() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val sponsor = userService.create("sponsor@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
-        val team = teamService.create(participant, "name", "description", event)
+        val team = teamService.create(participant, "name", "description", event, null)
 
         val body = mapOf("amountPerKm" to 1.0, "limit" to 200)
 
@@ -198,9 +198,6 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.userId").exists())
                 .andExpect(jsonPath("$.status").value("PROPOSED"))
                 .andExpect(jsonPath("$.unregisteredSponsor").doesNotExist())
-                .andExpect(jsonPath("$.contract.type").exists())
-                .andExpect(jsonPath("$.contract.id").exists())
-                .andExpect(jsonPath("$.contract.uploadToken").exists())
     }
 
     @Test
@@ -208,7 +205,7 @@ class SponsoringControllerTest : IntegrationTest() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val sponsor = userService.create("sponsor@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
-        val team = teamService.create(participant, "name", "description", event)
+        val team = teamService.create(participant, "name", "description", event, null)
 
         val body = mapOf("amountPerKm" to 0.35, "limit" to 200)
 
@@ -233,7 +230,7 @@ class SponsoringControllerTest : IntegrationTest() {
     fun testCreateSponsoringWithUnregisteredSponsor() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
-        val team = teamService.create(participant, "name", "description", event)
+        val team = teamService.create(participant, "name", "description", event, null)
 
         val body = mapOf(
                 "amountPerKm" to 1.0,
@@ -270,9 +267,6 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.status").value("ACCEPTED"))
                 .andExpect(jsonPath("$.sponsorId").doesNotExist())
                 .andExpect(jsonPath("$.userId").doesNotExist())
-                .andExpect(jsonPath("$.contract.type").exists())
-                .andExpect(jsonPath("$.contract.id").exists())
-                .andExpect(jsonPath("$.contract.uploadToken").exists())
                 .andExpect(jsonPath("$.unregisteredSponsor.firstname").value("Florian"))
                 .andExpect(jsonPath("$.unregisteredSponsor.lastname").value("Schmidt"))
                 .andExpect(jsonPath("$.unregisteredSponsor.url").value("www.florianschmidt.me"))
@@ -305,7 +299,7 @@ class SponsoringControllerTest : IntegrationTest() {
             addRole(Participant::class)
             addRole(Sponsor::class)
         })
-        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+        val team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event, null)
 
         val body = mapOf(
                 "amountPerKm" to 1.0,
@@ -341,7 +335,7 @@ class SponsoringControllerTest : IntegrationTest() {
     fun testGetAllSponsoringsForSponsor() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
-        val team = teamService.create(participant, "name", "description", event)
+        val team = teamService.create(participant, "name", "description", event, null)
 
         val sponsor1 = userService.create("sponsor1@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
         sponsoringService.createSponsoring(sponsor1, team, euroOf(1), euroOf(200))
@@ -370,7 +364,7 @@ class SponsoringControllerTest : IntegrationTest() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val sponsor = userService.create("sponsor@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
-        val team = teamService.create(participant, "name", "description", event)
+        val team = teamService.create(participant, "name", "description", event, null)
         val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(1), euroOf(200))
 
         val body = mapOf("status" to "ACCEPTED")
@@ -396,7 +390,7 @@ class SponsoringControllerTest : IntegrationTest() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val sponsor = userService.create("sponsor@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
-        val team = teamService.create(participant, "name", "description", event)
+        val team = teamService.create(participant, "name", "description", event, null)
         val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(1), euroOf(200))
 
         val body = mapOf("status" to "rejected")
@@ -421,7 +415,7 @@ class SponsoringControllerTest : IntegrationTest() {
     fun testWithdrawSponsoringForUnregisteredSponsor() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
-        val team = teamService.create(participant, "name", "description", event)
+        val team = teamService.create(participant, "name", "description", event, null)
         val sponsor = UnregisteredSponsor("", "", "", "", "", address = Address("", "", "", "", ""))
         setAuthenticatedUser(participant.email)
         val sponsoring = sponsoringService.createSponsoringWithOfflineSponsor(team, euroOf(1), euroOf(200), sponsor)
@@ -449,7 +443,7 @@ class SponsoringControllerTest : IntegrationTest() {
 
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
-        val team = teamService.create(participant, "name", "description", event)
+        val team = teamService.create(participant, "name", "description", event, null)
         val sponsor = userService.create("sponsor@break-out.org", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
 
         setAuthenticatedUser(sponsor.email)

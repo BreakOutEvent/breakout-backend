@@ -3,16 +3,12 @@ package backend.Integration
 import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.services.ConfigurationService
-import com.auth0.jwt.Algorithm
-import com.auth0.jwt.JWTSigner
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDate
@@ -108,7 +104,8 @@ class TestUserEndpoint : IntegrationTest() {
 
         val json = mapOf(
                 "email" to "a@x.de",
-                "password" to "password"
+                "password" to "password",
+                "profilePic" to mapOf("type" to "image", "url" to "url")
         ).toJsonString()
 
         val response = mockMvc.perform(post(url(), json))
@@ -116,7 +113,7 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.profilePic.type").exists())
                 .andExpect(jsonPath("$.profilePic.id").exists())
-                .andExpect(jsonPath("$.profilePic.uploadToken").exists())
+                .andExpect(jsonPath("$.profilePic.url").exists())
                 .andExpect(jsonPath("$.profilePic.type").value("IMAGE"))
                 .andReturn().response.contentAsString
 
@@ -124,85 +121,6 @@ class TestUserEndpoint : IntegrationTest() {
         val user = userRepository.findByEmail("a@x.de")
         assertNotNull(user)
         assertEquals(user.email, "a@x.de")
-    }
-
-
-    @Test
-    fun postUserAndAddMediaSizesWithValidToken() {
-
-        val json = mapOf(
-                "email" to "a@x.de",
-                "password" to "password"
-        ).toJsonString()
-
-        mockMvc.perform(post(url(), json))
-                .andExpect(status().isCreated)
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.profilePic.type").exists())
-                .andExpect(jsonPath("$.profilePic.id").exists())
-                .andExpect(jsonPath("$.profilePic.uploadToken").exists())
-                .andReturn().response.contentAsString
-
-        val user = userRepository.findByEmail("a@x.de")
-        assertNotNull(user)
-        assertEquals(user.email, "a@x.de")
-
-        val postData = mapOf(
-                "url" to "https://aws.amazon.com/bla.jpg",
-                "width" to 400,
-                "height" to 200,
-                "length" to 0.0,
-                "size" to 0.0,
-                "type" to "image"
-        ).toJsonString()
-
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/media/${user.profilePic.id}/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to user.profilePic.id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
-                .content(postData)
-
-        val response = mockMvc.perform(request)
-                .andExpect(status().isCreated)
-                .andExpect(MockMvcResultMatchers.content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.url").exists())
-                .andExpect(jsonPath("$.width").exists())
-                .andExpect(jsonPath("$.height").exists())
-                .andExpect(jsonPath("$.length").exists())
-                .andExpect(jsonPath("$.size").exists())
-                .andExpect(jsonPath("$.type").exists())
-                .andReturn().response.contentAsString
-
-
-        println(response)
-
-        val requestMedia = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/user/${user.account.id}/")
-                .contentType(MediaType.APPLICATION_JSON)
-
-        val responseMedia = mockMvc.perform(requestMedia)
-                .andExpect(status().isOk)
-                .andExpect(MockMvcResultMatchers.content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.email").doesNotExist())
-                .andExpect(jsonPath("$.passwordHash").doesNotExist())
-                .andExpect(jsonPath("$.profilePic").exists())
-                .andExpect(jsonPath("$.profilePic.id").exists())
-                .andExpect(jsonPath("$.profilePic.type").exists())
-                .andExpect(jsonPath("$.profilePic.sizes").exists())
-                .andExpect(jsonPath("$.profilePic.sizes").isArray)
-                .andExpect(jsonPath("$.profilePic.sizes[0]").exists())
-                .andExpect(jsonPath("$.profilePic.sizes[0].id").exists())
-                .andExpect(jsonPath("$.profilePic.sizes[0].url").exists())
-                .andExpect(jsonPath("$.profilePic.sizes[0].width").exists())
-                .andExpect(jsonPath("$.profilePic.sizes[0].height").exists())
-                .andExpect(jsonPath("$.profilePic.sizes[0].length").exists())
-                .andExpect(jsonPath("$.profilePic.sizes[0].size").exists())
-                .andExpect(jsonPath("$.profilePic.sizes[0].type").exists())
-                .andReturn().response.contentAsString
-
-        println(responseMedia)
     }
 
     /**
@@ -273,7 +191,8 @@ class TestUserEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.lastname").value("Schmidt"))
                 .andExpect(jsonPath("$.gender").value("Male"))
                 .andExpect(jsonPath("$.blocked").value(false)) // A user can't block itself
-                .andExpect(jsonPath("$.profilePic.uploadToken").exists())
+                .andExpect(jsonPath("$.profilePic.id").exists())
+                .andExpect(jsonPath("$.profilePic.url").exists())
                 .andExpect(jsonPath("$.profilePic.type").value("IMAGE"))
                 .andExpect(jsonPath("$.passwordHash").doesNotExist())
 
@@ -464,7 +383,7 @@ class TestUserEndpoint : IntegrationTest() {
         }).getRole(Participant::class)!!
 
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
-        val team = teamService.create(creator, "team-name1234", "description", event)
+        val team = teamService.create(creator, "team-name1234", "description", event, null)
 
 
         userService.create("secondTest@break-out.org", "password", {
@@ -507,7 +426,7 @@ class TestUserEndpoint : IntegrationTest() {
         }).getRole(Participant::class)!!
 
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
-        val team = teamService.create(creator, "team-name1234", "description", event)
+        val team = teamService.create(creator, "team-name1234", "description", event, null)
 
 
         userService.create("secondTest@break-out.org", "password", {

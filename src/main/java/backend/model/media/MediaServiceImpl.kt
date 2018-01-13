@@ -10,8 +10,8 @@ class MediaServiceImpl @Autowired constructor(val repository: MediaRepository) :
 
     override fun findAll(): Iterable<Media> = repository.findAll()
 
-    override fun createMedia(type: String): Media {
-        val media = Media(type)
+    override fun createMedia(type: String, url: String): Media {
+        val media = Media(MediaType.valueOf(type), url)
         return repository.save(media)
     }
 
@@ -19,8 +19,6 @@ class MediaServiceImpl @Autowired constructor(val repository: MediaRepository) :
         return repository.findById(id)
     }
 
-    override fun deleteSizes(media: Media) {
-        media.sizes.clear()
-        repository.save(media)
-    }
+    override fun delete(media: Media) = repository.delete(media)
+
 }

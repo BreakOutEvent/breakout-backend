@@ -55,7 +55,7 @@ class ChallengeView {
         this.teamId = challenge.team!!.id!!
         this.team = challenge.team!!.name
         this.status = challenge.status.toString().toUpperCase()
-        this.contract = MediaView(challenge.contract)
+        this.contract = challenge.contract?.let(::MediaView)
         this.billableAmount = challenge.billableAmount().numberStripped.toDouble()
 
         // Add information about registered sponsor

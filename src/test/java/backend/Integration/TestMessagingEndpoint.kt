@@ -24,7 +24,7 @@ class TestMessagingEndpoint : IntegrationTest() {
     }
 
     @Test
-    @Ignore
+    @Ignore //create group message call is missing
     fun createNewGroupMessage() {
 
         prepareCreateNewGroupMessage()
@@ -33,13 +33,15 @@ class TestMessagingEndpoint : IntegrationTest() {
                 .asUser(this.mockMvc, "user@break-out.org", "password")
                 .json(listOf<Long>())
 
-        mockMvc.perform(requestMe)
+        val resp = mockMvc.perform(requestMe)
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.groupMessageIds[0]").exists())
                 .andExpect(jsonPath("$.groupMessageIds[1]").doesNotExist())
                 .andReturn().response.contentAsString
+
+        println(resp)
     }
 
 

@@ -14,6 +14,7 @@ import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import javax.persistence.*
+import javax.persistence.CascadeType.ALL
 import javax.persistence.CascadeType.PERSIST
 import javax.persistence.FetchType.LAZY
 
@@ -45,8 +46,8 @@ class Posting : BasicEntity {
     @ManyToOne(fetch = LAZY)
     var team: Team? = null
 
-    @OneToMany(cascade = arrayOf(CascadeType.ALL))
-    var media: MutableList<Media> = arrayListOf()
+    @OneToOne(cascade = arrayOf(ALL))
+    var media: Media? = null
 
     @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
     var comments: MutableList<Comment> = arrayListOf()
@@ -61,7 +62,7 @@ class Posting : BasicEntity {
     @Transient
     var hasLiked = false
 
-    constructor(text: String?, date: LocalDateTime, location: Location?, user: UserAccount, media: MutableList<Media>) : this() {
+    constructor(text: String?, date: LocalDateTime, location: Location?, user: UserAccount, media: Media?) : this() {
         this.text = text
         this.date = date
         this.location = location
@@ -121,7 +122,7 @@ class Posting : BasicEntity {
     fun preRemove() {
         this.likes.clear()
         this.comments.clear()
-        this.media.clear()
+        this.media = null
         this.challenge = null
         this.user = null
         this.team = null

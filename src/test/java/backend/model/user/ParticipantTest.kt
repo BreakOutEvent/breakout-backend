@@ -22,7 +22,7 @@ class ParticipantTest {
         val user = User.create("email@example.com", "password")
         val participant = user.addRole(Participant::class)
 
-        val team = Team(mock(Participant::class.java), "", "", mock(Event::class.java))
+        val team = Team(mock(Participant::class.java), "", "", mock(Event::class.java), null)
         team.invite(EmailAddress(participant.email))
         team.join(participant)
 
@@ -33,7 +33,7 @@ class ParticipantTest {
     fun whenParticipantCreatesATeam_thenThisIsHisCurrentTeam() {
         val user = User.create("email@example.com", "password")
         val participant = user.addRole(Participant::class)
-        val team = Team(participant, "", "", mock(Event::class.java))
+        val team = Team(participant, "", "", mock(Event::class.java), null)
 
         assertEquals(team, participant.getCurrentTeam())
     }
@@ -42,7 +42,7 @@ class ParticipantTest {
     fun whenParticipantCreatesATeam_thenGetAllTeamsContainsThisTeam() {
         val user = User.create("email@example.com", "password")
         val participant = user.addRole(Participant::class)
-        val team = Team(participant, "", "", mock(Event::class.java))
+        val team = Team(participant, "", "", mock(Event::class.java), null)
 
         assertTrue(participant.getAllTeams().contains(team))
     }
@@ -52,7 +52,7 @@ class ParticipantTest {
         val user = User.create("email@example.com", "password")
         val participant = user.addRole(Participant::class)
 
-        val team = Team(mock(Participant::class.java), "", "", mock(Event::class.java))
+        val team = Team(mock(Participant::class.java), "", "", mock(Event::class.java), null)
         team.invite(EmailAddress(participant.email))
         team.join(participant)
 
@@ -77,9 +77,9 @@ class ParticipantTest {
 
         val user = User.create("email@example.com", "password")
         val participant = user.addRole(Participant::class)
-        Team(participant, "", "", event1)
+        Team(participant, "", "", event1, null)
 
-        val anotherTeam = Team(mock(Participant::class.java), "", "", event1)
+        val anotherTeam = Team(mock(Participant::class.java), "", "", event1, null)
         anotherTeam.invite(EmailAddress(participant.email))
 
         assertFails {
@@ -94,9 +94,9 @@ class ParticipantTest {
 
         val user = User.create("email@example.com", "password")
         val participant = user.addRole(Participant::class)
-        val team = Team(participant, "", "", anEvent)
+        val team = Team(participant, "", "", anEvent, null)
 
-        val anotherTeam = Team(mock(Participant::class.java), "", "", aDifferentEvent)
+        val anotherTeam = Team(mock(Participant::class.java), "", "", aDifferentEvent, null)
         anotherTeam.invite(EmailAddress(participant.email))
 
 

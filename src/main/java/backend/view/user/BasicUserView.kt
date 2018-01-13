@@ -44,7 +44,7 @@ class BasicUserView() {
         this.gender = user.gender
         this.isBlocked = user.isBlocked
         this.participant = if (user.hasRole(Participant::class)) BasicParticipantViewModel(user) else null
-        this.profilePic = MediaView(user.profilePic)
+        this.profilePic = user.profilePic?.let(::MediaView)
         this.roles = user.account.getAuthorities().map { it.authority }
     }
 

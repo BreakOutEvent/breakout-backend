@@ -1,18 +1,13 @@
 package backend.model.payment
 
 import backend.model.BasicEntity
-import backend.model.misc.EmailAddress
 import backend.util.euroOf
 import org.apache.commons.codec.binary.Hex
 import org.javamoney.moneta.Money
-import org.javamoney.moneta.RoundedMoney
 import java.math.BigDecimal
-import java.math.MathContext
 import java.math.RoundingMode
 import java.security.MessageDigest
 import java.util.*
-import javax.money.CurrencyUnit
-import javax.money.MonetaryOperator
 import javax.persistence.CascadeType.MERGE
 import javax.persistence.CascadeType.PERSIST
 import javax.persistence.Column

@@ -49,17 +49,17 @@ class LocationControllerTest : IntegrationTest() {
         fifthUser = userService.create("test5@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val sixthUser = userService.create("test6@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
 
-        firstTeam = teamService.create(firstUser, "team awesome", "description", munichEvent)
+        firstTeam = teamService.create(firstUser, "team awesome", "description", munichEvent, null)
         setAuthenticatedUser(firstUser.email)
         teamService.invite(EmailAddress(secondUser.email), firstTeam)
         teamService.join(secondUser, firstTeam)
 
-        secondTeam = teamService.create(thirdUser, "team not awesome", "description", munichEvent)
+        secondTeam = teamService.create(thirdUser, "team not awesome", "description", munichEvent, null)
         setAuthenticatedUser(thirdUser.email)
         teamService.invite(EmailAddress(fourthUser.email), secondTeam)
         teamService.join(fourthUser, secondTeam)
 
-        thirdTeam = teamService.create(fifthUser, "team shit", "description", berlinEvent)
+        thirdTeam = teamService.create(fifthUser, "team shit", "description", berlinEvent, null)
         setAuthenticatedUser(fifthUser.email)
         teamService.invite(EmailAddress(sixthUser.email), thirdTeam)
         teamService.join(sixthUser, thirdTeam)
@@ -177,13 +177,13 @@ class LocationControllerTest : IntegrationTest() {
         val thisUser = userService.create("testduring@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
 
         // TODO: Refactor this
-        val thisTeam = teamService.create(thisUser, "team awesome", "description", thisEvent)
+        val thisTeam = teamService.create(thisUser, "team awesome", "description", thisEvent, null)
         thisTeam.hasStarted = true
         teamService.save(thisTeam)
         setAuthenticatedUser(thisUser.email)
 
         val feature = Feature("event.isNow", true)
-        featureReposity.save(feature)
+        featureRepository.save(feature)
 
         val data = mapOf(
                 "latitude" to 1.0,
@@ -219,11 +219,11 @@ class LocationControllerTest : IntegrationTest() {
 
         val thisEvent = eventService.createEvent("Event", timeEvent, "Test", Coord(1.0, 1.0), 36)
         val thisUser = userService.create("testduring@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
-        val thisTeam = teamService.create(thisUser, "team awesome", "description", thisEvent)
+        val thisTeam = teamService.create(thisUser, "team awesome", "description", thisEvent, null)
         setAuthenticatedUser(thisUser.email)
 
         val feature = Feature("event.isNow", false)
-        featureReposity.save(feature)
+        featureRepository.save(feature)
 
         val data = mapOf(
                 "latitude" to 1.0,
@@ -259,10 +259,10 @@ class LocationControllerTest : IntegrationTest() {
 
         val thisEvent = eventService.createEvent("Event", timeEvent, "Test", Coord(1.0, 1.0), 36)
         val thisUser = userService.create("testduring@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
-        val thisTeam = teamService.create(thisUser, "team awesome", "description", thisEvent)
+        val thisTeam = teamService.create(thisUser, "team awesome", "description", thisEvent, null)
 
         val feature = Feature("event.isNow", false)
-        featureReposity.save(feature)
+        featureRepository.save(feature)
 
         setAuthenticatedUser(thisUser.email)
 

@@ -85,7 +85,6 @@ class ChallengeController(private var challengeService: ChallengeService,
     private fun challengeWithRegisteredSponsor(user: User, team: Team, amount: Money, description: String): ChallengeView {
         val sponsor = user.getRole(Sponsor::class) ?: throw UnauthorizedException("User is no sponsor")
         val challenge = challengeService.proposeChallenge(sponsor, team, amount, description)
-        challenge.contract.generateSignedUploadToken(jwtSecret)
         return ChallengeView(challenge)
     }
 
@@ -103,7 +102,6 @@ class ChallengeController(private var challengeService: ChallengeService,
                 isHidden = unregisteredSponsor.isHidden)
 
         val challenge = challengeService.proposeChallenge(sponsor, team, amount, description)
-        challenge.contract.generateSignedUploadToken(jwtSecret)
         return ChallengeView(challenge)
     }
 
@@ -162,7 +160,7 @@ class ChallengeController(private var challengeService: ChallengeService,
                         url = it.sponsor.url)
             }
 
-            ChallengeTeamProfileView(it.amount, it.description, it.status.toString(), sponsor)
+            ChallengeTeamProfileView(it.id, it.amount, it.description, it.status.toString(), sponsor)
         }
     }
 

@@ -9,8 +9,6 @@ import backend.model.user.Participant
 import backend.model.user.User
 import backend.services.ConfigurationService
 import backend.testHelper.json
-import com.auth0.jwt.Algorithm
-import com.auth0.jwt.JWTSigner
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.hamcrest.Matchers.hasSize
 import org.junit.Before
@@ -59,15 +57,15 @@ open class TestTeamEndpoint : IntegrationTest() {
         makeUserParticipant(inviteeCredentials)
         creator = userRepository.findOne(creatorCredentials.id.toLong()).getRole(Participant::class)!!
         invitee = userRepository.findOne(inviteeCredentials.id.toLong())
-        team = teamService.create(creator as Participant, "name", "description", event)
+        team = teamService.create(creator as Participant, "name", "description", event, null)
 
         val fakeLocationData = mapOf("COUNTRY" to "Germany")
 
         val firstLocation = Location(Coord(1.0, 1.0), creator.getRole(Participant::class)!!, LocalDateTime.now(), fakeLocationData)
         val secondLocation = Location(Coord(1.2, 2.0), creator.getRole(Participant::class)!!, LocalDateTime.now(), fakeLocationData)
 
-        postingService.save(Posting("test", LocalDateTime.now(), firstLocation, creator.account, arrayListOf()))
-        postingService.save(Posting("test", LocalDateTime.now(), secondLocation, creator.account, arrayListOf()))
+        postingService.save(Posting("test", LocalDateTime.now(), firstLocation, creator.account, null))
+        postingService.save(Posting("test", LocalDateTime.now(), secondLocation, creator.account, null))
 
     }
 
@@ -79,7 +77,7 @@ open class TestTeamEndpoint : IntegrationTest() {
     @Test
     fun testCreateTeam() {
 
-        val body = mapOf("name" to "Team awesome", "description" to "Our team is awesome").toJsonString()
+        val body = mapOf("name" to "Team awesome", "description" to "Our team is awesome", "profilePic" to mapOf("type" to "image", "url" to "url")).toJsonString()
 
         val request = post("/event/${event.id}/team/")
                 // TODO: Stop using inviteeCredentials just because creator already is part of a team because of setUp()
@@ -93,7 +91,7 @@ open class TestTeamEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.profilePic.type").exists())
                 .andExpect(jsonPath("$.profilePic.id").exists())
-                .andExpect(jsonPath("$.profilePic.uploadToken").exists())
+                .andExpect(jsonPath("$.profilePic.url").exists())
                 .andExpect(jsonPath("$.profilePic.type").value("IMAGE"))
                 .andExpect(jsonPath("$.event").value(event.id!!.toInt()))
                 .andExpect(jsonPath("$.name").value("Team awesome"))
@@ -107,7 +105,7 @@ open class TestTeamEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun Given_a_user_is_in_a_team_at_an_event__When_he_wants_to_create_another_team__Then_it_fails() {
+    fun GivenAUserIsInATeamAtAnEventWhenHeWantsToCreateAnotherTeamThenItFails() {
         val testUserCredentials = createUser(this.mockMvc, "test@example.com", "pw", this.userService)
         makeUserParticipant(testUserCredentials)
 
@@ -121,7 +119,8 @@ open class TestTeamEndpoint : IntegrationTest() {
     private fun createTeam(credentials: Credentials, name: String, description: String, eventId: Long): Long {
         val body = mapOf(
                 "name" to name,
-                "description" to description
+                "description" to description,
+                "profilePic" to mapOf("type" to "image", "url" to "url")
         )
 
         val request = post("/event/$eventId/team/")
@@ -133,7 +132,7 @@ open class TestTeamEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.profilePic.type").exists())
                 .andExpect(jsonPath("$.profilePic.id").exists())
-                .andExpect(jsonPath("$.profilePic.uploadToken").exists())
+                .andExpect(jsonPath("$.profilePic.url").exists())
                 .andExpect(jsonPath("$.profilePic.type").value("IMAGE"))
                 .andExpect(jsonPath("$.event").value(event.id!!.toInt()))
                 .andExpect(jsonPath("$.name").value(name))
@@ -150,71 +149,6 @@ open class TestTeamEndpoint : IntegrationTest() {
         return (jsonRes["id"] as? Int)?.toLong() ?: throw Exception("Can't parse id ${jsonRes["id"]} to long")
 
     }
-
-    @Test
-    fun testCreateTeamAndAddMediaSizesWithValidToken() {
-
-        val postData = mapOf(
-                "url" to "https://aws.amazon.com/bla.jpg",
-                "width" to 400,
-                "height" to 200,
-                "length" to 0.0,
-                "size" to 0.0,
-                "type" to "image"
-        ).toJsonString()
-
-        val request = MockMvcRequestBuilders
-                .request(HttpMethod.POST, "/media/${team.profilePic.id}/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to team.profilePic.id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
-                .content(postData)
-
-        val response = mockMvc.perform(request)
-                .andExpect(status().isCreated)
-                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.url").exists())
-                .andExpect(jsonPath("$.width").exists())
-                .andExpect(jsonPath("$.height").exists())
-                .andExpect(jsonPath("$.length").exists())
-                .andExpect(jsonPath("$.size").exists())
-                .andExpect(jsonPath("$.type").exists())
-                .andReturn().response.contentAsString
-
-
-        println(response)
-
-        val requestMedia = MockMvcRequestBuilders
-                .request(HttpMethod.GET, "/event/${event.id}/team/${team.id}/")
-                .contentType(MediaType.APPLICATION_JSON)
-
-        val responseMedia = mockMvc.perform(requestMedia)
-                .andExpect(status().isOk)
-                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").exists())
-                .andExpect(jsonPath("$.event").exists())
-                .andExpect(jsonPath("$.invoiceId").exists())
-                .andExpect(jsonPath("$.description").exists())
-                .andExpect(jsonPath("$.members").exists())
-                .andExpect(jsonPath("$.profilePic").exists())
-                .andExpect(jsonPath("$.profilePic.id").exists())
-                .andExpect(jsonPath("$.profilePic.type").exists())
-                .andExpect(jsonPath("$.profilePic.sizes").exists())
-                .andExpect(jsonPath("$.profilePic.sizes").isArray)
-                .andExpect(jsonPath("$.profilePic.sizes[0]").exists())
-                .andExpect(jsonPath("$.profilePic.sizes[0].id").exists())
-                .andExpect(jsonPath("$.profilePic.sizes[0].url").exists())
-                .andExpect(jsonPath("$.profilePic.sizes[0].width").exists())
-                .andExpect(jsonPath("$.profilePic.sizes[0].height").exists())
-                .andExpect(jsonPath("$.profilePic.sizes[0].length").exists())
-                .andExpect(jsonPath("$.profilePic.sizes[0].size").exists())
-                .andExpect(jsonPath("$.profilePic.sizes[0].type").exists())
-                .andReturn().response.contentAsString
-
-        println(responseMedia)
-    }
-
 
     @Test
     fun failToCreateTeamIfUserIsNoParticipant() {
@@ -260,7 +194,7 @@ open class TestTeamEndpoint : IntegrationTest() {
     @Test
     fun testEditTeam() {
 
-        val body = mapOf("name" to "Team megaAwesome", "description" to "Our team is super awesome").toJsonString()
+        val body = mapOf("name" to "Team megaAwesome", "description" to "Our team is super awesome", "profilePic" to mapOf("type" to "image", "url" to "url")).toJsonString()
 
         val request = put("/event/${event.id}/team/${team.id}/")
                 .header("Authorization", "Bearer ${creatorCredentials.accessToken}")
@@ -270,9 +204,10 @@ open class TestTeamEndpoint : IntegrationTest() {
         val response = mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.profilePic").exists())
                 .andExpect(jsonPath("$.profilePic.type").exists())
                 .andExpect(jsonPath("$.profilePic.id").exists())
-                .andExpect(jsonPath("$.profilePic.uploadToken").exists())
+                .andExpect(jsonPath("$.profilePic.url").exists())
                 .andExpect(jsonPath("$.profilePic.type").value("IMAGE"))
                 .andExpect(jsonPath("$.event").value(event.id!!.toInt()))
                 .andExpect(jsonPath("$.name").value("Team megaAwesome"))

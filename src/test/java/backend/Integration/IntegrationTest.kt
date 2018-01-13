@@ -16,8 +16,6 @@ import backend.model.location.LocationRepository
 import backend.model.location.LocationService
 import backend.model.media.MediaRepository
 import backend.model.media.MediaService
-import backend.model.media.MediaSizeRepository
-import backend.model.media.MediaSizeService
 import backend.model.messaging.GroupMessageRepository
 import backend.model.messaging.GroupMessageService
 import backend.model.payment.SponsoringInvoiceRepository
@@ -80,12 +78,11 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var teamRepository: TeamRepository
     @Autowired lateinit protected var postingRepository: PostingRepository
     @Autowired lateinit protected var mediaRepository: MediaRepository
-    @Autowired lateinit protected var mediaSizeRepository: MediaSizeRepository
     @Autowired lateinit protected var locationRepository: LocationRepository
     @Autowired lateinit protected var sponsoringRepository: SponsoringRepository
     @Autowired lateinit protected var groupMessageRepository: GroupMessageRepository
     @Autowired lateinit protected var challengeRepository: ChallengeRepository
-    @Autowired lateinit protected var featureReposity: FeatureRepository
+    @Autowired lateinit protected var featureRepository: FeatureRepository
     @Autowired lateinit protected var sponsoringInvoiceRepository: SponsoringInvoiceRepository
     @Autowired lateinit protected var teamOverviewRepository: TeamoverviewRepository
 
@@ -95,7 +92,6 @@ abstract class IntegrationTest {
     @Autowired lateinit protected var postingService: PostingService
     @Autowired lateinit protected var eventService: EventService
     @Autowired lateinit protected var mediaService: MediaService
-    @Autowired lateinit protected var mediaSizeService: MediaSizeService
     @Autowired lateinit protected var teamEntryFeeService: TeamEntryFeeService
     @Autowired lateinit protected var locationService: LocationService
     @Autowired lateinit protected var sponsoringService: SponsoringService
@@ -115,12 +111,11 @@ abstract class IntegrationTest {
         groupMessageRepository.deleteAll()
         userRepository.deleteAll()
         mediaRepository.deleteAll()
-        mediaSizeRepository.deleteAll()
         eventRepository.deleteAll()
         locationRepository.deleteAll()
         challengeRepository.deleteAll()
         sponsoringRepository.deleteAll()
-        featureReposity.deleteAll()
+        featureRepository.deleteAll()
         teamOverviewRepository.deleteAll()
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
@@ -163,7 +158,8 @@ fun createUser(mockMvc: MockMvc, email: String = "a@x.de", password: String = "p
     // Create user
     val userdata = mapOf(
             "email" to email,
-            "password" to password
+            "password" to password,
+            "profilePic" to mapOf("type" to "image", "url" to "url")
     ).toJsonString()
 
     val createRequest = MockMvcRequestBuilders

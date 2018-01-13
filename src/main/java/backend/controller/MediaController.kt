@@ -2,18 +2,14 @@ package backend.controller
 
 import backend.controller.exceptions.NotFoundException
 import backend.model.media.MediaService
-import backend.model.media.MediaSizeService
 import backend.services.ConfigurationService
 import backend.util.CacheNames.POSTINGS
 import backend.util.CacheNames.TEAMS
-import backend.util.verifyJwtClaim
-import backend.view.MediaSizeView
+import com.cloudinary.Cloudinary
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Caching
-import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
-import javax.validation.Valid
 
 /**
  * Is only called by the media recoding microservice
@@ -21,29 +17,11 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/media")
-class MediaController(private val mediaSizeService: MediaSizeService,
-                      private val mediaService: MediaService,
+class MediaController(private val mediaService: MediaService,
                       private val configurationService: ConfigurationService) {
 
-    private val JWT_SECRET: String = configurationService.getRequired("org.breakout.api.jwt_secret")
-
-    /**
-     * POST /media/{id}/
-     * Adds single MediaSize to Media
-     */
-    @Caching(evict = arrayOf(CacheEvict(POSTINGS, allEntries = true), CacheEvict(TEAMS, allEntries = true)))
-    @PostMapping("/{id}/")
-    @ResponseStatus(CREATED)
-    fun createMediaSize(@PathVariable("id") id: Long,
-                        @RequestHeader("X-UPLOAD-TOKEN") uploadToken: String,
-                        @Valid @RequestBody body: MediaSizeView): MediaSizeView {
-
-        verifyJwtClaim(JWT_SECRET, uploadToken, id.toString())
-        val media = mediaService.getByID(id) ?: throw NotFoundException("No media with id $id")
-
-        val mediaSize = mediaSizeService.createOrUpdate(media.id!!, body.url!!, body.width!!, body.height!!, body.length!!, body.size!!, body.type!!)
-        return MediaSizeView(mediaSize)
-    }
+    private val CLOUDINARY_API_SECRET = configurationService.getRequired("org.breakout.cloudinary.api_secret");
+    private val CLOUDINARY_API_KEY = configurationService.getRequired("org.breakout.cloudinary.api_key");
 
     /**
      * DELETE /media/{id}/
@@ -54,8 +32,16 @@ class MediaController(private val mediaSizeService: MediaSizeService,
     @RequestMapping("/{id}/", method = arrayOf(RequestMethod.DELETE))
     fun adminDeletePosting(@PathVariable("id") id: Long): Map<String, String> {
         val media = mediaService.getByID(id) ?: throw NotFoundException("media with id $id does not exist")
-        mediaService.deleteSizes(media)
+        mediaService.delete(media)
         return mapOf("message" to "success")
+    }
+
+    @RequestMapping("/signCloudinaryParams/")
+    fun getCloudinaryUploadHash(@RequestBody uploadOptions: MutableMap<String, Any>): Map<String, Any> {
+        val cloudinary = Cloudinary();
+        uploadOptions["timestamp"] = System.currentTimeMillis()
+        uploadOptions["signature"] = cloudinary.apiSignRequest(uploadOptions, CLOUDINARY_API_SECRET)
+        return uploadOptions
     }
 
 }

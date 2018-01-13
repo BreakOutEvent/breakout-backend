@@ -34,7 +34,7 @@ class ChallengeControllerTest : IntegrationTest() {
         val user = userService.create("participant@break-out.org", "password")
         user.addRole(Participant::class)
         this.participant = userService.save(user).getRole(Participant::class)!!
-        this.team = teamService.create(participant, "name", "description", event)
+        this.team = teamService.create(participant, "name", "description", event, null)
         this.sponsor = userService.create("sponsor@break-out.org", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
     }
 
@@ -60,8 +60,6 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.team").value(team.name))
                 .andExpect(jsonPath("$.teamId").value(team.id!!.toInt()))
                 .andExpect(jsonPath("$.status").value("PROPOSED"))
-                .andExpect(jsonPath("$.contract").exists())
-                .andExpect(jsonPath("$.contract.uploadToken").exists())
     }
 
     @Test
@@ -112,8 +110,6 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.unregisteredSponsor.gender").exists())
                 .andExpect(jsonPath("$.unregisteredSponsor.hidden").exists())
                 .andExpect(jsonPath("$.unregisteredSponsor.address").exists())
-                .andExpect(jsonPath("$.contract").exists())
-                .andExpect(jsonPath("$.contract.uploadToken").exists())
     }
 
     @Test
@@ -276,7 +272,7 @@ class ChallengeControllerTest : IntegrationTest() {
     @Test
     fun getAllChallengesForSponsor() {
         val participant2 = userService.create("participant2@break-out.org", "password", { addRole(Participant::class) })
-        val team2 = teamService.create(participant2.getRole(Participant::class)!!, "", "", event)
+        val team2 = teamService.create(participant2.getRole(Participant::class)!!, "", "", event, null)
 
         setAuthenticatedUser(sponsor.email)
         challengeService.proposeChallenge(sponsor, team, euroOf(10.0), "description")
@@ -399,7 +395,7 @@ class ChallengeControllerTest : IntegrationTest() {
     fun testWithdrawChallengeForUnregisteredSponsor() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
-        val team = teamService.create(participant, "name", "description", event)
+        val team = teamService.create(participant, "name", "description", event, null)
         val sponsor = UnregisteredSponsor("", "", "", "", "", address = Address("", "", "", "", ""))
         setAuthenticatedUser(participant.email)
         val challenge = challengeService.proposeChallenge(sponsor, team, euroOf(200), "desc")
@@ -427,7 +423,7 @@ class ChallengeControllerTest : IntegrationTest() {
 
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
-        val team = teamService.create(participant, "name", "description", event)
+        val team = teamService.create(participant, "name", "description", event, null)
         val sponsor = userService.create("challenger@break-out.org", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
 
         setAuthenticatedUser(sponsor.email)

@@ -5,22 +5,15 @@ import org.hibernate.validator.constraints.SafeHtml
 import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import javax.validation.Valid
 
-class MediaView() {
+class MediaView(id: Long?, type: String, url: String?) {
 
-    var id: Long? = null
+    constructor(media: Media) : this(media.id, media.mediaType.name, media.url)
+
+    var id: Long? = id
 
     @Valid
     @SafeHtml(whitelistType = NONE)
-    var type: String? = null
+    var type: String = type
 
-    var uploadToken: String? = null
-
-    var sizes: List<MediaSizeView>? = null
-
-    constructor(media: Media) : this() {
-        this.id = media.id
-        this.type = media.mediaType.toString()
-        this.uploadToken = media.uploadToken
-        this.sizes = media.sizes.map(::MediaSizeView)
-    }
+    var url: String? = url
 }

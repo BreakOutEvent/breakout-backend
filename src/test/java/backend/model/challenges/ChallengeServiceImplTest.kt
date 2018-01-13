@@ -35,7 +35,7 @@ open class ChallengeServiceImplTest : IntegrationTest() {
         event = eventService.createEvent("Title", LocalDateTime.now(), "Munich", Coord(0.0), 36)
         participant = userService.create("participant@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         sponsor = userService.create("sponsor@break-out.org", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
-        team = teamService.create(participant, "name", "description", event)
+        team = teamService.create(participant, "name", "description", event, null)
         posting = postingService.createPosting(participant, "Test", null, null, LocalDateTime.now())
         unregisteredSponsor = UnregisteredSponsor(
                 firstname = "firstname",
@@ -116,7 +116,7 @@ open class ChallengeServiceImplTest : IntegrationTest() {
     fun testAddProofFailsIfFeatureDisabled() {
 
         val feature = Feature("challenge.addProof", false)
-        featureReposity.save(feature)
+        featureRepository.save(feature)
 
         setAuthenticatedUser("sponsor@break-out.org")
         val challenge = challengeService.proposeChallenge(sponsor, team, euroOf(20), "desc")

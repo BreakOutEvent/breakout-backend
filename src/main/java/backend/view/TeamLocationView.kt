@@ -31,7 +31,7 @@ class TeamLocationView {
         this.description = team.description
         this.members = ArrayList()
         team.members.forEach { this.members!!.add(BasicUserView(it)) }
-        this.profilePic = MediaView(team.profilePic)
+        this.profilePic = null
         this.hasStarted = team.hasStarted
         this.locations = locations.map(::BasicLocationView)
     }

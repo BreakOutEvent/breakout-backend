@@ -45,7 +45,7 @@ class TeamView() {
         this.description = team.description
         this.members = ArrayList()
         team.members.forEach { this.members!!.add(BasicUserView(it)) }
-        this.profilePic = MediaView(team.profilePic)
+        this.profilePic = team.profilePic?.let(::MediaView)
         this.invoiceId = team.invoice?.id
         this.hasStarted = team.hasStarted
         this.hasFullyPaid = team.invoice?.isFullyPaid()
@@ -59,7 +59,7 @@ class TeamView() {
         this.description = team.description
         this.members = ArrayList()
         team.members.forEach { this.members!!.add(BasicUserView(it)) }
-        this.profilePic = MediaView(team.profilePic)
+        this.profilePic = team.profilePic?.let(::MediaView)
         this.invoiceId = team.invoice?.id
         this.hasStarted = team.hasStarted
         this.hasFullyPaid = team.invoice?.isFullyPaid()

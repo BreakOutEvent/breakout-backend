@@ -55,10 +55,10 @@ class TeamControllerTest : IntegrationTest() {
         val participant = userService.create("participant@example.com", "pw", { addRole(Participant::class) })
                 .getRole(Participant::class)!!
 
-        val firstTeam = teamService.create(participant, "firstteam", "description", firstEvent)
+        val firstTeam = teamService.create(participant, "firstteam", "description", firstEvent, null)
         val firstPosting = postingService.createPosting(participant, "Hello 1", null, null, LocalDateTime.now())
 
-        val secondTeam = teamService.create(participant, "secondteam", "description", secondEvent)
+        val secondTeam = teamService.create(participant, "secondteam", "description", secondEvent, null)
         val secondPosting = postingService.createPosting(participant, "Hello 2", null, null, LocalDateTime.now().plusYears(1))
 
         // when
@@ -86,7 +86,7 @@ class TeamControllerTest : IntegrationTest() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "Munich", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@break-out.org", "password", { addRole(Participant::class) })
                 .getRole(Participant::class)!!
-        val team = teamService.create(participant, "name", "description", event)
+        val team = teamService.create(participant, "name", "description", event, null)
 
         val body = mapOf(
                 "hasStarted" to true
@@ -107,7 +107,7 @@ class TeamControllerTest : IntegrationTest() {
         val participant = userService.create("participant@break-out.org", "password", { addRole(Participant::class) })
                 .getRole(Participant::class)!!
         val admin = userService.create("admin@break-out.org", "password", { addRole(Admin::class) })
-        val team = teamService.create(participant, "name", "description", event)
+        val team = teamService.create(participant, "name", "description", event, null)
 
         val body = mapOf(
                 "hasStarted" to true

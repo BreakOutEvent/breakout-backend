@@ -5,6 +5,7 @@ package backend.Integration
 import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.media.Media
+import backend.model.media.MediaType
 import backend.model.misc.Coord
 import backend.model.misc.EmailAddress
 import backend.model.user.Admin
@@ -13,8 +14,6 @@ import backend.model.user.User
 import backend.services.ConfigurationService
 import backend.testHelper.asUser
 import backend.testHelper.json
-import com.auth0.jwt.Algorithm
-import com.auth0.jwt.JWTSigner
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.intellij.lang.annotations.Language
 import org.junit.Before
@@ -46,7 +45,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         event = eventService.createEvent("Breakout München", LocalDateTime.now(), "Munich", Coord(1.0, 1.0), 36)
         admin = userService.create("test_admin@break-out.org", "password", { addRole(Admin::class); isBlocked = false })
         user = userService.create("test@mail.com", "password", { addRole(Participant::class) })
-        team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event)
+        team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event, null)
     }
 
 
@@ -85,49 +84,20 @@ open class TestPostingEndpoint : IntegrationTest() {
 
     @Test
     open fun adminDeletePostingCascade() {
-        val posting = postingService.savePostingWithLocationAndMedia("hello #breakout", Coord(1.0, 1.0), user.account, mutableListOf("image", "audio"), LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("hello #breakout", Coord(1.0, 1.0), user.account, Media(MediaType.IMAGE, "url"), LocalDateTime.now())
         postingService.like(posting, user.account, LocalDateTime.now())
         postingService.addComment(posting, user.account, LocalDateTime.now(), "Hello!")
-
-        val postData = mapOf(
-                "url" to "https://aws.amazon.com/bla.jpg",
-                "width" to 400,
-                "height" to 200,
-                "length" to 0.0,
-                "size" to 0.0,
-                "type" to "image"
-        )
-
-        println(posting.media)
-
-        val requestMediaSize = post("/media/${posting.media.first().id}/")
-                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
-                .json(postData)
-
-        mockMvc.perform(requestMediaSize)
-                .andExpect(status().isCreated)
-                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.url").exists())
-                .andExpect(jsonPath("$.width").exists())
-                .andExpect(jsonPath("$.height").exists())
-                .andExpect(jsonPath("$.length").exists())
-                .andExpect(jsonPath("$.size").exists())
-                .andExpect(jsonPath("$.type").exists())
-                .andReturn().response.contentAsString
 
 
         val request = MockMvcRequestBuilders
                 .delete("/posting/${posting.id}/")
                 .asUser(mockMvc, admin.email, "password")
 
-        val response = mockMvc.perform(request)
+        mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.message").exists())
                 .andExpect(jsonPath("$.message").value("success"))
                 .andReturn().response.contentAsString
-
-        println(response)
     }
 
     @Test
@@ -235,10 +205,9 @@ open class TestPostingEndpoint : IntegrationTest() {
                         "latitude" to 1.0,
                         "longitude" to 1.0
                 ),
-                "uploadMediaTypes" to arrayOf(
-                        "image",
-                        "image",
-                        "audio"
+                "media" to mapOf(
+                        "type" to "image",
+                        "url" to "url"
                 )
         )
 
@@ -259,15 +228,9 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .andExpect(jsonPath("$.postingLocation.distance").exists())
                 .andExpect(jsonPath("$.postingLocation.locationData").exists())
                 .andExpect(jsonPath("$.postingLocation.locationData.COUNTRY").value("Germany"))
-                .andExpect(jsonPath("$.media[0].type").exists())
-                .andExpect(jsonPath("$.media[0].id").exists())
-                .andExpect(jsonPath("$.media[0].uploadToken").exists())
-                .andExpect(jsonPath("$.media[1].type").exists())
-                .andExpect(jsonPath("$.media[1].id").exists())
-                .andExpect(jsonPath("$.media[1].uploadToken").exists())
-                .andExpect(jsonPath("$.media[2].type").exists())
-                .andExpect(jsonPath("$.media[2].id").exists())
-                .andExpect(jsonPath("$.media[2].uploadToken").exists())
+                .andExpect(jsonPath("$.media.type").exists())
+                .andExpect(jsonPath("$.media.id").exists())
+                .andExpect(jsonPath("$.media.url").exists())
                 .andReturn().response.contentAsString
 
         println(response)
@@ -368,10 +331,9 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun createNewPostingWithMediaApi() {
         val postData = mapOf(
-                "uploadMediaTypes" to arrayOf(
-                        "image",
-                        "image",
-                        "audio"
+                "media" to mapOf(
+                        "type" to "image",
+                        "url" to "url"
                 ),
                 "date" to LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
         )
@@ -384,15 +346,9 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .andExpect(status().isCreated)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.media[0].type").exists())
-                .andExpect(jsonPath("$.media[0].id").exists())
-                .andExpect(jsonPath("$.media[0].uploadToken").exists())
-                .andExpect(jsonPath("$.media[1].type").exists())
-                .andExpect(jsonPath("$.media[1].id").exists())
-                .andExpect(jsonPath("$.media[1].uploadToken").exists())
-                .andExpect(jsonPath("$.media[2].type").exists())
-                .andExpect(jsonPath("$.media[2].id").exists())
-                .andExpect(jsonPath("$.media[2].uploadToken").exists())
+                .andExpect(jsonPath("$.media.type").exists())
+                .andExpect(jsonPath("$.media.id").exists())
+                .andExpect(jsonPath("$.media.url").exists())
                 .andExpect(jsonPath("$.date").exists())
                 .andExpect(jsonPath("$.user").exists())
                 .andReturn().response.contentAsString
@@ -519,68 +475,9 @@ open class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
-    open fun createNewPostingWithMediaAndAddMediaSizesWithoutToken() {
-        //given
-
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now());
-        val media = mediaService.createMedia("image")
-        posting.media = mutableListOf(media) as MutableList<Media>
-        val savedposting = postingService.save(posting)
-
-        val postData = mapOf(
-                "url" to "https://aws.amazon.com/bla.jpg",
-                "width" to 400,
-                "height" to 200,
-                "length" to 0.0,
-                "size" to 0.0,
-                "type" to "image"
-        )
-
-        //when
-        val request = post("/media/${savedposting!!.media.first().id}/")
-                .json(postData)
-
-        //then
-        val response = mockMvc.perform(request)
-                .andExpect(status().isBadRequest)
-                .andReturn().response.contentAsString
-
-        println(response)
-    }
-
-    @Test
-    open fun createNewPostingWithMediaAndAddMediaSizesWithWrongToken() {
-
-
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now());
-        val media = mediaService.createMedia("image")
-        posting.media = mutableListOf(media) as MutableList<Media>
-        val savedposting = postingService.save(posting)
-
-        val postData = mapOf(
-                "url" to "https://aws.amazon.com/bla.jpg",
-                "width" to 400,
-                "height" to 200,
-                "length" to 0.0,
-                "size" to 0.0,
-                "type" to "image"
-        )
-
-        val request = post("/media/${savedposting!!.media.first().id}/")
-                .header("X-UPLOAD-TOKEN", "87654321")
-                .json(postData)
-
-        val response = mockMvc.perform(request)
-                .andExpect(status().isUnauthorized)
-                .andReturn().response.contentAsString
-
-        println(response)
-    }
-
-    @Test
     open fun createNewPostingWithMedia() {
 
-        val posting = postingService.createPosting(user.account, "Test", arrayListOf("VIDEO"), null, LocalDateTime.now())
+        val posting = postingService.createPosting(user.account, "Test", Media(MediaType.IMAGE, "url"), null, LocalDateTime.now())
 
         val requestMedia = get("/posting/${posting.id}/")
 
@@ -588,422 +485,9 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
                 .andExpect(jsonPath("$.media").exists())
-                .andExpect(jsonPath("$.media").isArray)
-                .andExpect(jsonPath("$.media[0]").exists())
-                .andExpect(jsonPath("$.media[0].id").exists())
-                .andExpect(jsonPath("$.media[0].type").exists())
-                .andExpect(jsonPath("$.media[0].sizes").exists())
-                .andExpect(jsonPath("$.media[0].sizes").isArray)
-                .andReturn().response.contentAsString
-
-        println(responseMedia)
-    }
-
-
-    @Test
-    open fun createNewPostingWithMediaAndAddMediaSizesWithValidToken() {
-
-
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now())
-        val media = mediaService.createMedia("image")
-        posting.media = mutableListOf(media) as MutableList<Media>
-        val savedposting = postingService.save(posting)
-
-        val postData = mapOf(
-                "url" to "https://aws.amazon.com/bla.jpg",
-                "width" to 400,
-                "height" to 200,
-                "length" to 0.0,
-                "size" to 0.0,
-                "type" to "image"
-        )
-
-        println(posting.media)
-
-        val request = post("/media/${savedposting!!.media.first().id}/")
-                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
-                .json(postData)
-
-        val response = mockMvc.perform(request)
-                .andExpect(status().isCreated)
-                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.url").exists())
-                .andExpect(jsonPath("$.width").exists())
-                .andExpect(jsonPath("$.height").exists())
-                .andExpect(jsonPath("$.length").exists())
-                .andExpect(jsonPath("$.size").exists())
-                .andExpect(jsonPath("$.type").exists())
-                .andReturn().response.contentAsString
-
-
-        println(response)
-
-        val requestMedia = get("/posting/${savedposting.id}/")
-
-        val responseMedia = mockMvc.perform(requestMedia)
-                .andExpect(status().isOk)
-                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.media").exists())
-                .andExpect(jsonPath("$.media").isArray)
-                .andExpect(jsonPath("$.media[0]").exists())
-                .andExpect(jsonPath("$.media[0].id").exists())
-                .andExpect(jsonPath("$.media[0].type").exists())
-                .andExpect(jsonPath("$.media[0].sizes").exists())
-                .andExpect(jsonPath("$.media[0].sizes").isArray)
-                .andExpect(jsonPath("$.media[0].sizes[0]").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].id").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].url").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].width").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].height").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].length").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].size").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].type").exists())
-                .andReturn().response.contentAsString
-
-        println(responseMedia)
-    }
-
-
-    @Test
-    open fun createNewPostingWithMediaAndAddManyMediaSizes() {
-
-
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now());
-        val media = mediaService.createMedia("image")
-        posting.media = mutableListOf(media) as MutableList<Media>
-        val savedposting = postingService.save(posting)
-
-        for (i in 0..100) {
-
-            val postData = mapOf(
-                    "url" to "https://aws.amazon.com/bla$i.jpg",
-                    "width" to i * 100 + 100,
-                    "height" to 200,
-                    "length" to 0.0,
-                    "size" to 0.0,
-                    "type" to "image"
-            )
-
-            val request = post("/media/${savedposting!!.media.first().id}/")
-                    .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
-                    .json(postData)
-
-            mockMvc.perform(request)
-        }
-
-
-        val requestMedia = get("/posting/${savedposting!!.id}/")
-
-        val responseMedia = mockMvc.perform(requestMedia)
-                .andExpect(status().isOk)
-                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.media").exists())
-                .andExpect(jsonPath("$.media").isArray)
-                .andExpect(jsonPath("$.media[0]").exists())
-                .andExpect(jsonPath("$.media[0].id").exists())
-                .andExpect(jsonPath("$.media[0].type").exists())
-                .andExpect(jsonPath("$.media[0].sizes").exists())
-                .andExpect(jsonPath("$.media[0].sizes").isArray)
-                .andExpect(jsonPath("$.media[0].sizes[0]").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].id").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].url").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].width").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].height").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].length").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].size").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].type").exists())
-                .andExpect(jsonPath("$.media[0].sizes[99]").exists())
-                .andExpect(jsonPath("$.media[0].sizes[100]").doesNotExist())
-                .andReturn().response.contentAsString
-
-        println(responseMedia)
-    }
-
-    @Test
-    open fun createNewPostingWithMediaAndAddMediaSizesUpdateMediaSizes() {
-
-
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now());
-        val media = mediaService.createMedia("image")
-        posting.media = mutableListOf(media) as MutableList<Media>
-        val savedposting = postingService.save(posting)
-
-        var postData = mapOf(
-                "url" to "https://aws.amazon.com/bla.jpg",
-                "width" to 400,
-                "height" to 200,
-                "length" to 0.0,
-                "size" to 0.0,
-                "type" to "image"
-        )
-
-        println(posting.media)
-
-        var request = post("/media/${savedposting!!.media.first().id}/")
-                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
-                .json(postData)
-
-        var response = mockMvc.perform(request)
-                .andExpect(status().isCreated)
-                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.url").exists())
-                .andExpect(jsonPath("$.width").exists())
-                .andExpect(jsonPath("$.height").exists())
-                .andExpect(jsonPath("$.length").exists())
-                .andExpect(jsonPath("$.size").exists())
-                .andExpect(jsonPath("$.type").exists())
-                .andReturn().response.contentAsString
-
-
-        println(response)
-
-        postData = mapOf(
-                "url" to "https://aws.amazon.com/bla123.jpg",
-                "width" to 400,
-                "height" to 200,
-                "length" to 0.0,
-                "size" to 0.0,
-                "type" to "image"
-        )
-
-        println(posting.media)
-
-        request = post("/media/${savedposting.media.first().id}/")
-                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
-                .json(postData)
-
-        response = mockMvc.perform(request)
-                .andExpect(status().isCreated)
-                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.url").exists())
-                .andExpect(jsonPath("$.width").exists())
-                .andExpect(jsonPath("$.height").exists())
-                .andExpect(jsonPath("$.length").exists())
-                .andExpect(jsonPath("$.size").exists())
-                .andExpect(jsonPath("$.type").exists())
-                .andReturn().response.contentAsString
-
-
-        println(response)
-
-        val requestMedia = MockMvcRequestBuilders
-                .get("/posting/${savedposting.id}/")
-
-        val responseMedia = mockMvc.perform(requestMedia)
-                .andExpect(status().isOk)
-                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.media").exists())
-                .andExpect(jsonPath("$.media").isArray)
-                .andExpect(jsonPath("$.media[0]").exists())
-                .andExpect(jsonPath("$.media[0].id").exists())
-                .andExpect(jsonPath("$.media[0].type").exists())
-                .andExpect(jsonPath("$.media[0].sizes").exists())
-                .andExpect(jsonPath("$.media[0].sizes").isArray)
-                .andExpect(jsonPath("$.media[0].sizes[0]").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].id").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].url").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].url").value("https://aws.amazon.com/bla123.jpg"))
-                .andExpect(jsonPath("$.media[0].sizes[0].width").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].height").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].length").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].size").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].type").exists())
-                .andExpect(jsonPath("$.media[1]").doesNotExist())
-                .andReturn().response.contentAsString
-
-        println(responseMedia)
-    }
-
-    @Test
-    open fun createNewPostingWithMediaAndAddMediaSizesUpdateMediaSizesWithVariationWidth() {
-
-
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now());
-        val media = mediaService.createMedia("image")
-        posting.media = mutableListOf(media) as MutableList<Media>
-        val savedposting = postingService.save(posting)
-
-        var postData = mapOf(
-                "url" to "https://aws.amazon.com/bla.jpg",
-                "width" to 400,
-                "height" to 200,
-                "length" to 0.0,
-                "size" to 0.0,
-                "type" to "image"
-        )
-
-        println(posting.media)
-
-        var request = post("/media/${savedposting!!.media.first().id}/")
-                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
-                .json(postData)
-
-        var response = mockMvc.perform(request)
-                .andExpect(status().isCreated)
-                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.url").exists())
-                .andExpect(jsonPath("$.width").exists())
-                .andExpect(jsonPath("$.height").exists())
-                .andExpect(jsonPath("$.length").exists())
-                .andExpect(jsonPath("$.size").exists())
-                .andExpect(jsonPath("$.type").exists())
-                .andReturn().response.contentAsString
-
-
-        println(response)
-
-        postData = mapOf(
-                "url" to "https://aws.amazon.com/bla123.jpg",
-                "width" to 398,
-                "height" to 200,
-                "length" to 0.0,
-                "size" to 0.0,
-                "type" to "image"
-        )
-
-        println(posting.media)
-
-        request = post("/media/${savedposting.media.first().id}/")
-                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
-                .json(postData)
-
-        response = mockMvc.perform(request)
-                .andExpect(status().isCreated)
-                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.url").exists())
-                .andExpect(jsonPath("$.width").exists())
-                .andExpect(jsonPath("$.height").exists())
-                .andExpect(jsonPath("$.length").exists())
-                .andExpect(jsonPath("$.size").exists())
-                .andExpect(jsonPath("$.type").exists())
-                .andReturn().response.contentAsString
-
-
-        println(response)
-
-        val requestMedia = get("/posting/${savedposting.id}/")
-
-        val responseMedia = mockMvc.perform(requestMedia)
-                .andExpect(status().isOk)
-                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.media").exists())
-                .andExpect(jsonPath("$.media").isArray)
-                .andExpect(jsonPath("$.media[0]").exists())
-                .andExpect(jsonPath("$.media[0].id").exists())
-                .andExpect(jsonPath("$.media[0].type").exists())
-                .andExpect(jsonPath("$.media[0].sizes").exists())
-                .andExpect(jsonPath("$.media[0].sizes").isArray)
-                .andExpect(jsonPath("$.media[0].sizes[0]").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].id").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].url").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].url").value("https://aws.amazon.com/bla123.jpg"))
-                .andExpect(jsonPath("$.media[0].sizes[0].width").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].height").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].length").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].size").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].type").exists())
-                .andExpect(jsonPath("$.media[1]").doesNotExist())
-                .andReturn().response.contentAsString
-
-        println(responseMedia)
-    }
-
-    @Test
-    open fun createNewPostingWithMediaAndAddMediaSizesUpdateMediaSizesWithVariationHeight() {
-
-
-        val posting = postingService.savePostingWithLocationAndMedia("Test", Coord(1.0, 1.0), user.account, null, LocalDateTime.now());
-        val media = mediaService.createMedia("image")
-        posting.media = mutableListOf(media)
-        val savedposting = postingService.save(posting)
-
-        var postData = mapOf(
-                "url" to "https://aws.amazon.com/bla.jpg",
-                "width" to 200,
-                "height" to 400,
-                "length" to 0.0,
-                "size" to 0.0,
-                "type" to "image"
-        )
-
-        println(posting.media)
-
-        var request = post("/media/${savedposting!!.media.first().id}/")
-                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
-                .json(postData)
-
-        var response = mockMvc.perform(request)
-                .andExpect(status().isCreated)
-                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.url").exists())
-                .andExpect(jsonPath("$.width").exists())
-                .andExpect(jsonPath("$.height").exists())
-                .andExpect(jsonPath("$.length").exists())
-                .andExpect(jsonPath("$.size").exists())
-                .andExpect(jsonPath("$.type").exists())
-                .andReturn().response.contentAsString
-
-
-        println(response)
-
-        postData = mapOf(
-                "url" to "https://aws.amazon.com/bla123.jpg",
-                "width" to 200,
-                "height" to 402,
-                "length" to 0.0,
-                "size" to 0.0,
-                "type" to "image"
-        )
-
-        println(posting.media)
-
-        request = post("/media/${savedposting.media.first().id}/")
-                .header("X-UPLOAD-TOKEN", JWTSigner(JWT_SECRET).sign(mapOf("subject" to posting.media.first().id.toString()), JWTSigner.Options().setAlgorithm(Algorithm.HS512)))
-                .json(postData)
-
-        response = mockMvc.perform(request)
-                .andExpect(status().isCreated)
-                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.url").exists())
-                .andExpect(jsonPath("$.width").exists())
-                .andExpect(jsonPath("$.height").exists())
-                .andExpect(jsonPath("$.length").exists())
-                .andExpect(jsonPath("$.size").exists())
-                .andExpect(jsonPath("$.type").exists())
-                .andReturn().response.contentAsString
-
-
-        println(response)
-
-        val requestMedia = get("/posting/${savedposting.id}/")
-
-        val responseMedia = mockMvc.perform(requestMedia)
-                .andExpect(status().isOk)
-                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
-                .andExpect(jsonPath("$.media").exists())
-                .andExpect(jsonPath("$.media").isArray)
-                .andExpect(jsonPath("$.media[0]").exists())
-                .andExpect(jsonPath("$.media[0].id").exists())
-                .andExpect(jsonPath("$.media[0].type").exists())
-                .andExpect(jsonPath("$.media[0].sizes").exists())
-                .andExpect(jsonPath("$.media[0].sizes").isArray)
-                .andExpect(jsonPath("$.media[0].sizes[0]").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].id").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].url").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].url").value("https://aws.amazon.com/bla123.jpg"))
-                .andExpect(jsonPath("$.media[0].sizes[0].width").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].height").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].length").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].size").exists())
-                .andExpect(jsonPath("$.media[0].sizes[0].type").exists())
-                .andExpect(jsonPath("$.media[1]").doesNotExist())
+                .andExpect(jsonPath("$.media.id").exists())
+                .andExpect(jsonPath("$.media.type").exists())
+                .andExpect(jsonPath("$.media.url").exists())
                 .andReturn().response.contentAsString
 
         println(responseMedia)
@@ -1019,14 +503,14 @@ open class TestPostingEndpoint : IntegrationTest() {
         val participant3 = userService.create("part3@example.com", "pw", { addRole(Participant::class) }).getRole(Participant::class)!!
         val participant4 = userService.create("part4@example.com", "pw", { addRole(Participant::class) }).getRole(Participant::class)!!
 
-        val teamMuc = teamService.create(participant1, "", "", eventMuc)
+        val teamMuc = teamService.create(participant1, "", "", eventMuc, null)
         setAuthenticatedUser(participant1.email)
         teamService.invite(EmailAddress(participant2.email), teamMuc)
 
         setAuthenticatedUser(participant2.email)
         teamService.join(participant2, teamMuc)
 
-        val teamBer = teamService.create(participant3, "", "", eventBer)
+        val teamBer = teamService.create(participant3, "", "", eventBer, null)
         setAuthenticatedUser(participant3.email)
         teamService.invite(EmailAddress(participant4.email), teamBer)
 

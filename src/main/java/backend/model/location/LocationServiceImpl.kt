@@ -9,7 +9,6 @@ import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.services.FeatureFlagService
 import backend.services.GeoCodingService
-import backend.util.parallelStream
 import backend.util.speedToLocation
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service

@@ -30,14 +30,14 @@ class TeamTest {
     fun setUp() {
         creator = User.create("creator@mail.de", "password").addRole(Participant::class)
         event = Event("Awesome Event", LocalDateTime.now(), "Munich", Coord(0.0, 0.0), duration = 36)
-        team = Team(creator, "Team awesome", "our team is awesome", event)
+        team = Team(creator, "Team awesome", "our team is awesome", event, null)
     }
 
 
     @Test
     fun testCreateTeam() {
         val creator = User.create("creator@mail.de", "password").addRole(Participant::class)
-        val team = Team(creator, "Team awesome", "our team is awesome", event)
+        val team = Team(creator, "Team awesome", "our team is awesome", event, null)
 
         assertEquals(team, creator.getCurrentTeam())
         assertEquals(team.members.size, 1)
@@ -47,7 +47,7 @@ class TeamTest {
     @Test
     fun failToCreateTeam() {
         assertFailsWith<Exception>("Participant ${creator.email} is already part of a team", {
-            Team(creator, "Team not Awesome", "our team sucks", event)
+            Team(creator, "Team not Awesome", "our team sucks", event, null)
         })
     }
 
@@ -149,8 +149,8 @@ class TeamTest {
         val user = User.create("firstname@example.com", "pw").addRole(Participant::class)
         val mockEvent1 = mock(Event::class.java)
         val mockEvent2 = mock(Event::class.java)
-        val team1 = Team(user, "", "", mockEvent1)
-        val team2 = Team(user, "", "", mockEvent2)
+        val team1 = Team(user, "", "", mockEvent1, null)
+        val team2 = Team(user, "", "", mockEvent2, null)
 
         assertEquals(team2, user.getCurrentTeam())
         assertTrue(user.getAllTeams().contains(team1))
@@ -161,9 +161,9 @@ class TeamTest {
     fun testCantJoinMultipleTeamsAtSameEvent() {
         val user = User.create("firstname@example.com", "pw").addRole(Participant::class)
         val mockEvent = mock(Event::class.java)
-        val team1 = Team(user, "", "", mockEvent)
+        val team1 = Team(user, "", "", mockEvent, null)
 
-        assertFails { Team(user, "", "", mockEvent) }
+        assertFails { Team(user, "", "", mockEvent, null) }
         assertEquals(team1, user.getCurrentTeam())
         assertTrue(user.getAllTeams().contains(team1))
         assertEquals(1, user.getAllTeams().size)
@@ -172,10 +172,10 @@ class TeamTest {
     @Test
     fun givenThatAUserHasBeenInATeamAtAnEvent_whenCreatingANewTeamForThatEvent_thenAnExceptionOccurs() {
         val anotherEvent = mock(Event::class.java)
-        val anotherTeam = Team(creator, "", "", anotherEvent)
+        val anotherTeam = Team(creator, "", "", anotherEvent, null)
 
         assertFailsWith(DomainException::class) {
-            Team(creator, "", "", event)
+            Team(creator, "", "", event, null)
         }
     }
 

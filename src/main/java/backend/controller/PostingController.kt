@@ -3,14 +3,13 @@ package backend.controller
 import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.NotFoundException
 import backend.model.challenges.ChallengeService
+import backend.model.media.Media
 import backend.model.misc.Coord
 import backend.model.posting.PostingService
 import backend.model.user.UserService
 import backend.services.ConfigurationService
-import backend.util.CacheNames
 import backend.util.CacheNames.LOCATIONS
 import backend.util.CacheNames.POSTINGS
-import backend.util.getSignedJwtToken
 import backend.util.localDateTimeOf
 import backend.view.CommentView
 import backend.view.LikeView
@@ -36,7 +35,7 @@ class PostingController(private val postingService: PostingService,
                         private val challengeService: ChallengeService) {
 
     private val logger = LoggerFactory.getLogger(PostingController::class.java)
-    
+
     private val JWT_SECRET: String = configurationService.getRequired("org.breakout.api.jwt_secret")
     private val PAGE_SIZE: Int = configurationService.getRequired("org.breakout.api.page_size").toInt()
 
@@ -64,9 +63,7 @@ class PostingController(private val postingService: PostingService,
 
         val clientDate = localDateTimeOf(body.date ?: throw RuntimeException("Client date has not been given"))
 
-        val posting = postingService.createPosting(user, body.text, body.uploadMediaTypes, locationCoord, clientDate)
-        posting.media.forEach { it.uploadToken = getSignedJwtToken(JWT_SECRET, it.id.toString()) }
-
+        val posting = postingService.createPosting(user, body.text, body.media?.let(::Media), locationCoord, clientDate)
         return PostingView(posting, null)
     }
 
@@ -130,8 +127,8 @@ class PostingController(private val postingService: PostingService,
 
         logger.info("Cache miss on /posting for page $page userId $userId events $events")
 
-        val postings = if(events != null) {
-            postingService.findByEventIds(events, page ?:0 , PAGE_SIZE)
+        val postings = if (events != null) {
+            postingService.findByEventIds(events, page ?: 0, PAGE_SIZE)
         } else {
             postingService.findAll(page ?: 0, PAGE_SIZE)
         }

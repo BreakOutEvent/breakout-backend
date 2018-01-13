@@ -26,7 +26,7 @@ class Sponsor : UserRole, ISponsor {
     override var company: String? = null
 
     @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true)
-    lateinit var logo: Media
+    var logo: Media? = null
 
     @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "registeredSponsor")
     override var sponsorings: MutableList<Sponsoring> = arrayListOf()
@@ -51,9 +51,9 @@ class Sponsor : UserRole, ISponsor {
         this.account = account
     }
 
-    constructor(account: UserAccount, company: String, logo: String, url: Url, address: Address, isHidden: Boolean) : super(account) {
+    constructor(account: UserAccount, company: String, url: Url, address: Address, isHidden: Boolean, logo: Media?) : super(account) {
         this.company = company
-        this.logo = Media("IMAGE")
+        this.logo = logo
         this.url = url
         this.address = address
         this.isHidden = isHidden

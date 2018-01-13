@@ -10,8 +10,6 @@ import backend.services.mail.MailService
 import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.data.repository.CrudRepository
-import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import javax.transaction.Transactional
