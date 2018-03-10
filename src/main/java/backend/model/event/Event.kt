@@ -15,6 +15,7 @@ class Event : BasicEntity {
     lateinit var date: LocalDateTime
     lateinit var city: String
     var isCurrent: Boolean = false
+    var isOpenForRegistration: Boolean = false
 
     @OneToMany(mappedBy = "event")
     var teams: MutableList<Team> = ArrayList()
