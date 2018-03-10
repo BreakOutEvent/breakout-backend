@@ -29,6 +29,8 @@ class EventView() {
     @JsonProperty("isCurrent")
     var isCurrent: Boolean = false
 
+    var isOpenForRegistration: Boolean = false
+
     @NotNull
     var duration: Int = 36
 
@@ -40,5 +42,6 @@ class EventView() {
         this.startingLocation = CoordView(event.startingLocation)
         this.duration = event.duration
         this.isCurrent = event.isCurrent
+        this.isOpenForRegistration = event.isOpenForRegistration
     }
 }
