@@ -1,4 +1,5 @@
 FROM java:openjdk-8-jdk
+LABEL maintainer="devops@breakoutevent.onmicrosoft.com"
 
 RUN mkdir -p /usr/src/myapp
 COPY . /usr/src/myapp
