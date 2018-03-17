@@ -39,7 +39,7 @@ class TeamEntryFeeInvoiceTest {
 
         PowerMockito.`when`(team.isFull()).thenReturn(true)
         // Test passes if this does not throw
-        invoice.checkPaymentEligability(payment)
+        invoice.checkPaymentEligibility(payment)
     }
 
     @Test

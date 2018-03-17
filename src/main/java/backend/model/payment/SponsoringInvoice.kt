@@ -91,7 +91,7 @@ class SponsoringInvoice : Invoice {
 
     private constructor() : super()
 
-    override fun checkPaymentEligability(payment: Payment) {
+    override fun checkPaymentEligibility(payment: Payment) {
         // Payments will be accepted no matter what!
     }
 
@@ -136,27 +136,32 @@ class SponsoringInvoice : Invoice {
     fun getContactEmails(): List<EmailAddress> {
         return when (sponsor) {
             is UnregisteredSponsor -> {
-                val fromChallenges = this.challenges.flatMap { it.team?.members?.map { EmailAddress(it.email) } ?: listOf() }
-                val fromSponsorings = this.sponsorings.flatMap { it.team?.members?.map { EmailAddress(it.email) } ?: listOf() }
-                var fromUnregistered: Iterable<EmailAddress>
-
-                if(this.unregisteredSponsor?.email != null) {
-                    try {
-                        fromUnregistered = listOf(EmailAddress(this.unregisteredSponsor!!.email!!))
-                    } catch (e: Exception) {
-                        fromUnregistered = listOf<EmailAddress>()
-                    }
-
-                } else {
-                    fromUnregistered = listOf<EmailAddress>()
+                val fromChallenges = this.challenges.flatMap {
+                    it.team?.members?.map { EmailAddress(it.email) } ?: listOf()
                 }
+
+                val fromSponsorings = this.sponsorings.flatMap {
+                    it.team?.members?.map { EmailAddress(it.email) } ?: listOf()
+                }
+
+                val fromUnregistered: Iterable<EmailAddress> =
+                        if (this.unregisteredSponsor?.email != null) {
+                            try {
+                                listOf(EmailAddress(this.unregisteredSponsor!!.email!!))
+                            } catch (e: Exception) {
+                                listOf<EmailAddress>()
+                            }
+
+                        } else {
+                            listOf<EmailAddress>()
+                        }
 
                 val total = fromChallenges
                         .union(fromSponsorings)
                         .union(fromUnregistered)
                         .distinct()
 
-                if(total.size > 3) throw Exception("There should be at max 3 emails to contact per invoice")
+                if (total.size > 3) throw Exception("There should be at max 3 emails to contact per invoice")
                 return total
             }
             is Sponsor -> listOf(EmailAddress(registeredSponsor!!.email))

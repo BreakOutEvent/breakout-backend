@@ -20,16 +20,16 @@ class TeamEntryFeeInvoice : Invoice {
         this.team!!.invoice = this
     }
 
-    override fun checkPaymentEligability(payment: Payment) {
+    override fun checkPaymentEligibility(payment: Payment) {
         val isAdminOrSepa = payment is AdminPayment || payment is SepaPayment
 
-        if (exeedsTotalAmount(payment)) throw DomainException("This payment is not eligable because the total necessary amount of $amount would be exeeded")
+        if (exceedsTotalAmount(payment)) throw DomainException("This payment is not eligable because the total necessary amount of $amount would be exeeded")
         if (!isAdminOrSepa) throw DomainException("Currently only payments via admins or sepa can be added to team invoices")
         if (!isFullAmount(payment.amount)) throw DomainException("Only full amount of a payment can be added!")
         if (!team!!.isFull()) throw DomainException("Payments can only be added to teams which already have two members")
     }
 
-    private fun exeedsTotalAmount(payment: Payment): Boolean {
+    private fun exceedsTotalAmount(payment: Payment): Boolean {
         val after = payment.amount.add(this.amountOfCurrentPayments())
         return after > this.amount
     }
