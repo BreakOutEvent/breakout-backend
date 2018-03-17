@@ -1,13 +1,15 @@
 package backend.model.misc
 
+import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
-import sun.font.FontSubstitution
+import com.sendgrid.Email
+import com.sendgrid.Mail
+import com.sendgrid.Personalization
 import java.util.*
 import javax.persistence.Column
 import javax.persistence.ElementCollection
-import javax.persistence.Embedded
 import javax.persistence.Entity
 
 @Entity
@@ -16,15 +18,15 @@ class Email : BasicEntity {
     constructor()
 
     constructor(to: List<EmailAddress>,
-                subject: String,
-                body: String,
+                subject: String? = null,
+                body: String? = null,
                 files: List<Url> = ArrayList(),
                 bcc: List<EmailAddress> = ArrayList(),
                 campaignCode: String? = null,
                 buttonText: String? = null,
                 buttonUrl: String? = null,
                 substitutions: Map<String, String> = mapOf(),
-                template: String = "") {
+                template: String? = null) {
         this.to = to
         this.subject = subject
         this.body = body
@@ -53,7 +55,7 @@ class Email : BasicEntity {
     lateinit var files: List<Url>
 
     @JsonIgnore
-      @ElementCollection
+    @ElementCollection
     lateinit var substitutions: Map<String, String>
 
     // This is a workAround because I don't know  how to serialize the List<EmailAddress>
@@ -73,17 +75,17 @@ class Email : BasicEntity {
         return files.map(Url::toString)
     }
 
-    lateinit var subject: String
+    var subject: String? = null
 
     var buttonText: String? = null
 
     var buttonUrl: String? = null
 
-    var template: String = ""
+    var template: String? = null
 
     @JsonProperty("html")
     @Column(columnDefinition = "LONGTEXT")
-    lateinit var body: String
+    var body: String? = null
 
     @JsonProperty("campaign_code")
     var campaignCode: String? = null
@@ -92,7 +94,7 @@ class Email : BasicEntity {
         if (this === other) return true
         if (other?.javaClass != javaClass) return false
 
-        other as Email
+        other as backend.model.misc.Email
 
         if (to != other.to) return false
         if (bcc != other.bcc) return false
@@ -112,13 +114,40 @@ class Email : BasicEntity {
         var result = to.hashCode()
         result += 31 * result + bcc.hashCode()
         result += 31 * result + files.hashCode()
-        result += 31 * result + subject.hashCode()
+        result += 31 * result + (subject?.hashCode() ?: 0)
         result += 31 * result + (buttonText?.hashCode() ?: 0)
         result += 31 * result + (buttonUrl?.hashCode() ?: 0)
-        result += 31 * result + body.hashCode()
+        result += 31 * result + (body?.hashCode() ?: 0)
         result += 31 * result + (campaignCode?.hashCode() ?: 0)
         result += 31 * result + substitutions.hashCode()
-        result += 31 * result + template.hashCode()
+        result += 31 * result + (template?.hashCode() ?: 0)
         return result
+    }
+
+    fun toSendgrid(): Mail {
+        checkValidSendgrid()
+
+        val mail = Mail()
+        to.forEach {
+            val personalization = Personalization()
+            personalization.addTo(Email(it.toString()))
+            substitutions.forEach { (key, value) ->
+                personalization.addSubstitution("<%$key%>", value)
+            }
+            mail.addPersonalization(personalization)
+        }
+
+        mail.from = Email("event@break-out.org")
+        mail.templateId = template
+        return mail
+    }
+
+    private fun checkValidSendgrid() {
+        if(template == null) throw DomainException("Template has to be defined for Sendgrid")
+        if(buttonText != null) throw DomainException("ButtonText may not be used for Sendgrid")
+        if(buttonUrl != null) throw DomainException("ButtonUrl may not be used for Sendgrid")
+        if(campaignCode != null) throw DomainException("CampaignCode may not be used for Sendgrid")
+        if(body != null) throw DomainException("CampaignCode may not be used for Sendgrid")
+        if(subject != null) throw DomainException("CampaignCode may not be used for Sendgrid")
     }
 }

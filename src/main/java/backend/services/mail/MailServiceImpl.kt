@@ -373,49 +373,15 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
     override fun sendUserHasRegisteredEmail(token: String, user: User) {
 
-        val germanText = """Vielen Dank für Dein Interesse an BreakOut 2017.<br><br>
-
-        Zum Schutz Deiner Daten müssen wir sicherstellen, dass diese E-Mail-Adresse Dir gehört. Bitte klicke dazu auf
-        den Button am Ende der E-Mail.<br><br>
-
-        Du hast Dich nicht für BreakOut angemeldet? Dann ignoriere diese E-Mail einfach.<br><br>
-
-        Du hast Fragen oder benötigst Unterstützung? Schreib uns eine E-Mail an
-        <a href='mailto:event@break-out.org'>event@break-out.org</a>.<br><br>
-
-        Liebe Grüße<br>
-        Dein BreakOut-Team""".trimIndent()
-
-
-        val englishText = """Thank you for your interest in BreakOut 2017!<br><br>
-
-         To protect your data we need to make sure this e-mail address belongs to you. Please click on the button on
-         the bottom of this message to confirm your e-mail address.<br><br>
-
-         You did not sign up for BreakOut? Please just ignore this e-mail.<br><br>
-
-         You have questions or need support with your registration? Drop us a message at
-         <a href='mailto:event@break-out.org'>event@break-out.org</a>.<br><br>
-
-         Your BreakOut Team""".trimIndent()
-
-        val germanSubject = "Willkommen bei BreakOut 2017!"
-        val englishSubject = "Welcome to BreakOut 2017!"
-
-        val subject = mergeEmailSubject(germanSubject, englishSubject)
-        val body = mergeEmailBody(germanText, englishText)
-
-        val buttonText = "Email-Adresse bestätigen / Confirm email address"
-        val buttonUrl = "$host/activation/$token?utm_source=backend&utm_medium=email&utm_campaign=confirm"
-        val campaignCode = "confirm"
+        val substitutions: Map<String, String> = mapOf(
+                "firstname" to (user.firstname ?: ""),
+                "button-url" to "$host/activation/$token?utm_source=backend&utm_medium=email&utm_campaign=confirm"
+        )
 
         val mail = Email(
                 to = listOf(EmailAddress(user.email)),
-                subject = subject,
-                body = body,
-                buttonText = buttonText,
-                buttonUrl = buttonUrl,
-                campaignCode = campaignCode)
+                substitutions = substitutions,
+                template = "939610d6-8c88-4d61-bca8-b1d7577a3056")
 
         this.send(mail)
     }
