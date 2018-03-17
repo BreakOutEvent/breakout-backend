@@ -31,7 +31,7 @@ class TeamServiceImpl(private val repository: TeamRepository,
         val team = Team(creator, name, description, event)
         // TODO: Maybe use sensible cascading?
         val savedTeam = this.repository.save(team)
-        savedTeam.invoice?.generatePurposeOfTransfer()
+        savedTeam.invoice?.generatePurposeOfTransfer() //TODO: WHERE IS THIS SAVED?
 
         userService.save(creator)
         eventPublisher.publishEvent(TeamCreatedEvent(team))
@@ -56,7 +56,7 @@ class TeamServiceImpl(private val repository: TeamRepository,
         return saved
     }
 
-    override fun findOne(id: Long) = repository.findById(id)
+    override fun findOne(id: Long) = repository.findById(id) //TODO: WHY DOES IT FAIL HERE?
 
     override fun findPostingsById(teamId: Long, page: Int, size: Int) = repository.findPostingsByTeamId(teamId, PageRequest(page, size))
 

@@ -128,42 +128,51 @@ class TeamControllerTest : IntegrationTest() {
     }
 
     @Test
-    fun aPurposeOfTransferIsCreated() {
-        // given an event exists and a participant exist
-        val participant = userService.create("test@example.com", "test", { addRole(Participant::class) }).getRole(Participant::class)!!
+    fun purposeOfTransferWithoutCollision() {
 
-        // when creating a team
-        val body = mapOf(
-                "name" to "Testteam",
-                "description" to "Beschreibung"
-        )
+        fun createNewCode(nonce: Int) {
+            // given an event exists and a participant exist
+            val participant = userService.create("test$nonce@example.com", "test$nonce", { addRole(Participant::class) }).getRole(Participant::class)!!
 
-        val request = MockMvcRequestBuilders.post("/event/${testEvent.id}/team/")
-                .asUser(mockMvc, participant.email, "test")
-                .json(body)
+            // when creating a team
+            val body = mapOf(
+                    "name" to "Testteam$nonce",
+                    "description" to "Beschreibung"
+            )
 
-        val response = mockMvc.perform(request)
-                .andExpect(status().isCreated)
-                .toJsonNode()
+            val request = MockMvcRequestBuilders.post("/event/${testEvent.id}/team/")
+                    .asUser(mockMvc, participant.email, "test$nonce")
+                    .json(body)
 
-        val teamId = response.get("id").intValue
+            val response = mockMvc.perform(request)
+                    .andExpect(status().isCreated)
+                    .toJsonNode()
 
-        // then the invoice has a purposeOfTransfer containing the teamId, eventId
-        val invoiceRequest = MockMvcRequestBuilders.get("/team/$teamId/startingfee")
-                .asUser(mockMvc, participant.email, "test")
+            val teamId = response.get("id").intValue
 
-        val invoiceResponse = mockMvc.perform(invoiceRequest)
-                .andExpect(status().isOk)
-                .toJsonNode()
+            // then the invoice has a purposeOfTransfer containing the teamId, eventId
+            val invoiceRequest = MockMvcRequestBuilders.get("/team/$teamId/startingfee")
+                    .asUser(mockMvc, participant.email, "test$nonce")
 
-        val invoiceId = invoiceResponse.get("id").intValue
+            val invoiceResponse = mockMvc.perform(invoiceRequest)
+                    .andExpect(status().isOk)
+                    .toJsonNode()
 
-        val expectedPurposeSuffix = "-BREAKOUT${this.testEvent.id}-TEAM$teamId-INVOICE$invoiceId-ENTRYFREE"
-        val actualPurpose = invoiceResponse.get("purposeOfTransfer").asText()
-        assertEquals(actualPurpose.substring(0, actualPurpose.indexOf("-")).length, 6)
-        assert(actualPurpose.endsWith(expectedPurposeSuffix))
+            val invoiceId = invoiceResponse.get("id").intValue
 
+            val expectedPurposeSuffix = "-BREAKOUT${this.testEvent.id}-TEAM$teamId-INVOICE$invoiceId-ENTRYFREE"
+            val actualPurpose = invoiceResponse.get("purposeOfTransfer").asText()
+            assertEquals(actualPurpose.substring(0, actualPurpose.indexOf("-")).length, 6)
+            assert(actualPurpose.endsWith(expectedPurposeSuffix))
+        }
+
+        for (nonce in 1..1000) {
+            createNewCode(nonce)
+            //TODO: WHY DOES THIS FAIL IF RUN IN PARALLEL (duplicate email)
+            //TODO: WHY IS NO TEAM/INVOICE IN DB DURING RUN (users are)
+        }
     }
+
 
     @Test
     @Ignore
