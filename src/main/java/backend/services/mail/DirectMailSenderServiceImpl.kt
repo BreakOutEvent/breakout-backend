@@ -2,28 +2,30 @@ package backend.services.mail
 
 import backend.model.misc.Email
 import backend.model.misc.EmailRepository
+import backend.services.ConfigurationService
 import backend.util.Profiles.DEVELOPMENT
-import backend.util.Profiles.STAGING
-import backend.util.Profiles.TEST
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicInteger
+
 
 @Service
-@Profile(TEST, STAGING)
-class SpyMailSenderServiceImpl @Autowired constructor(private val emailRepository: EmailRepository) : MailSenderService {
+@Profile(DEVELOPMENT)
+class DirectMailSenderServiceImpl @Autowired constructor(private val emailRepository: EmailRepository,
+                                                         configurationService: ConfigurationService) : MailSenderService {
 
-    private val logger = LoggerFactory.getLogger(SpyMailSenderServiceImpl::class.java)
+    private val logger = LoggerFactory.getLogger(DirectMailSenderServiceImpl::class.java)
     private val pool = Executors.newCachedThreadPool()
-    private var count = AtomicInteger(0)
 
     override fun send(email: Email, saveToDb: Boolean) {
-        logger.info("Nr.${count.getAndIncrement()} - Email to ${email.to} with subject \"${email.subject}\" and body \"${email.body}\" would be sent now")
-        if (email.buttonUrl != null) logger.info("Email Button ${email.buttonUrl}")
+        if (saveToDb) {
+            email.isSent = true
+            emailRepository.save(email)
+        }
+
     }
 
     override fun resendFailed(): Int {
@@ -40,4 +42,3 @@ class SpyMailSenderServiceImpl @Autowired constructor(private val emailRepositor
         })
     }
 }
-

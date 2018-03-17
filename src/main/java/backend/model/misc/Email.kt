@@ -3,9 +3,11 @@ package backend.model.misc
 import backend.model.BasicEntity
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
+import sun.font.FontSubstitution
 import java.util.*
 import javax.persistence.Column
 import javax.persistence.ElementCollection
+import javax.persistence.Embedded
 import javax.persistence.Entity
 
 @Entity
@@ -20,7 +22,9 @@ class Email : BasicEntity {
                 bcc: List<EmailAddress> = ArrayList(),
                 campaignCode: String? = null,
                 buttonText: String? = null,
-                buttonUrl: String? = null) {
+                buttonUrl: String? = null,
+                substitutions: Map<String, String> = mapOf(),
+                template: String = "") {
         this.to = to
         this.subject = subject
         this.body = body
@@ -29,6 +33,8 @@ class Email : BasicEntity {
         this.campaignCode = campaignCode
         this.buttonText = buttonText
         this.buttonUrl = buttonUrl
+        this.substitutions = substitutions
+        this.template = template
     }
 
     @JsonIgnore
@@ -45,6 +51,10 @@ class Email : BasicEntity {
     @JsonIgnore
     @ElementCollection
     lateinit var files: List<Url>
+
+    @JsonIgnore
+      @ElementCollection
+    lateinit var substitutions: Map<String, String>
 
     // This is a workAround because I don't know  how to serialize the List<EmailAddress>
     // to an [] of strings using jackson
@@ -69,6 +79,8 @@ class Email : BasicEntity {
 
     var buttonUrl: String? = null
 
+    var template: String = ""
+
     @JsonProperty("html")
     @Column(columnDefinition = "LONGTEXT")
     lateinit var body: String
@@ -90,6 +102,8 @@ class Email : BasicEntity {
         if (buttonUrl != other.buttonUrl) return false
         if (body != other.body) return false
         if (campaignCode != other.campaignCode) return false
+        if (substitutions != other.substitutions) return false
+        if (template != other.template) return false
 
         return true
     }
@@ -103,6 +117,8 @@ class Email : BasicEntity {
         result += 31 * result + (buttonUrl?.hashCode() ?: 0)
         result += 31 * result + body.hashCode()
         result += 31 * result + (campaignCode?.hashCode() ?: 0)
+        result += 31 * result + substitutions.hashCode()
+        result += 31 * result + template.hashCode()
         return result
     }
 }
