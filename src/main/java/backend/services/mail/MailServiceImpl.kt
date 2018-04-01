@@ -280,14 +280,14 @@ class MailServiceImpl(configurationService: ConfigurationService,
             mit einem T-Shirt und Starterkit für Eure Reise ausstatten können.<br><br>
 
             Bitte überweist eure Teamgebühr an folgendes Konto:<br>
-            Kontoinhaber: Daria Brauner<br>
-            IBAN: DE60700222000072708326<br>
+            Kontoinhaber: BreakOut e.V.<br>
+            IBAN: DE85 7002 2200 0020 2418 37<br>
             BIC: FDDODEMMXXX<br>
             Überweisungszweck: ${team.invoice!!.purposeOfTransfer}<br>
             Betrag: 60,00€<br><br>
 
             Wenn ihr lieber Paypal nutzt, sendet bitte 60€ unter Angabe eurer
-            Teamnummer an anmeldung@break-out.org.<br><br>
+            Teamnummer an finanzen@break-out.org.<br><br>
 
             Ihr möchtet doch nicht mehr teilnehmen? Schade! Bitte gebt uns kurz unter
             event@break-out.org Bescheid.<br><br>
@@ -303,13 +303,13 @@ class MailServiceImpl(configurationService: ConfigurationService,
             latest May 8th so that we can equip you with a t-shirt and your starter kit.<br><br>
 
             Please transfer the registration fee to the following account:<br>
-            Account owner: Daria Brauner<br>
-            IBAN: DE60700222000072708326<br>
+            Account owner: BreakOut e.V.<br>
+            IBAN: DE85 7002 2200 0020 2418 37<br>
             BIC: FDDODEMMXXX<br>
             Purpose of transfer: ${team.invoice!!.purposeOfTransfer}<br>
             Amount: 60.00€<br><br>
 
-            If you prefer Paypal, please send 60.00€ to anmeldung@break-out.org,
+            If you prefer Paypal, please send 60.00€ to finanzen@break-out.org,
             indicating your team number.<br><br>
 
             You have decided not to participate in BreakOut 2018? Please let us know by
@@ -440,15 +440,14 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
         Bitte überweist eure Teamgebühr an folgendes Konto:<br><br>
 
-// TODO: Change this
-        Kontoinhaber: Daria Brauner<br>
-        IBAN: DE60700222000072708326<br>
+        Kontoinhaber: BreakOut e.V.<br>
+        IBAN: DE85 7002 2200 0020 2418 37<br>
         BIC: FDDODEMMXXX<br>
         Überweisungszweck: $purposeOfTransfer<br>
         Betrag: 60,00€<br><br>
 
         Wenn ihr lieber Paypal nutzt, sendet bitte 60€ unter Angabe eurer Teamnummer an
-        <a href="mailto:anmeldung@break-out.org">anmeldung@break-out.org</a>.<br><br>
+        <a href="mailto:finanzen@break-out.org">finanzen@break-out.org</a>.<br><br>
 
         Liebe Grüße<br>
         Euer BreakOut-Team""".trimIndent()
@@ -463,14 +462,14 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
         Please transfer the registration fee to the following account:<br><br>
 
-        Account owner: Daria Brauner<br>
-        IBAN: DE60700222000072708326<br>
+        Account owner: BreakOut e.V.<br>
+        IBAN:  DE85 7002 2200 0020 2418 37<br>
         BIC: FDDODEMMXXX<br>
         Purpose of transfer: $purposeOfTransfer<br>
         Amount: 60.00€<br><br>
 
         If you prefer Paypal, please send 60.00€ to
-        <a href="mailto:anmeldung@break-out.org">anmeldung@break-out.org</a>, indicating your team number.<br><br>
+        <a href="mailto:finanzen@break-out.org">finanzen@break-out.org</a>, indicating your team number.<br><br>
 
         Your BreakOut Team"""
 
@@ -661,12 +660,13 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
     override fun sendGeneratedDonationPromiseSponsor(invoice: SponsoringInvoice) {
 
+        // TODO: Deadline for payment
         val germanText = """
             |Sollten Sie bereits eine Email mit Ihrem Spendenversprechen erhalten haben, können Sie diese ignorieren
             |
             |Liebe(r) ${invoice.sponsor.firstname} ${invoice.sponsor.lastname},
             |
-            |vielen herzlichen Dank, dass Sie beim BreakOut 2018 ein Team unterstützen! Ihre Spende wird von BreakOut e. V. an Jambo Bukoba e. V. weitergeleitet. So unterstützen Sie den Bau von Regenwassertanks an tansanischen Schulen. Wir bitten Sie herzlich, Ihre Spende bis zum 6. Juni an das unten angegebene Konto zu überweisen, damit wir das Geld rechtzeitig zur Siegerehrung des diesjährigen BreakOuts erhalten.
+            |vielen herzlichen Dank, dass Sie beim BreakOut 2018 ein Team unterstützen! Ihre Spende wird von BreakOut e. V. an One Dollar Glasses weitergeleitet. Wir bitten Sie herzlich, Ihre Spende bis zum 6. Juni an das unten angegebene Konto zu überweisen, damit wir das Geld rechtzeitig zur Siegerehrung des diesjährigen BreakOuts erhalten.
             |Bei Challenges, für die Ihr Spendenversprechen 0€ beträgt, wurde die Challenge vom Team leider während des BreakOuts 2018 nicht erfüllt.
             |Bitte beachten Sie: wenn Sie Teams in mehreren Städten unterstützt haben, erhalten Sie pro Stadt eine Email mit der Auflistung Ihres Spendenversprechens für diese Stadt.
             |
@@ -701,7 +701,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
             |
             |Dear ${invoice.sponsor.firstname} ${invoice.sponsor.lastname},
             |
-            |Many, many thanks for supporting a team during BreakOut 2018! Your donation will allow Jambo Bukoba build water tanks at Tanzanian schools and make an important contribution to improving students' lives. We would kindly ask you to transfer your donation by June 6th so that we will receive the payment in time for our awards party.
+            |Many, many thanks for supporting a team during BreakOut 2018! We would kindly ask you to transfer your donation by June 6th so that we will receive the payment in time for our awards party.
             |If your donation promise for a given challenge is 0€, the team has unfortunately not mastered the challenge during BreakOut 2018.
             |If you supported teams in different cities, you will receive on email per city showing your donation promise for the given city.
             |
@@ -742,7 +742,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
         val germanText = """
             |Liebe(r) ${invoice.sponsor.firstname} ${invoice.sponsor.lastname},
             |
-            |vielen herzlichen Dank, dass Sie beim BreakOut 2018 ein Team unterstützen! Ihre Spende wird von BreakOut e. V. an Jambo Bukoba e. V. weitergeleitet. So unterstützen Sie den Bau von Regenwassertanks an tansanischen Schulen. Daher möchten wir Sie gern daran erinnern, Ihr Spendenversprechen baldmöglichst einzulösen.
+            |vielen herzlichen Dank, dass Sie beim BreakOut 2018 ein Team unterstützen! Ihre Spende wird von BreakOut e. V. an One Dollar Glasses weitergeleitet. Daher möchten wir Sie gern daran erinnern, Ihr Spendenversprechen baldmöglichst einzulösen.
             |Sollten Sie Ihre Überweisung bereits veranlasst haben, können Sie diese Email einfach ignorieren.
             |
             |Bei Challenges, für die Ihr Spendenversprechen 0€ beträgt, wurde die Challenge vom Team leider während des BreakOuts 2018 nicht erfüllt.
@@ -778,7 +778,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
             |
             |Dear ${invoice.sponsor.firstname} ${invoice.sponsor.lastname},
             |
-            |Many, many thanks for supporting a team during BreakOut 2018! Your donation will allow Jambo Bukoba build water tanks at Tanzanian schools and make an important contribution to improving students' lives. We would like to kindly remind you to fulfill your donation promise as soon as possible. If you have already transferred your donation, you can simply ignore this email.
+            |Many, many thanks for supporting a team during BreakOut 2018! We would like to kindly remind you to fulfill your donation promise as soon as possible. If you have already transferred your donation, you can simply ignore this email.
             |If your donation promise for a given challenge is 0€, the team has unfortunately not mastered the challenge during BreakOut 2018.
             |If you supported teams in different cities, you will receive on email per city showing your donation promise for the given city.
             |
