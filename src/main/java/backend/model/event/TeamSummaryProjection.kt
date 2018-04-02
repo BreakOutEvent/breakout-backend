@@ -14,4 +14,7 @@ interface TeamSummaryProjection {
 
     @Value("#{target.event.title}")
     fun getEventTitle(): String
+
+    @Value("#{target.event.allowNewSponsoring}")
+    fun getEventAllowNewSponsoring(): Boolean
 }

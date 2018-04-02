@@ -16,6 +16,7 @@ class Event : BasicEntity {
     lateinit var city: String
     var isCurrent: Boolean = false
     var isOpenForRegistration: Boolean = false
+    var allowNewSponsoring: Boolean = false
 
     @OneToMany(mappedBy = "event")
     var teams: MutableList<Team> = ArrayList()

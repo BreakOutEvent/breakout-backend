@@ -30,6 +30,7 @@ class EventView() {
     var isCurrent: Boolean = false
 
     var isOpenForRegistration: Boolean = false
+    var allowNewSponsoring: Boolean = false
 
     @NotNull
     var duration: Int = 36
@@ -43,5 +44,6 @@ class EventView() {
         this.duration = event.duration
         this.isCurrent = event.isCurrent
         this.isOpenForRegistration = event.isOpenForRegistration
+        this.allowNewSponsoring = event.allowNewSponsoring
     }
 }
