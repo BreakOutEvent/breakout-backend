@@ -270,13 +270,12 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
     override fun sendTeamEntryFeePaymentReminderEmail(team: Team) {
 
-// TODO: Change this here!
         val germanText = """Liebes Team ${team.name},<br><br>
 
             vielen Dank, dass Ihr Euch für den BreakOut 2018 angemeldet habt. Um Eure
             Anmeldung abzuschließen, müsst Ihr noch 60€ Teilnahmegebühr überweisen.
             Solange Ihr keine Teilnahmegebühr überwiesen habt, können wir Euer Team nicht
-            freischalten. Bitte überweist das Geld bis spätestens 8. Mai, damit wir euch
+            freischalten. Bitte überweist das Geld bis spätestens 16. Mai, damit wir euch
             mit einem T-Shirt und Starterkit für Eure Reise ausstatten können.<br><br>
 
             Bitte überweist eure Teamgebühr an folgendes Konto:<br>
@@ -300,7 +299,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
             Thank you for signing up for BreakOut 2018. To complete your registration,
             please transfer your registration fee as soon as possible. We can only activate
             your team once we've received the registration fee. Please transfer the fee by
-            latest May 8th so that we can equip you with a t-shirt and your starter kit.<br><br>
+            latest May 16th so that we can equip you with a t-shirt and your starter kit.<br><br>
 
             Please transfer the registration fee to the following account:<br>
             Account owner: BreakOut e.V.<br>
@@ -334,7 +333,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
         val germanText = """Hallo ${participant.firstname},<br><br>
 
             vielen Dank, dass Du dich bei BreakOut angemeldet hast. Um beim BreakOut 2018
-            dabei sein zu können, brauchst du noch einen Teampartner. Folge diesem <a href="https://break-out.org/invite">LINK</a>,
+            dabei sein zu können, brauchst du noch einen Teampartner. Folge diesem <a href="https://break-out.org/invite">Link</a>,
             um jemanden in Dein Team einzuladen.<br><br>
 
             Alle Deine Freunde sind schon verplant? Kein Problem. Schreib uns einfach
@@ -346,7 +345,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
         val englishText = """Hello ${participant.firstname},<br><br>
 
             thank you for signing up for BreakOut. To participate at BreakOut 2018, you
-            still need another team member. Click on this <a href="https://break-out.org/invite">LINK</a> to invite somebody to join
+            still need another team member. Click on this <a href="https://break-out.org/invite">link</a> to invite somebody to join
             your team.<br><br>
 
             All your friends are busy during BreakOut 2018? No problem! Just send a message
@@ -395,8 +394,8 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
          Your BreakOut Team""".trimIndent()
 
-        val germanSubject = "Willkommen bei BreakOut 2018!"
-        val englishSubject = "Welcome to BreakOut 2018!"
+        val germanSubject = "Aktiviere deinen BreakOut Account"
+        val englishSubject = "Activate your BreakOut account"
 
         val subject = mergeEmailSubject(germanSubject, englishSubject)
         val body = mergeEmailBody(germanText, englishText)
@@ -493,7 +492,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
     override fun sendTeamHasPaidEmail(invoice: TeamEntryFeeInvoice) {
         val germanText = """Liebes Team ${invoice.team!!.name},<br><br>
 
-        Eure Startgebühr ist vollständig bei uns eingegangen. Eure Anmelung für den BreakOut 2018 ist damit
+        eure Startgebühr ist vollständig bei uns eingegangen. Eure Anmeldung für den BreakOut 2018 ist damit
         abgeschlossen! Jetzt geht's an die Sponsorensuche. Infos dazu findet ihr hier:
         <a href="https://break-out.org/next-steps">https://break-out.org/next-steps</a> <br>
         Über alles weitere halten wir Euch per E-Mail auf dem Laufenden! Schaut außerdem regelmäßig auf unserer
@@ -506,8 +505,8 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
         val englishText = """Dear Team ${invoice.team!!.name},<br><br>
 
-        We've received your registration fee - thank you! Your registration for BreakOut 2018 is completed successfully.
-        Now it's time to find sponsors.You can get more information on how to acquire sponsors on our website:
+        we've received your registration fee - thank you! Your registration for BreakOut 2018 is completed successfully.
+        Now it's time to find sponsors. You can get more information on how to acquire sponsors on our website:
         <a href="https://break-out.org/next-steps">https://break-out.org/next-steps</a> <br>
         We'll send you more information about the event via e-mail. Check out our Facebook page at https://www.facebook.com/breakout.ev/
         for the latest news and fun competitions.<br>
