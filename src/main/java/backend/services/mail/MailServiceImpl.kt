@@ -38,12 +38,11 @@ class MailServiceImpl(configurationService: ConfigurationService,
         val germanText = """${team.members.first().firstname} ${team.members.first().lastname} möchte mit Dir ein
             Abenteuer bestreiten!<br><br>
 
-            BreakOut ist ein Spendenmarathon, bei dem Geld für das Bildungprojekt Jambo Bukoba e.V. gesammelt wird.<br><br>
+            BreakOut ist ein Spendenmarathon, bei dem Geld für das Bildungprojekt One Dollar Glasses gesammelt wird.<br><br>
 
             In Zweierteams versucht Ihr, euch ab Startschuss binnen 36 Stunden so weit wie möglich von Eurem Startpunkt
             (München, Berlin oder Barcelona) zu entfernen. Dabei gilt es, für das Reisen kein Geld auszugeben – vielmehr
-            sammelt Ihr pro zurückgelegtem Kilometer Geld für Jambo Bukoba e.V. Von den Spenden werden Schulprojekte in
-            Tansania realisiert.<br>
+            sammelt Ihr pro zurückgelegtem Kilometer Geld für One Dollar Glasses.<br>
             Das Konzept folgt damit der Idee eines Spendenmarathons: Im Vorfeld akquiriert Ihr eigene Sponsoren, die dann
             pro gereistem Kilometer einen vorab festgelegten Betrag spenden.<br><br>
 
@@ -58,13 +57,12 @@ class MailServiceImpl(configurationService: ConfigurationService,
         val englishText = """${team.members.first().firstname} ${team.members.first().lastname} is inviting you to join
             the adventure!<br><br>
 
-            BreakOut is a charity travel competition. By participating, you'll raise donations for Jambo Bukoba e.V.,
-            an NGO promoting health and education in Tanzanian schools.<br><br>
+            BreakOut is a charity travel competition. By participating, you'll raise donations for One Dollar Glasses.<br><br>
 
             In pairs of two, you'll try to travel as far as you can within 36 hours from your respective starting location.
             The challenge: you're not allowed to spend any money on transportation! <br>
             Before the event, you'll find sponsors who will donate a fixed amount per kilometer to support
-            Jambo Bukoba..<br><br>
+            One Dollar Glasses.<br><br>
 
             Challenge accepted? Click on the button at the bottom of this message to join your team. <br><br>
 
@@ -73,8 +71,8 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
             Your BreakOut Team""".trimIndent()
 
-        val germanSubject = "Einladung zu BreakOut 2017"
-        val englishSubject = "Invitation to BreakOut 2017!"
+        val germanSubject = "Einladung zu BreakOut 2018"
+        val englishSubject = "Invitation to BreakOut 2018!"
 
         val buttonText = "Einladung annehmen / Accept invite"
         val buttonUrl = "$host/login?utm_source=backend&utm_medium=email&utm_campaign=invite"
@@ -147,8 +145,8 @@ class MailServiceImpl(configurationService: ConfigurationService,
             Best regards<br>
             Your BreakOut-Team""".trimIndent()
 
-        val germanSubject = "BreakOut 2017 - Rückzug einer Challenge!"
-        val englishSubject = "BreakOut 2017 - Challenge Withdrawal!"
+        val germanSubject = "BreakOut 2018 - Rückzug einer Challenge!"
+        val englishSubject = "BreakOut 2018 - Challenge Withdrawal!"
 
         val email = Email(
                 to = challenge.team!!.members.map { EmailAddress(it.email) },
@@ -177,16 +175,15 @@ class MailServiceImpl(configurationService: ConfigurationService,
             you just received a new challenge! <br><br>
 
             "${challenge.description}". After mastering this challenge your team will receive an
-            additional amount of ${challenge.amount.numberStripped.toPlainString()}€ for
-            Jambo Bukoba.<br>
+            additional amount of ${challenge.amount.numberStripped.toPlainString()}€.<br>
             Do you have any questions or do you need support? Feel free to shoot us an
             email at  <a href=\"event@break-out.org\">event@break-out.org</a>.<br><br>
 
             Best regards<br>
             Your BreakOut-Team""".trimIndent()
 
-        val germanSubject = "Eine Challenge wurde gestellt!"
-        val englishSubject = "BreakOut 2017 - New Challenge For Your Team!"
+        val germanSubject = "BreakOut 2018 - Eine Challenge wurde gestellt!"
+        val englishSubject = "BreakOut 2018 - New Challenge For Your Team!"
 
         val email = Email(
                 to = challenge.team!!.members.map { EmailAddress(it.email) },
@@ -219,8 +216,8 @@ class MailServiceImpl(configurationService: ConfigurationService,
             Best regards<br>
             Your BreakOut-Team""".trimIndent()
 
-        val germanSubject = "BreakOut 2017 - Rückzug eines Sponsorings!"
-        val englishSubject = "BreakOut 2017 - Sponsorship Withdrawal!"
+        val germanSubject = "BreakOut 2018 - Rückzug eines Sponsorings!"
+        val englishSubject = "BreakOut 2018 - Sponsorship Withdrawal!"
 
         val email = Email(
                 to = sponsoring.team!!.members.map { EmailAddress(it.email) },
@@ -252,16 +249,15 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
             Your team will receive an additional amount of
             ${sponsoring.amountPerKm.numberStripped.toPlainString()}€ per travelled kilometer
-            with a maximum limit of ${sponsoring.limit.numberStripped.toPlainString()}€
-            for Jambo Bukoba.<br>
+            with a maximum limit of ${sponsoring.limit.numberStripped.toPlainString()}€.<br>
             Do you have any questions or do you need support? Feel free to shoot us an
             email at  <a href=\"event@break-out.org\">event@break-out.org</a>.<br><br>
 
             Best regards<br>
             Your BreakOut-Team""".trimIndent()
 
-        val germanSubject = "BreakOut 2017 - New Sponsorship!"
-        val englishSubject = "BreakOut 2017 - Neues Sponsoring hinzugefügt!"
+        val germanSubject = "BreakOut 2018 - New Sponsorship!"
+        val englishSubject = "BreakOut 2018 - Neues Sponsoring hinzugefügt!"
 
         val email = Email(
                 to = sponsoring.team!!.members.map { EmailAddress(it.email) },
@@ -274,24 +270,23 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
     override fun sendTeamEntryFeePaymentReminderEmail(team: Team) {
 
-
         val germanText = """Liebes Team ${team.name},<br><br>
 
-            vielen Dank, dass Ihr Euch für den BreakOut 2017 angemeldet habt. Um Eure
+            vielen Dank, dass Ihr Euch für den BreakOut 2018 angemeldet habt. Um Eure
             Anmeldung abzuschließen, müsst Ihr noch 60€ Teilnahmegebühr überweisen.
             Solange Ihr keine Teilnahmegebühr überwiesen habt, können wir Euer Team nicht
-            freischalten. Bitte überweist das Geld bis spätestens 8. Mai, damit wir euch
+            freischalten. Bitte überweist das Geld bis spätestens 16. Mai, damit wir euch
             mit einem T-Shirt und Starterkit für Eure Reise ausstatten können.<br><br>
 
             Bitte überweist eure Teamgebühr an folgendes Konto:<br>
-            Kontoinhaber: Daria Brauner<br>
-            IBAN: DE60700222000072708326<br>
+            Kontoinhaber: BreakOut e.V.<br>
+            IBAN: DE85 7002 2200 0020 2418 37<br>
             BIC: FDDODEMMXXX<br>
             Überweisungszweck: ${team.invoice!!.purposeOfTransfer}<br>
             Betrag: 60,00€<br><br>
 
             Wenn ihr lieber Paypal nutzt, sendet bitte 60€ unter Angabe eurer
-            Teamnummer an anmeldung@break-out.org.<br><br>
+            Teamnummer an finanzen@break-out.org.<br><br>
 
             Ihr möchtet doch nicht mehr teilnehmen? Schade! Bitte gebt uns kurz unter
             event@break-out.org Bescheid.<br><br>
@@ -301,28 +296,28 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
         val englishText = """Dear Team ${team.name},<br><br>
 
-            Thank you for signing up for BreakOut 2017. To complete your registration,
+            Thank you for signing up for BreakOut 2018. To complete your registration,
             please transfer your registration fee as soon as possible. We can only activate
             your team once we've received the registration fee. Please transfer the fee by
-            latest May 8th so that we can equip you with a t-shirt and your starter kit.<br><br>
+            latest May 16th so that we can equip you with a t-shirt and your starter kit.<br><br>
 
             Please transfer the registration fee to the following account:<br>
-            Account owner: Daria Brauner<br>
-            IBAN: DE60700222000072708326<br>
+            Account owner: BreakOut e.V.<br>
+            IBAN: DE85 7002 2200 0020 2418 37<br>
             BIC: FDDODEMMXXX<br>
             Purpose of transfer: ${team.invoice!!.purposeOfTransfer}<br>
             Amount: 60.00€<br><br>
 
-            If you prefer Paypal, please send 60.00€ to anmeldung@break-out.org,
+            If you prefer Paypal, please send 60.00€ to finanzen@break-out.org,
             indicating your team number.<br><br>
 
-            You have decided not to participate in BreakOut 2017? Please let us know by
+            You have decided not to participate in BreakOut 2018? Please let us know by
             sending a message to event@break-out.org <br><br>
 
             Your BreakOut Team""".trimIndent()
 
-        val germanSubject = "BreakOut 2017 - Bitte bezahlt Eure Teilnahmegebühr!"
-        val englishSubject = "BreakOut 2017 - Please pay your registration fee!"
+        val germanSubject = "BreakOut 2018 - Bitte bezahlt Eure Teilnahmegebühr!"
+        val englishSubject = "BreakOut 2018 - Please pay your registration fee!"
 
         val email = Email(
                 to = team.members.map { EmailAddress(it.email) },
@@ -337,8 +332,8 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
         val germanText = """Hallo ${participant.firstname},<br><br>
 
-            vielen Dank, dass Du dich bei BreakOut angemeldet hast. Um beim BreakOut 2017
-            dabei sein zu können, brauchst du noch einen Teampartner. Folge diesem LINK,
+            vielen Dank, dass Du dich bei BreakOut angemeldet hast. Um beim BreakOut 2018
+            dabei sein zu können, brauchst du noch einen Teampartner. Folge diesem <a href="https://break-out.org/invite">Link</a>,
             um jemanden in Dein Team einzuladen.<br><br>
 
             Alle Deine Freunde sind schon verplant? Kein Problem. Schreib uns einfach
@@ -349,18 +344,18 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
         val englishText = """Hello ${participant.firstname},<br><br>
 
-            thank you for signing up for BreakOut. To participate at BreakOut 2017, you
-            still need another team member. Click on this LINK to invite somebody to join
+            thank you for signing up for BreakOut. To participate at BreakOut 2018, you
+            still need another team member. Click on this <a href="https://break-out.org/invite">link</a> to invite somebody to join
             your team.<br><br>
 
-            All your friends are busy during BreakOut 2017? No problem! Just send a message
+            All your friends are busy during BreakOut 2018? No problem! Just send a message
             to event@break-out.org and let us know that you're still looking for a
             team partner. <br><br>
 
             Your BreakOut Team""".trimIndent()
 
-        val germanSubject = "BreakOut 2017 - vervollständige Dein Team!"
-        val englishSubject = "BreakOut 2017 - add a team member!"
+        val germanSubject = "BreakOut 2018 - vervollständige Dein Team!"
+        val englishSubject = "BreakOut 2018 - add a team member!"
 
         val email = Email(
                 to = listOf(EmailAddress(participant.email)),
@@ -373,7 +368,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
     override fun sendUserHasRegisteredEmail(token: String, user: User) {
 
-        val germanText = """Vielen Dank für Dein Interesse an BreakOut 2017.<br><br>
+        val germanText = """Vielen Dank für Dein Interesse an BreakOut 2018.<br><br>
 
         Zum Schutz Deiner Daten müssen wir sicherstellen, dass diese E-Mail-Adresse Dir gehört. Bitte klicke dazu auf
         den Button am Ende der E-Mail.<br><br>
@@ -387,7 +382,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
         Dein BreakOut-Team""".trimIndent()
 
 
-        val englishText = """Thank you for your interest in BreakOut 2017!<br><br>
+        val englishText = """Thank you for your interest in BreakOut 2018!<br><br>
 
          To protect your data we need to make sure this e-mail address belongs to you. Please click on the button on
          the bottom of this message to confirm your e-mail address.<br><br>
@@ -399,8 +394,8 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
          Your BreakOut Team""".trimIndent()
 
-        val germanSubject = "Willkommen bei BreakOut 2017!"
-        val englishSubject = "Welcome to BreakOut 2017!"
+        val germanSubject = "Aktiviere deinen BreakOut Account"
+        val englishSubject = "Activate your BreakOut account"
 
         val subject = mergeEmailSubject(germanSubject, englishSubject)
         val body = mergeEmailBody(germanText, englishText)
@@ -439,46 +434,46 @@ class MailServiceImpl(configurationService: ConfigurationService,
         vollständig.<br>
 
         Um Eure Anmeldung abzuschließen, müsst Ihr nur noch die Teilnahmegebühr von 60€ pro Team bis spätestens
-        8. Mai überweisen. In der Gebühr ist ein Deposit von 20€ enthalten. Wenn ihr 100€ Spenden gesammelt habt
+        16. Mai überweisen. In der Gebühr ist ein Deposit von 20€ enthalten. Wenn ihr 100€ Spenden gesammelt habt
         (keine Sorge, das schafft ihr locker!), wird euch das Deposit nach dem Event zurücküberwiesen.<br><br>
 
         Bitte überweist eure Teamgebühr an folgendes Konto:<br><br>
 
-        Kontoinhaber: Daria Brauner<br>
-        IBAN: DE60700222000072708326<br>
+        Kontoinhaber: BreakOut e.V.<br>
+        IBAN: DE85 7002 2200 0020 2418 37<br>
         BIC: FDDODEMMXXX<br>
         Überweisungszweck: $purposeOfTransfer<br>
         Betrag: 60,00€<br><br>
 
         Wenn ihr lieber Paypal nutzt, sendet bitte 60€ unter Angabe eurer Teamnummer an
-        <a href="mailto:anmeldung@break-out.org">anmeldung@break-out.org</a>.<br><br>
+        <a href="mailto:finanzen@break-out.org">finanzen@break-out.org</a>.<br><br>
 
         Liebe Grüße<br>
         Euer BreakOut-Team""".trimIndent()
 
         val englishText = """Hello ${first.firstname},<br><br>
 
-        Congratulations! ${second.firstname} will join you for BreakOut 2017 - your team is now complete.<br>
-        To complete your registration, please transfer the registration fee of 60€ per team by May 8th. This fee
+        Congratulations! ${second.firstname} will join you for BreakOut 2018 - your team is now complete.<br>
+        To complete your registration, please transfer the registration fee of 60€ per team by May 16th. This fee
         includes a deposit of 20€. When your team has raised 100€ of donations
         (no worries, you'll definitely raise more than 100€ :) ! ), we will transfer the deposit back to your
         account.<br><br>
 
         Please transfer the registration fee to the following account:<br><br>
 
-        Account owner: Daria Brauner<br>
-        IBAN: DE60700222000072708326<br>
+        Account owner: BreakOut e.V.<br>
+        IBAN:  DE85 7002 2200 0020 2418 37<br>
         BIC: FDDODEMMXXX<br>
         Purpose of transfer: $purposeOfTransfer<br>
         Amount: 60.00€<br><br>
 
         If you prefer Paypal, please send 60.00€ to
-        <a href="mailto:anmeldung@break-out.org">anmeldung@break-out.org</a>, indicating your team number.<br><br>
+        <a href="mailto:finanzen@break-out.org">finanzen@break-out.org</a>, indicating your team number.<br><br>
 
         Your BreakOut Team"""
 
-        val germanSubject = "BreakOut 2017 - Ein letzter Schritt zur Anmeldung!"
-        val englishSubject = "BreakOut 2017 - One final step to your registration!"
+        val germanSubject = "BreakOut 2018 - Ein letzter Schritt zur Anmeldung!"
+        val englishSubject = "BreakOut 2018 - One final step to your registration!"
 
         val url = "$host/join-team-success?utm_source=backend&utm_medium=email&utm_content=intial&utm_campaign=payment"
 
@@ -497,30 +492,30 @@ class MailServiceImpl(configurationService: ConfigurationService,
     override fun sendTeamHasPaidEmail(invoice: TeamEntryFeeInvoice) {
         val germanText = """Liebes Team ${invoice.team!!.name},<br><br>
 
-        Eure Startgebühr ist vollständig bei uns eingegangen. Eure Anmelung für den BreakOut 2017 ist damit
+        eure Startgebühr ist vollständig bei uns eingegangen. Eure Anmeldung für den BreakOut 2018 ist damit
         abgeschlossen! Jetzt geht's an die Sponsorensuche. Infos dazu findet ihr hier:
         <a href="https://break-out.org/next-steps">https://break-out.org/next-steps</a> <br>
         Über alles weitere halten wir Euch per E-Mail auf dem Laufenden! Schaut außerdem regelmäßig auf unserer
-        Facebookseite vorbei für großartige Gewinnspiele und die neuesten Neuigkeiten rund um BreakOut 2017:
-        https://www.facebook.com/breakoutmuenchen/ <br>
-        Bis zum 25. Mai - wir freuen uns auf Euch!<br><br>
+        Facebookseite vorbei für großartige Gewinnspiele und die neuesten Neuigkeiten rund um BreakOut 2018:
+        https://www.facebook.com/breakout.ev/ <br>
+        Bis zum 8. Juni - wir freuen uns auf Euch!<br><br>
 
         Liebe Grüße<br>
         Euer BreakOut-Team"""
 
         val englishText = """Dear Team ${invoice.team!!.name},<br><br>
 
-        We've received your registration fee - thank you! Your registration for BreakOut2017 is completed successfully.
-        Now it's time to find sponsors.You can get more information on how to acquire sponsors on our website:
+        we've received your registration fee - thank you! Your registration for BreakOut 2018 is completed successfully.
+        Now it's time to find sponsors. You can get more information on how to acquire sponsors on our website:
         <a href="https://break-out.org/next-steps">https://break-out.org/next-steps</a> <br>
-        We'll send you more information about the event via e-mail. Check out our Facebook page for the latest news and
-        fun competitions.<br>
-        We're excited to see you at BreakOut 2017 on May 25th!<br><br>
+        We'll send you more information about the event via e-mail. Check out our Facebook page at https://www.facebook.com/breakout.ev/
+        for the latest news and fun competitions.<br>
+        We're excited to see you at BreakOut 2018 on June 8th!<br><br>
 
         Your BreakOut Team"""
 
-        val germanSubject = "BreakOut 2017 Anmeldung erfolgreich!"
-        val englishSubject = "BreakOut 2017 Registration successful"
+        val germanSubject = "BreakOut 2018 Anmeldung erfolgreich!"
+        val englishSubject = "BreakOut 2018 Registration successful"
 
         val mail = Email(
                 to = invoice.team!!.members.map { EmailAddress(it.email) },
@@ -532,16 +527,18 @@ class MailServiceImpl(configurationService: ConfigurationService,
         this.send(mail)
     }
 
+    // TODO: note that from here on downwards emails need to be checked again
     override fun sendTeamWithDonationOverviewEmail(team: Team) {
         val raisedAmount = team.raisedAmountFromChallenges().add(team.raisedAmountFromSponsorings())
         val numberFulfilled = team.challenges.filter { it.status == ChallengeStatus.WITH_PROOF }.count()
         val distance = team.getCurrentDistance()
 
+        // TODO: Change date until payment
         val germanText = """
             |Liebes Team ${team.name},
             |
             |Ihr seid der Wahnsinn! Ihr habt dieses Jahr eine Strecke von $distance km zurückgelegt, dabei $numberFulfilled Challenges erfüllt und $raisedAmount € an Spendenversprechen generiert. Chapeau!
-            |Bei Challenges, für die das Spendenversprechen 0€ beträgt, wurde die Challenge leider während des BreakOuts 2017 nicht erfüllt.
+            |Bei Challenges, für die das Spendenversprechen 0€ beträgt, wurde die Challenge leider während des BreakOuts 2018 nicht erfüllt.
             |
             |Diese Spenden setzen sich wie folgt zusammen:
             |
@@ -561,7 +558,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
             |Dear Team ${team.name},
             |
             |You are madness! You covered a distance of $distance km this year, fulfilled $numberFulfilled Challenges and generated a donations promise of $raisedAmount. Chapeau!
-            |If your donation promise for a given challenge is 0€, you have unfortunately not mastered the challenge during BreakOut 2017.
+            |If your donation promise for a given challenge is 0€, you have unfortunately not mastered the challenge during BreakOut 2018.
             |
             |These donations are made up as follows:
             |
@@ -662,13 +659,14 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
     override fun sendGeneratedDonationPromiseSponsor(invoice: SponsoringInvoice) {
 
+        // TODO: Deadline for payment
         val germanText = """
             |Sollten Sie bereits eine Email mit Ihrem Spendenversprechen erhalten haben, können Sie diese ignorieren
             |
             |Liebe(r) ${invoice.sponsor.firstname} ${invoice.sponsor.lastname},
             |
-            |vielen herzlichen Dank, dass Sie beim BreakOut 2017 ein Team unterstützen! Ihre Spende wird von BreakOut e. V. an Jambo Bukoba e. V. weitergeleitet. So unterstützen Sie den Bau von Regenwassertanks an tansanischen Schulen. Wir bitten Sie herzlich, Ihre Spende bis zum 6. Juni an das unten angegebene Konto zu überweisen, damit wir das Geld rechtzeitig zur Siegerehrung des diesjährigen BreakOuts erhalten.
-            |Bei Challenges, für die Ihr Spendenversprechen 0€ beträgt, wurde die Challenge vom Team leider während des BreakOuts 2017 nicht erfüllt.
+            |vielen herzlichen Dank, dass Sie beim BreakOut 2018 ein Team unterstützen! Ihre Spende wird von BreakOut e. V. an One Dollar Glasses weitergeleitet. Wir bitten Sie herzlich, Ihre Spende bis zum 6. Juni an das unten angegebene Konto zu überweisen, damit wir das Geld rechtzeitig zur Siegerehrung des diesjährigen BreakOuts erhalten.
+            |Bei Challenges, für die Ihr Spendenversprechen 0€ beträgt, wurde die Challenge vom Team leider während des BreakOuts 2018 nicht erfüllt.
             |Bitte beachten Sie: wenn Sie Teams in mehreren Städten unterstützt haben, erhalten Sie pro Stadt eine Email mit der Auflistung Ihres Spendenversprechens für diese Stadt.
             |
             |Hier eine Aufschlüsselung Ihres Spendenversprechens:
@@ -702,8 +700,8 @@ class MailServiceImpl(configurationService: ConfigurationService,
             |
             |Dear ${invoice.sponsor.firstname} ${invoice.sponsor.lastname},
             |
-            |Many, many thanks for supporting a team during BreakOut 2017! Your donation will allow Jambo Bukoba build water tanks at Tanzanian schools and make an important contribution to improving students' lives. We would kindly ask you to transfer your donation by June 6th so that we will receive the payment in time for our awards party.
-            |If your donation promise for a given challenge is 0€, the team has unfortunately not mastered the challenge during BreakOut 2017.
+            |Many, many thanks for supporting a team during BreakOut 2018! We would kindly ask you to transfer your donation by June 6th so that we will receive the payment in time for our awards party.
+            |If your donation promise for a given challenge is 0€, the team has unfortunately not mastered the challenge during BreakOut 2018.
             |If you supported teams in different cities, you will receive on email per city showing your donation promise for the given city.
             |
             |${invoice.toEmailOverview()}
@@ -717,7 +715,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
             |IBAN: DE85700222000020241837
             |BIC: FDDODEMMXXX
             |
-            |Please pay close attention to using the correct payment reference, because we can only assign your donation to the right team with the correct purpose. In addition, we can only send you an official donation receipt when you've saved your address in your BreakOut account. Feel free to contact us under event@break-out.org if you need any assistance. We will send you an official donation receipt by the end of 2017 if your donation amounts to more than 200€. Under German law, it is otherwise sufficient for you to provide a simplified donation receipt. For more info, please consult this <a href="|[1] http://assets.contentful.com/i8fp6rw03mps/2LEqetuxOMCc4wciskMgwO/9e8448c32314de24cd099888a0ae3125/VereinfachterZuwendungsnachweis.pdf">Link</a>.
+            |Please pay close attention to using the correct payment reference, because we can only assign your donation to the right team with the correct purpose. In addition, we can only send you an official donation receipt when you've saved your address in your BreakOut account. Feel free to contact us under event@break-out.org if you need any assistance. We will send you an official donation receipt by the end of 2018 if your donation amounts to more than 200€. Under German law, it is otherwise sufficient for you to provide a simplified donation receipt. For more info, please consult this <a href="|[1] http://assets.contentful.com/i8fp6rw03mps/2LEqetuxOMCc4wciskMgwO/9e8448c32314de24cd099888a0ae3125/VereinfachterZuwendungsnachweis.pdf">Link</a>.
             |
             |If you have any questions, please do not hesitate to contact the team you are supporting or us at event@break-out.org.
             |
@@ -730,7 +728,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
         val email = Email(
                 to = invoice.getContactEmails(),
-                subject = mergeEmailSubject("Ihr Spendenversprechen für BreakOut 2017", "Your donation promise for BreakOut 2017"),
+                subject = mergeEmailSubject("Ihr Spendenversprechen für BreakOut 2018", "Your donation promise for BreakOut 2018"),
                 body = mergeEmailBody(germanText, englishText))
 
         mailSenderService.send(email)
@@ -743,10 +741,10 @@ class MailServiceImpl(configurationService: ConfigurationService,
         val germanText = """
             |Liebe(r) ${invoice.sponsor.firstname} ${invoice.sponsor.lastname},
             |
-            |vielen herzlichen Dank, dass Sie beim BreakOut 2017 ein Team unterstützen! Ihre Spende wird von BreakOut e. V. an Jambo Bukoba e. V. weitergeleitet. So unterstützen Sie den Bau von Regenwassertanks an tansanischen Schulen. Daher möchten wir Sie gern daran erinnern, Ihr Spendenversprechen baldmöglichst einzulösen.
+            |vielen herzlichen Dank, dass Sie beim BreakOut 2018 ein Team unterstützen! Ihre Spende wird von BreakOut e. V. an One Dollar Glasses weitergeleitet. Daher möchten wir Sie gern daran erinnern, Ihr Spendenversprechen baldmöglichst einzulösen.
             |Sollten Sie Ihre Überweisung bereits veranlasst haben, können Sie diese Email einfach ignorieren.
             |
-            |Bei Challenges, für die Ihr Spendenversprechen 0€ beträgt, wurde die Challenge vom Team leider während des BreakOuts 2017 nicht erfüllt.
+            |Bei Challenges, für die Ihr Spendenversprechen 0€ beträgt, wurde die Challenge vom Team leider während des BreakOuts 2018 nicht erfüllt.
             |Bitte beachten Sie: wenn Sie Teams in mehreren Städten unterstützt haben, erhalten Sie pro Stadt eine Email mit der Auflistung Ihres Spendenversprechens für diese Stadt.
             |
             |Hier eine Aufschlüsselung Ihres Spendenversprechens:
@@ -779,8 +777,8 @@ class MailServiceImpl(configurationService: ConfigurationService,
             |
             |Dear ${invoice.sponsor.firstname} ${invoice.sponsor.lastname},
             |
-            |Many, many thanks for supporting a team during BreakOut 2017! Your donation will allow Jambo Bukoba build water tanks at Tanzanian schools and make an important contribution to improving students' lives. We would like to kindly remind you to fulfill your donation promise as soon as possible. If you have already transferred your donation, you can simply ignore this email.
-            |If your donation promise for a given challenge is 0€, the team has unfortunately not mastered the challenge during BreakOut 2017.
+            |Many, many thanks for supporting a team during BreakOut 2018! We would like to kindly remind you to fulfill your donation promise as soon as possible. If you have already transferred your donation, you can simply ignore this email.
+            |If your donation promise for a given challenge is 0€, the team has unfortunately not mastered the challenge during BreakOut 2018.
             |If you supported teams in different cities, you will receive on email per city showing your donation promise for the given city.
             |
             |${invoice.toEmailOverview()}
@@ -794,7 +792,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
             |IBAN: DE85700222000020241837
             |BIC: FDDODEMMXXX
             |
-            |Please pay close attention to using the correct payment reference, because we can only assign your donation to the right team with the correct purpose. In addition, we can only send you an official donation receipt when you've saved your address in your BreakOut account. Feel free to contact us under event@break-out.org if you need any assistance. We will send you an official donation receipt by the end of 2017 if your donation amounts to more than 200€. Under German law, it is otherwise sufficient for you to provide a simplified donation receipt. For more info, please consult this <a href="http://assets.contentful.com/i8fp6rw03mps/2LEqetuxOMCc4wciskMgwO/9e8448c32314de24cd099888a0ae3125/VereinfachterZuwendungsnachweis.pdf">Link</a>.[1]
+            |Please pay close attention to using the correct payment reference, because we can only assign your donation to the right team with the correct purpose. In addition, we can only send you an official donation receipt when you've saved your address in your BreakOut account. Feel free to contact us under event@break-out.org if you need any assistance. We will send you an official donation receipt by the end of 2018 if your donation amounts to more than 200€. Under German law, it is otherwise sufficient for you to provide a simplified donation receipt. For more info, please consult this <a href="http://assets.contentful.com/i8fp6rw03mps/2LEqetuxOMCc4wciskMgwO/9e8448c32314de24cd099888a0ae3125/VereinfachterZuwendungsnachweis.pdf">Link</a>.[1]
             |
             |If you have any questions, please do not hesitate to contact the team you are supporting or us at event@break-out.org.
             |
@@ -807,7 +805,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
         val email = Email(
                 to = invoice.getContactEmails(),
-                subject = mergeEmailSubject("Ihr Spendenversprechen für BreakOut 2017", "Your donation promise for BreakOut 2017"),
+                subject = mergeEmailSubject("Ihr Spendenversprechen für BreakOut 2018", "Your donation promise for BreakOut 2018"),
                 body = mergeEmailBody(germanText, englishText))
 
         mailSenderService.send(email)
