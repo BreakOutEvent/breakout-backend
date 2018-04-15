@@ -12,6 +12,7 @@ import backend.util.euroOf
 import org.javamoney.moneta.Money
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import javax.transaction.Transactional
 
 @Service
@@ -34,8 +35,8 @@ class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: Spon
     }
 
     @Transactional
-    override fun addSepaPaymentToInvoice(admin: Admin, fidorId: Long, amount: Money, invoice: SponsoringInvoice): SponsoringInvoice {
-        val payment = SepaPayment(amount, admin, fidorId)
+    override fun addSepaPaymentToInvoice(admin: Admin, fidorId: Long, amount: Money, date: LocalDateTime?, invoice: SponsoringInvoice): SponsoringInvoice {
+        val payment = SepaPayment(amount, admin, fidorId, date)
         invoice.addPayment(payment)
         return invoice
     }

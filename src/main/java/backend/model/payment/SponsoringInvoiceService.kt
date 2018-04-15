@@ -4,6 +4,7 @@ import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.user.Admin
 import org.javamoney.moneta.Money
+import java.time.LocalDateTime
 
 interface SponsoringInvoiceService {
 
@@ -23,7 +24,7 @@ interface SponsoringInvoiceService {
 
     fun createInvoicesForEvent(event: Event): Int
 
-    fun addSepaPaymentToInvoice(admin: Admin, fidorId: Long, amount: Money, invoice: SponsoringInvoice): SponsoringInvoice
+    fun addSepaPaymentToInvoice(admin: Admin, fidorId: Long, amount: Money, date: LocalDateTime?, invoice: SponsoringInvoice): SponsoringInvoice
 
     fun sendInvoiceEmailsToSponsorsForEvent(event: Event)
 
