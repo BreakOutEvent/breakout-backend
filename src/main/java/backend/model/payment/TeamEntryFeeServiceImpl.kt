@@ -6,6 +6,7 @@ import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import javax.transaction.Transactional
 
 @Service
@@ -42,8 +43,8 @@ class TeamEntryFeeServiceImpl(private val teamEntryFeeInvoiceRepository: TeamEnt
     }
 
     @Transactional
-    override fun addSepaPaymentToInvoice(admin: Admin, fidorId: Long, amount: Money, invoice: TeamEntryFeeInvoice): TeamEntryFeeInvoice {
-        val payment = SepaPayment(amount, admin, fidorId)
+    override fun addSepaPaymentToInvoice(admin: Admin, fidorId: Long, amount: Money, date: LocalDateTime?, invoice: TeamEntryFeeInvoice): TeamEntryFeeInvoice {
+        val payment = SepaPayment(amount, admin, fidorId, date)
         invoice.addPayment(payment)
 
         if (invoice.isFullyPaid()) {

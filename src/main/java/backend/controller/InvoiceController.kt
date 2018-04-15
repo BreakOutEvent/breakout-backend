@@ -21,6 +21,11 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.temporal.TemporalAccessor
 import javax.validation.Valid
 
 @RestController
@@ -79,16 +84,19 @@ class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
         val teamFeeInvoice = teamEntryFeeService.findByPurposeOfTransferCode(purposeOfTransferCode)
         val sponsoringInvoice = sponsoringInvoiceService.findByPurposeOfTransferCode(purposeOfTransferCode)
         val amount = Money.of(BigDecimal.valueOf(paymentView.amount!!), "EUR")
-        val admin = userService.getUserById(1)!!.getRole(Admin::class) ?: throw UnauthorizedException("User is no admin")
+        val admin = userService.getUserById(1)!!.getRole(Admin::class)
+                ?: throw UnauthorizedException("User is no admin")
         if (paymentView.fidorId == null) throw RuntimeException("No fidorId is set for automatic payment insertion")
 
+        val date: LocalDateTime? = paymentView.date?.let { LocalDateTime.ofInstant(Instant.ofEpochSecond(it), ZoneOffset.UTC) }
+
         if (teamFeeInvoice != null) {
-            val savedInvoice = teamEntryFeeService.addSepaPaymentToInvoice(admin, paymentView.fidorId!!, amount, teamFeeInvoice)
+            val savedInvoice = teamEntryFeeService.addSepaPaymentToInvoice(admin, paymentView.fidorId!!, amount, date, teamFeeInvoice)
             return TeamEntryFeeInvoiceView(savedInvoice)
         }
 
         if (sponsoringInvoice != null) {
-            val savedInvoice = sponsoringInvoiceService.addSepaPaymentToInvoice(admin, paymentView.fidorId!!, amount, sponsoringInvoice)
+            val savedInvoice = sponsoringInvoiceService.addSepaPaymentToInvoice(admin, paymentView.fidorId!!, amount, date, sponsoringInvoice)
             return SponsoringInvoiceView(savedInvoice)
         }
 
@@ -105,7 +113,8 @@ class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
     @GetMapping("/teamfee/{invoiceId}/")
     fun getTeamFeeInvoice(@PathVariable invoiceId: Long): TeamEntryFeeInvoiceView {
 
-        val invoice = teamEntryFeeService.findById(invoiceId) ?: throw NotFoundException("No invoice with id $invoiceId found")
+        val invoice = teamEntryFeeService.findById(invoiceId)
+                ?: throw NotFoundException("No invoice with id $invoiceId found")
         return TeamEntryFeeInvoiceView(invoice)
     }
 
@@ -125,7 +134,8 @@ class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
         }
 
         val team = teamService.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")
-        val participant = user.getRole(Participant::class) ?: throw UnauthorizedException("User not admin or member of team")
+        val participant = user.getRole(Participant::class)
+                ?: throw UnauthorizedException("User not admin or member of team")
 
         if (team.isMember(participant)) {
             val invoices = sponsoringInvoiceService.findByTeamId(teamId)

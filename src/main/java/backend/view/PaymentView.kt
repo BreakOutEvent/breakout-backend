@@ -1,6 +1,7 @@
 package backend.view
 
 import backend.model.payment.Payment
+import java.time.ZoneOffset
 import javax.validation.constraints.NotNull
 
 class PaymentView {
@@ -14,6 +15,8 @@ class PaymentView {
 
     var fidorId: Long? = null
 
+    var date: Long? = null
+
     constructor()
 
     constructor(payment: Payment) {
@@ -21,5 +24,6 @@ class PaymentView {
         this.paymentMethod = payment.getPaymentMethod()
         this.user = payment.user()!!.account.id
         this.fidorId = payment.fidorId
+        this.date = payment.date?.toEpochSecond(ZoneOffset.UTC)
     }
 }
