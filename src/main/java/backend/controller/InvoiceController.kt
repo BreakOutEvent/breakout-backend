@@ -104,6 +104,21 @@ class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
 
     }
 
+    /**
+     * GET /invoice/payment/
+     * Allows admin to get all payments
+     */
+    @GetMapping("/payment/")
+    fun getPayments(@RequestHeader("X-AUTH-TOKEN") authToken: String): List<PaymentView> {
+
+        if (authToken != PAYMENT_AUTH_TOKEN) throw UnauthorizedException("Invalid Payment-Auth Token")
+
+        val teamEntryFeePayments = teamEntryFeeService.findAll().flatMap { it.getPayments() }
+        val sponsoringInvoicePayments = sponsoringInvoiceService.findAll().flatMap { it.getPayments() }
+
+        return (teamEntryFeePayments + sponsoringInvoicePayments).map(::PaymentView)
+    }
+
 
     /**
      * GET /invoice/teamfee/{id}/

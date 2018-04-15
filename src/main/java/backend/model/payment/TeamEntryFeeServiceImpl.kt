@@ -54,5 +54,9 @@ class TeamEntryFeeServiceImpl(private val teamEntryFeeInvoiceRepository: TeamEnt
         return invoice
     }
 
+    override fun findAll(): Iterable<TeamEntryFeeInvoice> {
+        return teamEntryFeeInvoiceRepository.findAll()
+    }
+
 }
 
