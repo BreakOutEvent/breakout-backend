@@ -1,5 +1,6 @@
 package backend.model.event
 
+import backend.Blockable
 import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.challenges.Challenge
@@ -22,7 +23,7 @@ import javax.persistence.CascadeType.REMOVE
 import javax.persistence.FetchType.LAZY
 
 @Entity
-class Team : BasicEntity {
+class Team : BasicEntity, Blockable {
 
     /**
      * Private constructor for JPA
@@ -200,5 +201,9 @@ class Team : BasicEntity {
     private fun Challenge.toEmailListing(): String {
         println()
         return "<b>Name</b> ${this.sponsor.firstname} ${this.sponsor.lastname} <b>Beschreibung</b> ${this.description.take(50)}... <b>Challengebetrag</b> ${this.amount.display()} <b>Spendenversprechen</b> ${this.billableAmount().display()}"
+    }
+
+    override fun isBlockedBy(userId: Long?): Boolean {
+        return this.members.fold(true) { acc, participant -> acc && participant.isBlockedBy(userId) }
     }
 }

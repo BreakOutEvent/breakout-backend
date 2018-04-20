@@ -179,6 +179,36 @@ class UserController(private val userService: UserService,
         return BasicUserView(user)
     }
 
+    /**
+     * POST /user/{id}/block
+     * Blocks user with given id
+     */
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{id}/block")
+    fun blockUser(@PathVariable id: Long): BasicUserView {
+
+        val user = userService.getUserById(id) ?: throw NotFoundException("user with id $id does not exist")
+
+        // TODO: block!
+
+        return BasicUserView(user)
+    }
+
+    /**
+     * POST /user/{id}/block
+     * Blocks user with given id
+     */
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/{id}/block")
+    fun unblockUser(@PathVariable id: Long): BasicUserView {
+
+        val user = userService.getUserById(id) ?: throw NotFoundException("user with id $id does not exist")
+
+        // TODO: unblock!
+
+        return BasicUserView(user)
+    }
+
     private fun User.setValuesFrom(userView: UserView): User {
 
         this.firstname = userView.firstname ?: this.firstname

@@ -210,8 +210,13 @@ class TeamController(private val teamService: TeamService,
      * gets a specific Team
      */
     @GetMapping("/{teamId}/")
-    fun showTeam(@PathVariable teamId: Long): TeamView {
+    fun showTeam(@PathVariable teamId: Long,
+                 @RequestParam(value = "userid", required = false) userId: Long?): TeamView {
         val team = teamService.findOne(teamId) ?: throw NotFoundException("team with id $teamId does not exist")
+
+        if (team.isBlockedBy(userId))
+            throw NotFoundException("All members of team with id $teamId were blocked")
+
         val teamDonateSum = teamService.getDonateSum(teamId)
         val teamDistance = teamService.getDistance(teamId)
         return TeamView(team, teamDistance, teamDonateSum)
@@ -223,10 +228,12 @@ class TeamController(private val teamService: TeamService,
      */
     @Cacheable(TEAMS, sync = true)
     @GetMapping("/")
-    fun showTeamsByEvent(@PathVariable eventId: Long): Iterable<TeamView> {
+    fun showTeamsByEvent(@PathVariable eventId: Long,
+                         @RequestParam(value = "userid", required = false) userId: Long?): Iterable<TeamView> {
+
         logger.info("Cache miss on /event/$eventId/team/")
         val teams = teamService.findByEventId(eventId)
-        return teams.map(::TeamView)
+        return teams.removeBlockedBy(userId).map(::TeamView)
     }
 
     /**

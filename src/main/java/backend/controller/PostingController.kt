@@ -215,11 +215,12 @@ class PostingController(private val postingService: PostingService,
      * Gets Likes for Posting
      */
     @GetMapping("/{id}/like/")
-    fun getLikesForPosting(@PathVariable("id") id: Long): List<LikeView> {
+    fun getLikesForPosting(@PathVariable("id") id: Long,
+                           @RequestParam(value = "userid", required = false) userId: Long?): List<LikeView> {
 
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
         val likes = posting.likes
-        return likes.map(::LikeView)
+        return likes.removeBlockedBy(userId).map(::LikeView)
     }
 
     /**
