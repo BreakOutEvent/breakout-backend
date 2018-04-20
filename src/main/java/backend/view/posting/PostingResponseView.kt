@@ -1,9 +1,7 @@
 package backend.view.posting
 
 import backend.model.challenges.ChallengeProofProjection
-import backend.model.posting.Comment
 import backend.model.posting.Posting
-import backend.model.user.UserAccount
 import backend.removeBlockedBy
 import backend.view.CommentView
 import backend.view.MediaView
