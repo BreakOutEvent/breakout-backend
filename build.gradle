@@ -1,7 +1,8 @@
 buildscript {
 
-    ext.kotlin_version = '1.1.2-2'
-    ext.powermock_version = '1.6.5'
+    ext.kotlin_version = '1.2.40'
+    ext.powermock_version = '1.7.4'
+    ext.spring_boot_version = '1.5.12.RELEASE'
 
     repositories {
         mavenCentral()
@@ -11,7 +12,7 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlin_version"
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:$spring_boot_version")
 
     }
 }
@@ -47,7 +48,7 @@ dependencies {
     testCompile "mysql:mysql-connector-java"
     runtime "mysql:mysql-connector-java"
 
-    compile "com.zaxxer:HikariCP:2.6.0"
+    compile "com.zaxxer:HikariCP:3.1.0"
 
     // Other
     compile "org.springframework.boot:spring-boot-starter-web"
@@ -55,9 +56,9 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-data-jpa"
     compile "org.springframework.boot:spring-boot-starter-cache"
 
-    compile "org.springframework.security.oauth:spring-security-oauth2:2.0.9.RELEASE"
+    compile "org.springframework.security.oauth:spring-security-oauth2:2.3.2.RELEASE"
     compile("org.springframework:spring-web")
-    compile 'org.springframework:spring-context-support:4.2.6.RELEASE'
+    compile 'org.springframework:spring-context-support:5.0.5.RELEASE'
 
     compile "io.springfox:springfox-swagger2:2.4.0"
     compile "io.springfox:springfox-swagger-ui:2.4.0"
@@ -69,12 +70,12 @@ dependencies {
 
 //    compile 'com.google.guava:guava:19.0'
     compile 'com.google.maps:google-maps-services:0.1.12'
-    compile "org.javamoney:moneta:1.0"
+    compile "org.javamoney:moneta:1.2.1"
 
     compile 'commons-validator:commons-validator:1.5.0'
     compile 'com.github.grumlimited:geocalc:v0.5.1'
-    compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.7.4"
-    compile "org.flywaydb:flyway-core:4.1.2"
+    compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.7.9.1"
+    compile "org.flywaydb:flyway-core:5.0.7"
 
     compile "com.cloudinary:cloudinary-http44:1.17.0"
 
@@ -83,14 +84,14 @@ dependencies {
 
     testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
     testCompile "org.mockito:mockito-core:1.10.19"
-    testCompile "com.jayway.jsonpath:json-path:2.2.0"
+    testCompile "com.jayway.jsonpath:json-path:2.4.0"
     testCompile "org.springframework.boot:spring-boot-starter-test"
     testCompile "junit:junit"
 
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.7'
+    gradleVersion = '4.7'
 }
 
 // See: http://stackoverflow.com/questions/26389679/running-spring-app-built-with-gradle-on-heroku

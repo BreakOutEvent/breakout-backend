@@ -85,7 +85,7 @@ class SponsoringInvoiceController(private val sponsoringInvoiceService: Sponsori
 
         eventService.findById(eventId) ?: throw NotFoundException("Event with id $eventId not found")
 
-        return if (detailed != false) {
+        return if (detailed == true) {
             sponsoringInvoiceService.findByEventId(eventId).map(::DetailedSponsoringInvoiceView)
         } else {
             sponsoringInvoiceService.findByEventId(eventId).map(::SponsoringInvoiceView)
