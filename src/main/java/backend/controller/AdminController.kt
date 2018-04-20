@@ -83,6 +83,6 @@ class AdminController(private val mailService: MailService,
         val team = teamService.findOne(body.teamId) ?: throw NotFoundException("Team with ID ${body.teamId} not found")
         return PostingView(
                 postingService.adminCreatePosting(
-                        team.members.elementAt(0), "Current Location: ${body.city}", null, Coord(body.latitude, body.longitude), LocalDateTime.now()), null)
+                        team.members.elementAt(0), "Current Location: ${body.city}", null, Coord(body.latitude, body.longitude), LocalDateTime.now()), null, null)
     }
 }

@@ -1,5 +1,6 @@
 package backend.model.posting
 
+import backend.UserGenerated
 import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.ConflictException
 import backend.controller.exceptions.NotFoundException
@@ -8,6 +9,7 @@ import backend.model.event.Team
 import backend.model.location.Location
 import backend.model.media.Media
 import backend.model.user.Participant
+import backend.model.user.User
 import backend.model.user.UserAccount
 import java.time.LocalDateTime
 import java.util.*
@@ -19,7 +21,7 @@ import javax.persistence.CascadeType.PERSIST
 import javax.persistence.FetchType.LAZY
 
 @Entity
-class Posting : BasicEntity {
+class Posting : BasicEntity, UserGenerated {
 
     private constructor() : super()
 
@@ -160,4 +162,9 @@ class Posting : BasicEntity {
         this.comments.add(comment)
         return comment
     }
+
+    override fun getUser(): User? {
+        return user
+    }
+
 }

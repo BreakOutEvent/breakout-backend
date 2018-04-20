@@ -1,8 +1,10 @@
 package backend.view.posting
 
 import backend.model.challenges.ChallengeProofProjection
+import backend.model.posting.Comment
 import backend.model.posting.Posting
 import backend.model.user.UserAccount
+import backend.removeBlockedBy
 import backend.view.CommentView
 import backend.view.MediaView
 import com.fasterxml.jackson.annotation.JsonInclude
@@ -42,7 +44,7 @@ class PostingResponseView() {
     var proves: PostingChallengeView? = null
 
 
-    constructor(posting: Posting, blockedUsers: List<Long>, challenge: ChallengeProofProjection?) : this() {
+    constructor(posting: Posting, challenge: ChallengeProofProjection?, userId: Long?) : this() {
         this.id = posting.id
         this.text = posting.text
         this.hashtags = posting.hashtags.map { it.value }
@@ -50,15 +52,9 @@ class PostingResponseView() {
         this.postingLocation = posting.location?.let(::PostingLocationView)
         this.user = PostingUserView(posting)
         this.media = posting.media?.let(::MediaView)
-        this.comments = posting.comments.filterBlockedUsers(blockedUsers, { it.user }).map(::CommentView)
+        this.comments = posting.comments.removeBlockedBy(userId).map(::CommentView)
         this.likes = posting.likes.count()
         this.hasLiked = posting.hasLiked
         this.proves = challenge?.let(::PostingChallengeView)
     }
 }
-
-// TODO: find a good place for this function
-fun <T> List<T>.filterBlockedUsers(inList: List<Long>, transform: (T) -> UserAccount?): List<T> {
-    return this.filter { transform(it).let { !inList.contains(it?.id) } ?: true }
-}
-

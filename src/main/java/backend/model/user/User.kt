@@ -1,10 +1,11 @@
 package backend.model.user
 
+import backend.Blockable
 import backend.model.media.Media
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import kotlin.reflect.KClass
 
-interface User {
+interface User: Blockable {
 
     var email: String
     var passwordHash: String
@@ -38,6 +39,11 @@ interface User {
     fun isActivated(): Boolean
 
     fun setNewPassword(password: String, token: String)
+
+    override fun isBlockedBy(userId: Long?): Boolean {
+        return false // TODO:
+    }
+
 }
 
 enum class Language {

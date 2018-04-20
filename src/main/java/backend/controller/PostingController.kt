@@ -7,6 +7,7 @@ import backend.model.media.Media
 import backend.model.misc.Coord
 import backend.model.posting.PostingService
 import backend.model.user.UserService
+import backend.removeBlockedBy
 import backend.services.ConfigurationService
 import backend.util.CacheNames.LOCATIONS
 import backend.util.CacheNames.POSTINGS
@@ -16,7 +17,6 @@ import backend.view.LikeView
 import backend.view.LocationView
 import backend.view.posting.PostingResponseView
 import backend.view.posting.PostingView
-import backend.view.posting.filterBlockedUsers
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
@@ -65,7 +65,8 @@ class PostingController(private val postingService: PostingService,
         val clientDate = localDateTimeOf(body.date ?: throw RuntimeException("Client date has not been given"))
 
         val posting = postingService.createPosting(user, body.text, body.media?.let(::Media), locationCoord, clientDate)
-        return PostingView(posting, null)
+
+        return PostingView(posting, null, user.account.id)
     }
 
     /**
@@ -73,12 +74,18 @@ class PostingController(private val postingService: PostingService,
      * Gets posting by id
      */
     @GetMapping("/{id}/")
-    fun getPosting(@PathVariable("id") id: Long, @RequestParam(value = "userid", required = false) userId: Long?): PostingResponseView {
+    fun getPosting(@PathVariable("id") id: Long,
+                   @RequestParam(value = "userid", required = false) userId: Long?): PostingResponseView {
+
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
+
+        if (posting.isBlockedBy(userId))
+            throw NotFoundException("posting with id $id was posted by blocked user ${posting.user!!.id}")
+
         val challengeProveProjection = posting.challenge?.let {
             challengeService.findChallengeProveProjectionById(posting.challenge!!)
         }
-        return PostingResponseView(posting.hasLikesBy(userId), challengeProveProjection)
+        return PostingResponseView(posting.hasLikesBy(userId), challengeProveProjection, userId)
     }
 
     /**
@@ -128,20 +135,16 @@ class PostingController(private val postingService: PostingService,
 
         logger.info("Cache miss on /posting for page $page userId $userId events $events")
 
-        // TODO: Add Blocking Controller with endpoints
-        // TODO: Add Blocking Service to fetch this list.
-        val usersBlocked = List<Long>(0, { 0 }) // TODO: Fetch list of blocked users
-
         val postings = if(events != null) {
-            postingService.findByEventIds(events, page ?:0 , PAGE_SIZE)
+            postingService.findByEventIds(events, page ?: 0 , PAGE_SIZE)
         } else {
             postingService.findAll(page ?: 0, PAGE_SIZE)
         }
 
-        return postings.filterBlockedUsers(usersBlocked, { it.user }).map {
-            PostingResponseView(it.hasLikesBy(userId), usersBlocked, it.challenge?.let {
+        return postings.removeBlockedBy(userId).map {
+            PostingResponseView(it.hasLikesBy(userId), it.challenge?.let {
                 challengeService.findChallengeProveProjectionById(it)
-            })
+            }, userId)
         }
     }
 
@@ -214,8 +217,6 @@ class PostingController(private val postingService: PostingService,
     @GetMapping("/{id}/like/")
     fun getLikesForPosting(@PathVariable("id") id: Long): List<LikeView> {
 
-        // TODO: filter blocked
-
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
         val likes = posting.likes
         return likes.map(::LikeView)
@@ -230,13 +231,11 @@ class PostingController(private val postingService: PostingService,
                              @PathVariable("hashtag") hashtag: String,
                              @RequestParam(value = "userid", required = false) userId: Long?): List<PostingView> {
 
-        // TODO: filter blocked
-
         val posting = postingService.findByHashtag(hashtag, page ?: 0, PAGE_SIZE)
-        return posting.map {
+        return posting.removeBlockedBy(userId).map {
             PostingView(it.hasLikesBy(userId), it.challenge?.let {
                 challengeService.findOne(it)
-            })
+            }, userId)
         }
     }
 

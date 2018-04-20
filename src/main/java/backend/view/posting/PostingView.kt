@@ -3,6 +3,7 @@ package backend.view.posting
 import backend.model.challenges.Challenge
 import backend.model.misc.Url
 import backend.model.posting.Posting
+import backend.removeBlockedBy
 import backend.view.CommentView
 import backend.view.LocationView
 import backend.view.MediaView
@@ -43,7 +44,7 @@ class PostingView() {
 
     var proves: ChallengeView? = null
 
-    constructor(posting: Posting, challenge: Challenge?) : this() {
+    constructor(posting: Posting, challenge: Challenge?, userId: Long?) : this() {
         this.id = posting.id
         this.text = posting.text
         this.hashtags = posting.hashtags.map { it.value }
@@ -51,7 +52,7 @@ class PostingView() {
         this.postingLocation = posting.location?.let(::LocationView)
         this.user = BasicUserView(posting.user!!.account)
         this.media = posting.media?.let(::MediaView)
-        this.comments = posting.comments.map(::CommentView)
+        this.comments = posting.comments.removeBlockedBy(userId).map(::CommentView)
         this.likes = posting.likes.count()
         this.hasLiked = posting.hasLiked
         this.proves = challenge?.let(::ChallengeView)

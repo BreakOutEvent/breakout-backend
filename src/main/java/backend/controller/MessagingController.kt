@@ -39,7 +39,7 @@ class MessagingController(private val groupMessageService: GroupMessageService,
             if (!groupMessage.users.contains(userToAdd.account)) groupMessageService.addUser(userToAdd.account, groupMessage)
         }
 
-        return GroupMessageView(groupMessage)
+        return GroupMessageView(groupMessage, user.account.id)
     }
 
     /**
@@ -61,7 +61,7 @@ class MessagingController(private val groupMessageService: GroupMessageService,
             if (!groupMessage.users.contains(userToAdd.account)) groupMessageService.addUser(userToAdd.account, groupMessage)
         }
 
-        return GroupMessageView(groupMessage)
+        return GroupMessageView(groupMessage, user.account.id)
     }
 
     /**
@@ -82,7 +82,7 @@ class MessagingController(private val groupMessageService: GroupMessageService,
         val message = Message(user.account, body.text!!, localDateTimeOf(body.date!!))
         groupMessageService.addMessage(message, groupMessage)
 
-        return GroupMessageView(groupMessage)
+        return GroupMessageView(groupMessage, user.account.id)
     }
 
     /**
@@ -98,6 +98,6 @@ class MessagingController(private val groupMessageService: GroupMessageService,
         val groupMessage = groupMessageService.getByID(id) ?: throw NotFoundException("groupmessage with id $id does not exist")
         if (!groupMessage.users.contains(user.account)) throw UnauthorizedException("authenticated user and requested resource mismatch")
 
-        return GroupMessageView(groupMessage)
+        return GroupMessageView(groupMessage, user.account.id)
     }
 }

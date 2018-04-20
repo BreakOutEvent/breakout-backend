@@ -9,6 +9,7 @@ import backend.model.event.TeamService
 import backend.model.media.Media
 import backend.model.misc.Url
 import backend.model.user.*
+import backend.removeBlockedBy
 import backend.services.ConfigurationService
 import backend.util.CacheNames.POSTINGS
 import backend.util.CacheNames.TEAMS
@@ -97,8 +98,8 @@ class UserController(private val userService: UserService,
      * Gets all users
      */
     @GetMapping("/")
-    fun showUsers(): Iterable<BasicUserView> {
-        return userService.getAllUsers().map(::BasicUserView)
+    fun showUsers(@RequestParam(value = "userid", required = false) userId: Long?): Iterable<BasicUserView> {
+        return userService.getAllUsers().removeBlockedBy(userId).map(::BasicUserView)
     }
 
     /**
@@ -106,11 +107,13 @@ class UserController(private val userService: UserService,
      * Searches for User by String greater 2 chars
      */
     @GetMapping("/search/{search}/")
-    fun searchUsers(@PathVariable("search") search: String): List<SimpleUserView> {
+    fun searchUsers(@PathVariable("search") search: String,
+                    @RequestParam(value = "userid", required = false) userId: Long?): List<SimpleUserView> {
+
         if (search.length < 3) return listOf()
         val users = userService.searchByString(search).take(6).toMutableList()
         users.addAll(teamService.searchByString(search).take(3).flatMap { it.members.map { it.account } })
-        return users.map(::SimpleUserView)
+        return users.removeBlockedBy(userId).map(::SimpleUserView)
     }
 
     /**
@@ -165,9 +168,14 @@ class UserController(private val userService: UserService,
      * Gets user with given id
      */
     @GetMapping("/{id}/")
-    fun showUser(@PathVariable id: Long): BasicUserView {
+    fun showUser(@PathVariable id: Long,
+                 @RequestParam(value = "userid", required = false) userId: Long?): BasicUserView {
 
         val user = userService.getUserById(id) ?: throw NotFoundException("user with id $id does not exist")
+
+        if (user.isBlockedBy(userId))
+            throw NotFoundException("user with id $id was blocked")
+
         return BasicUserView(user)
     }
 

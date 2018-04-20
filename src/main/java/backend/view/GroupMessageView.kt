@@ -1,6 +1,7 @@
 package backend.view
 
 import backend.model.messaging.GroupMessage
+import backend.removeBlockedBy
 import backend.view.user.BasicUserView
 import java.util.*
 
@@ -12,9 +13,9 @@ class GroupMessageView() {
 
     var messages: List<MessageView> = ArrayList()
 
-    constructor(groupMessage: GroupMessage) : this() {
+    constructor(groupMessage: GroupMessage, userId: Long?) : this() {
         this.id = groupMessage.id
         this.users = groupMessage.users.map(::BasicUserView)
-        this.messages = groupMessage.messages.map(::MessageView)
+        this.messages = groupMessage.messages.removeBlockedBy(userId).map(::MessageView)
     }
 }
