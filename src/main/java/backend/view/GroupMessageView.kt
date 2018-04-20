@@ -13,9 +13,9 @@ class GroupMessageView() {
 
     var messages: List<MessageView> = ArrayList()
 
-    constructor(groupMessage: GroupMessage, userId: Long?) : this() {
+    constructor(groupMessage: GroupMessage) : this() {
         this.id = groupMessage.id
         this.users = groupMessage.users.map(::BasicUserView)
-        this.messages = groupMessage.messages.removeBlockedBy(userId).map(::MessageView)
+        this.messages = groupMessage.messages.map(::MessageView)
     }
 }

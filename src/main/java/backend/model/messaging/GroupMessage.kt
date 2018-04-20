@@ -1,12 +1,13 @@
 package backend.model.messaging
 
+import backend.Blockable
 import backend.model.BasicEntity
 import backend.model.user.UserAccount
 import java.util.*
 import javax.persistence.*
 
 @Entity
-class GroupMessage : BasicEntity {
+class GroupMessage : BasicEntity, Blockable {
 
     private constructor() : super()
 
@@ -33,5 +34,9 @@ class GroupMessage : BasicEntity {
     fun preRemove() {
         this.users.clear()
         this.messages.clear()
+    }
+
+    override fun isBlockedBy(userId: Long?): Boolean {
+        return users.fold(false) { acc, user -> acc || user.isBlockedBy(userId) }
     }
 }
