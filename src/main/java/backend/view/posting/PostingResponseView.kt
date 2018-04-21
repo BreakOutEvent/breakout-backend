@@ -2,7 +2,7 @@ package backend.view.posting
 
 import backend.model.challenges.ChallengeProofProjection
 import backend.model.posting.Posting
-import backend.removeBlockedBy
+import backend.model.removeBlockedBy
 import backend.view.CommentView
 import backend.view.MediaView
 import com.fasterxml.jackson.annotation.JsonInclude

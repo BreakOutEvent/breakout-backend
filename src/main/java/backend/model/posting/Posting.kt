@@ -1,6 +1,6 @@
 package backend.model.posting
 
-import backend.UserGenerated
+import backend.model.UserGenerated
 import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.ConflictException
 import backend.controller.exceptions.NotFoundException

@@ -1,6 +1,6 @@
 package backend.model.event
 
-import backend.Blockable
+import backend.model.Blockable
 import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.challenges.Challenge
@@ -13,6 +13,7 @@ import backend.model.payment.billableAmount
 import backend.model.payment.display
 import backend.model.sponsoring.Sponsoring
 import backend.model.user.Participant
+import backend.model.user.User
 import org.hibernate.annotations.Formula
 import org.javamoney.moneta.Money
 import java.math.BigDecimal
@@ -206,4 +207,5 @@ class Team : BasicEntity, Blockable {
     override fun isBlockedBy(userId: Long?): Boolean {
         return this.members.fold(true) { acc, participant -> acc && participant.isBlockedBy(userId) }
     }
+
 }

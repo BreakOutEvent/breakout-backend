@@ -1,11 +1,12 @@
 package backend.model.user
 
-import backend.Blockable
+import backend.model.Blockable
+import backend.model.Blocker
 import backend.model.media.Media
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import kotlin.reflect.KClass
 
-interface User: Blockable {
+interface User: Blockable, Blocker {
 
     var email: String
     var passwordHash: String
@@ -41,7 +42,12 @@ interface User: Blockable {
     fun setNewPassword(password: String, token: String)
 
     override fun isBlockedBy(userId: Long?): Boolean {
-        return false // TODO:
+        return userId.let { account.blockedBy.map { it.id }
+                                             .contains(it) }
+    }
+
+    override fun isBlocking(user: User?): Boolean {
+        return user?.isBlockedBy(account.id) ?: false
     }
 
 }

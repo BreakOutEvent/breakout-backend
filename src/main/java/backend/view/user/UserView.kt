@@ -1,7 +1,8 @@
 package backend.view.user
 
 import backend.model.user.*
-import backend.removeBlockedBy
+import backend.model.removeBlockedBy
+import backend.model.removeBlocking
 import backend.view.MediaView
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.validator.constraints.Email
@@ -62,7 +63,12 @@ class UserView() {
         this.sponsor = if (user.hasRole(Sponsor::class)) SponsorView(user) else null
         this.profilePic = user.profilePic?.let(::MediaView)
         this.roles = user.account.getAuthorities().map { it.authority }
-        this.groupMessageIds = user.account.groupMessages.removeBlockedBy(user.account.id).map { it.id!! }
+
+        this.groupMessageIds = user.account.groupMessages
+                                           .removeBlockedBy(user.account.id)
+                                           .removeBlocking(user)
+                                           .map { it.id!! }
+
         this.preferredLanguage = when (user.preferredLanguage) {
             Language.EN -> "en"
             Language.DE -> "de"

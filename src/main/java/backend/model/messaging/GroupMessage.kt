@@ -1,13 +1,15 @@
 package backend.model.messaging
 
-import backend.Blockable
+import backend.model.Blockable
 import backend.model.BasicEntity
+import backend.model.Blocker
+import backend.model.user.User
 import backend.model.user.UserAccount
 import java.util.*
 import javax.persistence.*
 
 @Entity
-class GroupMessage : BasicEntity, Blockable {
+class GroupMessage : BasicEntity, Blockable, Blocker {
 
     private constructor() : super()
 
@@ -38,5 +40,9 @@ class GroupMessage : BasicEntity, Blockable {
 
     override fun isBlockedBy(userId: Long?): Boolean {
         return users.fold(false) { acc, user -> acc || user.isBlockedBy(userId) }
+    }
+
+    override fun isBlocking(user: User?): Boolean {
+        return users.fold(false) { acc, otherUser -> acc || otherUser.isBlocking(user) }
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import java.util.*
 import javax.persistence.*
+import kotlin.collections.ArrayList
 import kotlin.reflect.KClass
 
 @Entity
@@ -51,6 +52,9 @@ class UserAccount : BasicEntity, User {
 
     @OneToMany(mappedBy = "user", cascade = arrayOf(CascadeType.ALL))
     val payments: MutableList<Payment> = ArrayList()
+
+    @ManyToMany
+    var blockedBy: MutableList<UserAccount> = ArrayList()
 
     /*
      * cascade all operations to children

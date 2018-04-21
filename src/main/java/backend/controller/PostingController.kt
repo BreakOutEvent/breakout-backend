@@ -7,7 +7,7 @@ import backend.model.media.Media
 import backend.model.misc.Coord
 import backend.model.posting.PostingService
 import backend.model.user.UserService
-import backend.removeBlockedBy
+import backend.model.removeBlockedBy
 import backend.services.ConfigurationService
 import backend.util.CacheNames.LOCATIONS
 import backend.util.CacheNames.POSTINGS

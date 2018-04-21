@@ -14,7 +14,7 @@ import backend.model.user.Admin
 import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserService
-import backend.removeBlockedBy
+import backend.model.removeBlockedBy
 import backend.services.ConfigurationService
 import backend.util.CacheNames.LOCATIONS
 import backend.util.CacheNames.POSTINGS

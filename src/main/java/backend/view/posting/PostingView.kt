@@ -3,7 +3,7 @@ package backend.view.posting
 import backend.model.challenges.Challenge
 import backend.model.misc.Url
 import backend.model.posting.Posting
-import backend.removeBlockedBy
+import backend.model.removeBlockedBy
 import backend.view.CommentView
 import backend.view.LocationView
 import backend.view.MediaView

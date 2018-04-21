@@ -1,6 +1,6 @@
 package backend.model.messaging
 
-import backend.UserGenerated
+import backend.model.UserGenerated
 import backend.model.BasicEntity
 import backend.model.user.User
 import backend.model.user.UserAccount
