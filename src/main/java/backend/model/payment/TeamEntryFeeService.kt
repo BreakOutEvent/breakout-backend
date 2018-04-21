@@ -16,4 +16,6 @@ interface TeamEntryFeeService {
 
     fun addSepaPaymentToInvoice(admin: Admin, fidorId: Long, amount: Money, date: LocalDateTime?, invoice: TeamEntryFeeInvoice): TeamEntryFeeInvoice
 
+    fun findAll(): Iterable<TeamEntryFeeInvoice>
+
 }

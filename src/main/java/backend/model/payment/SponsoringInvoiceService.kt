@@ -35,5 +35,6 @@ interface SponsoringInvoiceService {
     fun findAllNotFullyPaidInvoicesForEvent(event: Event): Iterable<SponsoringInvoice>
 
     fun sendInvoiceReminderEmailsToTeamsForEvent(event: Event)
+
     fun findTeamInvoicePairs(event: Event): Map<Team, List<SponsoringInvoice>>
 }
