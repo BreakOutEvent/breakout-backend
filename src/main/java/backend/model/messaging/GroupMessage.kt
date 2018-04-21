@@ -13,7 +13,7 @@ class GroupMessage : BasicEntity {
     @ManyToMany
     var users: MutableList<UserAccount> = ArrayList()
 
-    @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+    @OneToMany(cascade = [(CascadeType.ALL)], orphanRemoval = true)
     @OrderBy("date ASC")
     var messages: MutableList<Message> = ArrayList()
 

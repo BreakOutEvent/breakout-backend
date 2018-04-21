@@ -117,7 +117,7 @@ class UserController(private val userService: UserService,
      * PUT /user/{id}/
      * Edits user with given id
      */
-    @Caching(evict = arrayOf(CacheEvict(POSTINGS, allEntries = true), CacheEvict(TEAMS, allEntries = true)))
+    @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(TEAMS, allEntries = true))])
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}/")
     fun updateUser(@PathVariable id: Long,

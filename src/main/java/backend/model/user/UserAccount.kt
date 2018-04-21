@@ -43,13 +43,13 @@ class UserAccount : BasicEntity, User {
     @Enumerated(EnumType.STRING)
     override var preferredLanguage: Language = Language.DE
 
-    @OneToOne(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+    @OneToOne(cascade = [(CascadeType.ALL)], orphanRemoval = true)
     override var profilePic: Media? = null
 
-    @ManyToMany(mappedBy = "users", cascade = arrayOf(CascadeType.ALL))
+    @ManyToMany(mappedBy = "users", cascade = [(CascadeType.ALL)])
     val groupMessages: MutableList<GroupMessage> = ArrayList()
 
-    @OneToMany(mappedBy = "user", cascade = arrayOf(CascadeType.ALL))
+    @OneToMany(mappedBy = "user", cascade = [(CascadeType.ALL)])
     val payments: MutableList<Payment> = ArrayList()
 
     /*
@@ -58,7 +58,7 @@ class UserAccount : BasicEntity, User {
      * if it gets removed from Map userRoles and the account is saved!
      * See: http://stackoverflow.com/a/2011546
      */
-    @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(cascade = [(CascadeType.ALL)], fetch = FetchType.LAZY, orphanRemoval = true)
     private var userRoles: MutableMap<Class<out UserRole>, UserRole> = HashMap()
 
     private var activationToken: String? = null
@@ -113,7 +113,7 @@ class UserAccount : BasicEntity, User {
     override fun <T : UserRole> addRole(clazz: KClass<T>): T {
         if (userRoles.containsKey(clazz.java)) throw DomainException("User already has role $clazz")
         val role: UserRole = UserRole.createFor(clazz.java, this)
-        userRoles.put(clazz.java, role)
+        userRoles[clazz.java] = role
         return role as T
     }
 

@@ -73,13 +73,11 @@ class ChallengeController(private var challengeService: ChallengeService,
         val amount = euroOf(body.amount!!)
         val description = body.description!!
 
-        val challenge = if (body.unregisteredSponsor != null) {
+        return if (body.unregisteredSponsor != null) {
             challengeUnregisteredSponsor(body, team, amount, description)
         } else {
             challengeWithRegisteredSponsor(user, team, amount, description)
         }
-
-        return challenge
     }
 
     private fun challengeWithRegisteredSponsor(user: User, team: Team, amount: Money, description: String): ChallengeView {

@@ -142,10 +142,10 @@ class SponsoringServiceImpl(private val sponsoringRepository: SponsoringReposito
     override fun findOne(id: Long): Sponsoring? = sponsoringRepository.findOne(id)
 
     fun getAmountRaised(sponsoring: Sponsoring): Money {
-        if (reachedLimit(sponsoring)) {
-            return sponsoring.limit
+        return if (reachedLimit(sponsoring)) {
+            sponsoring.limit
         } else {
-            return calculateAmount(sponsoring)
+            calculateAmount(sponsoring)
         }
     }
 

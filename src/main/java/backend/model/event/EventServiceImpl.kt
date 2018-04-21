@@ -6,6 +6,7 @@ import backend.model.location.Location
 import backend.model.misc.Coord
 import backend.services.FeatureFlagService
 import backend.util.data.DonateSums
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
@@ -21,7 +22,7 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository,
                                               val cacheService: CacheService,
                                               val featureFlagService: FeatureFlagService) : EventService {
 
-    val logger = LoggerFactory.getLogger(EventServiceImpl::class.java)
+    val logger: Logger = LoggerFactory.getLogger(EventServiceImpl::class.java)
 
     @Scheduled(cron = "0 */2 * * * ?")
     @Transactional(propagation = Propagation.REQUIRED)

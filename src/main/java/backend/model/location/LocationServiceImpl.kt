@@ -81,16 +81,16 @@ class LocationServiceImpl(private val locationRepository: LocationRepository,
 
     override fun findByTeamId(id: Long, perTeam: Int): Iterable<Location> {
         val first = locationRepository.findTeamLocationBounds(id).firstOrNull()
-        if (first != null) {
-            try {
+        return if (first != null) {
+            return try {
                 val test = first as Array<*>
                 val locations = locationRepository.findByTeamId(id, (test[0] as Number).toLong(), (test[1] as Number).toLong(), (test[2] as Number).toLong(), perTeam)
-                return locations.filter { it.isDuringEvent }
+                locations.filter { it.isDuringEvent }
             } catch (e: Exception) {
-                return emptyList()
+                emptyList()
             }
         } else {
-            return emptyList()
+            emptyList()
         }
     }
 

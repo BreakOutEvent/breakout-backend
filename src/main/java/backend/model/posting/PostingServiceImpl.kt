@@ -74,7 +74,7 @@ class PostingServiceImpl(private val repository: PostingRepository,
 
         val posting = repository.save(Posting(text, date, location, user, savedMedia))
         //applicationEventPublisher.publishEvent(PostingCreatedEvent(posting))
-        return posting
+        return repository.save(Posting(text, date, location, user, media))
     }
 
     @Transactional
@@ -95,8 +95,7 @@ class PostingServiceImpl(private val repository: PostingRepository,
             savedMedia = mediaService.save(media)
         }
 
-        val posting = repository.save(Posting(text, date, location, user, savedMedia))
-        return posting
+        return repository.save(Posting(text, date, location, user, savedMedia))
     }
 
 

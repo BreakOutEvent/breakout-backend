@@ -21,16 +21,15 @@ import java.time.temporal.ChronoUnit
 fun speedToLocation(toLocation: Location, fromLocation: Location): SpeedToLocation? {
     val secondsDifference = toLocation.date.until(fromLocation.date, ChronoUnit.SECONDS)
     val distanceKm = distanceCoordsKM(fromLocation.coord, toLocation.coord)
-    val speed = calculateSpeed(distanceKm, secondsDifference)
-    return speed
+    return calculateSpeed(distanceKm, secondsDifference)
 }
 
 fun calculateSpeed(distanceKm: Double, secondsDifference: Long): SpeedToLocation? {
-    if (distanceKm > 0 && secondsDifference > 0) {
+    return if (distanceKm > 0 && secondsDifference > 0) {
         val speed = distanceKm / (secondsDifference / 3600.0)
-        return SpeedToLocation(speed, secondsDifference, distanceKm)
+        SpeedToLocation(speed, secondsDifference, distanceKm)
     } else {
-        return null
+        null
     }
 }
 

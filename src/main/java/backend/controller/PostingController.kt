@@ -44,9 +44,7 @@ class PostingController(private val postingService: PostingService,
      * POST /posting/
      * Creates new posting
      */
-    @Caching(evict = arrayOf(
-            CacheEvict(POSTINGS, allEntries = true),
-            CacheEvict(LOCATIONS, allEntries = true)))
+    @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(LOCATIONS, allEntries = true))])
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/")
     @ResponseStatus(CREATED)
@@ -84,11 +82,9 @@ class PostingController(private val postingService: PostingService,
      * DELETE /posting/{id}/
      * Allows Admin to delete Posting
      */
-    @Caching(evict = arrayOf(
-            CacheEvict(POSTINGS, allEntries = true),
-            CacheEvict(LOCATIONS, allEntries = true)))
+    @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(LOCATIONS, allEntries = true))])
     @PreAuthorize("hasAuthority('ADMIN')")
-    @RequestMapping("/{id}/", method = arrayOf(DELETE))
+    @RequestMapping("/{id}/", method = [DELETE])
     fun adminDeletePosting(@PathVariable("id") id: Long): Map<String, String> {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
         posting.challenge?.let {
@@ -104,7 +100,7 @@ class PostingController(private val postingService: PostingService,
      */
     @CacheEvict(value = POSTINGS, allEntries = true)
     @PreAuthorize("hasAuthority('ADMIN')")
-    @RequestMapping("/{id}/comment/{commentId}/", method = arrayOf(DELETE))
+    @RequestMapping("/{id}/comment/{commentId}/", method = [DELETE])
     fun adminDeleteComment(@PathVariable("id") postingId: Long,
                            @PathVariable("commentId") commentId: Long): Map<String, String> {
 
@@ -191,7 +187,7 @@ class PostingController(private val postingService: PostingService,
      */
     @CacheEvict(value = POSTINGS, allEntries = true)
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/{id}/like/", method = arrayOf(DELETE))
+    @RequestMapping("/{id}/like/", method = [DELETE])
     fun deleteLike(@PathVariable("id") id: Long,
                    @AuthenticationPrincipal customUserDetails: CustomUserDetails): Map<String, String> {
 

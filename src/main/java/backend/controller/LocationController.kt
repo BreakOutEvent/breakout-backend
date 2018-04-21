@@ -84,7 +84,7 @@ class LocationController(private val locationService: LocationService,
      * POST /event/{eventId}/team/{teamId}/location/
      * Upload a new location for a specific team at a specific event
      */
-    @Caching(evict = arrayOf(CacheEvict(POSTINGS, allEntries = true), CacheEvict(LOCATIONS, allEntries = true)))
+    @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(LOCATIONS, allEntries = true))])
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/team/{teamId}/location/")
     @ResponseStatus(CREATED)
@@ -108,7 +108,7 @@ class LocationController(private val locationService: LocationService,
      * POST /event/{eventId}/team/{teamId}/location/multiple/
      * Upload multiple new locations for a specific team at a specific event
      */
-    @Caching(evict = arrayOf(CacheEvict(POSTINGS, allEntries = true), CacheEvict(LOCATIONS, allEntries = true)))
+    @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(LOCATIONS, allEntries = true))])
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/team/{teamId}/location/multiple/")
     @ResponseStatus(CREATED)
@@ -122,13 +122,11 @@ class LocationController(private val locationService: LocationService,
         val team = teamService.findOne(teamId) ?: throw NotFoundException("no team with id $teamId found")
         if (!team.isMember(participant)) throw UnauthorizedException("user is not part of team $teamId are therefor cannot upload locations on it's behalf")
 
-        val savedLocationsAsLocationViews = locationViews.map {
+        return locationViews.map {
             val coord = Coord(it.latitude, it.longitude)
             val savedLocation = locationService.create(coord, participant, localDateTimeOf(epochSeconds = it.date))
             LocationView(savedLocation)
         }
-
-        return savedLocationsAsLocationViews
     }
 
 }

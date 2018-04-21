@@ -25,13 +25,13 @@ class Sponsor : UserRole, ISponsor {
 
     override var company: String? = null
 
-    @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true)
+    @OneToOne(cascade = [ALL], orphanRemoval = true)
     var logo: Media? = null
 
-    @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "registeredSponsor")
+    @OneToMany(cascade = [ALL], orphanRemoval = true, mappedBy = "registeredSponsor")
     override var sponsorings: MutableList<Sponsoring> = arrayListOf()
 
-    @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "registeredSponsor")
+    @OneToMany(cascade = [ALL], orphanRemoval = true, mappedBy = "registeredSponsor")
     override var challenges: MutableList<Challenge> = arrayListOf()
 
     @Embedded

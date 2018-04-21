@@ -58,7 +58,7 @@ interface TeamService {
     /**
      * Get Team Postings from database
      *
-     * @param id: The id of Team to get postings for
+     * @param teamId: The id of Team to get postings for
      *
      * @return gotten postings list
      */

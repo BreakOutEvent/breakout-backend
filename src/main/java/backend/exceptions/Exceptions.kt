@@ -1,4 +1,4 @@
-package backend.exceptions;
+package backend.exceptions
 
 class DomainException : RuntimeException {
 

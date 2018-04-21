@@ -41,8 +41,8 @@ class SponsoringController(private var sponsoringService: SponsoringService,
                           @PathVariable teamId: Long): Iterable<SponsoringView> {
 
         val team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId found")
-        if (customUserDetails != null) return getAllSponsoringsAuthenticated(customUserDetails, team)
-        else return getAllSponsoringsUnauthenticated(team)
+        return if (customUserDetails != null) getAllSponsoringsAuthenticated(customUserDetails, team)
+        else getAllSponsoringsUnauthenticated(team)
     }
 
     private fun getAllSponsoringsAuthenticated(customUserDetails: CustomUserDetails, team: Team): Iterable<SponsoringView> {
@@ -124,8 +124,7 @@ class SponsoringController(private var sponsoringService: SponsoringService,
                 email = sponsor.email,
                 isHidden = sponsor.isHidden)
 
-        val sponsoring = sponsoringService.createSponsoringWithOfflineSponsor(team, amount, limit, unregisteredSponsor)
-        return sponsoring
+        return sponsoringService.createSponsoringWithOfflineSponsor(team, amount, limit, unregisteredSponsor)
     }
 
 
@@ -155,10 +154,10 @@ class SponsoringController(private var sponsoringService: SponsoringService,
         val sponsoring = sponsoringService.findOne(sponsoringId) ?: throw NotFoundException("No sponsoring with id $sponsoringId found")
         val status = body["status"] ?: throw BadRequestException("Missing status in body")
 
-        when (status.toLowerCase()) {
-            "accepted" -> return SponsoringView(sponsoringService.acceptSponsoring(sponsoring))
-            "rejected" -> return SponsoringView(sponsoringService.rejectSponsoring(sponsoring))
-            "withdrawn" -> return SponsoringView(sponsoringService.withdrawSponsoring(sponsoring))
+        return when (status.toLowerCase()) {
+            "accepted" -> SponsoringView(sponsoringService.acceptSponsoring(sponsoring))
+            "rejected" -> SponsoringView(sponsoringService.rejectSponsoring(sponsoring))
+            "withdrawn" -> SponsoringView(sponsoringService.withdrawSponsoring(sponsoring))
             else -> throw BadRequestException("Invalid status $status")
         }
     }

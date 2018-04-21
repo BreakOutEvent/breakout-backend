@@ -814,11 +814,11 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
 
     private fun mergeEmailBody(germanText: String, englishText: String): String {
-        return germanText + "<br><br><hr><br><br>" + englishText
+        return "$germanText<br><br><hr><br><br>$englishText"
     }
 
     private fun mergeEmailSubject(germanSubject: String, englishSubject: String): String {
-        return germanSubject + " / " + englishSubject
+        return "$germanSubject / $englishSubject"
     }
 }
 

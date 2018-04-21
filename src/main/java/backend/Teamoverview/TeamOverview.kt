@@ -171,9 +171,8 @@ class TimestampSerializer : StdSerializer<LocalDateTime> {
     constructor(clazz: Class<LocalDateTime>) : super(clazz)
 
     override fun serialize(value: LocalDateTime, gen: JsonGenerator, provider: SerializerProvider?) {
-        val ts = value
         val zoneId = ZoneId.systemDefault()
-        val epoch = ts.atZone(zoneId).toInstant().toEpochMilli()
+        val epoch = value.atZone(zoneId).toInstant().toEpochMilli()
         gen.writeNumber(epoch)
     }
 

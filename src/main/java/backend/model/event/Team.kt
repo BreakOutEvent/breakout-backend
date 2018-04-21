@@ -49,26 +49,26 @@ class Team : BasicEntity {
     @Column(columnDefinition = "TEXT")
     lateinit var description: String
 
-    @OneToMany(cascade = arrayOf(ALL), mappedBy = "team", orphanRemoval = true)
+    @OneToMany(cascade = [ALL], mappedBy = "team", orphanRemoval = true)
     private var invitations: MutableList<Invitation> = ArrayList()
 
-    @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true, fetch = LAZY)
+    @OneToOne(cascade = [ALL], orphanRemoval = true, fetch = LAZY)
     var profilePic: Media? = null
 
     @ManyToMany
     val members: MutableSet<Participant> = HashSet()
 
-    @OneToMany(cascade = arrayOf(REMOVE), mappedBy = "team", orphanRemoval = true)
+    @OneToMany(cascade = [REMOVE], mappedBy = "team", orphanRemoval = true)
     val locations: MutableList<Location> = ArrayList()
 
     // TODO: Performance: Should probably be removed and used with invoiceService
-    @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "team", fetch = LAZY)
+    @OneToOne(cascade = [ALL], orphanRemoval = true, mappedBy = "team", fetch = LAZY)
     var invoice: TeamEntryFeeInvoice? = null
 
-    @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "team")
+    @OneToMany(cascade = [ALL], orphanRemoval = true, mappedBy = "team")
     var sponsoring: MutableList<Sponsoring> = ArrayList()
 
-    @OneToMany(cascade = arrayOf(ALL), orphanRemoval = true, mappedBy = "team")
+    @OneToMany(cascade = [ALL], orphanRemoval = true, mappedBy = "team")
     var challenges: MutableList<Challenge> = ArrayList()
 
     @Formula("(select max(l.distance) from location l inner join team t on (l.team_id = t.id) where l.is_during_event and t.id = id)")
@@ -120,7 +120,7 @@ class Team : BasicEntity {
     }
 
     fun isMember(participant: Participant): Boolean {
-        return this.members.filter { it.account == participant.account }.isNotEmpty()
+        return this.members.any { it.account == participant.account }
     }
 
     fun isFull(): Boolean {
