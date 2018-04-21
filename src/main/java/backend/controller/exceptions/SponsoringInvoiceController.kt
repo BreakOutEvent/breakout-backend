@@ -37,7 +37,7 @@ class SponsoringInvoiceController(private val sponsoringInvoiceService: Sponsori
 
     @PostMapping("/sendmails")
     @PreAuthorize("hasAuthority('ADMIN')")
-            // TODO: Why does @Param work here?
+    // TODO: Why does @Param work here?
     fun sendInvoiceEmailsToSponsors(@Param("eventId") eventId: Long): ResponseEntity<Any> {
 
         val event = eventService.findById(eventId) ?: throw NotFoundException("event $eventId not found")
@@ -81,19 +81,14 @@ class SponsoringInvoiceController(private val sponsoringInvoiceService: Sponsori
     @GetMapping("/{eventId}/")
     @PreAuthorize("hasAuthority('ADMIN')")
     fun getInvoicesByEvent(@PathVariable("eventId") eventId: Long,
-                           @RequestParam(required = false) detailed: Boolean = false): Iterable<SponsoringInvoiceView> {
+                           @RequestParam(required = false) detailed: Boolean?): Iterable<SponsoringInvoiceView> {
 
         eventService.findById(eventId) ?: throw NotFoundException("Event with id $eventId not found")
 
-        if (detailed) {
-            return sponsoringInvoiceService.findByEventId(eventId).map {
-                SponsoringInvoiceView(it)
-            }
+        return if (detailed != false) {
+            sponsoringInvoiceService.findByEventId(eventId).map(::DetailedSponsoringInvoiceView)
         } else {
-            return sponsoringInvoiceService.findByEventId(eventId).map {
-                DetailedSponsoringInvoiceView(it)
-            }
+            sponsoringInvoiceService.findByEventId(eventId).map(::SponsoringInvoiceView)
         }
-
     }
 }
