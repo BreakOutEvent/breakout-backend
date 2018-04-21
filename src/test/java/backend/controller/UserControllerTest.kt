@@ -132,6 +132,7 @@ class UserControllerTest : IntegrationTest() {
 
         val blocker = userService.create("test3@example.com", "pw", { addRole(Participant::class) })
         val blocked = userService.create("test4@example.com", "pw", { addRole(Participant::class) })
+        val randomDude = userService.create("test5@example.com","pw")
 
         val event = eventService.createEvent("Test Event",
                 LocalDateTime.now(),
@@ -142,6 +143,14 @@ class UserControllerTest : IntegrationTest() {
         val team = teamService.create(blocked.getRole(Participant::class) as Participant,
                 "This is a test Team",
                 "This is a test Team", event)
+
+        val blockedMessage = groupMessageService.createGroupMessage(blocked.account)
+        blockedMessage.addUser(blocker.account)
+        groupMessageService.save(blockedMessage)
+
+        val regularMessage = groupMessageService.createGroupMessage(randomDude.account)
+        regularMessage.addUser(blocker.account)
+        groupMessageService.save(regularMessage)
 
         postingService.createPosting(blocked, "Test From Blocked User", null, null, LocalDateTime.now())
 
@@ -182,6 +191,15 @@ class UserControllerTest : IntegrationTest() {
             val blockerTeamRequest = get("/event/${event.id}/team/")
                     .asUser(this.mockMvc, blocker!!.email, "pw")
             mockMvc.perform(blockerTeamRequest).andExpect(jsonPath("$[0]").doesNotExist())
+
+            // Test Message Filter
+
+            val userRequest = get("/me/")
+                    .asUser(this.mockMvc, blocker!!.email, "pw")
+
+            mockMvc.perform(userRequest).andExpect(jsonPath("$.groupMessageIds").isArray)
+                                        .andExpect(jsonPath("$.groupMessageIds[0]").value(regularMessage.id))
+                                        .andExpect(jsonPath("$.groupMessageIds[0]").doesNotExist())
 
         }
 
