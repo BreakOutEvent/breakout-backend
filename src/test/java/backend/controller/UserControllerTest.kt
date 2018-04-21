@@ -1,14 +1,18 @@
 package backend.controller
 
 import backend.Integration.IntegrationTest
+import backend.model.misc.Coord
+import backend.model.user.Participant
 import backend.testHelper.asUser
 import backend.testHelper.json
+import org.joda.time.DateTime
 import org.junit.Ignore
 import org.junit.Test
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
+import kotlin.reflect.KClass
 
 class UserControllerTest : IntegrationTest() {
 
@@ -126,8 +130,18 @@ class UserControllerTest : IntegrationTest() {
     @Test
     fun testBlockUser() {
 
-        val blocker = userService.create("test3@example.com", "pw")
-        val blocked = userService.create("test4@example.com", "pw")
+        val blocker = userService.create("test3@example.com", "pw", { addRole(Participant::class) })
+        val blocked = userService.create("test4@example.com", "pw", { addRole(Participant::class) })
+
+        val event = eventService.createEvent("Test Event",
+                LocalDateTime.now(),
+                "Munich",
+                Coord(0.0, 0.0),
+                36)
+
+        val team = teamService.create(blocked.getRole(Participant::class) as Participant,
+                "This is a test Team",
+                "This is a test Team", event)
 
         postingService.createPosting(blocked, "Test From Blocked User", null, null, LocalDateTime.now())
 
@@ -137,19 +151,38 @@ class UserControllerTest : IntegrationTest() {
         mockMvc.perform(request).andDo {
             val blocker = blocker.account.id?.let { userService.getUserById(it) }
             val blocked = blocked.account.id?.let { userService.getUserById(it) }
+
+            // Test Blocked Status
+
             assert(blocked?.isBlockedBy(blocker?.account?.id) ?: false)
+
+            // Test Team Filter
 
             val anonymousPostingRequest = get("/posting/")
             mockMvc.perform(anonymousPostingRequest).andExpect(jsonPath("$[0]").exists())
 
-            val blockerPostingRequest = get("/posting/").asUser(this.mockMvc, blocker!!.email, "pw")
+            val blockerPostingRequest = get("/posting/")
+                    .asUser(this.mockMvc, blocker!!.email, "pw")
             mockMvc.perform(blockerPostingRequest).andExpect(jsonPath("$[0]").doesNotExist())
+
+            // Test User Filter
 
             val anonymousBlockedRequest = get("/user/${blocked?.account?.id}/")
             mockMvc.perform(anonymousBlockedRequest).andExpect(jsonPath("$.id").exists())
 
-            val blockerBlockedRequest = get("/user/${blocked?.account?.id}/").asUser(this.mockMvc, blocker!!.email, "pw")
+            val blockerBlockedRequest = get("/user/${blocked?.account?.id}/")
+                    .asUser(this.mockMvc, blocker!!.email, "pw")
             mockMvc.perform(blockerBlockedRequest).andExpect(jsonPath("$.id").doesNotExist())
+
+            // Test Team Filter
+
+            val anonymousTeamRequest = get("/event/${event.id}/team/")
+            mockMvc.perform(anonymousTeamRequest).andExpect(jsonPath("$[0]").exists())
+
+            val blockerTeamRequest = get("/event/${event.id}/team/")
+                    .asUser(this.mockMvc, blocker!!.email, "pw")
+            mockMvc.perform(blockerTeamRequest).andExpect(jsonPath("$[0]").doesNotExist())
+
         }
 
     }
