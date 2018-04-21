@@ -142,7 +142,7 @@ class UserControllerTest : IntegrationTest() {
 
         val team = teamService.create(blocked.getRole(Participant::class) as Participant,
                 "This is a test Team",
-                "This is a test Team", event)
+                "This is a test Team", event, null)
 
         val blockedMessage = groupMessageService.createGroupMessage(blocked.account)
         blockedMessage.addUser(blocker.account)
@@ -199,7 +199,7 @@ class UserControllerTest : IntegrationTest() {
 
             mockMvc.perform(userRequest).andExpect(jsonPath("$.groupMessageIds").isArray)
                                         .andExpect(jsonPath("$.groupMessageIds[0]").value(regularMessage.id))
-                                        .andExpect(jsonPath("$.groupMessageIds[0]").doesNotExist())
+                                        .andExpect(jsonPath("$.groupMessageIds[1]").doesNotExist())
 
         }
 
