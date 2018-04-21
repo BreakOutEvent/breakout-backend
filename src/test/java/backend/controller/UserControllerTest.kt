@@ -143,12 +143,10 @@ class UserControllerTest : IntegrationTest() {
                 "This is a test Team", event, null)
 
         val blockedMessage = groupMessageService.createGroupMessage(blocked.account)
-        blockedMessage.addUser(blocker.account)
-        groupMessageService.save(blockedMessage)
+        groupMessageService.addUser(blocker.account, blockedMessage)
 
         val regularMessage = groupMessageService.createGroupMessage(randomDude.account)
-        regularMessage.addUser(blocker.account)
-        groupMessageService.save(regularMessage)
+        groupMessageService.addUser(blocker.account, regularMessage)
 
         postingService.createPosting(blocked, "Test From Blocked User", null, null, LocalDateTime.now())
 
@@ -192,12 +190,16 @@ class UserControllerTest : IntegrationTest() {
 
             // Test Message Filter
 
-            val userRequest = get("/me/")
+            val regularMessageRequest = get("/messaging/${regularMessage.id}/")
                     .asUser(this.mockMvc, blocker!!.email, "pw")
 
-            mockMvc.perform(userRequest).andExpect(jsonPath("$.groupMessageIds").isArray)
-                                        .andExpect(jsonPath("$.groupMessageIds[0]").value(regularMessage.id))
-                                        .andExpect(jsonPath("$.groupMessageIds[1]").doesNotExist())
+            mockMvc.perform(regularMessageRequest).andExpect(jsonPath("$.id").exists())
+
+
+            val blockedMessageRequest = get("/messaging/${blockedMessage.id}/")
+                    .asUser(this.mockMvc, blocker!!.email, "pw")
+
+            mockMvc.perform(blockedMessageRequest).andExpect(jsonPath("$.id").doesNotExist())
 
         }
 
