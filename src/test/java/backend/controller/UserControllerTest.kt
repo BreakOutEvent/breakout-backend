@@ -8,6 +8,7 @@ import org.junit.Test
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.LocalDateTime
 
 class UserControllerTest : IntegrationTest() {
 
@@ -119,6 +120,37 @@ class UserControllerTest : IntegrationTest() {
     @Test
     @Ignore("Needs to be migrated from package integration")
     fun testShowUser() {
+
+    }
+
+    @Test
+    fun testBlockUser() {
+
+        val blocker = userService.create("test3@example.com", "pw")
+        val blocked = userService.create("test4@example.com", "pw")
+
+        postingService.createPosting(blocked, "Test From Blocked User", null, null, LocalDateTime.now())
+
+        val request = post("/user/${blocked.account.id}/block/", "")
+                .asUser(this.mockMvc, blocker.email, "pw")
+
+        mockMvc.perform(request).andDo {
+            val blocker = blocker.account.id?.let { userService.getUserById(it) }
+            val blocked = blocked.account.id?.let { userService.getUserById(it) }
+            assert(blocked?.isBlockedBy(blocker?.account?.id) ?: false)
+
+            val anonymousPostingRequest = get("/posting/")
+            mockMvc.perform(anonymousPostingRequest).andExpect(jsonPath("$[0]").exists())
+
+            val blockerPostingRequest = get("/posting/").asUser(this.mockMvc, blocker!!.email, "pw")
+            mockMvc.perform(blockerPostingRequest).andExpect(jsonPath("$[0]").doesNotExist())
+
+            val anonymousBlockedRequest = get("/user/${blocked?.account?.id}/")
+            mockMvc.perform(anonymousBlockedRequest).andExpect(jsonPath("$.id").exists())
+
+            val blockerBlockedRequest = get("/user/${blocked?.account?.id}/").asUser(this.mockMvc, blocker!!.email, "pw")
+            mockMvc.perform(blockerBlockedRequest).andExpect(jsonPath("$.id").doesNotExist())
+        }
 
     }
 
