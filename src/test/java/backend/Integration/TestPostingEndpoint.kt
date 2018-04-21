@@ -735,7 +735,8 @@ open class TestPostingEndpoint : IntegrationTest() {
         println(response)
 
 
-        val requestPosting = get("/posting/${posting.id}/?userid=${user.account.id}")
+        val requestPosting = get("/posting/${posting.id}/")
+                .asUser(mockMvc, user.email, "password")
 
         val responsePosting = mockMvc.perform(requestPosting)
                 .andExpect(status().isOk)
