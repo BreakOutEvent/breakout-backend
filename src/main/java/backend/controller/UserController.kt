@@ -191,7 +191,7 @@ class UserController(private val userService: UserService,
             CacheEvict(POSTINGS, allEntries = true),
             CacheEvict(TEAMS, allEntries = true)))
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/{id}/block")
+    @PostMapping("/{id}/block/")
     fun blockUser(@PathVariable id: Long,
                   @AuthenticationPrincipal customUserDetails: CustomUserDetails): BasicUserView {
 
@@ -216,7 +216,7 @@ class UserController(private val userService: UserService,
             CacheEvict(POSTINGS, allEntries = true),
             CacheEvict(TEAMS, allEntries = true)))
     @PreAuthorize("isAuthenticated()")
-    @DeleteMapping("/{id}/block")
+    @DeleteMapping("/{id}/block/")
     fun unblockUser(@PathVariable id: Long,
                     @AuthenticationPrincipal customUserDetails: CustomUserDetails): BasicUserView {
 
