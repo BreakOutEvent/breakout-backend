@@ -12,6 +12,7 @@ import backend.model.user.*
 import backend.model.removeBlockedBy
 import backend.model.removeBlocking
 import backend.services.ConfigurationService
+import backend.util.CacheNames
 import backend.util.CacheNames.POSTINGS
 import backend.util.CacheNames.TEAMS
 import backend.view.DetailedInvitationView
@@ -20,6 +21,7 @@ import backend.view.user.BasicUserView
 import backend.view.user.SimpleUserView
 import backend.view.user.UserView
 import io.swagger.annotations.Api
+import org.hibernate.annotations.Cache
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CacheEvict
@@ -185,6 +187,9 @@ class UserController(private val userService: UserService,
      * POST /user/{id}/block
      * Blocks user with given id
      */
+    @Caching(evict = arrayOf(
+            CacheEvict(POSTINGS, allEntries = true),
+            CacheEvict(TEAMS, allEntries = true)))
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/block")
     fun blockUser(@PathVariable id: Long,
@@ -203,8 +208,11 @@ class UserController(private val userService: UserService,
 
     /**
      * DELETE /user/{id}/block
-     * Unblocks user with given id
+     * Unblocks user with given idt
      */
+    @Caching(evict = arrayOf(
+            CacheEvict(POSTINGS, allEntries = true),
+            CacheEvict(TEAMS, allEntries = true)))
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}/block")
     fun unblockUser(@PathVariable id: Long,
