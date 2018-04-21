@@ -84,6 +84,8 @@ class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
         val teamFeeInvoice = teamEntryFeeService.findByPurposeOfTransferCode(purposeOfTransferCode)
         val sponsoringInvoice = sponsoringInvoiceService.findByPurposeOfTransferCode(purposeOfTransferCode)
         val amount = Money.of(BigDecimal.valueOf(paymentView.amount!!), "EUR")
+
+        //TODO get admin in a nicer way
         val admin = userService.getUserById(1)!!.getRole(Admin::class)
                 ?: throw UnauthorizedException("User is no admin")
         if (paymentView.fidorId == null) throw RuntimeException("No fidorId is set for automatic payment insertion")
