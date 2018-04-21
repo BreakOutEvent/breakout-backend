@@ -5,14 +5,12 @@ import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.testHelper.asUser
 import backend.testHelper.json
-import org.joda.time.DateTime
 import org.junit.Ignore
 import org.junit.Test
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
-import kotlin.reflect.KClass
 
 class UserControllerTest : IntegrationTest() {
 
