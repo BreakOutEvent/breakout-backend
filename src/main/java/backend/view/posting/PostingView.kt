@@ -1,14 +1,13 @@
 package backend.view.posting
 
 import backend.model.challenges.Challenge
+import backend.model.misc.Url
 import backend.model.posting.Posting
 import backend.view.CommentView
 import backend.view.LocationView
 import backend.view.MediaView
 import backend.view.challenge.ChallengeView
 import backend.view.user.BasicUserView
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import org.hibernate.validator.constraints.SafeHtml
 import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import java.time.ZoneOffset
@@ -29,10 +28,7 @@ class PostingView() {
     @Valid
     var postingLocation: LocationView? = null
 
-    var media: List<MediaView>? = null
-
-    @JsonInclude(NON_NULL)
-    var uploadMediaTypes: List<String>? = null
+    var media: MediaView? = null
 
     @Valid
     var user: BasicUserView? = null
@@ -54,7 +50,7 @@ class PostingView() {
         this.date = posting.date.toEpochSecond(ZoneOffset.UTC)
         this.postingLocation = posting.location?.let(::LocationView)
         this.user = BasicUserView(posting.user!!.account)
-        this.media = posting.media.map(::MediaView)
+        this.media = posting.media?.let(::MediaView)
         this.comments = posting.comments.map(::CommentView)
         this.likes = posting.likes.count()
         this.hasLiked = posting.hasLiked

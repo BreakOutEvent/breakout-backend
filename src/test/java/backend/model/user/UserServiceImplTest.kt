@@ -1,5 +1,6 @@
 package backend.model.user
 
+import backend.model.media.MediaService
 import backend.services.ConfigurationService
 import backend.services.mail.MailService
 import org.junit.Before
@@ -10,6 +11,7 @@ import org.mockito.Mockito.*
 class UserServiceImplTest {
 
     private lateinit var mailService: MailService
+    private lateinit var mediaService: MediaService
     private lateinit var userServiceImpl: UserService
     private lateinit var userRepository: UserRepository
 
@@ -17,8 +19,9 @@ class UserServiceImplTest {
     fun setUp() {
         mailService = mock(MailService::class.java)
         userRepository = mock(UserRepository::class.java)
+        mediaService = mock(MediaService::class.java)
         val configurationService = mock(ConfigurationService::class.java)
-        userServiceImpl = UserServiceImpl(userRepository, mailService, configurationService)
+        userServiceImpl = UserServiceImpl(userRepository, mailService, mediaService, configurationService)
 
         `when`(configurationService.getRequired("org.breakout.api.host")).thenReturn("localhost")
         `when`(configurationService.getRequired("org.breakout.api.port")).thenReturn("8083")

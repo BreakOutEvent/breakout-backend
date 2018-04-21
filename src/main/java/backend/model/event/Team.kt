@@ -29,13 +29,13 @@ class Team : BasicEntity {
      */
     private constructor() : super()
 
-    constructor(creator: Participant, name: String, description: String, event: Event) : this() {
+    constructor(creator: Participant, name: String, description: String, event: Event, profilePic: Media?) : this() {
         this.event = event
         this.event.teams.add(this)
         this.addMember(creator)
         this.name = name
         this.description = description
-        this.profilePic = Media("image")
+        this.profilePic = profilePic
         this.invoice = TeamEntryFeeInvoice(this, Money.of(BigDecimal.valueOf(60), "EUR"))
     }
 
@@ -53,7 +53,7 @@ class Team : BasicEntity {
     private var invitations: MutableList<Invitation> = ArrayList()
 
     @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true, fetch = LAZY)
-    lateinit var profilePic: Media
+    var profilePic: Media? = null
 
     @ManyToMany
     val members: MutableSet<Participant> = HashSet()

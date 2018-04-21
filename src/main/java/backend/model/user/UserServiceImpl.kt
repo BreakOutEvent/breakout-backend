@@ -4,6 +4,8 @@ import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.ConflictException
 import backend.controller.exceptions.NotFoundException
 import backend.exceptions.DomainException
+import backend.model.media.Media
+import backend.model.media.MediaService
 import backend.services.ConfigurationService
 import backend.services.mail.MailService
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service
 @Service
 class UserServiceImpl @Autowired constructor(private val userRepository: UserRepository,
                                              private val mailService: MailService,
+                                             private val mediaService: MediaService,
                                              configurationService: ConfigurationService) : UserService {
 
     private val host: String = configurationService.getRequired("org.breakout.api.host")
@@ -54,7 +57,14 @@ class UserServiceImpl @Autowired constructor(private val userRepository: UserRep
         mailService.sendUserHasRegisteredEmail(token, user)
     }
 
-    override fun save(user: User): User = userRepository.save(user.account)
+    override fun save(user: User): User {
+
+        if (user.profilePic != null) {
+            user.profilePic = mediaService.save(user.profilePic as Media)
+        }
+
+        return userRepository.save(user.account)
+    }
 
     override fun create(email: String, password: String, f: User.() -> Unit): User {
         val user = this.create(email, password)

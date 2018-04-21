@@ -1,31 +1,22 @@
 package backend.controller
 
 import backend.controller.exceptions.NotFoundException
-import backend.model.challenges.Challenge
 import backend.model.challenges.ChallengeService
-import backend.model.challenges.ChallengeStatus
 import backend.model.event.TeamService
 import backend.model.location.LocationService
 import backend.model.misc.Coord
-import backend.model.misc.Email
-import backend.model.misc.EmailAddress
 import backend.model.misc.EmailRepository
 import backend.model.payment.SponsoringInvoiceService
 import backend.model.posting.PostingService
-import backend.model.sponsoring.Sponsoring
 import backend.model.sponsoring.SponsoringService
-import backend.model.sponsoring.SponsoringStatus
 import backend.model.user.UserService
 import backend.services.mail.MailService
 import backend.view.posting.PostingView
 import backend.view.user.AdminTeamLocationView
-import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
-import java.math.BigDecimal
-import java.math.RoundingMode
 import java.time.LocalDateTime
 import javax.validation.Valid
 

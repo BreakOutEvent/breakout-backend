@@ -50,7 +50,7 @@ class DetailedSponsoringView() {
         this.limit = sponsoring.limit.numberStripped.toDouble()
         this.status = sponsoring.status.toString().toUpperCase()
 
-        this.contract = sponsoring.contract.let(::MediaView)
+        this.contract = sponsoring.contract?.let(::MediaView)
 
         // Add information about registered sponsor
         // if he exists and isHidden is false

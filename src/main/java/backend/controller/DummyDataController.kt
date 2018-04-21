@@ -50,7 +50,7 @@ class DummyDataController(val userService: UserService,
                 postingService.savePostingWithLocationAndMedia(
                         text = "text$it",
                         postingLocation = Coord(0.0, 0.0),
-                        mediaTypes = null,
+                        media = null,
                         user = user,
                         date = LocalDateTime.now()).id!!
             } else 1

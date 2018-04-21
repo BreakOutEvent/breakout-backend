@@ -15,7 +15,7 @@ interface User {
     var firstname: String?
     var lastname: String?
     var gender: String?
-    var profilePic: Media
+    var profilePic: Media?
     var notificationToken: String?
 
     fun <T : UserRole> addRole(clazz: KClass<T>): T

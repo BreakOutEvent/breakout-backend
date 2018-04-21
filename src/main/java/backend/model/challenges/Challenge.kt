@@ -5,7 +5,7 @@ import backend.model.BasicEntity
 import backend.model.challenges.ChallengeStatus.*
 import backend.model.event.Team
 import backend.model.media.Media
-import backend.model.media.MediaType.DOCUMENT
+import backend.model.media.MediaType
 import backend.model.misc.EmailAddress
 import backend.model.payment.Billable
 import backend.model.sponsoring.ISponsor
@@ -24,7 +24,7 @@ class Challenge : BasicEntity, Billable {
     lateinit var description: String
 
     @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true, fetch = FetchType.LAZY)
-    lateinit var contract: Media
+    var contract: Media? = null
 
     var status: ChallengeStatus = PROPOSED
         private set (value) {
@@ -139,7 +139,7 @@ class Challenge : BasicEntity, Billable {
         this.team = team
         this.amount = amount
         this.description = description
-        this.contract = Media(DOCUMENT)
+        this.contract = null //TODO: how to handle contracts in future?
     }
 
     fun accept() {

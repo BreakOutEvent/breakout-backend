@@ -4,7 +4,7 @@ import backend.model.messaging.Message
 import backend.model.user.UserAccount
 import backend.util.Profiles.PRODUCTION
 import backend.util.Profiles.STAGING
-import com.auth0.jwt.internal.com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile

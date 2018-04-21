@@ -4,7 +4,6 @@ import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.event.Team
 import backend.model.media.Media
-import backend.model.media.MediaType.DOCUMENT
 import backend.model.misc.EmailAddress
 import backend.model.payment.Billable
 import backend.model.sponsoring.SponsoringStatus.*
@@ -23,7 +22,7 @@ class Sponsoring : BasicEntity, Billable {
     private val logger: Logger = LoggerFactory.getLogger(Sponsoring::class.java)
 
     @OneToOne(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
-    lateinit var contract: Media
+    var contract: Media? = null
 
     var status: SponsoringStatus = PROPOSED
         private set (value) {
@@ -62,7 +61,7 @@ class Sponsoring : BasicEntity, Billable {
         this.team = team
         this.amountPerKm = amountPerKm
         this.limit = limit
-        this.contract = Media(DOCUMENT)
+        this.contract = null
         this.sponsor.sponsorings.add(this)
     }
 
@@ -72,7 +71,7 @@ class Sponsoring : BasicEntity, Billable {
         this.amountPerKm = amountPerKm
         this.limit = limit
         this.status = ACCEPTED
-        this.contract = Media(DOCUMENT)
+        this.contract = null
         this.sponsor.sponsorings.add(this)
     }
 

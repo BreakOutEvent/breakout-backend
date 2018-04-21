@@ -1,5 +1,6 @@
 package backend.model.posting
 
+import backend.model.media.Media
 import backend.model.misc.Coord
 import backend.model.user.User
 import backend.model.user.UserAccount
@@ -7,13 +8,13 @@ import java.time.LocalDateTime
 
 interface PostingService {
 
-    fun savePostingWithLocationAndMedia(text: String?, postingLocation: Coord?, user: UserAccount, mediaTypes: List<String>?, date: LocalDateTime): Posting
+    fun savePostingWithLocationAndMedia(text: String?, postingLocation: Coord?, user: UserAccount, media: Media?, date: LocalDateTime): Posting
 
-    fun adminSavePostingWithLocationAndMedia(text: String?, postingLocation: Coord?, user: UserAccount, mediaTypes: List<String>?, date: LocalDateTime): Posting
+    fun adminSavePostingWithLocationAndMedia(text: String?, postingLocation: Coord?, user: UserAccount, media: Media?, date: LocalDateTime): Posting
 
-    fun createPosting(user: User, text: String?, uploadMediaTypes: List<String>?, locationCoord: Coord?, clientDate: LocalDateTime): Posting
+    fun createPosting(user: User, text: String?, media: Media?, locationCoord: Coord?, clientDate: LocalDateTime): Posting
 
-    fun adminCreatePosting(user: User, text: String?, uploadMediaTypes: List<String>?, locationCoord: Coord?, clientDate: LocalDateTime): Posting
+    fun adminCreatePosting(user: User, text: String?, media: Media?, locationCoord: Coord?, clientDate: LocalDateTime): Posting
 
     fun findAll(page: Int, size: Int): List<Posting>
 

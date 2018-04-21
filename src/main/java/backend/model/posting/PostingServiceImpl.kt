@@ -5,7 +5,7 @@ import backend.exceptions.DomainException
 import backend.model.location.Location
 import backend.model.location.LocationService
 import backend.model.media.Media
-import backend.model.media.MediaRepository
+import backend.model.media.MediaService
 import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.model.user.User
@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 @Service
 class PostingServiceImpl(private val repository: PostingRepository,
                          private val locationService: LocationService,
-                         private val mediaRepository: MediaRepository,
+                         private val mediaService: MediaService,
                          private val applicationEventPublisher: ApplicationEventPublisher) : PostingService {
 
     override fun removeComment(posting: Posting, commentId: Long) {
@@ -58,7 +58,7 @@ class PostingServiceImpl(private val repository: PostingRepository,
     override fun savePostingWithLocationAndMedia(text: String?,
                                                  postingLocation: Coord?,
                                                  user: UserAccount,
-                                                 mediaTypes: List<String>?,
+                                                 media: Media?,
                                                  date: LocalDateTime): Posting {
 
         var location: Location? = null
@@ -67,23 +67,22 @@ class PostingServiceImpl(private val repository: PostingRepository,
             location = locationService.create(postingLocation, uploader, date, true)
         }
 
-        //Create Media-Objects for each media item requested to add
-        val media: MutableList<Media> = arrayListOf()
-        mediaTypes?.forEach {
-            media.add(Media(it))
+        var savedMedia: Media? = null
+        if (media != null) {
+            savedMedia = mediaService.save(media)
         }
 
-        val posting = repository.save(Posting(text, date, location, user, media))
+        val posting = repository.save(Posting(text, date, location, user, savedMedia))
         //applicationEventPublisher.publishEvent(PostingCreatedEvent(posting))
         return posting
     }
 
     @Transactional
     override fun adminSavePostingWithLocationAndMedia(text: String?,
-                                                 postingLocation: Coord?,
-                                                 user: UserAccount,
-                                                 mediaTypes: List<String>?,
-                                                 date: LocalDateTime): Posting {
+                                                      postingLocation: Coord?,
+                                                      user: UserAccount,
+                                                      media: Media?,
+                                                      date: LocalDateTime): Posting {
 
         var location: Location? = null
         if (postingLocation != null) {
@@ -91,42 +90,40 @@ class PostingServiceImpl(private val repository: PostingRepository,
             location = locationService.adminCreate(postingLocation, uploader, date, true)
         }
 
-        //Create Media-Objects for each media item requested to add
-        val media: MutableList<Media> = arrayListOf()
-        mediaTypes?.forEach {
-            media.add(Media(it))
+        var savedMedia: Media? = null
+        if (media != null) {
+            savedMedia = mediaService.save(media)
         }
 
-        val posting = repository.save(Posting(text, date, location, user, media))
+        val posting = repository.save(Posting(text, date, location, user, savedMedia))
         return posting
     }
 
 
-
     override fun createPosting(user: User,
                                text: String?,
-                               uploadMediaTypes: List<String>?,
+                               media: Media?,
                                locationCoord: Coord?,
                                clientDate: LocalDateTime): Posting {
 
         //check if any of the optional posting types is available
-        if (uploadMediaTypes == null && (text == null || text.trim() == "") && locationCoord == null)
+        if (media == null && (text == null || text.trim() == "") && locationCoord == null)
             throw BadRequestException("empty postings not allowed")
 
-        return this.savePostingWithLocationAndMedia(text, locationCoord, user.account, uploadMediaTypes, clientDate)
+        return this.savePostingWithLocationAndMedia(text, locationCoord, user.account, media, clientDate)
     }
 
     override fun adminCreatePosting(user: User,
-                               text: String?,
-                               uploadMediaTypes: List<String>?,
-                               locationCoord: Coord?,
-                               clientDate: LocalDateTime): Posting {
+                                    text: String?,
+                                    media: Media?,
+                                    locationCoord: Coord?,
+                                    clientDate: LocalDateTime): Posting {
 
         //check if any of the optional posting types is available
-        if (uploadMediaTypes == null && (text == null || text.trim() == "") && locationCoord == null)
+        if (media == null && (text == null || text.trim() == "") && locationCoord == null)
             throw BadRequestException("empty postings not allowed")
 
-        return this.adminSavePostingWithLocationAndMedia(text, locationCoord, user.account, uploadMediaTypes, clientDate)
+        return this.adminSavePostingWithLocationAndMedia(text, locationCoord, user.account, media, clientDate)
     }
 
     override fun getByID(id: Long): Posting? = repository.findById(id)
@@ -135,10 +132,6 @@ class PostingServiceImpl(private val repository: PostingRepository,
 
     @Transactional
     override fun delete(posting: Posting) {
-        posting.media.forEach {
-            mediaRepository.delete(it)
-        }
-
         repository.delete(posting)
     }
 }

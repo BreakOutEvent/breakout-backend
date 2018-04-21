@@ -33,7 +33,7 @@ open class TeamEntryFeeServiceImplTest : IntegrationTest() {
         invitee = userService.create("invitee@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         admin = userService.create("admin@mail.com", "password", { addRole(Admin::class) }).getRole(Admin::class)!!
         event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
-        team = teamService.create(creator, "name", "description", event)
+        team = teamService.create(creator, "name", "description", event, null)
 
         setAuthenticatedUser(creator.email)
         teamService.invite(EmailAddress(invitee.email), team)

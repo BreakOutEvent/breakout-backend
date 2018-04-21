@@ -19,7 +19,7 @@ class UserAccount : BasicEntity, User {
 
     constructor() : super() {
         this.isBlocked = true
-        this.profilePic = Media("image")
+        this.profilePic = null
         this.preferredLanguage = Language.DE
     }
 
@@ -44,7 +44,7 @@ class UserAccount : BasicEntity, User {
     override var preferredLanguage: Language = Language.DE
 
     @OneToOne(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
-    override var profilePic: Media
+    override var profilePic: Media? = null
 
     @ManyToMany(mappedBy = "users", cascade = arrayOf(CascadeType.ALL))
     val groupMessages: MutableList<GroupMessage> = ArrayList()

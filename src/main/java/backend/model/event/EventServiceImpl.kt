@@ -27,7 +27,7 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository,
     @Transactional(propagation = Propagation.REQUIRED)
     fun scheduleRegenerateScores() {
         if (featureFlagService.isEnabled("event.scheduleRegenerateScores"))
-        regenerateCache(null)
+            regenerateCache(null)
         logger.info("Recalculated event scores!"
         )
     }

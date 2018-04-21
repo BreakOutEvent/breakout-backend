@@ -48,7 +48,7 @@ class SponsoringView() {
         this.limit = sponsoring.limit.numberStripped.toDouble()
         this.status = sponsoring.status.toString().toUpperCase()
         this.billableAmount = sponsoring.billableAmount().numberStripped.toDouble()
-        this.contract = sponsoring.contract.let(::MediaView)
+        this.contract = sponsoring.contract?.let(::MediaView)
         this.teamDistance = sponsoring.team?.getCurrentDistance()
 
         // Add information about registered sponsor

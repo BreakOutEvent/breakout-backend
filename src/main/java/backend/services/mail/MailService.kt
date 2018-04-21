@@ -6,7 +6,6 @@ import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.payment.SponsoringInvoice
 import backend.model.payment.TeamEntryFeeInvoice
-import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.Sponsoring
 import backend.model.user.Participant
 import backend.model.user.User

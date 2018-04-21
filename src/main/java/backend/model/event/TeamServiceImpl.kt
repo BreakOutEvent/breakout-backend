@@ -1,6 +1,8 @@
 package backend.model.event
 
 import backend.controller.exceptions.NotFoundException
+import backend.model.media.Media
+import backend.model.media.MediaService
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
@@ -21,15 +23,21 @@ import java.math.BigDecimal
 class TeamServiceImpl(private val repository: TeamRepository,
                       private val userService: UserService,
                       private val mailService: MailService,
+                      private val mediaService: MediaService,
                       private val eventPublisher: ApplicationEventPublisher,
                       private val configurationService: ConfigurationService) : TeamService {
 
     private val logger: Logger = LoggerFactory.getLogger(TeamServiceImpl::class.java)
 
     @Transactional
-    override fun create(creator: Participant, name: String, description: String, event: Event): Team {
-        val team = Team(creator, name, description, event)
+    override fun create(creator: Participant, name: String, description: String, event: Event, profilePic: Media?): Team {
+        val team = Team(creator, name, description, event, profilePic)
         // TODO: Maybe use sensible cascading?
+
+        if (team.profilePic != null) {
+            team.profilePic = mediaService.save(team.profilePic as Media)
+        }
+
         val savedTeam = this.repository.save(team)
         savedTeam.invoice?.generatePurposeOfTransfer()
 
@@ -51,6 +59,10 @@ class TeamServiceImpl(private val repository: TeamRepository,
     }
 
     override fun save(team: Team): Team {
+        if (team.profilePic != null) {
+            team.profilePic = mediaService.save(team.profilePic as Media)
+        }
+
         val saved = repository.save(team)
         eventPublisher.publishEvent(TeamChangedEvent(saved))
         return saved

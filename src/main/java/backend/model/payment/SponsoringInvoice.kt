@@ -140,7 +140,7 @@ class SponsoringInvoice : Invoice {
                 val fromSponsorings = this.sponsorings.flatMap { it.team?.members?.map { EmailAddress(it.email) } ?: listOf() }
                 var fromUnregistered: Iterable<EmailAddress>
 
-                if(this.unregisteredSponsor?.email != null) {
+                if (this.unregisteredSponsor?.email != null) {
                     try {
                         fromUnregistered = listOf(EmailAddress(this.unregisteredSponsor!!.email!!))
                     } catch (e: Exception) {
@@ -156,7 +156,7 @@ class SponsoringInvoice : Invoice {
                         .union(fromUnregistered)
                         .distinct()
 
-                if(total.size > 3) throw Exception("There should be at max 3 emails to contact per invoice")
+                if (total.size > 3) throw Exception("There should be at max 3 emails to contact per invoice")
                 return total
             }
             is Sponsor -> listOf(EmailAddress(registeredSponsor!!.email))

@@ -1,6 +1,7 @@
 package backend.model.event
 
 import backend.model.location.Location
+import backend.model.media.Media
 import backend.model.misc.EmailAddress
 import backend.model.posting.Posting
 import backend.model.user.Participant
@@ -21,7 +22,7 @@ interface TeamService {
      * @return The newly created Team
      */
     @Throws
-    fun create(creator: Participant, name: String, description: String, event: Event): Team
+    fun create(creator: Participant, name: String, description: String, event: Event, profilePic: Media?): Team
 
     /**
      * Invite a participant to a team

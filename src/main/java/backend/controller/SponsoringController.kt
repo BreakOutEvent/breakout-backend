@@ -13,7 +13,6 @@ import backend.model.user.Participant
 import backend.model.user.Sponsor
 import backend.model.user.UserService
 import backend.services.ConfigurationService
-import backend.util.getSignedJwtToken
 import backend.view.SponsorTeamProfileView
 import backend.view.UnregisteredSponsorView
 import backend.view.sponsoring.SponsoringTeamProfileView
@@ -106,7 +105,6 @@ class SponsoringController(private var sponsoringService: SponsoringService,
             createSponsoringWithAuthenticatedSponsor(team, amountPerKm, limit, sponsor)
         }
 
-        sponsoring.contract.uploadToken = getSignedJwtToken(jwtSecret, sponsoring.contract.id.toString())
         return SponsoringView(sponsoring)
     }
 

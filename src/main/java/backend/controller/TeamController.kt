@@ -8,6 +8,7 @@ import backend.model.challenges.ChallengeService
 import backend.model.event.EventService
 import backend.model.event.Team
 import backend.model.event.TeamService
+import backend.model.media.Media
 import backend.model.misc.EmailAddress
 import backend.model.user.Admin
 import backend.model.user.Participant
@@ -18,7 +19,6 @@ import backend.util.CacheNames.LOCATIONS
 import backend.util.CacheNames.POSTINGS
 import backend.util.CacheNames.TEAMS
 import backend.util.data.DonateSums
-import backend.util.getSignedJwtToken
 import backend.view.InvitationView
 import backend.view.TeamView
 import backend.view.posting.PostingView
@@ -105,9 +105,8 @@ class TeamController(private val teamService: TeamService,
         val description = body.description ?: ""
         val name = body.name ?: throw BadRequestException("Team must have a name. Missing in body")
         if (name.isEmpty()) throw BadRequestException("Team name cannot be empty")
-        val team = teamService.create(creator, name, description, event)
+        val team = teamService.create(creator, name, description, event, body.profilePic?.let(::Media))
 
-        team.profilePic.uploadToken = getSignedJwtToken(JWT_SECRET, team.profilePic.id.toString())
 
         return TeamView(team)
     }
@@ -139,10 +138,9 @@ class TeamController(private val teamService: TeamService,
 
         team.description = body.description ?: team.description
         team.name = body.name ?: team.name
+        team.profilePic = body.profilePic?.let(::Media) ?: team.profilePic
 
         teamService.save(team)
-
-        team.profilePic.uploadToken = getSignedJwtToken(JWT_SECRET, team.profilePic.id.toString())
 
         return TeamView(team)
     }

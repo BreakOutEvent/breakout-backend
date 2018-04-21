@@ -6,12 +6,12 @@ import backend.controller.exceptions.ConflictException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
 import backend.model.event.TeamService
+import backend.model.media.Media
 import backend.model.misc.Url
 import backend.model.user.*
 import backend.services.ConfigurationService
 import backend.util.CacheNames.POSTINGS
 import backend.util.CacheNames.TEAMS
-import backend.util.getSignedJwtToken
 import backend.view.DetailedInvitationView
 import backend.view.NotificationTokenView
 import backend.view.user.BasicUserView
@@ -57,10 +57,6 @@ class UserController(private val userService: UserService,
         val user = userService.create(email, password)
         user.setValuesFrom(body)
         userService.save(user)
-
-        // Dynamically generate upload tokens before showing view to user
-        user.profilePic.generateSignedUploadToken(JWT_SECRET)
-        user.getRole(Sponsor::class)?.logo?.generateSignedUploadToken(JWT_SECRET)
 
         return UserView(user)
     }
@@ -134,7 +130,6 @@ class UserController(private val userService: UserService,
         user.setValuesFrom(body)
         userService.save(user)
 
-        user.profilePic.uploadToken = getSignedJwtToken(JWT_SECRET, user.profilePic.id.toString())
         return UserView(user)
     }
 
@@ -181,6 +176,7 @@ class UserController(private val userService: UserService,
         this.firstname = userView.firstname ?: this.firstname
         this.lastname = userView.lastname ?: this.lastname
         this.gender = userView.gender ?: this.gender
+        this.profilePic = userView.profilePic?.let(::Media) ?: this.profilePic
 
         userView.preferredLanguage?.let {
             when (it) {

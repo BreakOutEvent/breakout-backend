@@ -47,7 +47,7 @@ open class TestTeamOverview : IntegrationTest() {
             }
         }).getRole(Participant::class)!!
 
-        val team = teamService.create(florian, "name", "description", event)
+        val team = teamService.create(florian, "name", "description", event, null)
 
         setAuthenticatedUser(florian.email)
         teamService.invite(EmailAddress(max.email), team)
@@ -105,7 +105,7 @@ open class TestTeamOverview : IntegrationTest() {
             }
         }).getRole(Participant::class)!!
 
-        val team = teamService.create(florian, "name", "description", event)
+        val team = teamService.create(florian, "name", "description", event, null)
 
         setAuthenticatedUser(florian.email)
         teamService.invite(EmailAddress(max.email), team)
@@ -168,7 +168,7 @@ open class TestTeamOverview : IntegrationTest() {
             }
         }).getRole(Participant::class)!!
 
-        val team = teamService.create(florian, "name", "description", event)
+        val team = teamService.create(florian, "name", "description", event, null)
 
         setAuthenticatedUser(florian.email)
         teamService.invite(EmailAddress(max.email), team)
@@ -176,7 +176,7 @@ open class TestTeamOverview : IntegrationTest() {
         setAuthenticatedUser(max.email)
         teamService.join(max, team)
 
-        postingService.createPosting(max, "", listOf(), null, LocalDateTime.now())
+        postingService.createPosting(max, "", null, null, LocalDateTime.now())
         // when requesting the team overview
         val request = get("/teamoverview/")
                 .asUser(this.mockMvc, "admin@example.com", "pw")
@@ -226,7 +226,7 @@ open class TestTeamOverview : IntegrationTest() {
             }
         }).getRole(Participant::class)!!
 
-        val team = teamService.create(florian, "name", "description", event)
+        val team = teamService.create(florian, "name", "description", event, null)
 
         setAuthenticatedUser(florian.email)
         teamService.invite(EmailAddress(max.email), team)

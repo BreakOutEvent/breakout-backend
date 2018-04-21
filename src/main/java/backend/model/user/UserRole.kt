@@ -67,7 +67,7 @@ abstract class UserRole : BasicEntity, User, GrantedAuthority {
             this.account.gender = gender
         }
 
-    override var profilePic: Media
+    override var profilePic: Media?
         get() = this.account.profilePic
         set(profilePic) {
             this.account.profilePic = profilePic

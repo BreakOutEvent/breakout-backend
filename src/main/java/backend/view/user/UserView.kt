@@ -59,7 +59,7 @@ class UserView() {
         this.isBlocked = user.isBlocked
         this.participant = if (user.hasRole(Participant::class)) ParticipantViewModel(user) else null
         this.sponsor = if (user.hasRole(Sponsor::class)) SponsorView(user) else null
-        this.profilePic = MediaView(user.profilePic)
+        this.profilePic = user.profilePic?.let(::MediaView)
         this.roles = user.account.getAuthorities().map { it.authority }
         this.groupMessageIds = user.account.groupMessages.map { it.id!! }
         this.preferredLanguage = when (user.preferredLanguage) {

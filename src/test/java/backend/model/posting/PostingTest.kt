@@ -31,7 +31,7 @@ class PostingTest {
         later = now.plusMinutes(10)
         someLocation = mock(Location::class.java)
         creator = mock(UserAccount::class.java)
-        posting = getPostingInstance("Lalala", LocalDateTime.MAX, someLocation, creator, mutableListOf())
+        posting = getPostingInstance("Lalala", LocalDateTime.MAX, someLocation, creator, null)
     }
 
     @Test
@@ -88,7 +88,7 @@ class PostingTest {
                                localDateTime: LocalDateTime,
                                location: Location,
                                creator: UserAccount,
-                               media: MutableList<Media>): Posting {
+                               media: Media?): Posting {
             return Posting(description, localDateTime, location, creator, media)
         }
     }

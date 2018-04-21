@@ -49,7 +49,7 @@ class TestDataInitializer {
         val leo = userService.create("leokaessner@me.com", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val david = userService.create("david.symhoven@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val keno = userService.create("keno@break-out.org", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
-        val teamiOS = teamService.create(leo, "Team Leo + Elo", "Die fleißigen iOS Tester", eventMunich)
+        val teamiOS = teamService.create(leo, "Team Leo + Elo", "Die fleißigen iOS Tester", eventMunich, null)
 
         setAuthenticatedUser(leo.email)
         teamService.invite(EmailAddress(david.email), teamiOS)
@@ -69,7 +69,7 @@ class TestDataInitializer {
         val participant1 = userService.create("participant1@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val participant2 = userService.create("participant2@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
 
-        val team1 = teamService.create(participant1, "Erstes Team", "Geile Sache", eventMunich)
+        val team1 = teamService.create(participant1, "Erstes Team", "Geile Sache", eventMunich, null)
         setAuthenticatedUser(participant1.email)
         teamService.invite(EmailAddress(participant2.email), team1)
         teamService.join(participant2, team1)
@@ -78,7 +78,7 @@ class TestDataInitializer {
         val participant3 = userService.create("participant3@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val participant4 = userService.create("participant4@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
 
-        val team2 = teamService.create(participant3, "Zweites Team", "Immer noch geil", eventBerlin)
+        val team2 = teamService.create(participant3, "Zweites Team", "Immer noch geil", eventBerlin, null)
         setAuthenticatedUser(participant3.email)
         teamService.invite(EmailAddress(participant4.email), team2)
         teamService.join(participant4, team2)

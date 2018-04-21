@@ -33,7 +33,7 @@ open class TeamServiceImplTest : IntegrationTest() {
         val participant = User.create("f@x.de", "lorem").addRole(Participant::class)
         userService.save(participant)
 
-        val team = teamService.create(participant, "Team Awesome", "Das beste Team aus Dresden", event)
+        val team = teamService.create(participant, "Team Awesome", "Das beste Team aus Dresden", event, null)
         val savedTeam = teamRepository.findAll().first()
 
         assertNotNull(savedTeam)
@@ -44,7 +44,7 @@ open class TeamServiceImplTest : IntegrationTest() {
     @Test
     fun testInvite() {
         val creator = setAuthenticatedUser("user@mail.com", Participant::class.java).getRole(Participant::class)!!
-        val team = teamService.create(creator, "name", "description", event)
+        val team = teamService.create(creator, "name", "description", event, null)
 
         teamService.invite(EmailAddress("invitee@mail.de"), team)
     }
@@ -53,7 +53,7 @@ open class TeamServiceImplTest : IntegrationTest() {
     fun failToInvite() {
         setAuthenticatedUser("user@mail.com", Participant::class.java).getRole(Participant::class)
         val creator = userService.create("not@mail.com", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
-        val team = teamService.create(creator, "name", "description", event)
+        val team = teamService.create(creator, "name", "description", event, null)
 
         assertFails { teamService.invite(EmailAddress("test@mail.com"), team) }
     }
@@ -95,7 +95,7 @@ open class TeamServiceImplTest : IntegrationTest() {
     fun testFindInvitationsForUser() {
         // Authenticated as inviting user
         val creator = setAuthenticatedUser("inviting@mail.com", Participant::class.java).getRole(Participant::class)!!
-        val team = teamService.create(creator, "Team awesome", "description", event)
+        val team = teamService.create(creator, "Team awesome", "description", event, null)
         teamService.invite(EmailAddress("invitee@mail.com"), team)
 
         // Authenticated as invitee

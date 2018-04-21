@@ -5,7 +5,6 @@ import backend.exceptions.CacheNonExistentException
 import backend.model.cache.CacheService
 import backend.model.event.EventService
 import backend.model.misc.Coord
-import backend.util.CacheNames
 import backend.util.CacheNames.LOCATIONS
 import backend.view.EventView
 import org.slf4j.Logger
@@ -82,7 +81,7 @@ class EventController(open var eventService: EventService,
     open fun getEventDistance(@PathVariable("id") id: Long): Any {
         try {
             return cacheService.getCache("Event_${id}_Distance")
-        } catch(e: CacheNonExistentException) {
+        } catch (e: CacheNonExistentException) {
             eventService.regenerateCache(id)
             throw e
         }
@@ -96,7 +95,7 @@ class EventController(open var eventService: EventService,
     open fun getEventDonateSum(@PathVariable("id") id: Long): Any {
         try {
             return cacheService.getCache("Event_${id}_DonateSum")
-        } catch(e: CacheNonExistentException) {
+        } catch (e: CacheNonExistentException) {
             eventService.regenerateCache(id)
             throw e
         }

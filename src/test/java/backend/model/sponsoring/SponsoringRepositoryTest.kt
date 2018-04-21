@@ -129,7 +129,7 @@ class SponsoringRepositoryTest : IntegrationTest() {
             }
         }.build()
     }
-    
+
     @Test
     fun testFindAllRegisteredSponsorsWithChallengesAtEvent() {
 
@@ -375,7 +375,7 @@ class TeamBuilder(private val teamService: TeamService,
     }
 
     fun build(): Team {
-        val team = teamService.create(creator, name, description, event)
+        val team = teamService.create(creator, name, description, event, null)
 
         setAuthenticatedUser(creator.email)
         teamService.invite(EmailAddress(invited.email), team)

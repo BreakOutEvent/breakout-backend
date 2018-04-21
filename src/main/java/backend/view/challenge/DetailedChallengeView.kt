@@ -56,7 +56,7 @@ class DetailedChallengeView {
         this.teamId = challenge.team!!.id!!
         this.team = challenge.team!!.name
         this.status = challenge.status.toString().toUpperCase()
-        this.contract = MediaView(challenge.contract)
+        this.contract = challenge.contract?.let(::MediaView)
 
         // Add information about registered sponsor
         // if he exists and isHidden is false

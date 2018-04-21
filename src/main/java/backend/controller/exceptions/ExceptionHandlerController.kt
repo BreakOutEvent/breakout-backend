@@ -36,9 +36,9 @@ class ExceptionHandlerController {
         logger.info("A domain exception with cause ${e.message} was returned as BadRequest to user")
         val message = mapOf(
                 "timestamp" to LocalDateTime.now().toEpochSecond(UTC).toString(),
-                "status"    to BAD_REQUEST.value().toString(),
-                "error"     to "Bad Request",
-                "message"   to (e.message ?: "Something went wrong with your request"))
+                "status" to BAD_REQUEST.value().toString(),
+                "error" to "Bad Request",
+                "message" to (e.message ?: "Something went wrong with your request"))
         return ResponseEntity(message, BAD_REQUEST)
     }
 }
