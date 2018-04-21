@@ -101,8 +101,8 @@ class UserController(private val userService: UserService,
      * Gets all users
      */
     @GetMapping("/")
-    fun showUsers(@RequestParam(value = "userid", required = false) userId: Long?): Iterable<BasicUserView> {
-        return userService.getAllUsers().removeBlockedBy(userId).map(::BasicUserView)
+    fun showUsers(@AuthenticationPrincipal customUserDetails: CustomUserDetails?): Iterable<BasicUserView> {
+        return userService.getAllUsers().removeBlockedBy(customUserDetails?.id).map(::BasicUserView)
     }
 
     /**
@@ -111,13 +111,13 @@ class UserController(private val userService: UserService,
      */
     @GetMapping("/search/{search}/")
     fun searchUsers(@PathVariable("search") search: String,
-                    @RequestParam(value = "userid", required = false) userId: Long?): List<SimpleUserView> {
+                    @AuthenticationPrincipal customUserDetails: CustomUserDetails?): List<SimpleUserView> {
 
         if (search.length < 3) return listOf()
-        val user = userId?.let { userService.getUserById(it) }
+        val user = customUserDetails?.id?.let { userService.getUserById(it) }
         val users = userService.searchByString(search).take(6).toMutableList()
         users.addAll(teamService.searchByString(search).take(3).flatMap { it.members.map { it.account } })
-        return users.removeBlockedBy(userId).removeBlocking(user).map(::SimpleUserView)
+        return users.removeBlockedBy(customUserDetails?.id).removeBlocking(user).map(::SimpleUserView)
     }
 
     /**
@@ -173,11 +173,11 @@ class UserController(private val userService: UserService,
      */
     @GetMapping("/{id}/")
     fun showUser(@PathVariable id: Long,
-                 @RequestParam(value = "userid", required = false) userId: Long?): BasicUserView {
+                 @AuthenticationPrincipal customUserDetails: CustomUserDetails?): BasicUserView {
 
         val user = userService.getUserById(id) ?: throw NotFoundException("user with id $id does not exist")
 
-        if (user.isBlockedBy(userId))
+        if (user.isBlockedBy(customUserDetails?.id))
             throw NotFoundException("user with id $id was blocked")
 
         return BasicUserView(user)

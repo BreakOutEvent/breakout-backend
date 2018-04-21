@@ -211,10 +211,10 @@ class TeamController(private val teamService: TeamService,
      */
     @GetMapping("/{teamId}/")
     fun showTeam(@PathVariable teamId: Long,
-                 @RequestParam(value = "userid", required = false) userId: Long?): TeamView {
+                 @AuthenticationPrincipal customUserDetails: CustomUserDetails?): TeamView {
         val team = teamService.findOne(teamId) ?: throw NotFoundException("team with id $teamId does not exist")
 
-        if (team.isBlockedBy(userId))
+        if (team.isBlockedBy(customUserDetails?.id))
             throw NotFoundException("All members of team with id $teamId were blocked")
 
         val teamDonateSum = teamService.getDonateSum(teamId)
@@ -229,11 +229,11 @@ class TeamController(private val teamService: TeamService,
     @Cacheable(TEAMS, sync = true)
     @GetMapping("/")
     fun showTeamsByEvent(@PathVariable eventId: Long,
-                         @RequestParam(value = "userid", required = false) userId: Long?): Iterable<TeamView> {
+                         @AuthenticationPrincipal customUserDetails: CustomUserDetails?): Iterable<TeamView> {
 
         logger.info("Cache miss on /event/$eventId/team/")
         val teams = teamService.findByEventId(eventId)
-        return teams.removeBlockedBy(userId).map(::TeamView)
+        return teams.removeBlockedBy(customUserDetails?.id).map(::TeamView)
     }
 
     /**
@@ -243,12 +243,12 @@ class TeamController(private val teamService: TeamService,
     @GetMapping("/{teamId}/posting/")
     fun getTeamPostingIds(@PathVariable teamId: Long,
                           @RequestParam(value = "page", required = false) page: Int?,
-                          @RequestParam(value = "userid", required = false) userId: Long?): List<PostingView> {
+                          @AuthenticationPrincipal customUserDetails: CustomUserDetails?): List<PostingView> {
         // TODO: Remove hardcoded page size of 150
-        return teamService.findPostingsById(teamId, page ?: 0, 150).removeBlockedBy(userId).map {
-            PostingView(it.hasLikesBy(userId), it.challenge?.let {
+        return teamService.findPostingsById(teamId, page ?: 0, 150).removeBlockedBy(customUserDetails?.id).map {
+            PostingView(it.hasLikesBy(customUserDetails?.id), it.challenge?.let {
                 challengeService.findOne(it)
-            }, userId)
+            }, customUserDetails?.id)
         }
     }
 
