@@ -20,4 +20,7 @@ interface UserRepository : CrudRepository<UserAccount, Long> {
     @Query("from Sponsor s")
     fun findAllSponsors(): Iterable<Sponsor>
 
+    @Query("select u from UserAccount u join u.blockedBy b where b.id = :userid")
+    fun findAllUsersBlockedByUser(@Param("userid") userId: Long): List<UserAccount>
+
 }
