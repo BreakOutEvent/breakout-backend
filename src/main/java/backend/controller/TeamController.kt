@@ -109,7 +109,7 @@ class TeamController(private val teamService: TeamService,
         val team = teamService.create(creator, name, description, event, body.profilePic?.let(::Media))
 
 
-        return TeamView(team)
+        return TeamView(team, customUserDetails.id)
     }
 
     /**
@@ -143,7 +143,7 @@ class TeamController(private val teamService: TeamService,
 
         teamService.save(team)
 
-        return TeamView(team)
+        return TeamView(team, customUserDetails.id)
     }
 
     private fun checkAuthenticationForEditTeam(team: Team, user: User) {
@@ -202,7 +202,7 @@ class TeamController(private val teamService: TeamService,
 
         teamService.join(participant, team)
 
-        return TeamView(team)
+        return TeamView(team, customUserDetails.id)
     }
 
     /**
@@ -219,7 +219,7 @@ class TeamController(private val teamService: TeamService,
 
         val teamDonateSum = teamService.getDonateSum(teamId)
         val teamDistance = teamService.getDistance(teamId)
-        return TeamView(team, teamDistance, teamDonateSum)
+        return TeamView(team, teamDistance, teamDonateSum, customUserDetails?.id)
     }
 
     /**
@@ -233,7 +233,7 @@ class TeamController(private val teamService: TeamService,
 
         logger.info("Cache miss on /event/$eventId/team/")
         val teams = teamService.findByEventId(eventId)
-        return teams.removeBlockedBy(customUserDetails?.id).map(::TeamView)
+        return teams.removeBlockedBy(customUserDetails?.id).map { TeamView(it, customUserDetails?.id) }
     }
 
     /**
