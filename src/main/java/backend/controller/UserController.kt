@@ -195,8 +195,8 @@ class UserController(private val userService: UserService,
     }
 
     /**
-     * POST /user/{id}/block
-     * Blocks user with given id
+     * DELETE /user/{id}/block
+     * Unblocks user with given id
      */
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}/block")
