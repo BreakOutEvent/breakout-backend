@@ -198,6 +198,8 @@ class UserController(private val userService: UserService,
         val currentUser = userService.getUserFromCustomUserDetails(customUserDetails)
         val user = userService.getUserById(id) ?: throw NotFoundException("user with id $id does not exist")
 
+        if (user.account.id == currentUser.account.id) throw BadRequestException("user not allowed to block itself")
+
         if (!user.isBlockedBy(currentUser.account.id))
             user.account.blockedBy.add(currentUser.account)
 
