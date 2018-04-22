@@ -169,7 +169,7 @@ fun createUser(mockMvc: MockMvc, email: String = "a@x.de", password: String = "p
             .andReturn().response.contentAsString
 
     val createResponse: Map<String, kotlin.Any> = ObjectMapper()
-            .reader(Map::class.java)
+            .readerFor(Map::class.java)
             .readValue(createResponseString)
 
     val id = createResponse["id"] as Int
@@ -199,9 +199,14 @@ fun getTokens(mockMvc: MockMvc, email: String, password: String): Pair<String, S
             .header("Authorization", "Basic $clientCredentials")
             .accept(MediaType.APPLICATION_JSON_VALUE)
 
-    val oauthResponseString = mockMvc.perform(request).andReturn().response.contentAsString
+    val oauthResponseString = mockMvc.perform(request)
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("$.access_token").exists())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.refresh_token").exists())
+            .andReturn().response.contentAsString
+
     val oauthResponse: Map<String, Any> = ObjectMapper()
-            .reader(Map::class.java)
+            .readerFor(Map::class.java)
             .readValue(oauthResponseString)
 
     val accessToken = oauthResponse["access_token"] as String
