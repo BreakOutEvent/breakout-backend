@@ -148,14 +148,13 @@ class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: Spon
                 .filter { !it.isFullyPaid() }
 
         // Transform each invoice into a combination of List<Team, List<ISponsor>>
-        val grouped: Map<Team, List<SponsoringInvoice>> = invoices
+
+        return invoices
                 .map(this::invoiceToTeamSponsorPairs)
                 .flatten()
                 .groupBy { it.first }
                 .mapValues { it.value.map { value -> value.second } }
                 .filter { it.key.hasStarted }
-
-        return grouped
     }
 
     private fun invoiceToTeamSponsorPairs(invoice: SponsoringInvoice): List<Pair<Team, SponsoringInvoice>> {

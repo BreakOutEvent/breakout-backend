@@ -52,7 +52,7 @@ class SponsoringInvoiceTest {
         `when`(sponsoring3.belongsToEvent(1)).thenReturn(true)
 
         `when`(sponsor.sponsorings).thenReturn(sponsorings)
-        `when`(sponsor.challenges).thenReturn(mutableListOf<Challenge>())
+        `when`(sponsor.challenges).thenReturn(mutableListOf())
 
         // when creating the invoice for this sponsor
         val invoice = SponsoringInvoice(sponsor, event)
@@ -207,7 +207,7 @@ class SponsoringInvoiceTest {
         `when`(sponsoring3.belongsToEvent(1)).thenReturn(true)
 
         `when`(sponsor.sponsorings).thenReturn(sponsorings)
-        `when`(sponsor.challenges).thenReturn(mutableListOf<Challenge>())
+        `when`(sponsor.challenges).thenReturn(mutableListOf())
 
         // when creating the invoice for this sponsor
         val invoice = SponsoringInvoice(sponsor, event)
@@ -240,7 +240,7 @@ class SponsoringInvoiceTest {
         `when`(sponsoring3.belongsToEvent(1)).thenReturn(true)
 
         `when`(sponsor.sponsorings).thenReturn(sponsorings)
-        `when`(sponsor.challenges).thenReturn(mutableListOf<Challenge>())
+        `when`(sponsor.challenges).thenReturn(mutableListOf())
 
         // when creating the invoice for this sponsor with too little payments
         val invoice = SponsoringInvoice(sponsor, event)

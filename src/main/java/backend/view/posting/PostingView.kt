@@ -1,7 +1,6 @@
 package backend.view.posting
 
 import backend.model.challenges.Challenge
-import backend.model.misc.Url
 import backend.model.posting.Posting
 import backend.view.CommentView
 import backend.view.LocationView

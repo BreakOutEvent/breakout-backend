@@ -58,11 +58,7 @@ import javax.servlet.Filter
 @RunWith(SpringRunner::class)
 @SpringBootTest(
         webEnvironment = WebEnvironment.RANDOM_PORT,
-        classes = arrayOf(
-                TestBackendConfiguration::class,
-                WebSecurityConfiguration::class,
-                ResourceServerConfiguration::class,
-                AuthorizationServerConfiguration::class))
+        classes = [(TestBackendConfiguration::class), (WebSecurityConfiguration::class), (ResourceServerConfiguration::class), (AuthorizationServerConfiguration::class)])
 @Transactional
 abstract class IntegrationTest {
 
@@ -147,10 +143,10 @@ abstract class IntegrationTest {
 }
 
 // Add .toJsonString() to class map
-fun Map<String, kotlin.Any?>.toJsonString() = ObjectMapper().writeValueAsString(this)
+fun Map<String, kotlin.Any?>.toJsonString(): String = ObjectMapper().writeValueAsString(this)
 
 // Add .toJsonString() to class List
-fun List<kotlin.Any?>.toJsonString() = ObjectMapper().writeValueAsString(this)
+fun List<kotlin.Any?>.toJsonString(): String = ObjectMapper().writeValueAsString(this)
 
 // Create a user via the API and return it's credentials
 fun createUser(mockMvc: MockMvc, email: String = "a@x.de", password: String = "password", userService: UserService): Credentials {

@@ -5,7 +5,6 @@ import backend.model.BasicEntity
 import backend.model.challenges.ChallengeStatus.*
 import backend.model.event.Team
 import backend.model.media.Media
-import backend.model.media.MediaType
 import backend.model.misc.EmailAddress
 import backend.model.payment.Billable
 import backend.model.sponsoring.ISponsor
@@ -23,7 +22,7 @@ class Challenge : BasicEntity, Billable {
     @Column(columnDefinition = "TEXT")
     lateinit var description: String
 
-    @OneToOne(cascade = arrayOf(ALL), orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToOne(cascade = [ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     var contract: Media? = null
 
     var status: ChallengeStatus = PROPOSED
@@ -33,10 +32,12 @@ class Challenge : BasicEntity, Billable {
         }
 
     private fun checkTransition(from: ChallengeStatus, to: ChallengeStatus) {
-        if (from == to) return
-        else if (unregisteredSponsor != null) checkTransitionForUnregisteredSponsor(from, to)
-        else if (registeredSponsor != null) checkTransitionForRegisteredSponsor(from, to)
-        else throw Exception("Sponsoring has neither Sponsor")
+        when {
+            from == to -> return
+            unregisteredSponsor != null -> checkTransitionForUnregisteredSponsor(from, to)
+            registeredSponsor != null -> checkTransitionForRegisteredSponsor(from, to)
+            else -> throw Exception("Sponsoring has neither Sponsor")
+        }
     }
 
     private fun checkTransitionForUnregisteredSponsor(from: ChallengeStatus, to: ChallengeStatus) {
@@ -105,7 +106,7 @@ class Challenge : BasicEntity, Billable {
             }
         }
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = arrayOf(PERSIST))
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [PERSIST])
     private var unregisteredSponsor: UnregisteredSponsor? = null
         set(value) {
             if (registeredSponsor != null) {
@@ -168,11 +169,11 @@ class Challenge : BasicEntity, Billable {
 
     @Suppress("UNUSED") //Used by Spring @PreAuthorize
     fun checkWithdrawPermissions(username: String): Boolean {
-        if (this.unregisteredSponsor != null) {
-            return this.team!!.isMember(username)
-        } else if (this.registeredSponsor != null) {
-            return EmailAddress(this.registeredSponsor!!.email) == EmailAddress(username)
-        } else throw Exception("Error checking withdrawal permissions")
+        return when {
+            this.unregisteredSponsor != null -> this.team!!.isMember(username)
+            this.registeredSponsor != null -> EmailAddress(this.registeredSponsor!!.email) == EmailAddress(username)
+            else -> throw Exception("Error checking withdrawal permissions")
+        }
     }
 
     fun hasRegisteredSponsor(): Boolean {

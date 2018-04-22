@@ -43,7 +43,6 @@ class TeamControllerV2(val userService: UserService, val teamService: TeamServic
 
     @GetMapping("/")
     fun getAllTeamsOverview(): Iterable<TeamSummaryProjection> {
-        val teams = teamService.findAllTeamSummaryProjections()
-        return teams
+        return teamService.findAllTeamSummaryProjections()
     }
 }

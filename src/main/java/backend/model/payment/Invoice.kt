@@ -17,7 +17,7 @@ import javax.persistence.OneToMany
 @Entity
 abstract class Invoice : BasicEntity {
 
-    @OneToMany(cascade = arrayOf(MERGE, PERSIST), mappedBy = "invoice", orphanRemoval = true)
+    @OneToMany(cascade = [MERGE, PERSIST], mappedBy = "invoice", orphanRemoval = true)
     private val payments: MutableList<Payment> = mutableListOf()
 
     @Column

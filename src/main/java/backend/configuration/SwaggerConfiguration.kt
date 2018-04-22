@@ -24,7 +24,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2
 class SwaggerConfiguration {
 
     @Bean
-    fun api() = Docket(DocumentationType.SWAGGER_2)
+    fun api(): Docket = Docket(DocumentationType.SWAGGER_2)
             .select()
             .apis(RequestHandlerSelectors.any())
             .apis(Predicates.not(RequestHandlerSelectors.basePackage("org.springframework.boot")))
@@ -33,7 +33,7 @@ class SwaggerConfiguration {
             .apiInfo(apiInfo())
 
     @Bean
-    fun uiConfiguration() = UiConfiguration.DEFAULT
+    fun uiConfiguration(): UiConfiguration = UiConfiguration.DEFAULT
 
     private fun apiInfo(): ApiInfo? {
         val florian = Contact("Florian Schmidt", "break-out.org", "florian.schmidt@break-out.org")

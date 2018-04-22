@@ -29,7 +29,7 @@ class TeamOverviewServiceImpl(private val teamOverviewRepository: TeamoverviewRe
                 ?: throw NotFoundException("Team with id $teamId not found in TeamOverview")
 
         val previousComment = teamOverview.lastContactWithHeadquarters?.comment ?: ""
-        val newComment = previousComment + "----" + comment
+        val newComment = "$previousComment----$comment"
         teamOverview.setLastContactWithHeadquarters(newComment, LocalDateTime.now())
     }
 

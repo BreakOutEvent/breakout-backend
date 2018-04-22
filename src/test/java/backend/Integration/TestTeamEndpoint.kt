@@ -105,7 +105,7 @@ open class TestTeamEndpoint : IntegrationTest() {
     }
 
     @Test
-    fun GivenAUserIsInATeamAtAnEventWhenHeWantsToCreateAnotherTeamThenItFails() {
+    fun givenAUserIsInATeamAtAnEventWhenHeWantsToCreateAnotherTeamThenItFails() {
         val testUserCredentials = createUser(this.mockMvc, "test@example.com", "pw", this.userService)
         makeUserParticipant(testUserCredentials)
 

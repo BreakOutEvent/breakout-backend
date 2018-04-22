@@ -17,8 +17,8 @@ class GeoToolsTest {
 
     @Test
     fun testDistanceCoordsKM() {
-        val coord1: Coord = Coord(1.0, 1.0)
-        val coord2: Coord = Coord(10.0, 10.0)
+        val coord1 = Coord(1.0, 1.0)
+        val coord2 = Coord(10.0, 10.0)
 
         assertEquals(1408, distanceCoordsKM(coord1, coord2).toInt())
     }
@@ -52,7 +52,7 @@ class GeoToolsTest {
 
     @Test
     fun testCoordToPoint() {
-        val coord: Coord = Coord(1.0, 1.0)
+        val coord = Coord(1.0, 1.0)
 
         assertEquals(Point(DegreeCoordinate(1.0), DegreeCoordinate(1.0)), coordToPoint(coord))
     }

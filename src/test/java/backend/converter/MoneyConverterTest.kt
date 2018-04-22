@@ -38,4 +38,16 @@ class MoneyConverterTest {
 
         assertEquals(money, fromStringToMoney)
     }
+
+    @Test
+    fun testConvertWorksWithOldValuesAndNewMonetaVersion() {
+        val fromDB1 = "EUR 363.02"
+        val fromDB2 = "EUR 2.8E+2"
+
+        val converter = MoneyConverter()
+
+        // should not fail
+        converter.convertToEntityAttribute(fromDB1)
+        converter.convertToEntityAttribute(fromDB2)
+    }
 }

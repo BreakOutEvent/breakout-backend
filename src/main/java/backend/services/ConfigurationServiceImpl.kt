@@ -18,7 +18,7 @@ class ConfigurationServiceImpl @Autowired constructor(private val environment: E
     }
 
     private fun propertiesToEnv(properties: String): String {
-        return properties.slice(4..properties.length - 1).replace(".", "_").toUpperCase()
+        return properties.slice(4 until properties.length).replace(".", "_").toUpperCase()
     }
 }
 

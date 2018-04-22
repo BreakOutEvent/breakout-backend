@@ -20,16 +20,16 @@ import org.springframework.web.bind.annotation.*
 class MediaController(private val mediaService: MediaService,
                       private val configurationService: ConfigurationService) {
 
-    private val CLOUDINARY_API_SECRET = configurationService.getRequired("org.breakout.cloudinary.api_secret");
-    private val CLOUDINARY_API_KEY = configurationService.getRequired("org.breakout.cloudinary.api_key");
+    private val CLOUDINARY_API_SECRET = configurationService.getRequired("org.breakout.cloudinary.api_secret")
+    private val CLOUDINARY_API_KEY = configurationService.getRequired("org.breakout.cloudinary.api_key")
 
     /**
      * DELETE /media/{id}/
      * Allows Admin to delete all mediaSizes for media
      */
-    @Caching(evict = arrayOf(CacheEvict(POSTINGS, allEntries = true), CacheEvict(TEAMS, allEntries = true)))
+    @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(TEAMS, allEntries = true))])
     @PreAuthorize("hasAuthority('ADMIN')")
-    @RequestMapping("/{id}/", method = arrayOf(RequestMethod.DELETE))
+    @RequestMapping("/{id}/", method = [(RequestMethod.DELETE)])
     fun adminDeletePosting(@PathVariable("id") id: Long): Map<String, String> {
         val media = mediaService.getByID(id) ?: throw NotFoundException("media with id $id does not exist")
         mediaService.delete(media)
@@ -38,7 +38,7 @@ class MediaController(private val mediaService: MediaService,
 
     @RequestMapping("/signCloudinaryParams/")
     fun getCloudinaryUploadHash(@RequestBody uploadOptions: MutableMap<String, Any>): Map<String, Any> {
-        val cloudinary = Cloudinary();
+        val cloudinary = Cloudinary()
         uploadOptions["timestamp"] = System.currentTimeMillis()
         uploadOptions["signature"] = cloudinary.apiSignRequest(uploadOptions, CLOUDINARY_API_SECRET)
         return uploadOptions

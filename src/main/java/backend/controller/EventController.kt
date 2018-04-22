@@ -69,8 +69,7 @@ class EventController(open var eventService: EventService,
      */
     @GetMapping("/{id}/posting/")
     fun getEventPostings(@PathVariable("id") id: Long): List<Long> {
-        val postingIds = eventService.findPostingsById(id) ?: throw NotFoundException("event with id $id does not exist")
-        return postingIds
+        return eventService.findPostingsById(id) ?: throw NotFoundException("event with id $id does not exist")
     }
 
     /**
