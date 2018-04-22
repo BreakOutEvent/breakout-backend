@@ -8,6 +8,7 @@ import backend.model.misc.Coord
 import backend.model.posting.PostingService
 import backend.model.user.UserService
 import backend.model.removeBlockedBy
+import backend.model.removeReported
 import backend.services.ConfigurationService
 import backend.util.CacheNames.LOCATIONS
 import backend.util.CacheNames.POSTINGS
@@ -139,7 +140,7 @@ class PostingController(private val postingService: PostingService,
             postingService.findAll(page ?: 0, PAGE_SIZE)
         }
 
-        return postings.removeBlockedBy(customUserDetails?.id).map {
+        return postings.removeReported().removeBlockedBy(customUserDetails?.id).map {
             PostingResponseView(it.hasLikesBy(customUserDetails?.id), it.challenge?.let {
                 challengeService.findChallengeProveProjectionById(it)
             }, customUserDetails?.id)
@@ -231,7 +232,7 @@ class PostingController(private val postingService: PostingService,
                              @AuthenticationPrincipal customUserDetails: CustomUserDetails?): List<PostingView> {
 
         val posting = postingService.findByHashtag(hashtag, page ?: 0, PAGE_SIZE)
-        return posting.removeBlockedBy(customUserDetails?.id).map {
+        return posting.removeReported().removeBlockedBy(customUserDetails?.id).map {
             PostingView(it.hasLikesBy(customUserDetails?.id), it.challenge?.let {
                 challengeService.findOne(it)
             }, customUserDetails?.id)
