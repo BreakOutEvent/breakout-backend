@@ -1,5 +1,6 @@
 package backend.model.event
 
+import backend.model.Blockable
 import backend.exceptions.DomainException
 import backend.model.BasicEntity
 import backend.model.challenges.Challenge
@@ -12,6 +13,7 @@ import backend.model.payment.billableAmount
 import backend.model.payment.display
 import backend.model.sponsoring.Sponsoring
 import backend.model.user.Participant
+import backend.model.user.User
 import org.hibernate.annotations.Formula
 import org.javamoney.moneta.Money
 import java.math.BigDecimal
@@ -22,7 +24,7 @@ import javax.persistence.CascadeType.REMOVE
 import javax.persistence.FetchType.LAZY
 
 @Entity
-class Team : BasicEntity {
+class Team : BasicEntity, Blockable {
 
     /**
      * Private constructor for JPA
@@ -201,4 +203,9 @@ class Team : BasicEntity {
         println()
         return "<b>Name</b> ${this.sponsor.firstname} ${this.sponsor.lastname} <b>Beschreibung</b> ${this.description.take(50)}... <b>Challengebetrag</b> ${this.amount.display()} <b>Spendenversprechen</b> ${this.billableAmount().display()}"
     }
+
+    override fun isBlockedBy(userId: Long?): Boolean {
+        return this.members.fold(true) { acc, participant -> acc && participant.isBlockedBy(userId) }
+    }
+
 }

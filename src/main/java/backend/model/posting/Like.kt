@@ -1,6 +1,8 @@
 package backend.model.posting
 
+import backend.model.UserGenerated
 import backend.model.BasicEntity
+import backend.model.user.User
 import backend.model.user.UserAccount
 import java.time.LocalDateTime
 import javax.persistence.*
@@ -8,7 +10,7 @@ import javax.persistence.*
 @Entity
 
 @Table(name = "postinglike")
-class Like : BasicEntity {
+class Like : BasicEntity, UserGenerated {
 
     private constructor() : super()
 
@@ -35,5 +37,9 @@ class Like : BasicEntity {
         if (user!!.id == other.user!!.id) return false // TODO: Implement equals in UserAccount!
 
         return true
+    }
+
+    override fun getUser(): User? {
+        return user
     }
 }
