@@ -10,6 +10,7 @@ import backend.model.user.UserService
 import backend.model.removeBlockedBy
 import backend.model.removeReported
 import backend.services.ConfigurationService
+import backend.services.mail.MailSenderService
 import backend.util.CacheNames.LOCATIONS
 import backend.util.CacheNames.POSTINGS
 import backend.util.localDateTimeOf
@@ -34,7 +35,8 @@ import javax.validation.Valid
 class PostingController(private val postingService: PostingService,
                         private val configurationService: ConfigurationService,
                         private val userService: UserService,
-                        private val challengeService: ChallengeService) {
+                        private val challengeService: ChallengeService,
+                        private val mailSenderService: MailSenderService) {
 
     private val logger = LoggerFactory.getLogger(PostingController::class.java)
 
@@ -87,6 +89,26 @@ class PostingController(private val postingService: PostingService,
         return PostingResponseView(posting.hasLikesBy(customUserDetails?.id),
                                    challengeProveProjection,
                                    customUserDetails?.id)
+    }
+
+    /**
+     * DELETE /posting/{id}/report/
+     * Allows Admin to delete report about a Posting
+     */
+    @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(LOCATIONS, allEntries = true))])
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @RequestMapping("/{id}/", method = [DELETE])
+    fun dismissReport(@PathVariable("id") id: Long): PostingResponseView {
+        val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
+
+        posting.reported = false
+        postingService.save(posting)
+
+        val challengeProveProjection = posting.challenge?.let {
+            challengeService.findChallengeProveProjectionById(posting.challenge!!)
+        }
+
+        return PostingResponseView(posting, challengeProveProjection,null)
     }
 
     /**
@@ -145,6 +167,31 @@ class PostingController(private val postingService: PostingService,
                 challengeService.findChallengeProveProjectionById(it)
             }, customUserDetails?.id)
         }
+    }
+
+    /**
+     * POST /posting/{id}/report/
+     * Gets posting by id
+     */
+    @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(LOCATIONS, allEntries = true))])
+    @PostMapping("/{id}/report/")
+    fun reportPosting(@PathVariable("id") id: Long,
+                      @AuthenticationPrincipal customUserDetails: CustomUserDetails?): PostingResponseView {
+
+        val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
+
+        posting.reported = true
+        postingService.save(posting)
+
+        // TODO: Send email
+
+        val challengeProveProjection = posting.challenge?.let {
+            challengeService.findChallengeProveProjectionById(posting.challenge!!)
+        }
+
+        return PostingResponseView(posting.hasLikesBy(customUserDetails?.id),
+                challengeProveProjection,
+                customUserDetails?.id)
     }
 
     /**
