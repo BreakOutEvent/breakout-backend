@@ -1,7 +1,7 @@
 package backend.model.payment
 
-import org.springframework.data.repository.CrudRepository
+import org.springframework.data.jpa.repository.JpaRepository
 
-interface TeamEntryFeeInvoiceRepository : CrudRepository<TeamEntryFeeInvoice, Long> {
+interface TeamEntryFeeInvoiceRepository : JpaRepository<TeamEntryFeeInvoice, Long> {
     fun findByPurposeOfTransferCode(purposeOfTransferCode: String): TeamEntryFeeInvoice?
 }

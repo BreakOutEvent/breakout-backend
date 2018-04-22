@@ -2,11 +2,11 @@
 
 package backend.model.user
 
+import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
-import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 
-interface UserRepository : CrudRepository<UserAccount, Long> {
+interface UserRepository : JpaRepository<UserAccount, Long> {
     fun findByEmail(email: String): User
 
     fun findByActivationToken(token: String): User

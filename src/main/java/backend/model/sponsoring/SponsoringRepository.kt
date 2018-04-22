@@ -1,11 +1,11 @@
 package backend.model.sponsoring
 
 import backend.model.user.Sponsor
+import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
-import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 
-interface SponsoringRepository : CrudRepository<Sponsoring, Long> {
+interface SponsoringRepository : JpaRepository<Sponsoring, Long> {
     fun findByTeamId(teamId: Long): Iterable<Sponsoring>
 
     @Query("Select s from Sponsoring s where s.registeredSponsor.account.id = :id")

@@ -3,11 +3,11 @@ package backend.model.event
 import backend.model.location.Location
 import backend.model.posting.Posting
 import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
-import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 
-interface TeamRepository : CrudRepository<Team, Long> {
+interface TeamRepository : JpaRepository<Team, Long> {
     fun findById(id: Long): Team?
 
     @Query("Select p from Posting p where p.team.id = :teamId order by p.id desc")

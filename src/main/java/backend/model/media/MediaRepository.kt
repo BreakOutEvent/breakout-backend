@@ -1,7 +1,7 @@
 package backend.model.media
 
-import org.springframework.data.repository.CrudRepository
+import org.springframework.data.jpa.repository.JpaRepository
 
-interface MediaRepository : CrudRepository<Media, Long> {
+interface MediaRepository : JpaRepository<Media, Long> {
     fun findById(id: Long): Media
 }

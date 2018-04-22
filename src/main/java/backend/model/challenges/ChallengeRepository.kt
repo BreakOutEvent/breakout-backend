@@ -2,12 +2,12 @@ package backend.model.challenges
 
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
+import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
-import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 
 
-interface ChallengeRepository : CrudRepository<Challenge, Long> {
+interface ChallengeRepository : JpaRepository<Challenge, Long> {
     fun findByTeamId(teamId: Long): Iterable<Challenge>
 
     @Query("Select c from Challenge c where c.registeredSponsor.account.id = :id")

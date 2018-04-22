@@ -1,10 +1,10 @@
 package backend.model.payment
 
+import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
-import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 
-interface SponsoringInvoiceRepository : CrudRepository<SponsoringInvoice, Long> {
+interface SponsoringInvoiceRepository : JpaRepository<SponsoringInvoice, Long> {
 
     fun findByTeamId(teamId: Long): Iterable<SponsoringInvoice>
 

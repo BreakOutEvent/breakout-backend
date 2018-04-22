@@ -1,7 +1,7 @@
 package backend.model.cache
 
-import org.springframework.data.repository.CrudRepository
+import org.springframework.data.jpa.repository.JpaRepository
 
-interface CacheRepository : CrudRepository<Cache, Long> {
+interface CacheRepository : JpaRepository<Cache, Long> {
     fun findOneByCacheKey(key: String): Cache?
 }

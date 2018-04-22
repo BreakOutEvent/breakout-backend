@@ -1,11 +1,11 @@
 package backend.model.posting
 
 import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
-import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 
-interface PostingRepository : CrudRepository<Posting, Long> {
+interface PostingRepository : JpaRepository<Posting, Long> {
     fun findById(id: Long): Posting
 
     @Query("select p from Posting p inner join p.hashtags h where h.value = :hashtag order by p.id desc")

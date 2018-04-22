@@ -1,11 +1,11 @@
 package backend.model.location
 
+import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
-import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 import java.time.LocalDateTime
 
-interface LocationRepository : CrudRepository<Location, Long> {
+interface LocationRepository : JpaRepository<Location, Long> {
 
     @Query("SELECT * FROM location WHERE id IN (SELECT id FROM (SELECT id, @rownum \\:= @rownum + 1 AS number FROM location JOIN (SELECT @rownum \\:= 0) R WHERE team_id = ?1) a WHERE a.id = ?2 OR a.id = ?3 OR a.number mod (ceil(?4/?5)) = 0 ORDER BY a.id DESC)", nativeQuery = true)
     fun findByTeamId(id: Long, maxId: Long, minId: Long, modSelector: Long, perTeam: Int): Iterable<Location>
