@@ -2,8 +2,10 @@ package backend.controller
 
 import backend.configuration.CustomUserDetails
 import backend.model.event.TeamService
+import backend.model.removeBlocking
 import backend.model.user.UserService
 import backend.view.InvitationView
+import backend.view.user.BasicUserView
 import backend.view.user.UserView
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -26,6 +28,18 @@ class AuthenticatedUserController(private val userService: UserService, private 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         return UserView(user)
     }
+
+    /**
+     * GET /me/
+     * Get information to the currently authenticated user
+     */
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/blocked/")
+    fun getBlockedUsers(@AuthenticationPrincipal customUserDetails: CustomUserDetails): Iterable<BasicUserView> {
+
+        return userService.getAllUsersBlockedBy(customUserDetails.id).map(::BasicUserView)
+    }
+
 
     /**
      * GET /me/invitation/

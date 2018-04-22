@@ -14,6 +14,7 @@ import backend.model.user.Admin
 import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserService
+import backend.model.removeBlockedBy
 import backend.services.ConfigurationService
 import backend.util.CacheNames.LOCATIONS
 import backend.util.CacheNames.POSTINGS
@@ -106,7 +107,7 @@ class TeamController(private val teamService: TeamService,
         val team = teamService.create(creator, name, description, event, body.profilePic?.let(::Media))
 
 
-        return TeamView(team)
+        return TeamView(team, customUserDetails.id)
     }
 
     /**
@@ -137,7 +138,7 @@ class TeamController(private val teamService: TeamService,
 
         teamService.save(team)
 
-        return TeamView(team)
+        return TeamView(team, customUserDetails.id)
     }
 
     private fun checkAuthenticationForEditTeam(team: Team, user: User) {
@@ -196,7 +197,7 @@ class TeamController(private val teamService: TeamService,
 
         teamService.join(participant, team)
 
-        return TeamView(team)
+        return TeamView(team, customUserDetails.id)
     }
 
     /**
@@ -204,11 +205,16 @@ class TeamController(private val teamService: TeamService,
      * gets a specific Team
      */
     @GetMapping("/{teamId}/")
-    fun showTeam(@PathVariable teamId: Long): TeamView {
+    fun showTeam(@PathVariable teamId: Long,
+                 @AuthenticationPrincipal customUserDetails: CustomUserDetails?): TeamView {
         val team = teamService.findOne(teamId) ?: throw NotFoundException("team with id $teamId does not exist")
+
+        if (team.isBlockedBy(customUserDetails?.id))
+            throw NotFoundException("All members of team with id $teamId were blocked")
+
         val teamDonateSum = teamService.getDonateSum(teamId)
         val teamDistance = teamService.getDistance(teamId)
-        return TeamView(team, teamDistance, teamDonateSum)
+        return TeamView(team, teamDistance, teamDonateSum, customUserDetails?.id)
     }
 
     /**
@@ -217,10 +223,12 @@ class TeamController(private val teamService: TeamService,
      */
     @Cacheable(TEAMS, sync = true)
     @GetMapping("/")
-    fun showTeamsByEvent(@PathVariable eventId: Long): Iterable<TeamView> {
+    fun showTeamsByEvent(@PathVariable eventId: Long,
+                         @AuthenticationPrincipal customUserDetails: CustomUserDetails?): Iterable<TeamView> {
+
         logger.info("Cache miss on /event/$eventId/team/")
         val teams = teamService.findByEventId(eventId)
-        return teams.map(::TeamView)
+        return teams.removeBlockedBy(customUserDetails?.id).map { TeamView(it, customUserDetails?.id) }
     }
 
     /**
@@ -230,12 +238,12 @@ class TeamController(private val teamService: TeamService,
     @GetMapping("/{teamId}/posting/")
     fun getTeamPostingIds(@PathVariable teamId: Long,
                           @RequestParam(value = "page", required = false) page: Int?,
-                          @RequestParam(value = "userid", required = false) userId: Long?): List<PostingView> {
+                          @AuthenticationPrincipal customUserDetails: CustomUserDetails?): List<PostingView> {
         // TODO: Remove hardcoded page size of 150
-        return teamService.findPostingsById(teamId, page ?: 0, 150).map {
-            PostingView(it.hasLikesBy(userId), it.challenge?.let {
+        return teamService.findPostingsById(teamId, page ?: 0, 150).removeBlockedBy(customUserDetails?.id).map {
+            PostingView(it.hasLikesBy(customUserDetails?.id), it.challenge?.let {
                 challengeService.findOne(it)
-            })
+            }, customUserDetails?.id)
         }
     }
 
