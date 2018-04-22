@@ -82,8 +82,6 @@ class Participant : UserRole {
     }
 
     fun participatedAtEvent(event: Event): Boolean {
-        return this.getAllTeams()
-                .filter { it.event == event }
-                .isNotEmpty()
+        return this.getAllTeams().any { it.event == event }
     }
 }

@@ -108,7 +108,7 @@ abstract class UserRole : BasicEntity, User, GrantedAuthority {
         @Suppress("UNCHECKED_CAST")
         @Throws(Exception::class)
         fun <T : UserRole> createFor(clazz: Class<T>, account: UserAccount): UserRole {
-            val constructor = clazz.declaredConstructors.filter { it.parameterCount == 0 }.firstOrNull()
+            val constructor = clazz.declaredConstructors.firstOrNull { it.parameterCount == 0 }
                     ?: throw Exception("no args constructor not found on $clazz")
             constructor.isAccessible = true
             val o = constructor.newInstance() as T

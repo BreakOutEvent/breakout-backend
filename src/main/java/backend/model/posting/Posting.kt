@@ -36,7 +36,7 @@ class Posting : BasicEntity, UserGenerated {
 
     lateinit var date: LocalDateTime
 
-    @OneToOne(cascade = arrayOf(PERSIST))
+    @OneToOne(cascade = [PERSIST])
     var location: Location? = null
 
     @Column(name = "challenge_id")
@@ -48,16 +48,16 @@ class Posting : BasicEntity, UserGenerated {
     @ManyToOne(fetch = LAZY)
     var team: Team? = null
 
-    @OneToOne(cascade = arrayOf(ALL))
+    @OneToOne(cascade = [(ALL)])
     var media: Media? = null
 
-    @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+    @OneToMany(cascade = [(CascadeType.ALL)], orphanRemoval = true)
     var comments: MutableList<Comment> = arrayListOf()
 
-    @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+    @OneToMany(cascade = [(CascadeType.ALL)], orphanRemoval = true)
     @JoinTable(
-            joinColumns = arrayOf(JoinColumn(name = "posting_id", referencedColumnName = "id")),
-            inverseJoinColumns = arrayOf(JoinColumn(name = "like_id", referencedColumnName = "id"))
+            joinColumns = [(JoinColumn(name = "posting_id", referencedColumnName = "id"))],
+            inverseJoinColumns = [(JoinColumn(name = "like_id", referencedColumnName = "id"))]
     ) // explicit annotation because "like" would cause an error as it is an sql keyword
     var likes: MutableSet<Like> = hashSetOf()
 
@@ -110,9 +110,7 @@ class Posting : BasicEntity, UserGenerated {
     }
 
     private fun findLikeByUser(user: UserAccount): Like? {
-        return this.likes
-                .filter { it.user?.id == user.id } // TODO: use equals here somehow?
-                .firstOrNull()
+        return this.likes.firstOrNull { it.user?.id == user.id }
     }
 
     private fun isLikedBy(user: UserAccount): Boolean {
@@ -139,7 +137,7 @@ class Posting : BasicEntity, UserGenerated {
     }
 
     private fun findCommentById(commentId: Long): Comment? {
-        return this.comments.filter { it.id == commentId }.firstOrNull()
+        return this.comments.firstOrNull { it.id == commentId }
     }
 
     fun removeComment(commentId: Long) {

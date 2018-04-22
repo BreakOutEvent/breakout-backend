@@ -1,15 +1,11 @@
 package backend.controller
 
 import backend.controller.exceptions.NotFoundException
-import backend.model.challenges.ChallengeService
 import backend.model.event.TeamService
 import backend.model.location.LocationService
 import backend.model.misc.Coord
-import backend.model.misc.EmailRepository
-import backend.model.payment.SponsoringInvoiceService
 import backend.model.posting.PostingService
 import backend.model.sponsoring.SponsoringService
-import backend.model.user.UserService
 import backend.services.mail.MailService
 import backend.view.posting.PostingView
 import backend.view.user.AdminTeamLocationView
@@ -25,11 +21,7 @@ import javax.validation.Valid
 class AdminController(private val mailService: MailService,
                       private val teamService: TeamService,
                       private val sponsoringService: SponsoringService,
-                      private val challengeService: ChallengeService,
-                      private val userService: UserService,
-                      private val emailRepository: EmailRepository,
                       private val locationService: LocationService,
-                      private val sponsoringInvoiceService: SponsoringInvoiceService,
                       private val postingService: PostingService) {
 
 

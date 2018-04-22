@@ -21,7 +21,7 @@ class Sponsoring : BasicEntity, Billable {
     @Transient
     private val logger: Logger = LoggerFactory.getLogger(Sponsoring::class.java)
 
-    @OneToOne(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+    @OneToOne(cascade = [(CascadeType.ALL)], orphanRemoval = true)
     var contract: Media? = null
 
     var status: SponsoringStatus = PROPOSED
@@ -40,7 +40,7 @@ class Sponsoring : BasicEntity, Billable {
     @ManyToOne
     var team: Team? = null
 
-    @ManyToOne(cascade = arrayOf(PERSIST))
+    @ManyToOne(cascade = [PERSIST])
     private var unregisteredSponsor: UnregisteredSponsor? = null
 
     @ManyToOne
@@ -100,18 +100,20 @@ class Sponsoring : BasicEntity, Billable {
 
     @Suppress("UNUSED") //Used by Spring @PreAuthorize
     fun checkWithdrawPermissions(username: String): Boolean {
-        if (this.unregisteredSponsor != null) {
-            return this.team!!.isMember(username)
-        } else if (this.registeredSponsor != null) {
-            return EmailAddress(this.registeredSponsor!!.email) == EmailAddress(username)
-        } else throw Exception("Error checking withdrawal permissions")
+        return when {
+            this.unregisteredSponsor != null -> this.team!!.isMember(username)
+            this.registeredSponsor != null -> EmailAddress(this.registeredSponsor!!.email) == EmailAddress(username)
+            else -> throw Exception("Error checking withdrawal permissions")
+        }
     }
 
     private fun checkTransition(from: SponsoringStatus, to: SponsoringStatus) {
-        if (from == to) return
-        else if (unregisteredSponsor != null) checkTransitionForUnregisteredSponsor(from, to)
-        else if (registeredSponsor != null) checkTransitionForRegisteredSponsor(from, to)
-        else throw Exception("Sponsoring has neither Sponsor")
+        when {
+            from == to -> return
+            unregisteredSponsor != null -> checkTransitionForUnregisteredSponsor(from, to)
+            registeredSponsor != null -> checkTransitionForRegisteredSponsor(from, to)
+            else -> throw Exception("Sponsoring has neither Sponsor")
+        }
     }
 
     private fun checkTransitionForUnregisteredSponsor(from: SponsoringStatus, to: SponsoringStatus) {
@@ -151,10 +153,10 @@ class Sponsoring : BasicEntity, Billable {
             else -> euroOf(0.0)
         }
 
-        if (raisedSum <= limit) {
-            return raisedSum
+        return if (raisedSum <= limit) {
+            raisedSum
         } else {
-            return limit
+            limit
         }
     }
 

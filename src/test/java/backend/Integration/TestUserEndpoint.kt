@@ -24,7 +24,7 @@ class TestUserEndpoint : IntegrationTest() {
 
     private fun url(): String = "/user/"
 
-    private fun url(id: Int): String = "/user/${id.toString()}/"
+    private fun url(id: Int): String = "/user/$id/"
 
     @Before
     override fun setUp() {

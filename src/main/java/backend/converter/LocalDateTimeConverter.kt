@@ -9,18 +9,14 @@ import javax.persistence.Converter
 class LocalDateTimeConverter() : AttributeConverter<LocalDateTime, Timestamp> {
 
     override fun convertToDatabaseColumn(data: java.time.LocalDateTime?): java.sql.Timestamp? {
-        if (data != null) {
-            return java.sql.Timestamp.valueOf(data)
+        return if (data != null) {
+            java.sql.Timestamp.valueOf(data)
         } else {
-            return null
+            null
         }
     }
 
     override fun convertToEntityAttribute(data: java.sql.Timestamp?): java.time.LocalDateTime? {
-        if (data != null) {
-            return data.toLocalDateTime()
-        } else {
-            return null
-        }
+        return data?.toLocalDateTime()
     }
 }

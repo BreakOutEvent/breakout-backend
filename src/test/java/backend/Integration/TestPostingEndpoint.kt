@@ -122,8 +122,7 @@ open class TestPostingEndpoint : IntegrationTest() {
             val mapper = ObjectMapper()
             val body = this.contentAsString
 
-            val json: Map<String, Any> = mapper.readValue(body, Map::class.java) as Map<String, Any>
-            return json
+            return mapper.readValue(body, Map::class.java) as Map<String, Any>
         }
 
         val comments: List<Map<String, Any>> = mockMvc.perform(get("/posting/${posting.id}/"))
@@ -132,7 +131,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         val commentId = comments.first()["id"]!!
 
         val requestDelete = MockMvcRequestBuilders
-                .delete("/posting/${posting.id}/comment/${commentId}/")
+                .delete("/posting/${posting.id}/comment/$commentId/")
                 .asUser(mockMvc, admin.email, "password")
 
         mockMvc.perform(requestDelete)
@@ -159,7 +158,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     open fun adminDeleteCommentFailNotAdmin() {
 
         val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.account, null, LocalDateTime.now())
-//        val comment = commentService.createComment("TestComment", LocalDateTime.now(), posting, user.account)
+        //val comment = commentService.createComment("TestComment", LocalDateTime.now(), posting, user.account)
         val comment = postingService.addComment(posting, user.account, LocalDateTime.now(), "Hello!")
         val requestPosting = get("/posting/${posting.id}/")
 
@@ -177,8 +176,7 @@ open class TestPostingEndpoint : IntegrationTest() {
             val mapper = ObjectMapper()
             val body = this.contentAsString
 
-            val json: Map<String, Any> = mapper.readValue(body, Map::class.java) as Map<String, Any>
-            return json
+            return mapper.readValue(body, Map::class.java) as Map<String, Any>
         }
 
         val comments: List<Map<String, Any>> = mockMvc.perform(get("/posting/${posting.id}/"))

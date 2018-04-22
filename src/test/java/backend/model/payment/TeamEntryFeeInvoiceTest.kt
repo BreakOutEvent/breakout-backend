@@ -45,7 +45,7 @@ class TeamEntryFeeInvoiceTest {
     @Test
     fun testGetAmount() {
         val invoice = TeamEntryFeeInvoice(team, euroOf(10))
-        assertEquals(invoice.amount, euroOf(10));
+        assertEquals(invoice.amount, euroOf(10))
     }
 
     @Test

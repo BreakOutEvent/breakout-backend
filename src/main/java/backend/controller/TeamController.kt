@@ -62,7 +62,7 @@ class TeamController(private val teamService: TeamService,
      * POST /event/{eventId}/team/leave/
      * The currently authenticated user can leave it's team at this endpoint
      */
-    @Caching(evict = arrayOf(CacheEvict(POSTINGS, allEntries = true), CacheEvict(TEAMS, allEntries = true)))
+    @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(TEAMS, allEntries = true))])
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/leave/")
     fun leaveTeam(@AuthenticationPrincipal customUserDetails: CustomUserDetails): Map<String, String> {
@@ -90,9 +90,7 @@ class TeamController(private val teamService: TeamService,
      * POST /event/{id}/team/
      * creates a new Team, with creator as first member
      */
-    @Caching(evict = arrayOf(
-            CacheEvict(TEAMS, allEntries = true),
-            CacheEvict(LOCATIONS, allEntries = true)))
+    @Caching(evict = [(CacheEvict(TEAMS, allEntries = true)), (CacheEvict(LOCATIONS, allEntries = true))])
     @ResponseStatus(CREATED)
     @PostMapping("/")
     @PreAuthorize("isAuthenticated()")
@@ -116,10 +114,7 @@ class TeamController(private val teamService: TeamService,
      * PUT /event/{id}/team/{teamId}/
      * allows teammembers to edit teamname and description
      */
-    @Caching(evict = arrayOf(
-            CacheEvict(POSTINGS, allEntries = true),
-            CacheEvict(LOCATIONS, allEntries = true),
-            CacheEvict(TEAMS, allEntries = true)))
+    @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(LOCATIONS, allEntries = true)), (CacheEvict(TEAMS, allEntries = true))])
     @PutMapping("/{teamId}/")
     @PreAuthorize("isAuthenticated()")
     fun editTeam(@PathVariable eventId: Long,
@@ -181,7 +176,7 @@ class TeamController(private val teamService: TeamService,
      * POST /event/{eventId}/team/{teamId}/member/
      * allows user with Invitation to join Team
      */
-    @Caching(evict = arrayOf(CacheEvict(POSTINGS, allEntries = true), CacheEvict(TEAMS, allEntries = true)))
+    @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(TEAMS, allEntries = true))])
     @ResponseStatus(CREATED)
     @PostMapping("/{teamId}/member/")
     @PreAuthorize("isAuthenticated()")

@@ -35,8 +35,7 @@ class TeamEntryFeeInvoice : Invoice {
     }
 
     private fun isFullAmount(money: Money): Boolean {
-        val isFullAmount = money.isEqualTo(this.amount)
-        return isFullAmount
+        return money.isEqualTo(amount)
     }
 
     override fun generatePurposeOfTransfer(): String {

@@ -29,7 +29,7 @@ open class TeamServiceImplTest : IntegrationTest() {
 
     @Test
     @Transactional
-    fun testCreate() {
+    open fun testCreate() {
         val participant = User.create("f@x.de", "lorem").addRole(Participant::class)
         userService.save(participant)
 

@@ -17,11 +17,11 @@ import javax.persistence.*
 @Entity
 class SponsoringInvoice : Invoice {
 
-    @OneToMany(cascade = arrayOf(CascadeType.MERGE))
+    @OneToMany(cascade = [(CascadeType.MERGE)])
     var sponsorings: List<Sponsoring> = listOf()
         private set
 
-    @OneToMany(cascade = arrayOf(CascadeType.MERGE))
+    @OneToMany(cascade = [(CascadeType.MERGE)])
     var challenges: List<Challenge> = listOf()
         private set
 
@@ -32,12 +32,12 @@ class SponsoringInvoice : Invoice {
     var type: SponsoringInvoiceType? = null
 
     @ManyToOne
-    public var unregisteredSponsor: UnregisteredSponsor? = null
+    var unregisteredSponsor: UnregisteredSponsor? = null
 
     @ManyToOne
-    public var registeredSponsor: Sponsor? = null
+    var registeredSponsor: Sponsor? = null
 
-    public var initialVersionSent: Boolean = false
+    var initialVersionSent: Boolean = false
 
     var sponsor: ISponsor
         private set(value) {
@@ -138,17 +138,15 @@ class SponsoringInvoice : Invoice {
             is UnregisteredSponsor -> {
                 val fromChallenges = this.challenges.flatMap { it.team?.members?.map { EmailAddress(it.email) } ?: listOf() }
                 val fromSponsorings = this.sponsorings.flatMap { it.team?.members?.map { EmailAddress(it.email) } ?: listOf() }
-                var fromUnregistered: Iterable<EmailAddress>
-
-                if (this.unregisteredSponsor?.email != null) {
+                val fromUnregistered: Iterable<EmailAddress> = if (this.unregisteredSponsor?.email != null) {
                     try {
-                        fromUnregistered = listOf(EmailAddress(this.unregisteredSponsor!!.email!!))
+                        listOf(EmailAddress(this.unregisteredSponsor!!.email!!))
                     } catch (e: Exception) {
-                        fromUnregistered = listOf<EmailAddress>()
+                        listOf<EmailAddress>()
                     }
 
                 } else {
-                    fromUnregistered = listOf<EmailAddress>()
+                    listOf()
                 }
 
                 val total = fromChallenges

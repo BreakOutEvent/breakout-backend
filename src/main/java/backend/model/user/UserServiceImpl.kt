@@ -20,8 +20,7 @@ class UserServiceImpl @Autowired constructor(private val userRepository: UserRep
     private val host: String = configurationService.getRequired("org.breakout.api.host")
 
     override fun getUserFromCustomUserDetails(customUserDetails: CustomUserDetails): User {
-        val user = userRepository.findOne(customUserDetails.id) ?: throw Exception("User could be authenticated but data was not found")
-        return user
+        return userRepository.findOne(customUserDetails.id) ?: throw Exception("User could be authenticated but data was not found")
     }
 
     override fun getUserById(id: Long): User? = userRepository.findOne(id)
