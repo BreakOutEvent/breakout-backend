@@ -119,7 +119,7 @@ class PostingController(private val postingService: PostingService,
      */
     @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(LOCATIONS, allEntries = true))])
     @PreAuthorize("hasAuthority('ADMIN')")
-    @RequestMapping("/{id}/report/", method = [DELETE])
+    @DeleteMapping("/{id}/report/")
     fun dismissReport(@PathVariable("id") id: Long): PostingResponseView {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
 
