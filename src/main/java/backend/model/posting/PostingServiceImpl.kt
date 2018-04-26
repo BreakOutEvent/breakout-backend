@@ -54,6 +54,8 @@ class PostingServiceImpl(private val repository: PostingRepository,
         return repository.findByTeamEventIdInOrderByIdDesc(events, PageRequest(page, size))
     }
 
+    override fun findReported(): List<Posting> = repository.findReported()
+
     @Transactional
     override fun savePostingWithLocationAndMedia(text: String?,
                                                  postingLocation: Coord?,
