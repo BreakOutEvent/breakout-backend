@@ -92,6 +92,20 @@ class PostingController(private val postingService: PostingService,
     }
 
     /**
+     * GET /posting/report/
+     * Gets posting by id
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/report/")
+    fun getReported(@AuthenticationPrincipal customUserDetails: CustomUserDetails?): Iterable<PostingResponseView> {
+        return postingService.findReported().map {
+            PostingResponseView(it.hasLikesBy(customUserDetails?.id), it.challenge?.let {
+                challengeService.findChallengeProveProjectionById(it)
+            }, customUserDetails?.id)
+        }
+    }
+
+    /**
      * DELETE /posting/{id}/report/
      * Allows Admin to delete report about a Posting
      */
