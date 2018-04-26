@@ -83,6 +83,9 @@ class PostingController(private val postingService: PostingService,
         if (posting.isBlockedBy(customUserDetails?.id))
             throw NotFoundException("posting with id $id was posted by blocked user ${posting.user!!.id}")
 
+        if (posting.reported)
+            throw NotFoundException("posting with id $id was reported.")
+
         val challengeProveProjection = posting.challenge?.let {
             challengeService.findChallengeProveProjectionById(posting.challenge!!)
         }
