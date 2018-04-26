@@ -1,12 +1,14 @@
 package backend.model.posting
 
+import backend.model.UserGenerated
 import backend.model.BasicEntity
+import backend.model.user.User
 import backend.model.user.UserAccount
 import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
-class Comment : BasicEntity {
+class Comment : BasicEntity, UserGenerated {
 
     private constructor() : super()
 
@@ -27,5 +29,9 @@ class Comment : BasicEntity {
     @PreRemove
     fun preRemove() {
         this.user = null
+    }
+
+    override fun getUser(): User? {
+        return user
     }
 }

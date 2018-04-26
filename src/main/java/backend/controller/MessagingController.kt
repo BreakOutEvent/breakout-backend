@@ -97,6 +97,7 @@ class MessagingController(private val groupMessageService: GroupMessageService,
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val groupMessage = groupMessageService.getByID(id) ?: throw NotFoundException("groupmessage with id $id does not exist")
         if (!groupMessage.users.contains(user.account)) throw UnauthorizedException("authenticated user and requested resource mismatch")
+        if (groupMessage.isBlockedBy(user.account.id)) throw NotFoundException("groupmessage with id $id includes users that were blocked")
 
         return GroupMessageView(groupMessage)
     }

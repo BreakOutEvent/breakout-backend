@@ -31,6 +31,8 @@ class UserServiceImpl @Autowired constructor(private val userRepository: UserRep
 
     override fun getAllUsers(): Iterable<UserAccount> = userRepository.findAll()
 
+    override fun getAllUsersBlockedBy(userId: Long): Iterable<UserAccount> = userRepository.findAllUsersBlockedByUser(userId)
+
     override fun exists(id: Long) = userRepository.exists(id)
 
     override fun exists(email: String) = userRepository.existsByEmail(email)

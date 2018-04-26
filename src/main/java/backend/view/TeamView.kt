@@ -1,6 +1,7 @@
 package backend.view
 
 import backend.model.event.Team
+import backend.model.removeBlockedBy
 import backend.util.data.DonateSums
 import backend.view.user.BasicUserView
 import org.hibernate.validator.constraints.SafeHtml
@@ -38,13 +39,15 @@ class TeamView() {
 
     var donateSum: DonateSums? = null
 
-    constructor(team: Team) : this() {
+    constructor(team: Team, userId: Long?) : this() {
         this.id = team.id
         this.name = team.name
         this.event = team.event.id
         this.description = team.description
+
         this.members = ArrayList()
-        team.members.forEach { this.members!!.add(BasicUserView(it)) }
+        team.members.removeBlockedBy(userId).forEach { this.members!!.add(BasicUserView(it)) }
+
         this.profilePic = team.profilePic?.let(::MediaView)
         this.invoiceId = team.invoice?.id
         this.hasStarted = team.hasStarted
@@ -52,13 +55,15 @@ class TeamView() {
         this.isFull = team.isFull()
     }
 
-    constructor(team: Team, distance: Double, donateSum: DonateSums) : this() {
+    constructor(team: Team, distance: Double, donateSum: DonateSums, userId: Long?) : this() {
         this.id = team.id
         this.name = team.name
         this.event = team.event.id
         this.description = team.description
+
         this.members = ArrayList()
-        team.members.forEach { this.members!!.add(BasicUserView(it)) }
+        team.members.removeBlockedBy(userId).forEach { this.members!!.add(BasicUserView(it)) }
+
         this.profilePic = team.profilePic?.let(::MediaView)
         this.invoiceId = team.invoice?.id
         this.hasStarted = team.hasStarted

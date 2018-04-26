@@ -9,7 +9,10 @@ import backend.model.event.TeamService
 import backend.model.media.Media
 import backend.model.misc.Url
 import backend.model.user.*
+import backend.model.removeBlockedBy
+import backend.model.removeBlocking
 import backend.services.ConfigurationService
+import backend.util.CacheNames
 import backend.util.CacheNames.POSTINGS
 import backend.util.CacheNames.TEAMS
 import backend.view.DetailedInvitationView
@@ -18,6 +21,7 @@ import backend.view.user.BasicUserView
 import backend.view.user.SimpleUserView
 import backend.view.user.UserView
 import io.swagger.annotations.Api
+import org.hibernate.annotations.Cache
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CacheEvict
@@ -97,8 +101,8 @@ class UserController(private val userService: UserService,
      * Gets all users
      */
     @GetMapping("/")
-    fun showUsers(): Iterable<BasicUserView> {
-        return userService.getAllUsers().map(::BasicUserView)
+    fun showUsers(@AuthenticationPrincipal customUserDetails: CustomUserDetails?): Iterable<BasicUserView> {
+        return userService.getAllUsers().removeBlockedBy(customUserDetails?.id).map(::BasicUserView)
     }
 
     /**
@@ -106,11 +110,14 @@ class UserController(private val userService: UserService,
      * Searches for User by String greater 2 chars
      */
     @GetMapping("/search/{search}/")
-    fun searchUsers(@PathVariable("search") search: String): List<SimpleUserView> {
+    fun searchUsers(@PathVariable("search") search: String,
+                    @AuthenticationPrincipal customUserDetails: CustomUserDetails?): List<SimpleUserView> {
+
         if (search.length < 3) return listOf()
+        val user = customUserDetails?.id?.let { userService.getUserById(it) }
         val users = userService.searchByString(search).take(6).toMutableList()
         users.addAll(teamService.searchByString(search).take(3).flatMap { it.members.map { it.account } })
-        return users.map(::SimpleUserView)
+        return users.removeBlockedBy(customUserDetails?.id).removeBlocking(user).map(::SimpleUserView)
     }
 
     /**
@@ -165,9 +172,62 @@ class UserController(private val userService: UserService,
      * Gets user with given id
      */
     @GetMapping("/{id}/")
-    fun showUser(@PathVariable id: Long): BasicUserView {
+    fun showUser(@PathVariable id: Long,
+                 @AuthenticationPrincipal customUserDetails: CustomUserDetails?): BasicUserView {
 
         val user = userService.getUserById(id) ?: throw NotFoundException("user with id $id does not exist")
+
+        if (user.isBlockedBy(customUserDetails?.id))
+            throw NotFoundException("user with id $id was blocked")
+
+        return BasicUserView(user)
+    }
+
+    /**
+     * POST /user/{id}/block
+     * Blocks user with given id
+     */
+    @Caching(evict = arrayOf(
+            CacheEvict(POSTINGS, allEntries = true),
+            CacheEvict(TEAMS, allEntries = true)))
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{id}/block/")
+    fun blockUser(@PathVariable id: Long,
+                  @AuthenticationPrincipal customUserDetails: CustomUserDetails): BasicUserView {
+
+        val currentUser = userService.getUserFromCustomUserDetails(customUserDetails)
+        val user = userService.getUserById(id) ?: throw NotFoundException("user with id $id does not exist")
+
+        if (user.account.id == currentUser.account.id) throw BadRequestException("user not allowed to block itself")
+
+        if (!user.isBlockedBy(currentUser.account.id))
+            user.account.blockedBy.add(currentUser.account)
+
+        userService.save(user)
+
+        return BasicUserView(user)
+    }
+
+    /**
+     * DELETE /user/{id}/block
+     * Unblocks user with given idt
+     */
+    @Caching(evict = arrayOf(
+            CacheEvict(POSTINGS, allEntries = true),
+            CacheEvict(TEAMS, allEntries = true)))
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/{id}/block/")
+    fun unblockUser(@PathVariable id: Long,
+                    @AuthenticationPrincipal customUserDetails: CustomUserDetails): BasicUserView {
+
+        val currentUser = userService.getUserFromCustomUserDetails(customUserDetails)
+        val user = userService.getUserById(id) ?: throw NotFoundException("user with id $id does not exist")
+
+        if (user.isBlockedBy(currentUser.account.id))
+            user.account.blockedBy.remove(currentUser.account)
+
+        userService.save(user)
+
         return BasicUserView(user)
     }
 
