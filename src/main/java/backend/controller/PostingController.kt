@@ -1,7 +1,7 @@
 package backend.controller
 
 import backend.configuration.CustomUserDetails
-import backend.controller.exceptions.NotFoundException
+import backend.controller.exceptions.*
 import backend.model.challenges.ChallengeService
 import backend.model.media.Media
 import backend.model.misc.Coord
@@ -11,6 +11,7 @@ import backend.model.posting.PostingService
 import backend.model.user.UserService
 import backend.model.removeBlockedBy
 import backend.model.removeReported
+import backend.model.user.Admin
 import backend.services.ConfigurationService
 import backend.services.mail.MailSenderService
 import backend.util.CacheNames.LOCATIONS
@@ -81,11 +82,13 @@ class PostingController(private val postingService: PostingService,
                    @AuthenticationPrincipal customUserDetails: CustomUserDetails?): PostingResponseView {
 
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
+        val user = customUserDetails?.let { userService.getUserFromCustomUserDetails(it) }
+        val isAdmin = user?.hasRole(Admin::class) ?: false
 
         if (posting.isBlockedBy(customUserDetails?.id))
             throw NotFoundException("posting with id $id was posted by blocked user ${posting.user!!.id}")
 
-        if (posting.reported)
+        if (posting.reported && !isAdmin)
             throw NotFoundException("posting with id $id was reported.")
 
         val challengeProveProjection = posting.challenge?.let {
