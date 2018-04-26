@@ -5,6 +5,8 @@ import backend.controller.exceptions.NotFoundException
 import backend.model.challenges.ChallengeService
 import backend.model.media.Media
 import backend.model.misc.Coord
+import backend.model.misc.Email
+import backend.model.misc.EmailAddress
 import backend.model.posting.PostingService
 import backend.model.user.UserService
 import backend.model.removeBlockedBy
@@ -191,16 +193,22 @@ class PostingController(private val postingService: PostingService,
      * Gets posting by id
      */
     @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(LOCATIONS, allEntries = true))])
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/report/")
     fun reportPosting(@PathVariable("id") id: Long,
                       @AuthenticationPrincipal customUserDetails: CustomUserDetails?): PostingResponseView {
 
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
 
+        if (posting.reported)
+            throw ConflictException("posting with id $id was already reported.")
+
         posting.reported = true
         postingService.save(posting)
 
-        // TODO: Send email
+        val admins = userService.getAllAdmins().map { EmailAddress(it.email) }
+        val email = Email(admins, "Posting was reported", "Posting $id by ${posting.team!!.name} was reported.")
+        mailSenderService.send(email)
 
         val challengeProveProjection = posting.challenge?.let {
             challengeService.findChallengeProveProjectionById(posting.challenge!!)
