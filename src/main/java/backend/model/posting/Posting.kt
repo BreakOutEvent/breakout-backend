@@ -5,6 +5,7 @@ import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.ConflictException
 import backend.controller.exceptions.NotFoundException
 import backend.model.BasicEntity
+import backend.model.Reportable
 import backend.model.event.Team
 import backend.model.location.Location
 import backend.model.media.Media
@@ -21,7 +22,7 @@ import javax.persistence.CascadeType.PERSIST
 import javax.persistence.FetchType.LAZY
 
 @Entity
-class Posting : BasicEntity, UserGenerated {
+class Posting : BasicEntity, UserGenerated, Reportable {
 
     private constructor() : super()
 
@@ -63,6 +64,8 @@ class Posting : BasicEntity, UserGenerated {
 
     @Transient
     var hasLiked = false
+
+    override var reported: Boolean = false
 
     constructor(text: String?, date: LocalDateTime, location: Location?, user: UserAccount, media: Media?) : this() {
         this.text = text

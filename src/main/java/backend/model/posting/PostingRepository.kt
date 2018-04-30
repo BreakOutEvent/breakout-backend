@@ -14,4 +14,7 @@ interface PostingRepository : CrudRepository<Posting, Long> {
     fun findAllByOrderByIdDesc(pageable: Pageable): List<Posting>
 
     fun findByTeamEventIdInOrderByIdDesc(eventIdList: List<Long>, pageable: Pageable): List<Posting>
+
+    @Query("select p from Posting p where p.reported = true")
+    fun findReported(): List<Posting>
 }

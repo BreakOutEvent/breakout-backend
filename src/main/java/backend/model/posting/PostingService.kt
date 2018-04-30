@@ -22,6 +22,8 @@ interface PostingService {
 
     fun getByID(id: Long): Posting?
 
+    fun findReported(): List<Posting>
+
     fun save(posting: Posting): Posting?
 
     fun findByHashtag(hashtag: String, page: Int, size: Int): List<Posting>

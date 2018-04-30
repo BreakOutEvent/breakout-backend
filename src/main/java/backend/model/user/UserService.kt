@@ -10,6 +10,7 @@ interface UserService {
     fun getUserByEmail(email: String): User?
     fun getAllUsers(): Iterable<UserAccount>
     fun getAllUsersBlockedBy(userId: Long): Iterable<UserAccount>
+    fun getAllAdmins(): Iterable<UserAccount>
 
     fun create(email: String, password: String): User
     fun create(email: String, password: String, f: User.() -> Unit): User

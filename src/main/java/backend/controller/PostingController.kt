@@ -1,14 +1,19 @@
 package backend.controller
 
 import backend.configuration.CustomUserDetails
-import backend.controller.exceptions.NotFoundException
+import backend.controller.exceptions.*
 import backend.model.challenges.ChallengeService
 import backend.model.media.Media
 import backend.model.misc.Coord
+import backend.model.misc.Email
+import backend.model.misc.EmailAddress
 import backend.model.posting.PostingService
 import backend.model.user.UserService
 import backend.model.removeBlockedBy
+import backend.model.removeReported
+import backend.model.user.Admin
 import backend.services.ConfigurationService
+import backend.services.mail.MailSenderService
 import backend.util.CacheNames.LOCATIONS
 import backend.util.CacheNames.POSTINGS
 import backend.util.localDateTimeOf
@@ -33,7 +38,8 @@ import javax.validation.Valid
 class PostingController(private val postingService: PostingService,
                         private val configurationService: ConfigurationService,
                         private val userService: UserService,
-                        private val challengeService: ChallengeService) {
+                        private val challengeService: ChallengeService,
+                        private val mailSenderService: MailSenderService) {
 
     private val logger = LoggerFactory.getLogger(PostingController::class.java)
 
@@ -76,9 +82,14 @@ class PostingController(private val postingService: PostingService,
                    @AuthenticationPrincipal customUserDetails: CustomUserDetails?): PostingResponseView {
 
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
+        val user = customUserDetails?.let { userService.getUserFromCustomUserDetails(it) }
+        val isAdmin = user?.hasRole(Admin::class) ?: false
 
         if (posting.isBlockedBy(customUserDetails?.id))
             throw NotFoundException("posting with id $id was posted by blocked user ${posting.user!!.id}")
+
+        if (posting.reported && !isAdmin)
+            throw NotFoundException("posting with id $id was reported.")
 
         val challengeProveProjection = posting.challenge?.let {
             challengeService.findChallengeProveProjectionById(posting.challenge!!)
@@ -86,6 +97,40 @@ class PostingController(private val postingService: PostingService,
         return PostingResponseView(posting.hasLikesBy(customUserDetails?.id),
                                    challengeProveProjection,
                                    customUserDetails?.id)
+    }
+
+    /**
+     * GET /posting/report/
+     * Gets posting by id
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/report/")
+    fun getReported(@AuthenticationPrincipal customUserDetails: CustomUserDetails?): Iterable<PostingResponseView> {
+        return postingService.findReported().map {
+            PostingResponseView(it.hasLikesBy(customUserDetails?.id), it.challenge?.let {
+                challengeService.findChallengeProveProjectionById(it)
+            }, customUserDetails?.id)
+        }
+    }
+
+    /**
+     * DELETE /posting/{id}/report/
+     * Allows Admin to delete report about a Posting
+     */
+    @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(LOCATIONS, allEntries = true))])
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @DeleteMapping("/{id}/report/")
+    fun dismissReport(@PathVariable("id") id: Long): PostingResponseView {
+        val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
+
+        posting.reported = false
+        postingService.save(posting)
+
+        val challengeProveProjection = posting.challenge?.let {
+            challengeService.findChallengeProveProjectionById(posting.challenge!!)
+        }
+
+        return PostingResponseView(posting, challengeProveProjection,null)
     }
 
     /**
@@ -139,11 +184,42 @@ class PostingController(private val postingService: PostingService,
             postingService.findAll(page ?: 0, PAGE_SIZE)
         }
 
-        return postings.removeBlockedBy(customUserDetails?.id).map {
+        return postings.removeReported().removeBlockedBy(customUserDetails?.id).map {
             PostingResponseView(it.hasLikesBy(customUserDetails?.id), it.challenge?.let {
                 challengeService.findChallengeProveProjectionById(it)
             }, customUserDetails?.id)
         }
+    }
+
+    /**
+     * POST /posting/{id}/report/
+     * Gets posting by id
+     */
+    @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(LOCATIONS, allEntries = true))])
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{id}/report/")
+    fun reportPosting(@PathVariable("id") id: Long,
+                      @AuthenticationPrincipal customUserDetails: CustomUserDetails?): PostingResponseView {
+
+        val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
+
+        if (posting.reported)
+            throw ConflictException("posting with id $id was already reported.")
+
+        posting.reported = true
+        postingService.save(posting)
+
+        val admins = userService.getAllAdmins().map { EmailAddress(it.email) }
+        val email = Email(admins, "Posting was reported", "Posting $id by ${posting.team!!.name} was reported.")
+        mailSenderService.send(email)
+
+        val challengeProveProjection = posting.challenge?.let {
+            challengeService.findChallengeProveProjectionById(posting.challenge!!)
+        }
+
+        return PostingResponseView(posting.hasLikesBy(customUserDetails?.id),
+                challengeProveProjection,
+                customUserDetails?.id)
     }
 
     /**
@@ -231,7 +307,7 @@ class PostingController(private val postingService: PostingService,
                              @AuthenticationPrincipal customUserDetails: CustomUserDetails?): List<PostingView> {
 
         val posting = postingService.findByHashtag(hashtag, page ?: 0, PAGE_SIZE)
-        return posting.removeBlockedBy(customUserDetails?.id).map {
+        return posting.removeReported().removeBlockedBy(customUserDetails?.id).map {
             PostingView(it.hasLikesBy(customUserDetails?.id), it.challenge?.let {
                 challengeService.findOne(it)
             }, customUserDetails?.id)
