@@ -23,4 +23,7 @@ interface UserRepository : CrudRepository<UserAccount, Long> {
     @Query("select u from UserAccount u join u.blockedBy b where b.id = :userid")
     fun findAllUsersBlockedByUser(@Param("userid") userId: Long): List<UserAccount>
 
+    @Query("select u from UserAccount u join u.userRoles r where KEY(r) = :role")
+    fun findAllUsersByRole(@Param("role") role: Class<out UserRole>): List<UserAccount>
+
 }

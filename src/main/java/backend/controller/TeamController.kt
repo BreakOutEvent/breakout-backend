@@ -15,6 +15,7 @@ import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserService
 import backend.model.removeBlockedBy
+import backend.model.removeReported
 import backend.services.ConfigurationService
 import backend.util.CacheNames.LOCATIONS
 import backend.util.CacheNames.POSTINGS
@@ -240,7 +241,7 @@ class TeamController(private val teamService: TeamService,
                           @RequestParam(value = "page", required = false) page: Int?,
                           @AuthenticationPrincipal customUserDetails: CustomUserDetails?): List<PostingView> {
         // TODO: Remove hardcoded page size of 150
-        return teamService.findPostingsById(teamId, page ?: 0, 150).removeBlockedBy(customUserDetails?.id).map {
+        return teamService.findPostingsById(teamId, page ?: 0, 150).removeReported().removeBlockedBy(customUserDetails?.id).map {
             PostingView(it.hasLikesBy(customUserDetails?.id), it.challenge?.let {
                 challengeService.findOne(it)
             }, customUserDetails?.id)
