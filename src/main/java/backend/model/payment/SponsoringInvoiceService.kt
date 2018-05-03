@@ -20,7 +20,7 @@ interface SponsoringInvoiceService {
 
     fun save(invoice: SponsoringInvoice): SponsoringInvoice
 
-    fun addAdminPaymentToInvoice(admin: Admin, amount: Money, invoice: SponsoringInvoice, fidorId: Long? = null): SponsoringInvoice
+    fun addAdminPaymentToInvoice(admin: Admin, amount: Money, invoice: SponsoringInvoice, date: LocalDateTime?, fidorId: Long?): SponsoringInvoice
 
     fun createInvoicesForEvent(event: Event): Int
 
