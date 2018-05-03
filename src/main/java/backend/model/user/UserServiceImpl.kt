@@ -59,7 +59,9 @@ class UserServiceImpl @Autowired constructor(private val userRepository: UserRep
     }
 
     private fun sendActivationEmail(token: String, user: User) {
-        mailService.sendUserHasRegisteredEmail(token, user)
+        // TODO: Fix activation
+        // See https://github.com/BreakOutEvent/breakout-backend/issues/221
+        // mailService.sendUserHasRegisteredEmail(token, user)
     }
 
     override fun save(user: User): User {
