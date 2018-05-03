@@ -9,6 +9,7 @@ class TeamEntryFeeInvoiceView {
     var team: Long? = null
     var payments: List<PaymentView> = listOf()
     var purposeOfTransfer: String? = null
+    var purposeOfTransferCode: String? = null
 
     constructor()
 
@@ -18,5 +19,6 @@ class TeamEntryFeeInvoiceView {
         this.team = invoice.team?.id
         this.payments = invoice.getPayments().map(::PaymentView)
         this.purposeOfTransfer = invoice.purposeOfTransfer
+        this.purposeOfTransferCode = invoice.purposeOfTransferCode
     }
 }

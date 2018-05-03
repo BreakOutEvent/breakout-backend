@@ -62,8 +62,8 @@ class SponsoringInvoiceServiceImplTest : IntegrationTest() {
         val first = invoices.toList()[0]
         val second = invoices.toList()[1]
 
-        sponsoringInvoiceService.addAdminPaymentToInvoice(admin, euroOf(10.0), first)
-        sponsoringInvoiceService.addAdminPaymentToInvoice(admin, euroOf(5.0), first)
+        sponsoringInvoiceService.addAdminPaymentToInvoice(admin, euroOf(10.0), first, null, null)
+        sponsoringInvoiceService.addAdminPaymentToInvoice(admin, euroOf(5.0), first, null, null)
 
         // when looking for not fully paid invoices
         val notFullyPaid = sponsoringInvoiceService.findAllNotFullyPaidInvoicesForEvent(event)
