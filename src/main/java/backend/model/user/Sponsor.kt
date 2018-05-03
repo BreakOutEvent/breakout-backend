@@ -23,6 +23,9 @@ class Sponsor : UserRole, ISponsor {
     override var unregisteredSponsor: UnregisteredSponsor? = null
         set(value) {}
 
+    @Enumerated(EnumType.STRING)
+    var supporterType: SupporterType = SupporterType.NONE
+
     override var company: String? = null
 
     @OneToOne(cascade = [ALL], orphanRemoval = true)
@@ -51,7 +54,9 @@ class Sponsor : UserRole, ISponsor {
         this.account = account
     }
 
-    constructor(account: UserAccount, company: String, url: Url, address: Address, isHidden: Boolean, logo: Media?) : super(account) {
+    constructor(account: UserAccount, supporterType: SupporterType, company: String, url: Url, address: Address,
+                isHidden: Boolean, logo: Media?) : super(account) {
+        this.supporterType = supporterType
         this.company = company
         this.logo = logo
         this.url = url
@@ -70,4 +75,11 @@ class Sponsor : UserRole, ISponsor {
         this.challenges.forEach(Challenge::removeSponsor)
         this.sponsorings.clear()
     }
+}
+
+enum class SupporterType {
+    NONE,
+    DONOR,
+    PASSIVE,
+    ACTIVE
 }

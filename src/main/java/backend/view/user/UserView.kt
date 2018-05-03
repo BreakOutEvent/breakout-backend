@@ -127,6 +127,8 @@ class UserView() {
         @JsonIgnore
         var sponsor: Sponsor? = null
 
+        var supporterType: String? = null
+
         @Valid
         @SafeHtml(whitelistType = NONE)
         var company: String? = null
@@ -138,16 +140,27 @@ class UserView() {
         @Valid
         var address: AddressView? = null
 
+        var logo: MediaView? = null
+
         var isHidden: Boolean? = null
 
         constructor(user: User) : this() {
             this.sponsor = user.getRole(Sponsor::class)
+            this.supporterType = when (sponsor?.supporterType) {
+                SupporterType.DONOR -> "DONOR"
+                SupporterType.ACTIVE -> "ACTIVE"
+                SupporterType.PASSIVE -> "PASSIVE"
+                else -> null
+            }
             this.company = sponsor?.company
             this.url = sponsor?.url.toString()
             this.address = AddressView(sponsor?.address)
+            this.logo = sponsor?.logo?.let(::MediaView)
             this.isHidden = sponsor?.isHidden
         }
     }
+
+
 
     class AddressView() {
 

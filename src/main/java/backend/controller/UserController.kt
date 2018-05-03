@@ -269,9 +269,18 @@ class UserController(private val userService: UserService,
     private fun User.becomeOrModifySponsor(sponsorView: UserView.SponsorView): User {
         val sponsor: Sponsor = this.getRole(Sponsor::class) ?: this.addRole(Sponsor::class)
 
+         sponsorView.supporterType?.let {
+            when (it) {
+                "DONOR" -> sponsor.supporterType = SupporterType.DONOR
+                "ACTIVE" -> sponsor.supporterType = SupporterType.ACTIVE
+                "PASSIVE" -> sponsor.supporterType = SupporterType.PASSIVE
+                else -> SupporterType.NONE
+            }
+        }
         sponsor.address = sponsorView.address?.toAddress() ?: sponsor.address
         sponsor.isHidden = sponsorView.isHidden ?: sponsor.isHidden
         sponsor.company = sponsorView.company ?: sponsor.company
+        sponsor.logo = sponsorView.logo?.let(::Media) ?: sponsor.logo
 
         val urlString = sponsorView.url
         if (urlString != null) sponsor.url = Url(urlString)
