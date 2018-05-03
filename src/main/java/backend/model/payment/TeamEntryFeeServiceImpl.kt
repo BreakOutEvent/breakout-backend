@@ -16,8 +16,8 @@ class TeamEntryFeeServiceImpl(private val teamEntryFeeInvoiceRepository: TeamEnt
     private val logger: Logger = LoggerFactory.getLogger(TeamEntryFeeServiceImpl::class.java)
 
     @Transactional
-    override fun addAdminPaymentToInvoice(admin: Admin, amount: Money, invoice: TeamEntryFeeInvoice): TeamEntryFeeInvoice {
-        val payment = AdminPayment(amount, admin)
+    override fun addAdminPaymentToInvoice(admin: Admin, amount: Money, invoice: TeamEntryFeeInvoice, date: LocalDateTime?, fidorId: Long?): TeamEntryFeeInvoice {
+        val payment = AdminPayment(amount, admin, fidorId, date)
         invoice.addPayment(payment)
 
         if (invoice.isFullyPaid()) {

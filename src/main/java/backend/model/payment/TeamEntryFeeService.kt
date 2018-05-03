@@ -12,7 +12,7 @@ interface TeamEntryFeeService {
 
     fun save(invoice: TeamEntryFeeInvoice): TeamEntryFeeInvoice
 
-    fun addAdminPaymentToInvoice(admin: Admin, amount: Money, invoice: TeamEntryFeeInvoice): TeamEntryFeeInvoice
+    fun addAdminPaymentToInvoice(admin: Admin, amount: Money, invoice: TeamEntryFeeInvoice, date: LocalDateTime?, fidorId: Long?): TeamEntryFeeInvoice
 
     fun addSepaPaymentToInvoice(admin: Admin, fidorId: Long, amount: Money, date: LocalDateTime?, invoice: TeamEntryFeeInvoice): TeamEntryFeeInvoice
 
