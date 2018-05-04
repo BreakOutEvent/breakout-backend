@@ -4,6 +4,7 @@ import backend.model.media.MediaService
 import backend.services.ConfigurationService
 import backend.services.mail.MailService
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.*
@@ -52,7 +53,9 @@ class UserServiceImplTest {
 
     }
 
+    // See https://github.com/BreakOutEvent/breakout-backend/issues/221
     @Test
+    @Ignore
     fun testCreate() {
         val expectedUser = User.create("mail@mail.de", "password")
         `when`(userRepository.save(any<UserAccount>())).thenReturn(expectedUser.account)
