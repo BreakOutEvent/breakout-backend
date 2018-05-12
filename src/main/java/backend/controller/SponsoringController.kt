@@ -119,7 +119,6 @@ class SponsoringController(private var sponsoringService: SponsoringService,
                 lastname = sponsor.lastname!!,
                 company = sponsor.company!!,
                 gender = sponsor.gender!!,
-                url = sponsor.url!!,
                 address = sponsor.address!!.toAddress()!!,
                 email = sponsor.email,
                 isHidden = sponsor.isHidden)

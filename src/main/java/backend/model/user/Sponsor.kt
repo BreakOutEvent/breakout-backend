@@ -7,6 +7,7 @@ import backend.model.media.Media
 import backend.model.misc.Url
 import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.Sponsoring
+import backend.model.sponsoring.SupporterType
 import backend.model.sponsoring.UnregisteredSponsor
 import javax.persistence.*
 import javax.persistence.CascadeType.ALL
@@ -75,11 +76,4 @@ class Sponsor : UserRole, ISponsor {
         this.challenges.forEach(Challenge::removeSponsor)
         this.sponsorings.clear()
     }
-}
-
-enum class SupporterType {
-    NONE,
-    DONOR,
-    PASSIVE,
-    ACTIVE
 }
