@@ -73,7 +73,6 @@ class ChallengeControllerTest : IntegrationTest() {
                         "lastname" to "Meier",
                         "company" to "privat",
                         "url" to "",
-                        "gender" to "male",
                         "isHidden" to "false",
                         "email" to "sponsor@example.com",
                         "address" to mapOf(
@@ -107,7 +106,6 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.unregisteredSponsor.lastname").exists())
                 .andExpect(jsonPath("$.unregisteredSponsor.company").exists())
                 .andExpect(jsonPath("$.unregisteredSponsor.url").exists())
-                .andExpect(jsonPath("$.unregisteredSponsor.gender").exists())
                 .andExpect(jsonPath("$.unregisteredSponsor.hidden").exists())
                 .andExpect(jsonPath("$.unregisteredSponsor.address").exists())
     }
@@ -259,7 +257,6 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[1].unregisteredSponsor.lastname").exists())
                 .andExpect(jsonPath("$.[1].unregisteredSponsor.company").exists())
                 .andExpect(jsonPath("$.[1].unregisteredSponsor.url").exists())
-                .andExpect(jsonPath("$.[1].unregisteredSponsor.gender").exists())
                 .andExpect(jsonPath("$.[1].unregisteredSponsor.address").doesNotExist())
                 .andExpect(jsonPath("$.[1].team").exists())
                 .andExpect(jsonPath("$.[1].teamId").exists())
