@@ -5,7 +5,6 @@ import backend.model.challenges.Challenge
 import backend.model.misc.Url
 import backend.model.user.Address
 import backend.model.user.Sponsor
-import backend.model.sponsoring.SupporterType
 import javax.persistence.*
 
 @Entity
@@ -55,6 +54,8 @@ class UnregisteredSponsor : BasicEntity, ISponsor {
     constructor(firstname: String,
                 lastname: String,
                 company: String,
+                gender: String? = null,
+                url: String? = null,
                 address: Address,
                 isHidden: Boolean = false,
                 email: String? = null) {
