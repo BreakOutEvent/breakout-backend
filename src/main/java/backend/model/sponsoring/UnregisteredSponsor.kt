@@ -28,7 +28,7 @@ class UnregisteredSponsor : BasicEntity, ISponsor {
     lateinit var gender: String
 
     @Enumerated(EnumType.STRING)
-    var supporterType: SupporterType = SupporterType.DONOR
+    override var supporterType: SupporterType = SupporterType.DONOR
 
     @Embedded
     @AttributeOverride(name = "value", column = Column(name = "url"))

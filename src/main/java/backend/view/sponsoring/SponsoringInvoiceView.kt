@@ -36,7 +36,7 @@ class DetailedSponsoringInvoiceView : SponsoringInvoiceView {
     constructor(invoice: SponsoringInvoice) : super(invoice) {
         this.challenges = invoice.challenges.map { ChallengeView(it) }
         this.sponsorings = invoice.sponsorings.map { SponsoringView(it) }
-        this.type = invoice.type?.toString()
+        this.type = invoice.sponsor.supporterType.toString()
         this.contactEmails = invoice.getContactEmails().map { email -> email.toString() }
     }
 }

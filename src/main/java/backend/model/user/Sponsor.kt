@@ -25,7 +25,7 @@ class Sponsor : UserRole, ISponsor {
         set(value) {}
 
     @Enumerated(EnumType.STRING)
-    var supporterType: SupporterType = SupporterType.NONE
+    override var supporterType: SupporterType = SupporterType.NONE
 
     override var company: String? = null
 
