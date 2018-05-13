@@ -10,6 +10,7 @@ import backend.model.event.TeamService
 import backend.model.posting.PostingService
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
+import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserService
 import backend.services.ConfigurationService
@@ -93,8 +94,6 @@ class ChallengeController(private var challengeService: ChallengeService,
                 firstname = unregisteredSponsor.firstname!!,
                 lastname = unregisteredSponsor.lastname!!,
                 company = unregisteredSponsor.company!!,
-                gender = unregisteredSponsor.gender!!,
-                url = unregisteredSponsor.url!!,
                 email = unregisteredSponsor.email,
                 address = unregisteredSponsor.address!!.toAddress()!!,
                 isHidden = unregisteredSponsor.isHidden)
@@ -131,10 +130,47 @@ class ChallengeController(private var challengeService: ChallengeService,
      * Get all challenges for a team
      */
     @GetMapping("/event/{eventId}/team/{teamId}/challenge/")
-    fun getAllChallengesForTeam(@PathVariable teamId: Long): Iterable<ChallengeView> {
-        return challengeService.findByTeamId(teamId).map {
-            val view = ChallengeView(it)
-            view.unregisteredSponsor?.address = null // Set address to null to make it non public
+    fun getAllChallengesForTeam(@AuthenticationPrincipal customUserDetails: CustomUserDetails?,
+                                @PathVariable teamId: Long): Iterable<ChallengeView> {
+        val team = teamService.findOne(teamId) ?: throw NotFoundException("No team with id $teamId found")
+
+        return if (customUserDetails != null) getAllChallengesAuthenticated(customUserDetails, team)
+        else getAllChallengesUnauthenticated(team)
+    }
+
+
+    private fun getAllChallengesAuthenticated(customUserDetails: CustomUserDetails, team: Team): Iterable<ChallengeView> {
+
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
+        val participant = user.getRole(Participant::class)
+
+        if (participant != null && team.isMember(participant)) {
+            return challengeService.findByTeamId(team.id!!).map(::ChallengeView)
+        } else {
+            throw UnauthorizedException("Only members of the team ${team.id} can view its challenges")
+        }
+    }
+
+    private fun getAllChallengesUnauthenticated(team: Team): Iterable<ChallengeView> {
+        return challengeService.findByTeamId(team.id!!).map { challenge ->
+            val view = ChallengeView(challenge)
+
+            challenge.sponsor.unregisteredSponsor?.let {
+                if (it.isHidden) {
+                    view.unregisteredSponsor = null
+                    view.sponsorIsHidden = true
+                }
+                view.unregisteredSponsor?.address = null
+                view.unregisteredSponsor?.email = null
+            }
+
+            challenge.sponsor.let {
+                if (it.isHidden) {
+                    view.sponsorId = null
+                    view.sponsorIsHidden = true
+                }
+            }
+
             return@map view
         }
     }

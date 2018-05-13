@@ -22,9 +22,6 @@ class UnregisteredSponsorView() {
     @SafeHtml(whitelistType = NONE)
     var url: String? = null
 
-    @NotNull
-    @SafeHtml(whitelistType = NONE)
-    var gender: String? = null
 
     @NotNull
     @SafeHtml(whitelistType = NONE)
@@ -44,7 +41,6 @@ class UnregisteredSponsorView() {
         this.address = UserView.AddressView(unregisteredSponsor.address)
         this.company = unregisteredSponsor.company
         this.url = unregisteredSponsor.url.toString()
-        this.gender = unregisteredSponsor.gender
         this.firstname = unregisteredSponsor.firstname
         this.lastname = unregisteredSponsor.lastname
         this.isHidden = unregisteredSponsor.isHidden

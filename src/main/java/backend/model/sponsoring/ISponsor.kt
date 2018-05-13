@@ -20,6 +20,8 @@ interface ISponsor {
 
     var url: Url?
 
+    var supporterType: SupporterType
+
     @Deprecated("Just a workaround")
     var registeredSponsor: Sponsor? // TODO: Fix this. Just a workaround!
 

@@ -28,9 +28,6 @@ class SponsoringInvoice : Invoice {
     @ManyToOne
     var event: Event? = null
 
-    @Enumerated(EnumType.STRING)
-    var type: SponsoringInvoiceType? = null
-
     @ManyToOne
     var unregisteredSponsor: UnregisteredSponsor? = null
 

@@ -1,6 +1,7 @@
 package backend.view.user
 
 import backend.model.user.*
+import backend.model.sponsoring.SupporterType
 import backend.model.removeBlockedBy
 import backend.model.removeBlocking
 import backend.view.MediaView

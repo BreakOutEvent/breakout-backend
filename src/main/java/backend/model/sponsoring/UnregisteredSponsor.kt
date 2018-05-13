@@ -24,7 +24,8 @@ class UnregisteredSponsor : BasicEntity, ISponsor {
 
     override var company: String? = null
 
-    lateinit var gender: String
+    @Enumerated(EnumType.STRING)
+    override var supporterType: SupporterType = SupporterType.DONOR
 
     @Embedded
     @AttributeOverride(name = "value", column = Column(name = "url"))
@@ -53,8 +54,8 @@ class UnregisteredSponsor : BasicEntity, ISponsor {
     constructor(firstname: String,
                 lastname: String,
                 company: String,
-                gender: String,
-                url: String,
+                gender: String? = null,
+                url: String? = null,
                 address: Address,
                 isHidden: Boolean = false,
                 email: String? = null) {
@@ -62,8 +63,6 @@ class UnregisteredSponsor : BasicEntity, ISponsor {
         this.firstname = firstname
         this.lastname = lastname
         this.company = company
-        this.gender = gender
-        this.url = Url(url)
         this.address = address
         this.isHidden = isHidden
         this.email = email

@@ -269,8 +269,6 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.userId").doesNotExist())
                 .andExpect(jsonPath("$.unregisteredSponsor.firstname").value("Florian"))
                 .andExpect(jsonPath("$.unregisteredSponsor.lastname").value("Schmidt"))
-                .andExpect(jsonPath("$.unregisteredSponsor.url").value("www.florianschmidt.me"))
-                .andExpect(jsonPath("$.unregisteredSponsor.gender").value("male"))
                 .andExpect(jsonPath("$.unregisteredSponsor.hidden").value(false))
                 .andExpect(jsonPath("$.unregisteredSponsor.company").value("awesome AG"))
                 .andExpect(jsonPath("$.unregisteredSponsor.email").value("sponsor@example.com"))

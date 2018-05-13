@@ -67,6 +67,7 @@ class SponsoringController(private var sponsoringService: SponsoringService,
                     view.sponsorIsHidden = true
                 }
                 view.unregisteredSponsor?.address = null
+                view.unregisteredSponsor?.email = null
             }
 
             sponsoring.sponsor.let {
@@ -118,8 +119,6 @@ class SponsoringController(private var sponsoringService: SponsoringService,
                 firstname = sponsor.firstname!!,
                 lastname = sponsor.lastname!!,
                 company = sponsor.company!!,
-                gender = sponsor.gender!!,
-                url = sponsor.url!!,
                 address = sponsor.address!!.toAddress()!!,
                 email = sponsor.email,
                 isHidden = sponsor.isHidden)

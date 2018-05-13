@@ -9,6 +9,7 @@ import backend.model.event.TeamService
 import backend.model.media.Media
 import backend.model.misc.Url
 import backend.model.user.*
+import backend.model.sponsoring.SupporterType
 import backend.model.removeBlockedBy
 import backend.model.removeBlocking
 import backend.services.ConfigurationService
@@ -32,6 +33,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 import javax.validation.Valid
+
 
 @Api
 @RestController
