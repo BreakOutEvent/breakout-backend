@@ -6,7 +6,6 @@ import backend.model.event.Team
 import backend.model.misc.EmailAddress
 import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.Sponsoring
-import backend.model.sponsoring.SupporterType
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
 import backend.util.euroOf
