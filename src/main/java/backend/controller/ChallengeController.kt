@@ -161,6 +161,7 @@ class ChallengeController(private var challengeService: ChallengeService,
                     view.sponsorIsHidden = true
                 }
                 view.unregisteredSponsor?.address = null
+                view.unregisteredSponsor?.email = null
             }
 
             challenge.sponsor.let {
