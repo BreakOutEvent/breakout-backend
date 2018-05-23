@@ -4,6 +4,7 @@ import backend.model.challenges.Challenge
 import backend.model.misc.Url
 import backend.model.user.Address
 import backend.model.user.Sponsor
+import backend.model.media.Media
 
 interface ISponsor {
     // TODO: Was braucht ein Sponsor??
@@ -19,6 +20,8 @@ interface ISponsor {
     var isHidden: Boolean
 
     var url: Url?
+
+    var logo: Media?
 
     var supporterType: SupporterType
 

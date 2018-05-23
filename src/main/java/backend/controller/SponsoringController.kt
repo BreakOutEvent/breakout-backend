@@ -169,13 +169,15 @@ class SponsoringController(private var sponsoringService: SponsoringService,
                         lastname = "",
                         company = null,
                         sponsorIsHidden = it.sponsor.isHidden,
-                        url = null)
+                        url = null,
+                        logoUrl = null)
                 false -> SponsorTeamProfileView(
                         firstname = it.sponsor.firstname ?: "",
                         lastname = it.sponsor.lastname ?: "",
                         company = it.sponsor.company,
                         sponsorIsHidden = it.sponsor.isHidden,
-                        url = it.sponsor.url)
+                        url = it.sponsor.url,
+                        logoUrl = it.sponsor.logo?.url)
             }
 
             SponsoringTeamProfileView(sponsor, it.status.toString())

@@ -6,6 +6,7 @@ import backend.model.misc.Url
 import backend.model.user.Address
 import backend.model.user.Sponsor
 import javax.persistence.*
+import backend.model.media.Media
 
 @Entity
 class UnregisteredSponsor : BasicEntity, ISponsor {
@@ -45,6 +46,9 @@ class UnregisteredSponsor : BasicEntity, ISponsor {
     var isHidden: Boolean = false
 
     var email: String? = null
+
+    @Transient
+    override var logo: Media? = null
 
     /**
      * private no-args constructor for JPA / Hibernate
