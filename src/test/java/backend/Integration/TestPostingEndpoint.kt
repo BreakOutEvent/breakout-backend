@@ -67,7 +67,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
-    open fun adminDeletePostingFailNotAdmin() {
+    open fun ownerDeletePosting() {
         val posting = postingService.savePostingWithLocationAndMedia("hello breakout", null, user.account, null, LocalDateTime.now())
 
         val request = MockMvcRequestBuilders
@@ -75,7 +75,24 @@ open class TestPostingEndpoint : IntegrationTest() {
                 .asUser(mockMvc, user.email, "password")
 
         val response = mockMvc.perform(request)
-                .andExpect(status().isForbidden)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.message").value("success"))
+                .andReturn().response.contentAsString
+
+        println(response)
+    }
+
+    @Test
+    open fun adminDeletePostingFailNotAdminOrOwner() {
+        val posting = postingService.savePostingWithLocationAndMedia("hello breakout", null, admin.account, null, LocalDateTime.now())
+
+        val request = MockMvcRequestBuilders
+                .delete("/posting/${posting.id}/")
+                .asUser(mockMvc, user.email, "password")
+
+        val response = mockMvc.perform(request)
+                .andExpect(status().isUnauthorized)
                 .andReturn().response.contentAsString
 
         println(response)

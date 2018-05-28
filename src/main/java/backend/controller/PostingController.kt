@@ -135,13 +135,19 @@ class PostingController(private val postingService: PostingService,
 
     /**
      * DELETE /posting/{id}/
-     * Allows Admin to delete Posting
+     * Allows Admin or poster to delete Posting
      */
     @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(LOCATIONS, allEntries = true))])
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping("/{id}/", method = [DELETE])
-    fun adminDeletePosting(@PathVariable("id") id: Long): Map<String, String> {
+    fun deletePosting(@PathVariable("id") id: Long, @AuthenticationPrincipal customUserDetails: CustomUserDetails
+    ): Map<String, String> {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
+        if (!(user.hasRole(Admin::class)) && posting.user?.id != customUserDetails.id) {
+            throw UnauthorizedException("A user can only delete postings submitted by itself")
+        }
+
         posting.challenge?.let {
             challengeService.rejectProof(challengeService.findOne(posting.challenge!!)!!)
         }
