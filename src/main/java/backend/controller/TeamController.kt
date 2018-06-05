@@ -143,11 +143,16 @@ class TeamController(private val teamService: TeamService,
     }
 
     private fun checkAuthenticationForEditTeam(team: Team, user: User) {
-        val role = user.getRole(Participant::class)
-                ?: user.getRole(Admin::class)
 
-        if (role is Participant) {
-            if (!team.members.contains(role)) throw UnauthorizedException("User is not part of team")
+
+        val userIsAdmin = user.getRole(Admin::class) != null
+        val userIsTeamMember = user
+                .getRole(Participant::class)
+                ?.let { team.members.contains(it) }
+                ?: false
+
+        if (!(userIsAdmin || userIsTeamMember)) {
+            throw UnauthorizedException("User is neither admin nor part of the team")
         }
     }
 
