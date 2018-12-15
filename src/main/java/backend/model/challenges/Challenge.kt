@@ -31,6 +31,11 @@ class Challenge : BasicEntity, Billable {
             field = value
         }
 
+    var fulfilledCount: Int = 0
+        private set
+
+    var maximumCount: Int? = 1
+
     private fun checkTransition(from: ChallengeStatus, to: ChallengeStatus) {
         when {
             from == to -> return
@@ -121,7 +126,7 @@ class Challenge : BasicEntity, Billable {
      */
     private constructor() : super()
 
-    constructor(sponsor: ISponsor, team: Team, amount: Money, description: String) {
+    constructor(sponsor: ISponsor, team: Team, amount: Money, description: String, maximumCount: Int? = 1) {
         when (sponsor) {
             is UnregisteredSponsor -> {
                 this.unregisteredSponsor = sponsor
