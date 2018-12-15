@@ -191,9 +191,9 @@ class Challenge : BasicEntity, Billable {
             WITHDRAWN -> euroOf(0.0)
             ACCEPTED -> euroOf(0.0)
             REJECTED -> euroOf(0.0)
-            WITH_PROOF -> amount
             PROOF_ACCEPTED -> amount
             PROOF_REJECTED -> euroOf(0.0)
+            WITH_PROOF -> amount.multiply(fulfilledCount)
         }
     }
 
