@@ -99,7 +99,7 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.amount").value(100.0))
                 .andExpect(jsonPath("$.team").value(team.name))
                 .andExpect(jsonPath("$.teamId").value(team.id!!.toInt()))
-                .andExpect(jsonPath("$.status").value("ACCEPTED"))
+                .andExpect(jsonPath("$.status").value("PROPOSED"))
                 .andExpect(jsonPath("$.unregisteredSponsor").exists())
                 .andExpect(jsonPath("$.unregisteredSponsor.email").exists())
                 .andExpect(jsonPath("$.unregisteredSponsor.firstname").exists())
