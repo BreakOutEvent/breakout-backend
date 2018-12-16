@@ -45,31 +45,6 @@ class ChallengeTest {
     }
 
     @Test
-    fun testAccept() {
-        val sponsor = mock(Sponsor::class.java)
-        val team = mock(Team::class.java)
-
-        val challenge = Challenge(sponsor, team, euroOf(50), "description")
-
-        assertEquals(PROPOSED, challenge.status)
-        challenge.accept()
-        assertEquals(ACCEPTED, challenge.status)
-    }
-
-    @Test
-    fun testMultipleAccept() {
-        val sponsor = mock(Sponsor::class.java)
-        val team = mock(Team::class.java)
-
-        val challenge = Challenge(sponsor, team, euroOf(50), "description")
-
-        assertEquals(PROPOSED, challenge.status)
-        challenge.accept()
-        challenge.accept()
-        assertEquals(ACCEPTED, challenge.status)
-    }
-
-    @Test
     fun testReject() {
         val sponsor = mock(Sponsor::class.java)
         val team = mock(Team::class.java)
@@ -88,36 +63,28 @@ class ChallengeTest {
         val proof = mock(Posting::class.java)
 
         val challenge = Challenge(sponsor, team, euroOf(50), "description")
-        challenge.accept()
+        challenge.maximumCount = 2
 
+        challenge.addProof()
         challenge.addProof()
         assertEquals(WITH_PROOF, challenge.status)
+        assertEquals(2, challenge.fulfilledCount)
+
+        assertFails { challenge.addProof() }
     }
 
     @Test
-    fun testAcceptProof() {
+    fun testTakeBack() {
         val sponsor = mock(Sponsor::class.java)
         val team = mock(Team::class.java)
         val proof = mock(Posting::class.java)
 
         val challenge = Challenge(sponsor, team, euroOf(50), "description")
-        challenge.accept()
         challenge.addProof()
-        challenge.acceptProof()
-        assertEquals(PROOF_ACCEPTED, challenge.status)
-    }
+        challenge.takeBack()
 
-    @Test
-    fun testRejectProof() {
-        val sponsor = mock(Sponsor::class.java)
-        val team = mock(Team::class.java)
-        val proof = mock(Posting::class.java)
-
-        val challenge = Challenge(sponsor, team, euroOf(50), "description")
-        challenge.accept()
-        challenge.addProof()
-        challenge.rejectProof()
-        assertEquals(PROOF_REJECTED, challenge.status)
+        assertEquals(PROPOSED, challenge.status)
+        assertEquals(0, challenge.fulfilledCount)
     }
 
     @Test
@@ -129,7 +96,6 @@ class ChallengeTest {
         challenge.withdraw()
 
         assertEquals(WITHDRAWN, challenge.status)
-        assertFails { challenge.accept() }
         assertFails { challenge.reject() }
     }
 
@@ -177,6 +143,17 @@ class ChallengeTest {
     }
 
     @Test
+    fun whenChallengeIsFullfilledMultipleTimes_thenBillableAmountReturnsAmountOfChallenge() {
+        val challenge = Challenge(mock(Sponsor::class.java), mock(Team::class.java), euroOf(50), "description")
+        challenge.maximumCount = null
+
+        challenge.addProof()
+        challenge.addProof()
+
+        assertEquals(euroOf(100), challenge.billableAmount())
+    }
+
+    @Test
     fun whenChallengeIsProposed_thenBillableAmountIsZero() {
         val challenge = Challenge(mock(Sponsor::class.java), mock(Team::class.java), euroOf(50), "description")
 
@@ -193,41 +170,12 @@ class ChallengeTest {
     }
 
     @Test
-    fun whenChallengeIsAccepted_thenBillableAmountIsZero() {
-        val challenge = Challenge(mock(Sponsor::class.java), mock(Team::class.java), euroOf(50), "description")
-
-        challenge.accept()
-
-        assertEquals(euroOf(0), challenge.billableAmount())
-    }
-
-    @Test
     fun whenChallengeIsRejected_thenBillableAmountIsZero() {
         val challenge = Challenge(mock(Sponsor::class.java), mock(Team::class.java), euroOf(50), "description")
 
         challenge.reject()
 
         assertEquals(euroOf(0), challenge.billableAmount())
-    }
-
-    @Test
-    fun whenChallengeProofIsRejected_thenBillableAmountIsZero() {
-        val challenge = Challenge(mock(Sponsor::class.java), mock(Team::class.java), euroOf(50), "description")
-
-        challenge.addProof()
-        challenge.rejectProof()
-
-        assertEquals(euroOf(0), challenge.billableAmount())
-    }
-
-    @Test
-    fun whenChallengeProofIsAccepted_thenBillableAmountIsAmount() {
-        val challenge = Challenge(mock(Sponsor::class.java), mock(Team::class.java), euroOf(50), "description")
-
-        challenge.addProof()
-        challenge.acceptProof()
-
-        assertEquals(euroOf(50), challenge.billableAmount())
     }
 
     @Test
