@@ -114,7 +114,6 @@ class ChallengeController(private var challengeService: ChallengeService,
 
         val challenge = challengeService.findOne(challengeId) ?: throw NotFoundException("No challenge with id $challengeId found")
         return when (body.status!!.toLowerCase()) {
-            "accepted" -> challengeService.accept(challenge)
             "rejected" -> challengeService.reject(challenge)
             "withdrawn" -> challengeService.withdraw(challenge)
             "with_proof" -> {
