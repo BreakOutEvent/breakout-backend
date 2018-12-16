@@ -15,7 +15,7 @@ interface ISponsor {
 
     var company: String?
 
-    var address: Address
+    var address: Address?
 
     var isHidden: Boolean
 
