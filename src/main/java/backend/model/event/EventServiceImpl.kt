@@ -99,4 +99,16 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository,
                     accSums.fullSum + donateSums.fullSum)
         }.orElseGet { DonateSums(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO) }
     }
+
+    override fun markAsCurrent(id: Long): Event {
+        val event = this.findById(id) ?: throw NotFoundException("event with id $id does not exist")
+        event.isCurrent = true
+        return repository.save(event)
+    }
+
+    override fun allowNewSponsoring(id: Long): Event {
+        val event = this.findById(id) ?: throw NotFoundException("event with id $id does not exist")
+        event.allowNewSponsoring = true
+        return repository.save(event)
+    }
 }
