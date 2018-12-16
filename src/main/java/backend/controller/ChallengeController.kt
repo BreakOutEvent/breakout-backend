@@ -82,7 +82,7 @@ class ChallengeController(private var challengeService: ChallengeService,
     }
 
     private fun challengeWithRegisteredSponsor(user: User, team: Team, amount: Money, description: String): ChallengeView {
-        val sponsor = user.getRole(Sponsor::class) ?: throw UnauthorizedException("User is no sponsor")
+        val sponsor = user.getRole(Sponsor::class) ?: user.addRole(Sponsor::class)
         val challenge = challengeService.proposeChallenge(sponsor, team, amount, description)
         return ChallengeView(challenge)
     }
