@@ -40,11 +40,23 @@ class TestDataInitializer {
     @PostConstruct
     fun initialize() {
 
-        val date = LocalDateTime.of(2016, 6, 3, 0, 0)
+        // Don't perform population if an event exists already
+        if (eventService.exists(1)) {
+            return
+        }
+
+        val date = LocalDateTime.now().minusHours(1)
 
         // ---- Events ----
-        val eventMunich = eventService.createEvent("Breakout München 2016", date, "München", Coord(48.1374300, 11.5754900), 36)
-        val eventBerlin = eventService.createEvent("Breakout Berlin 2016", date, "Berlin", Coord(52.5243700, 13.4105300), 36)
+        val eventMunich = eventService.createEvent("Breakout München", date, "München", Coord(48.1374300, 11.5754900), 36)
+        val eventBerlin = eventService.createEvent("Breakout Berlin", date, "Berlin", Coord(52.5243700, 13.4105300), 36)
+
+        arrayOf(eventMunich, eventBerlin).forEach {
+            eventService.markAsCurrent(it.id!!)
+            eventService.allowNewSponsoring(it.id!!)
+        }
+
+        // TODO: Insert oauth clients in DB
 
         // --- iOS Devs Test Accounts ---
         val leo = userService.create("leokaessner@me.com", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
