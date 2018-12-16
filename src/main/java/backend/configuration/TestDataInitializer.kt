@@ -11,6 +11,7 @@ import backend.model.user.Admin
 import backend.model.user.Participant
 import backend.model.user.Sponsor
 import backend.model.user.UserService
+import backend.util.Profiles.DEVELOPMENT
 import backend.util.Profiles.HEROKU
 import backend.util.euroOf
 import org.javamoney.moneta.Money
@@ -24,7 +25,7 @@ import java.time.LocalDateTime
 import javax.annotation.PostConstruct
 
 @Service
-@Profile(HEROKU)
+@Profile(HEROKU, DEVELOPMENT)
 class TestDataInitializer {
 
     // Services
