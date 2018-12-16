@@ -275,7 +275,7 @@ class PostingController(private val postingService: PostingService,
 
     /**
      * DELETE /posting/{id}/like/
-     * creates Like for Posting
+     * deletes Like for Posting
      */
     @CacheEvict(value = POSTINGS, allEntries = true)
     @PreAuthorize("isAuthenticated()")
