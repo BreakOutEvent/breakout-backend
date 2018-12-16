@@ -49,6 +49,7 @@ class Challenge : BasicEntity, Billable {
         val transitions = listOf(
                 (PROPOSED to REJECTED),
                 (PROPOSED to WITH_PROOF),
+                (PROPOSED to WITHDRAWN),
                 (REJECTED to PROPOSED),
                 (WITH_PROOF to PROPOSED),
                 (WITH_PROOF to WITH_PROOF))
