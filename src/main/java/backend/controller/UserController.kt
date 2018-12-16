@@ -300,4 +300,10 @@ class UserController(private val userService: UserService,
         val invitation = teamService.findInvitationsByInviteCode(token) ?: throw NotFoundException("No invitation for code $token")
         return DetailedInvitationView(invitation)
     }
+
+    @GetMapping("/exists")
+    fun exists(@RequestParam email: String): Boolean {
+        return userService.exists(email)
+    }
+
 }
