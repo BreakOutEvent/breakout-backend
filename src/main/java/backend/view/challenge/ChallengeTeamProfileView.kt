@@ -10,4 +10,6 @@ class ChallengeTeamProfileView(
         val amount: org.javamoney.moneta.Money,
         val description: String,
         val status: String,
+        val fulfilledCount: Int,
+        val maximumCount: Int?,
         val sponsor: SponsorTeamProfileView?)

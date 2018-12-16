@@ -42,6 +42,9 @@ class ChallengeView {
 
     var contract: MediaView? = null
 
+    var fulfilledCount: Int = 0
+    var maximumCount: Int? = 1
+
     /**
      * no-args constructor for Jackson
      */
@@ -57,6 +60,8 @@ class ChallengeView {
         this.status = challenge.status.toString().toUpperCase()
         this.contract = challenge.contract?.let(::MediaView)
         this.billableAmount = challenge.billableAmount().numberStripped.toDouble()
+        this.fulfilledCount = challenge.fulfilledCount
+        this.maximumCount = challenge.maximumCount
 
         // Add information about registered sponsor
         // if he exists and isHidden is false
