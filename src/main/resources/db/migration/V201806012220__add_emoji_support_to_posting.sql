@@ -120,12 +120,12 @@ alter table posting_media convert to character set utf8mb4 collate utf8mb4_unico
 
 alter table postinglike convert to character set utf8mb4 collate utf8mb4_unicode_ci;
 
-alter table schema_version convert to character set utf8mb4 collate utf8mb4_unicode_ci;
-ALTER TABLE `schema_version` CHANGE `version` `version` VARCHAR(50)  CHARACTER SET utf8mb4  COLLATE utf8mb4_unicode_ci  NULL  DEFAULT NULL;
-ALTER TABLE `schema_version` CHANGE `description` `description` VARCHAR(200)  CHARACTER SET utf8mb4  COLLATE utf8mb4_unicode_ci  NOT NULL  DEFAULT '';
-ALTER TABLE `schema_version` CHANGE `type` `type` VARCHAR(20)  CHARACTER SET utf8mb4  COLLATE utf8mb4_unicode_ci  NOT NULL  DEFAULT '';
-ALTER TABLE `schema_version` CHANGE `script` `script` VARCHAR(1000)  CHARACTER SET utf8mb4  COLLATE utf8mb4_unicode_ci  NOT NULL  DEFAULT '';
-ALTER TABLE `schema_version` CHANGE `installed_by` `installed_by` VARCHAR(100)  CHARACTER SET utf8mb4  COLLATE utf8mb4_unicode_ci  NOT NULL  DEFAULT '';
+-- alter table schema_version convert to character set utf8mb4 collate utf8mb4_unicode_ci;
+-- ALTER TABLE `schema_version` CHANGE `version` `version` VARCHAR(50)  CHARACTER SET utf8mb4  COLLATE utf8mb4_unicode_ci  NULL  DEFAULT NULL;
+-- ALTER TABLE `schema_version` CHANGE `description` `description` VARCHAR(200)  CHARACTER SET utf8mb4  COLLATE utf8mb4_unicode_ci  NOT NULL  DEFAULT '';
+-- ALTER TABLE `schema_version` CHANGE `type` `type` VARCHAR(20)  CHARACTER SET utf8mb4  COLLATE utf8mb4_unicode_ci  NOT NULL  DEFAULT '';
+-- ALTER TABLE `schema_version` CHANGE `script` `script` VARCHAR(1000)  CHARACTER SET utf8mb4  COLLATE utf8mb4_unicode_ci  NOT NULL  DEFAULT '';
+-- ALTER TABLE `schema_version` CHANGE `installed_by` `installed_by` VARCHAR(100)  CHARACTER SET utf8mb4  COLLATE utf8mb4_unicode_ci  NOT NULL  DEFAULT '';
 
 alter table sponsoring convert to character set utf8mb4 collate utf8mb4_unicode_ci;
 ALTER TABLE `sponsoring` CHANGE `amount_per_km` `amount_per_km` VARCHAR(255)  CHARACTER SET utf8mb4  COLLATE utf8mb4_unicode_ci  NULL  DEFAULT NULL;
