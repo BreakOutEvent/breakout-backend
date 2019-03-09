@@ -39,6 +39,8 @@ class TeamView() {
 
     var donateSum: DonateSums? = null
 
+    var score: Double? = null
+
     constructor(team: Team, userId: Long?) : this() {
         this.id = team.id
         this.name = team.name
@@ -55,7 +57,7 @@ class TeamView() {
         this.isFull = team.isFull()
     }
 
-    constructor(team: Team, distance: Double, donateSum: DonateSums, userId: Long?) : this() {
+    constructor(team: Team, distance: Double, donateSum: DonateSums, score: Double, userId: Long?) : this() {
         this.id = team.id
         this.name = team.name
         this.event = team.event.id
@@ -71,5 +73,6 @@ class TeamView() {
         this.isFull = team.isFull()
         this.distance = distance
         this.donateSum = donateSum
+        this.score = score
     }
 }

@@ -53,7 +53,8 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository,
                     "teamId" to it.id,
                     "teamName" to it.name,
                     "distance" to teamService.getDistance(it.id!!),
-                    "donatedSum" to teamService.getDonateSum(it.id!!)
+                    "donatedSum" to teamService.getDonateSum(it.id!!),
+                    "score" to teamService.getScore(it.id!!)
             )
         })
     }
