@@ -176,7 +176,7 @@ class Team : BasicEntity, Blockable {
     }
 
     fun toEmailOverview(): String {
-        val challenges = this.challenges.filter { it.status == ChallengeStatus.ACCEPTED || it.status == ChallengeStatus.WITH_PROOF }
+        val challenges = this.challenges.filter { it.status == ChallengeStatus.PROPOSED || it.status == ChallengeStatus.WITH_PROOF }
         return """
         |<b>Challenges</b>
         |${challenges.toEmailListing()}

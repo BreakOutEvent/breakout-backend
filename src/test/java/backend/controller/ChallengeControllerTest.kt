@@ -99,7 +99,7 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.amount").value(100.0))
                 .andExpect(jsonPath("$.team").value(team.name))
                 .andExpect(jsonPath("$.teamId").value(team.id!!.toInt()))
-                .andExpect(jsonPath("$.status").value("ACCEPTED"))
+                .andExpect(jsonPath("$.status").value("PROPOSED"))
                 .andExpect(jsonPath("$.unregisteredSponsor").exists())
                 .andExpect(jsonPath("$.unregisteredSponsor.email").exists())
                 .andExpect(jsonPath("$.unregisteredSponsor.firstname").exists())
@@ -108,32 +108,6 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.unregisteredSponsor.url").exists())
                 .andExpect(jsonPath("$.unregisteredSponsor.hidden").exists())
                 .andExpect(jsonPath("$.unregisteredSponsor.address").exists())
-    }
-
-    @Test
-    fun testAcceptChallenge() {
-
-        setAuthenticatedUser("sponsor@break-out.org")
-        val challenge = challengeService.proposeChallenge(sponsor, team, euroOf(10.0), "An awesome challenge")
-
-        val body = mapOf("status" to "accepted")
-
-        val request = put("/event/${event.id}/team/${team.id}/challenge/${challenge.id}/status/")
-                .json(body)
-                .asUser(this.mockMvc, participant.email, "password")
-
-        mockMvc.perform(request)
-                .andExpect(status().isOk)
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.eventId").value(team.event.id!!.toInt()))
-                .andExpect(jsonPath("$.description").value(challenge.description))
-                .andExpect(jsonPath("$.sponsorId").value(sponsor.id!!.toInt()))
-                .andExpect(jsonPath("$.userId").value(sponsor.account.id!!.toInt()))
-                .andExpect(jsonPath("$.amount").value(challenge.amount.numberStripped.toDouble()))
-                .andExpect(jsonPath("$.unregisteredSponsor").doesNotExist())
-                .andExpect(jsonPath("$.team").value(team.name))
-                .andExpect(jsonPath("$.teamId").value(team.id!!.toInt()))
-                .andExpect(jsonPath("$.status").value("ACCEPTED"))
     }
 
     @Test
@@ -327,7 +301,7 @@ class ChallengeControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.amount").value(100.0))
                 .andExpect(jsonPath("$.team").value(team.name))
                 .andExpect(jsonPath("$.teamId").value(team.id!!.toInt()))
-                .andExpect(jsonPath("$.status").value("ACCEPTED"))
+                .andExpect(jsonPath("$.status").value("PROPOSED"))
                 .andExpect(jsonPath("$.unregisteredSponsor").exists())
     }
 

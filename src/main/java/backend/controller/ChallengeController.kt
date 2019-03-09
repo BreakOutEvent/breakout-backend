@@ -77,13 +77,13 @@ class ChallengeController(private var challengeService: ChallengeService,
         return if (body.unregisteredSponsor != null) {
             challengeUnregisteredSponsor(body, team, amount, description)
         } else {
-            challengeWithRegisteredSponsor(user, team, amount, description)
+            challengeWithRegisteredSponsor(user, team, amount, description, body.maximumCount)
         }
     }
 
-    private fun challengeWithRegisteredSponsor(user: User, team: Team, amount: Money, description: String): ChallengeView {
+    private fun challengeWithRegisteredSponsor(user: User, team: Team, amount: Money, description: String, maximumCount: Int?): ChallengeView {
         val sponsor = user.getRole(Sponsor::class) ?: throw UnauthorizedException("User is no sponsor")
-        val challenge = challengeService.proposeChallenge(sponsor, team, amount, description)
+        val challenge = challengeService.proposeChallenge(sponsor, team, amount, description, maximumCount)
         return ChallengeView(challenge)
     }
 
@@ -98,7 +98,7 @@ class ChallengeController(private var challengeService: ChallengeService,
                 address = unregisteredSponsor.address!!.toAddress()!!,
                 isHidden = unregisteredSponsor.isHidden)
 
-        val challenge = challengeService.proposeChallenge(sponsor, team, amount, description)
+        val challenge = challengeService.proposeChallenge(sponsor, team, amount, description, body.maximumCount)
         return ChallengeView(challenge)
     }
 
@@ -114,7 +114,6 @@ class ChallengeController(private var challengeService: ChallengeService,
 
         val challenge = challengeService.findOne(challengeId) ?: throw NotFoundException("No challenge with id $challengeId found")
         return when (body.status!!.toLowerCase()) {
-            "accepted" -> challengeService.accept(challenge)
             "rejected" -> challengeService.reject(challenge)
             "withdrawn" -> challengeService.withdraw(challenge)
             "with_proof" -> {
@@ -196,7 +195,7 @@ class ChallengeController(private var challengeService: ChallengeService,
                         logoUrl = it.sponsor.logo?.url)
             }
 
-            ChallengeTeamProfileView(it.id, it.amount, it.description, it.status.toString(), sponsor)
+            ChallengeTeamProfileView(it.id, it.amount, it.description, it.status.toString(), it.fulfilledCount, it.maximumCount, sponsor)
         }
     }
 

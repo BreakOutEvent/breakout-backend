@@ -27,12 +27,6 @@ class ChallengeServiceImpl @Autowired constructor(
     }
 
     @Transactional
-    override fun accept(challenge: Challenge): Challenge {
-        challenge.accept()
-        return challengeRepository.save(challenge)
-    }
-
-    @Transactional
     override fun reject(challenge: Challenge): Challenge {
         challenge.reject()
         return challengeRepository.save(challenge)
@@ -49,28 +43,21 @@ class ChallengeServiceImpl @Autowired constructor(
         }
     }
 
-    @Transactional
-    override fun acceptProof(challenge: Challenge): Challenge {
-        challenge.accept()
+    override fun takeBack(challenge: Challenge): Challenge {
+        challenge.takeBack()
         return challengeRepository.save(challenge)
     }
 
     @Transactional
-    override fun rejectProof(challenge: Challenge): Challenge {
-        challenge.rejectProof()
-        return challengeRepository.save(challenge)
-    }
-
-    @Transactional
-    override fun proposeChallenge(sponsor: Sponsor, team: Team, amount: Money, description: String): Challenge {
-        val challenge = Challenge(sponsor, team, amount, description)
+    override fun proposeChallenge(sponsor: Sponsor, team: Team, amount: Money, description: String, maximumCount: Int?): Challenge {
+        val challenge = Challenge(sponsor, team, amount, description, maximumCount)
         mailService.sendChallengeWasCreatedEmail(challenge)
         return challengeRepository.save(challenge)
     }
 
     @Transactional
-    override fun proposeChallenge(unregisteredSponsor: UnregisteredSponsor, team: Team, amount: Money, description: String): Challenge {
-        val challenge = Challenge(unregisteredSponsor, team, amount, description)
+    override fun proposeChallenge(unregisteredSponsor: UnregisteredSponsor, team: Team, amount: Money, description: String, maximumCount: Int?): Challenge {
+        val challenge = Challenge(unregisteredSponsor, team, amount, description, maximumCount)
         return challengeRepository.save(challenge)
     }
 
