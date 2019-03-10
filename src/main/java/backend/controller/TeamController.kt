@@ -220,7 +220,8 @@ class TeamController(private val teamService: TeamService,
 
         val teamDonateSum = teamService.getDonateSum(teamId)
         val teamDistance = teamService.getDistance(teamId)
-        return TeamView(team, teamDistance, teamDonateSum, customUserDetails?.id)
+        val score = teamService.getScore(team)
+        return TeamView(team, teamDistance, teamDonateSum, score, customUserDetails?.id)
     }
 
     /**

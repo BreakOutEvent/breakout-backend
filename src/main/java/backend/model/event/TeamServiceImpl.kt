@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
+import kotlin.math.sqrt
 
 @Service
 class TeamServiceImpl(private val repository: TeamRepository,
@@ -134,6 +135,18 @@ class TeamServiceImpl(private val repository: TeamRepository,
     override fun getDonateSum(teamId: Long): DonateSums {
         val team: Team = this.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")
         return getDonateSum(team)
+    }
+
+    override fun getScore(team: Team): Double {
+        val donateSum = getDonateSum(team)
+        val distance = getDistance(team.id!!)
+        return sqrt(donateSum.fullSum.toDouble() * distance)
+    }
+
+    @Transactional
+    override fun getScore(teamId: Long): Double {
+        val team: Team = this.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")
+        return getScore(team)
     }
 
     override fun searchByString(search: String): List<Team> {
