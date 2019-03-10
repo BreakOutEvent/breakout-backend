@@ -6,6 +6,9 @@ import org.springframework.data.repository.query.Param
 
 interface SponsoringInvoiceRepository : CrudRepository<SponsoringInvoice, Long> {
 
+    @Query("from SponsoringInvoice where registeredSponsor.id = :registeredSponsorId")
+    fun findBySponsorId(@Param("registeredSponsorId") registeredSponsorId: Long): Iterable<SponsoringInvoice>
+
     @Query("""
         select distinct i
         from SponsoringInvoice i
