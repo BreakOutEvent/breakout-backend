@@ -8,10 +8,12 @@ import backend.model.payment.SponsoringInvoiceService
 import backend.model.payment.TeamEntryFeeService
 import backend.model.user.Admin
 import backend.model.user.Participant
+import backend.model.user.Sponsor
 import backend.model.user.UserService
 import backend.services.ConfigurationService
 import backend.view.PaymentView
 import backend.view.TeamEntryFeeInvoiceView
+import backend.view.sponsoring.DetailedSponsoringInvoiceView
 import backend.view.sponsoring.SponsoringInvoiceView
 import org.javamoney.moneta.Money
 import org.slf4j.Logger
@@ -152,9 +154,29 @@ class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
                 ?: throw UnauthorizedException("User not admin or member of team")
 
         if (team.isMember(participant)) {
-            val invoices = sponsoringInvoiceService.findByTeamId(teamId)
-            return invoices.map(::SponsoringInvoiceView)
+            return sponsoringInvoiceService
+                    .findByTeamId(teamId)
+                    .filter { it.amount.isPositive }
+                    .map(::SponsoringInvoiceView)
         } else throw UnauthorizedException("User not part of team")
+    }
+
+    /**
+     * GET /invoice/sponsoring/
+     * Allows admin & sponsors to get all sponsoring invoices
+     */
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/sponsoring/")
+    fun getAllSponsorInvoices(@AuthenticationPrincipal cud: CustomUserDetails): List<DetailedSponsoringInvoiceView> {
+        val user = userService.getUserFromCustomUserDetails(cud)
+
+        val sponsor = user.getRole(Sponsor::class)
+                ?: throw UnauthorizedException("User not a sponsor")
+
+        return sponsoringInvoiceService
+                .findBySponsorId(sponsor.id!!)
+                .filter { it.amount.isPositive }
+                .map(::DetailedSponsoringInvoiceView)
     }
 
     /**
@@ -164,8 +186,8 @@ class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/sponsoring/admin/")
     fun getAllSponsorInvoices(): List<SponsoringInvoiceView> {
-
         val invoices = sponsoringInvoiceService.findAll()
         return invoices.map(::SponsoringInvoiceView)
+
     }
 }
