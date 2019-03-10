@@ -162,7 +162,7 @@ class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
      * Allows admin to get all sponsoring invoices
      */
     @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("/sponsoring/")
+    @GetMapping("/sponsoring/admin/")
     fun getAllSponsorInvoices(): List<SponsoringInvoiceView> {
 
         val invoices = sponsoringInvoiceService.findAll()
