@@ -6,7 +6,14 @@ import org.springframework.data.repository.query.Param
 
 interface SponsoringInvoiceRepository : CrudRepository<SponsoringInvoice, Long> {
 
-    fun findByTeamId(teamId: Long): Iterable<SponsoringInvoice>
+    @Query("""
+        select distinct i
+        from SponsoringInvoice i
+        left join i.sponsorings s on s.team.id = :teamId
+        left join i.challenges c on c.team.id = :teamId
+        where s.id is not null or c.id is not null
+    """)
+    fun findByTeamId(@Param("teamId") teamId: Long): Iterable<SponsoringInvoice>
 
     fun findAllByEventId(eventId: Long): Iterable<SponsoringInvoice>
 
