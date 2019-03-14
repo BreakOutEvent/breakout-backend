@@ -91,6 +91,10 @@ interface TeamService {
 
     fun getDonateSum(team: Team): DonateSums
 
+    fun getScore(team: Team): Double
+
+    fun getScore(teamId: Long): Double
+
     fun searchByString(search: String): List<Team>
 
     fun sendEmailsToTeamsWhenEventHasEnded()

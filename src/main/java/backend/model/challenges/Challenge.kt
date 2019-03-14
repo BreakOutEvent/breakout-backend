@@ -31,6 +31,11 @@ class Challenge : BasicEntity, Billable {
             field = value
         }
 
+    var fulfilledCount: Int = 0
+        private set
+
+    var maximumCount: Int? = 1
+
     private fun checkTransition(from: ChallengeStatus, to: ChallengeStatus) {
         when {
             from == to -> return
@@ -42,16 +47,12 @@ class Challenge : BasicEntity, Billable {
 
     private fun checkTransitionForUnregisteredSponsor(from: ChallengeStatus, to: ChallengeStatus) {
         val transitions = listOf(
-                (PROPOSED to ACCEPTED),
                 (PROPOSED to REJECTED),
                 (PROPOSED to WITH_PROOF),
-                (ACCEPTED to REJECTED),
-                (ACCEPTED to WITHDRAWN),
-                (REJECTED to ACCEPTED),
-                (ACCEPTED to WITH_PROOF),
-                (WITH_PROOF to PROOF_ACCEPTED),
-                (WITH_PROOF to PROOF_REJECTED),
-                (PROOF_REJECTED to PROOF_ACCEPTED))
+                (PROPOSED to WITHDRAWN),
+                (REJECTED to PROPOSED),
+                (WITH_PROOF to PROPOSED),
+                (WITH_PROOF to WITH_PROOF))
 
         if (!transitions.contains(from to to)) {
             throw DomainException("Transition from $from to $to for status not allowed")
@@ -60,18 +61,13 @@ class Challenge : BasicEntity, Billable {
 
     private fun checkTransitionForRegisteredSponsor(from: ChallengeStatus, to: ChallengeStatus) {
         val transitions = listOf(
-                (PROPOSED to ACCEPTED),
                 (PROPOSED to REJECTED),
                 (PROPOSED to WITH_PROOF),
                 (PROPOSED to WITHDRAWN),
-                (ACCEPTED to REJECTED),
-                (ACCEPTED to WITHDRAWN),
-                (REJECTED to ACCEPTED),
                 (REJECTED to WITHDRAWN),
-                (ACCEPTED to WITH_PROOF),
-                (WITH_PROOF to PROOF_ACCEPTED),
-                (WITH_PROOF to PROOF_REJECTED),
-                (PROOF_REJECTED to PROOF_ACCEPTED))
+                (REJECTED to PROPOSED),
+                (WITH_PROOF to PROPOSED),
+                (WITH_PROOF to WITH_PROOF))
 
         if (!transitions.contains(from to to)) {
             throw DomainException("Transition from $from to $to for status not allowed")
@@ -121,11 +117,10 @@ class Challenge : BasicEntity, Billable {
      */
     private constructor() : super()
 
-    constructor(sponsor: ISponsor, team: Team, amount: Money, description: String) {
+    constructor(sponsor: ISponsor, team: Team, amount: Money, description: String, maximumCount: Int? = 1) {
         when (sponsor) {
             is UnregisteredSponsor -> {
                 this.unregisteredSponsor = sponsor
-                this.status = ACCEPTED
                 sponsor.challenges.add(this)
                 team.challenges.add(this)
             }
@@ -141,10 +136,7 @@ class Challenge : BasicEntity, Billable {
         this.amount = amount
         this.description = description
         this.contract = null //TODO: how to handle contracts in future?
-    }
-
-    fun accept() {
-        this.status = ACCEPTED
+        this.maximumCount = maximumCount
     }
 
     fun reject() {
@@ -152,19 +144,24 @@ class Challenge : BasicEntity, Billable {
     }
 
     fun addProof() {
+
+        maximumCount?.let {
+            if (it <= fulfilledCount) {
+                throw DomainException("Challenge cannot be fulfilled more than $it times")
+            }
+        }
+
         this.status = WITH_PROOF
-    }
-
-    fun acceptProof() {
-        this.status = PROOF_ACCEPTED
-    }
-
-    fun rejectProof() {
-        this.status = PROOF_REJECTED
+        this.fulfilledCount++
     }
 
     fun withdraw() {
         this.status = WITHDRAWN
+    }
+
+    fun takeBack() {
+        this.status = PROPOSED
+        this.fulfilledCount--
     }
 
     @Suppress("UNUSED") //Used by Spring @PreAuthorize
@@ -184,11 +181,8 @@ class Challenge : BasicEntity, Billable {
         return when (status) {
             PROPOSED -> euroOf(0.0)
             WITHDRAWN -> euroOf(0.0)
-            ACCEPTED -> euroOf(0.0)
             REJECTED -> euroOf(0.0)
-            WITH_PROOF -> amount
-            PROOF_ACCEPTED -> amount
-            PROOF_REJECTED -> euroOf(0.0)
+            WITH_PROOF -> amount.multiply(fulfilledCount)
         }
     }
 

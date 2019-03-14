@@ -63,7 +63,7 @@ class TestDataInitializer {
         locationService.create(Coord(48.8534100, 2.3488000), leo, date.plusHours(2))
 
         setAuthenticatedUser(keno.email)
-        challengeService.proposeChallenge(keno, teamiOS, euroOf(10), "Bade nackt in der Spree")
+        challengeService.proposeChallenge(keno, teamiOS, euroOf(10), "Bade nackt in der Spree", 2)
 
         // ---- Team 1 ----
         val participant1 = userService.create("participant1@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!

@@ -149,7 +149,7 @@ class PostingController(private val postingService: PostingService,
         }
 
         posting.challenge?.let {
-            challengeService.rejectProof(challengeService.findOne(posting.challenge!!)!!)
+            challengeService.takeBack(challengeService.findOne(posting.challenge!!)!!)
         }
         postingService.delete(posting)
         return mapOf("message" to "success")

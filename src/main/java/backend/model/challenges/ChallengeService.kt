@@ -10,17 +10,14 @@ import org.springframework.security.access.prepost.PreAuthorize
 interface ChallengeService {
 
     @PreAuthorize("#sponsor.email.equals(authentication.name)")
-    fun proposeChallenge(sponsor: Sponsor, team: Team, amount: Money, description: String): Challenge
+    fun proposeChallenge(sponsor: Sponsor, team: Team, amount: Money, description: String, maximumCount: Int? = 1): Challenge
 
     @PreAuthorize("#team.isMember(authentication.name)")
-    fun proposeChallenge(unregisteredSponsor: UnregisteredSponsor, team: Team, amount: Money, description: String): Challenge
+    fun proposeChallenge(unregisteredSponsor: UnregisteredSponsor, team: Team, amount: Money, description: String, maximumCount: Int? = 1): Challenge
 
     fun findOne(challengeId: Long): Challenge?
 
     fun findByTeamId(teamId: Long): Iterable<Challenge>
-
-    @PreAuthorize("#challenge.team.isMember(authentication.name)")
-    fun accept(challenge: Challenge): Challenge
 
     @PreAuthorize("#challenge.team.isMember(authentication.name)")
     fun reject(challenge: Challenge): Challenge
@@ -29,10 +26,7 @@ interface ChallengeService {
     fun addProof(challenge: Challenge, proof: Posting): Challenge
 
     @PreAuthorize("#challenge.team.isMember(authentication.name)")
-    fun acceptProof(challenge: Challenge): Challenge
-
-    @PreAuthorize("#challenge.team.isMember(authentication.name)")
-    fun rejectProof(challenge: Challenge): Challenge
+    fun takeBack(challenge: Challenge): Challenge
 
     @PreAuthorize("#challenge.checkWithdrawPermissions(authentication.name)")
     fun withdraw(challenge: Challenge): Challenge
