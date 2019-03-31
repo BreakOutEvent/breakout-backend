@@ -29,7 +29,7 @@ class NotificationServiceImpl(private val restTemplate: RestOperations,
     private val pool = Executors.newCachedThreadPool()
     private val logger = LoggerFactory.getLogger(NotificationServiceImpl::class.java)
 
-    override fun send(message: Message, groupId: Long?, users: List<UserAccount>) {
+    override fun notifyNewMessage(message: Message, groupId: Long?, users: List<UserAccount>) {
 
         val headers = HttpHeaders().apply {
             set("Authorization", "Basic $apiKey")
