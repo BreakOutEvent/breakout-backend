@@ -29,6 +29,8 @@ class NotificationServiceImpl(private val restTemplate: RestOperations,
     private val pool = Executors.newCachedThreadPool()
     private val logger = LoggerFactory.getLogger(NotificationServiceImpl::class.java)
 
+    private data class Translations(val german: String, val english: String = german)
+
     override fun notifyNewMessage(message: Message, groupId: Long?, users: List<UserAccount>) {
 
         val headers = HttpHeaders().apply {
@@ -73,5 +75,10 @@ class NotificationServiceImpl(private val restTemplate: RestOperations,
             .path("/v1")
             .path("/notifications")
             .build().toUriString()
+
+    private fun Translations.map(): Map<String, String> = mapOf(
+            "de" to german,
+            "en" to english
+    )
 
 }
