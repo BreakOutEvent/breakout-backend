@@ -32,6 +32,15 @@ class NotificationServiceImpl(private val restTemplate: RestOperations,
     private data class Translations(val german: String, val english: String = german)
 
     override fun notifyNewMessage(message: Message, groupId: Long?, users: List<UserAccount>) {
+        val senderName = message.creator.fullName()
+        val tokens = users.mapNotNull { it.notificationToken }
+        send(
+                mapOf("id" to groupId),
+                Translations("$senderName hat dir eine Nachricht geschickt", "$senderName sent you a message"),
+                Translations(message.text),
+                tokens
+        )
+    }
     }
 
     private fun send(data: Map<String, *>,
