@@ -51,7 +51,7 @@ class GroupMessageServiceImpl(val repository: GroupMessageRepository,
         userRepository.save(message.creator)
         groupMessage.addMessage(message)
         val notifiedUsers = groupMessage.users.filter { it.id != message.creator.id && groupMessage.isBlockedBy(it.id) }
-        notificationServer.send(message, groupMessage.id, notifiedUsers)
+        notificationServer.notifyNewMessage(message, groupMessage.id, notifiedUsers)
         return repository.save(groupMessage)
     }
 }
