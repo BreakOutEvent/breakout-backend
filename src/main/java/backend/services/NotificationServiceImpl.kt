@@ -24,6 +24,7 @@ class NotificationServiceImpl(private val restTemplate: RestOperations,
                               configurationService: ConfigurationService) : NotificationService {
 
     private var url: String = configurationService.getRequired("org.breakout.api.notifications.url")
+    private var apiKey: String = configurationService.getRequired("org.breakout.api.notifications.apiKey")
     private var appId: String = configurationService.getRequired("org.breakout.api.notifications.appId")
     private val pool = Executors.newCachedThreadPool()
     private val logger = LoggerFactory.getLogger(NotificationServiceImpl::class.java)
@@ -31,6 +32,7 @@ class NotificationServiceImpl(private val restTemplate: RestOperations,
     override fun send(message: Message, groupId: Long?, users: List<UserAccount>) {
 
         val headers = HttpHeaders().apply {
+            set("Authorization", "Basic $apiKey")
             set("Content-Type", "application/json;charset=utf-8")
         }
 
