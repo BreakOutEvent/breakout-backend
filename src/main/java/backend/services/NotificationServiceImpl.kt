@@ -32,26 +32,25 @@ class NotificationServiceImpl(private val restTemplate: RestOperations,
     private data class Translations(val german: String, val english: String = german)
 
     override fun notifyNewMessage(message: Message, groupId: Long?, users: List<UserAccount>) {
+    }
+
+    private fun send(data: Map<String, *>,
+                     headings: Translations,
+                     contents: Translations?,
+                     tokens: List<String>) {
+
+        if (tokens.isEmpty()) return
 
         val headers = HttpHeaders().apply {
             set("Authorization", "Basic $apiKey")
             set("Content-Type", "application/json;charset=utf-8")
         }
 
-        val tokens = users.mapNotNull { it.notificationToken }
-
         val body = mapOf(
                 "app_id" to appId,
-                "data" to mapOf(
-                        "id" to groupId
-                ),
-                "headings" to mapOf(
-                        "en" to "New Message",
-                        "de" to "Neue Nachricht"
-                ),
-                "contents" to mapOf(
-                        "en" to message.text
-                ),
+                "data" to data,
+                "headings" to headings.map(),
+                "contents" to contents?.map(),
                 "include_player_ids" to tokens
         )
 
@@ -65,7 +64,7 @@ class NotificationServiceImpl(private val restTemplate: RestOperations,
                 restTemplate.exchange(sendUrl, HttpMethod.POST, request, String::class.java)
             })
         } catch (e: Exception) {
-            logger.error("""Error pushing notification "$message.text" to clients $tokens: ${e.message}""")
+            logger.error("""Error pushing notification to clients $tokens: ${e.message}""")
         }
     }
 
