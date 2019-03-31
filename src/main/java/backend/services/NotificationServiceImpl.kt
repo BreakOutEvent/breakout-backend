@@ -1,6 +1,10 @@
 package backend.services
 
+import backend.model.challenges.Challenge
 import backend.model.messaging.Message
+import backend.model.posting.Comment
+import backend.model.posting.Like
+import backend.model.posting.Posting
 import backend.model.user.UserAccount
 import backend.util.Profiles.PRODUCTION
 import backend.util.Profiles.STAGING
@@ -41,6 +45,49 @@ class NotificationServiceImpl(private val restTemplate: RestOperations,
                 tokens
         )
     }
+
+    override fun notifyNewChallenge(challenge: Challenge, users: List<UserAccount>) {
+        val sponsorName = "${challenge.sponsor.firstname} ${challenge.sponsor.lastname}"
+        val challengeText = "${challenge.description} (${challenge.amount})"
+        val tokens = users.mapNotNull { it.notificationToken }
+        send(
+                mapOf("challengeId" to challenge.id),
+                Translations("Neue Challenge von $sponsorName", "New Challenge from $sponsorName"),
+                Translations(challengeText),
+                tokens
+        )
+    }
+
+    override fun notifyChallengeCompleted(challenge: Challenge, posting: Posting) {
+        val tokens = arrayOf(challenge.sponsor.registeredSponsor?.account).mapNotNull { it?.notificationToken }
+        send(
+                mapOf("postingId" to posting.id),
+                Translations("Team ${challenge.team?.name} hat deine Challenge erfüllt", "Team ${challenge.team?.name} completed your challenge"),
+                Translations(challenge.description),
+                tokens
+        )
+    }
+
+    override fun notifyNewComment(comment: Comment, posting: Posting, users: List<UserAccount>) {
+        val commenterName = comment.user?.fullName()
+        val tokens = users.mapNotNull { it.notificationToken }
+        send(
+                mapOf("postingId" to posting.id),
+                Translations("$commenterName hat auf dein Post kommentiert", "$commenterName commented on your Post"),
+                Translations(comment.text),
+                tokens
+        )
+    }
+
+    override fun notifyNewLike(like: Like, posting: Posting, users: List<UserAccount>) {
+        val likerName = like.user?.fullName()
+        val tokens = users.mapNotNull { it.notificationToken }
+        send(
+                mapOf("postingId" to posting.id),
+                Translations("$likerName hat dein Post geliked", "$likerName liked your Post"),
+                null,
+                tokens
+        )
     }
 
     private fun send(data: Map<String, *>,
@@ -88,5 +135,7 @@ class NotificationServiceImpl(private val restTemplate: RestOperations,
             "de" to german,
             "en" to english
     )
+
+    private fun UserAccount.fullName(): String = "$firstname $lastname"
 
 }
