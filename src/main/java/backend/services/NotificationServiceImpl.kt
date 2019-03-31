@@ -56,9 +56,9 @@ class NotificationServiceImpl(private val restTemplate: RestOperations,
         val request = HttpEntity<String>(payload, headers)
 
         try {
-            val sendurl = getSendUrl(url)
+            val sendUrl = getSendUrl(url)
             pool.submit(Callable {
-                restTemplate.exchange(sendurl, HttpMethod.POST, request, String::class.java)
+                restTemplate.exchange(sendUrl, HttpMethod.POST, request, String::class.java)
             })
         } catch (e: Exception) {
             logger.error("""Error pushing notification "$message.text" to clients $tokens: ${e.message}""")
