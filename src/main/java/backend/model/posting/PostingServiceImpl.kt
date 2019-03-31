@@ -34,7 +34,7 @@ class PostingServiceImpl(private val repository: PostingRepository,
         val comment = posting.addComment(from, at, withText)
         this.save(posting)
 
-        val users = posting.team!!.members.map { it.account }.filter { !it.isBlocking(from) }
+        val users = posting.team!!.members.map { it.account }.filter { it.id != from.id && !it.isBlocking(from) }
         notificationService.notifyNewComment(comment, posting, users)
 
         return comment
@@ -45,7 +45,7 @@ class PostingServiceImpl(private val repository: PostingRepository,
         val like = posting.like(timeCreated, account)
         this.save(posting)
 
-        val users = posting.team!!.members.map { it.account }.filter { !it.isBlocking(account) }
+        val users = posting.team!!.members.map { it.account }.filter { it.id != account.id && !it.isBlocking(account) }
         notificationService.notifyNewLike(like, posting, users)
 
         return like // TODO: Transactional?
