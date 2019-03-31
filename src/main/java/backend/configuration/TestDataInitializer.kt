@@ -17,6 +17,7 @@ import backend.util.euroOf
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -36,6 +37,7 @@ class TestDataInitializer {
     @Autowired lateinit private var sponsoringService: SponsoringService
     @Autowired lateinit private var challengeService: ChallengeService
     @Autowired lateinit private var userDetailsService: UserDetailsService
+    @Autowired lateinit private var template: JdbcTemplate
 
     @PostConstruct
     fun initialize() {
@@ -114,6 +116,50 @@ class TestDataInitializer {
         // ---- Locations for team2 ----
         locationService.create(Coord(53.5753200, 10.0153400), participant3, date.plusHours(2))
         locationService.create(Coord(52.3740300, 4.8896900), participant3, date.plusHours(2))
+
+        template.execute("""
+            INSERT INTO `oauth_client_details` (
+                `client_id`,
+                `resource_ids`,
+                `client_secret`,
+                `scope`,
+                `authorized_grant_types`,
+                `web_server_redirect_uri`,
+                `authorities`,
+                `access_token_validity`,
+                `refresh_token_validity`,
+                `additional_information`,
+                `autoapprove`
+            )
+
+            VALUES
+                (
+                    'test_breakout_app',
+                    'BREAKOUT_BACKEND',
+                    '123456789',
+                    'read,write',
+                    'password,refresh_token',
+                    '',
+                    'USER',
+                    NULL,
+                    NULL,
+                    '{}',
+                    ''
+                ),
+                (
+                    'test_client_app',
+                    'BREAKOUT_BACKEND',
+                    '123456789',
+                    'read,write',
+                    'password,refresh_token',
+                    '',
+                    'USER',
+                    NULL,
+                    NULL,
+                    '{}',
+                    ''
+                );
+        """.trimIndent())
 
     }
 
