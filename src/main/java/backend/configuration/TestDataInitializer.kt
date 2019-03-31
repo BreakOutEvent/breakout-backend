@@ -58,8 +58,6 @@ class TestDataInitializer {
             eventService.allowNewSponsoring(it.id!!)
         }
 
-        // TODO: Insert oauth clients in DB
-
         // --- iOS Devs Test Accounts ---
         val leo = userService.create("leokaessner@me.com", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val david = userService.create("david.symhoven@break-out.org", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
