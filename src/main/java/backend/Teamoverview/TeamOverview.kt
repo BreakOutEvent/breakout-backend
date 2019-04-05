@@ -67,6 +67,9 @@ interface TeamOverview {
     @Value("#{target.name}")
     fun getTeamName(): String
 
+    @Value("#{target.asleep}")
+    fun getAsleep(): Boolean
+
     @Value("#{target.members}")
     fun getMembers(): List<Participant>
 

@@ -4,6 +4,7 @@ import backend.model.event.Team
 import backend.model.removeBlockedBy
 import backend.util.data.DonateSums
 import backend.view.user.BasicUserView
+import com.sun.org.apache.xpath.internal.operations.Bool
 import org.hibernate.validator.constraints.SafeHtml
 import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import java.util.*
@@ -41,6 +42,8 @@ class TeamView() {
 
     var score: Double? = null
 
+    var asleep: Boolean? = null
+
     constructor(team: Team, userId: Long?) : this() {
         this.id = team.id
         this.name = team.name
@@ -55,6 +58,7 @@ class TeamView() {
         this.hasStarted = team.hasStarted
         this.hasFullyPaid = team.invoice?.isFullyPaid()
         this.isFull = team.isFull()
+        this.asleep = team.asleep
     }
 
     constructor(team: Team, distance: Double, donateSum: DonateSums, score: Double, userId: Long?) : this() {
@@ -74,5 +78,6 @@ class TeamView() {
         this.distance = distance
         this.donateSum = donateSum
         this.score = score
+        this.asleep = team.asleep
     }
 }
