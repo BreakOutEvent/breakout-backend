@@ -8,6 +8,13 @@ import java.time.ZoneId
 
 interface TeamOverview {
 
+    interface Event {
+        val id: Long
+
+        @Value("#{target.title}")
+        fun getName(): String
+    }
+
     interface Participant {
         val id: Long
         val firstname: String?
@@ -52,17 +59,13 @@ interface TeamOverview {
         fun getTimestamp(): Long
     }
 
+    val event: Event
+    
     @Value("#{target.id}")
     fun getTeamId(): Long
 
     @Value("#{target.name}")
     fun getTeamName(): String
-
-    @Value("#{target.event.id}")
-    fun getEventId(): Long
-
-    @Value("#{target.event.title}")
-    fun getEventTitle(): String
 
     @Value("#{target.members}")
     fun getMembers(): List<Participant>
