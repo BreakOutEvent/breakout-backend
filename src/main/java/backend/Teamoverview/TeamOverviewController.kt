@@ -35,13 +35,13 @@ class TeamOverviewController(val teamOverviewService: TeamOverviewService,
                                  @AuthenticationPrincipal customUserDetails: CustomUserDetails) {
 
         val admin = userService.getUserFromCustomUserDetails(customUserDetails)
-        teamOverviewService.addComment(teamId, body.comment, admin.account)
+        teamOverviewService.addComment(teamId, body.reason, body.comment, admin.account)
     }
 
     class ContactCommentBody {
         @NotNull
-        @Size(min = 1)
-        lateinit var comment: String
+        lateinit var reason: ContactWithHeadquarters.Reason
+        var comment: String? = null
     }
 }
 
