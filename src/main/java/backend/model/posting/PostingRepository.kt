@@ -17,4 +17,14 @@ interface PostingRepository : CrudRepository<Posting, Long> {
 
     @Query("select p from Posting p where p.reported = true")
     fun findReported(): List<Posting>
+
+
+    @Query("""
+        select *
+        from posting
+        where team_id = :id
+        order by id desc
+        limit 1
+    """, nativeQuery = true)
+    fun findLastPostingByTeamId(@Param("id") id: Long): Posting?
 }
