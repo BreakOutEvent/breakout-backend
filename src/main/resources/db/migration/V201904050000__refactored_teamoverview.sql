@@ -10,9 +10,10 @@ CREATE TABLE `contact_with_headquarters` (
   `updated_at` datetime DEFAULT NULL,
   `team_id` bigint(20) NOT NULL,
   `admin_id` bigint(20) NOT NULL,
-  `comment` varchar(255) DEFAULT NULL,
+  `reason` int(11) NOT NULL,
+  `comment` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+)
 
 -- Add going to sleep column
 alter table team add column `asleep` BIT DEFAULT 0;
