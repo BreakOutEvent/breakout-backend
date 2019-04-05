@@ -13,3 +13,6 @@ CREATE TABLE `contact_with_headquarters` (
   `comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Add going to sleep column
+alter table team add column `asleep` BIT DEFAULT 0;
