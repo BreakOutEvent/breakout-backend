@@ -18,9 +18,13 @@ class TeamOverviewServiceImpl(
             contactWithHeadquartersRepository.findAllByTeamId(teamId)
 
     @Transactional
-    override fun addComment(teamId: Long, comment: String, admin: UserAccount) {
+    override fun addComment(teamId: Long,
+                            reason: ContactWithHeadquarters.Reason,
+                            comment: String?,
+                            admin: UserAccount) {
+
         val team = teamRepository.findById(teamId) ?: return
-        val contact = ContactWithHeadquarters(team, comment, admin)
+        val contact = ContactWithHeadquarters(team, reason, comment, admin)
         contactWithHeadquartersRepository.save(contact)
     }
 }
