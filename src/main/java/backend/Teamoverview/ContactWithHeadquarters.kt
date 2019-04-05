@@ -1,4 +1,4 @@
-package backend.Teamoverview
+package backend.teamoverview
 
 import backend.model.BasicEntity
 import backend.model.event.Team

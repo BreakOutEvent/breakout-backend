@@ -1,4 +1,4 @@
-package backend.Teamoverview
+package backend.teamoverview
 
 import backend.model.user.UserAccount
 

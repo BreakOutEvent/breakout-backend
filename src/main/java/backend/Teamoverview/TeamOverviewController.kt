@@ -1,4 +1,4 @@
-package backend.Teamoverview
+package backend.teamoverview
 
 import backend.configuration.CustomUserDetails
 import backend.model.user.UserService

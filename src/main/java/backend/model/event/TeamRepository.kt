@@ -1,6 +1,6 @@
 package backend.model.event
 
-import backend.Teamoverview.TeamOverview
+import backend.teamoverview.TeamOverview
 import backend.model.location.Location
 import backend.model.posting.Posting
 import org.springframework.data.domain.Pageable

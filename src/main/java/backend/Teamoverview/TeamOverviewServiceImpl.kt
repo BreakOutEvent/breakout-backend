@@ -1,7 +1,6 @@
-package backend.Teamoverview
+package backend.teamoverview
 
 import backend.model.event.*
-import backend.model.user.Admin
 import backend.model.user.UserAccount
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

@@ -1,4 +1,4 @@
-package backend.Teamoverview
+package backend.teamoverview
 
 import backend.model.misc.Coord
 import org.springframework.beans.factory.annotation.Value
