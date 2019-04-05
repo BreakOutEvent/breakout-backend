@@ -32,14 +32,14 @@ interface TeamOverview {
         val coord: Coord
         val locationData: Map<String, String>
 
-        @Value("#{@dateTimeBean.formatDateTime(target.date)}")
+        @Value("#{@teamOverviewBean.formatDateTime(target.date)}")
         fun getTimestamp(): Long
     }
 
     interface Posting {
         val id: Long
 
-        @Value("#{@dateTimeBean.formatDateTime(target.date)}")
+        @Value("#{@teamOverviewBean.formatDateTime(target.date)}")
         fun getTimestamp(): Long
     }
 
@@ -55,7 +55,10 @@ interface TeamOverview {
         val admin: Admin
         val comment: String?
 
-        @Value("#{@dateTimeBean.formatDateTime(target.createdAt)}")
+        @Value("#{@teamOverviewBean.formatReason(target.reason)}")
+        fun getReason(): Int
+
+        @Value("#{@teamOverviewBean.formatDateTime(target.createdAt)}")
         fun getTimestamp(): Long
     }
 
@@ -84,7 +87,12 @@ interface TeamOverview {
 }
 
 @Component
-class DateTimeBean {
+class TeamOverviewBean {
+
+    fun formatReason(reason: ContactWithHeadquarters.Reason): Int {
+        return reason.ordinal
+    }
+
     fun formatDateTime(date: LocalDateTime): Long {
         val zoneId = ZoneId.systemDefault()
         return date.atZone(zoneId).toInstant().toEpochMilli()
