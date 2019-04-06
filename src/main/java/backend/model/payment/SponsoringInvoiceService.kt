@@ -10,6 +10,8 @@ interface SponsoringInvoiceService {
 
     fun findById(id: Long): SponsoringInvoice?
 
+    fun findBySponsorId(sponsorId: Long): Iterable<SponsoringInvoice>
+
     fun findByPurposeOfTransferCode(purposeOfTransferCode: String): SponsoringInvoice?
 
     fun findAll(): Iterable<SponsoringInvoice>
