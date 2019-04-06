@@ -11,7 +11,6 @@ import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserAccount
 import backend.services.NotificationService
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -21,8 +20,7 @@ import java.time.LocalDateTime
 class PostingServiceImpl(private val repository: PostingRepository,
                          private val notificationService: NotificationService,
                          private val locationService: LocationService,
-                         private val mediaService: MediaService,
-                         private val applicationEventPublisher: ApplicationEventPublisher) : PostingService {
+                         private val mediaService: MediaService) : PostingService {
 
     override fun removeComment(posting: Posting, commentId: Long) {
         posting.removeComment(commentId)
@@ -84,7 +82,6 @@ class PostingServiceImpl(private val repository: PostingRepository,
             savedMedia = mediaService.save(media)
         }
 
-        //applicationEventPublisher.publishEvent(PostingCreatedEvent(posting))
         return repository.save(Posting(text, date, location, user, savedMedia))
     }
 
@@ -145,5 +142,3 @@ class PostingServiceImpl(private val repository: PostingRepository,
         repository.delete(posting)
     }
 }
-
-class PostingCreatedEvent(val posting: Posting)

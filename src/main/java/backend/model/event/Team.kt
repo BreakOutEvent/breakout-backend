@@ -43,6 +43,8 @@ class Team : BasicEntity, Blockable {
 
     var hasStarted: Boolean = false
 
+    var asleep: Boolean = false
+
     lateinit var name: String
 
     @ManyToOne(fetch = LAZY)

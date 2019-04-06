@@ -1,5 +1,6 @@
 package backend.model.event
 
+import backend.teamoverview.TeamOverview
 import backend.model.location.Location
 import backend.model.posting.Posting
 import org.springframework.data.domain.Pageable
@@ -30,5 +31,9 @@ interface TeamRepository : CrudRepository<Team, Long> {
     @Query("from Team t where t.name like concat('%',:search,'%')")
     fun searchByString(@Param("search") search: String): List<Team>
 
+    fun findAllByEventIsCurrentTrueAndHasStartedTrue(): Iterable<TeamOverview>
+
     fun findAllByEventIsCurrentTrueOrderByName(): Iterable<TeamSummaryProjection>
 }
+
+

@@ -136,6 +136,7 @@ class TeamController(private val teamService: TeamService,
         team.description = body.description ?: team.description
         team.name = body.name ?: team.name
         team.profilePic = body.profilePic?.let(::Media) ?: team.profilePic
+        team.asleep = body.asleep ?: team.asleep
 
         teamService.save(team)
 
