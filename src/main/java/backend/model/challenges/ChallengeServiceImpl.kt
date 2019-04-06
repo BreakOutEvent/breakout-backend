@@ -6,6 +6,7 @@ import backend.model.posting.Posting
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
 import backend.services.FeatureFlagService
+import backend.services.NotificationService
 import backend.services.mail.MailService
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,6 +16,7 @@ import javax.transaction.Transactional
 @Service
 class ChallengeServiceImpl @Autowired constructor(
         private val challengeRepository: ChallengeRepository,
+        private val notificationService: NotificationService,
         private val mailService: MailService,
         private val featureFlagService: FeatureFlagService) : ChallengeService {
 
@@ -37,6 +39,7 @@ class ChallengeServiceImpl @Autowired constructor(
         if (featureFlagService.isEnabled("challenge.addProof")) {
             proof.challenge = challenge.id
             challenge.addProof()
+            notificationService.notifyChallengeCompleted(challenge, proof)
             return challengeRepository.save(challenge)
         } else {
             throw DomainException("Can't add proof to challenge. Feature disabled")
@@ -51,6 +54,8 @@ class ChallengeServiceImpl @Autowired constructor(
     @Transactional
     override fun proposeChallenge(sponsor: Sponsor, team: Team, amount: Money, description: String, maximumCount: Int?): Challenge {
         val challenge = Challenge(sponsor, team, amount, description, maximumCount)
+        val users = team.members.map { it.account }.filter { !it.isBlocking(sponsor.account) }
+        notificationService.notifyNewChallenge(challenge, users)
         mailService.sendChallengeWasCreatedEmail(challenge)
         return challengeRepository.save(challenge)
     }
