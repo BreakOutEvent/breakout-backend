@@ -282,10 +282,11 @@ class UserController(private val userService: UserService,
         sponsor.address = sponsorView.address?.toAddress() ?: sponsor.address
         sponsor.isHidden = sponsorView.isHidden ?: sponsor.isHidden
         sponsor.company = sponsorView.company ?: sponsor.company
-        sponsor.logo = sponsorView.logo?.let(::Media) ?: sponsor.logo
+        sponsor.logo = sponsorView.logo?.let(::Media) ?: null
 
         val urlString = sponsorView.url
         if (urlString != null) sponsor.url = Url(urlString)
+        else sponsor.url = null
 
         return this
     }
