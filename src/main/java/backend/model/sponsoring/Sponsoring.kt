@@ -24,7 +24,7 @@ class Sponsoring : BasicEntity, Billable {
     @OneToOne(cascade = [(CascadeType.ALL)], orphanRemoval = true)
     var contract: Media? = null
 
-    var status: SponsoringStatus = PROPOSED
+    var status: SponsoringStatus = ACCEPTED
         private set (value) {
             checkTransition(from = field, to = value)
             field = value
