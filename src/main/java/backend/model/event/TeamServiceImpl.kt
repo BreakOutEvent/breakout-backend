@@ -13,7 +13,6 @@ import backend.services.mail.MailService
 import backend.util.data.DonateSums
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -25,7 +24,6 @@ class TeamServiceImpl(private val repository: TeamRepository,
                       private val userService: UserService,
                       private val mailService: MailService,
                       private val mediaService: MediaService,
-                      private val eventPublisher: ApplicationEventPublisher,
                       private val configurationService: ConfigurationService) : TeamService {
 
     private val logger: Logger = LoggerFactory.getLogger(TeamServiceImpl::class.java)
@@ -43,7 +41,6 @@ class TeamServiceImpl(private val repository: TeamRepository,
         savedTeam.invoice?.generatePurposeOfTransfer()
 
         userService.save(creator)
-        eventPublisher.publishEvent(TeamCreatedEvent(team))
         return savedTeam
     }
 
@@ -64,9 +61,7 @@ class TeamServiceImpl(private val repository: TeamRepository,
             team.profilePic = mediaService.save(team.profilePic as Media)
         }
 
-        val saved = repository.save(team)
-        eventPublisher.publishEvent(TeamChangedEvent(saved))
-        return saved
+        return repository.save(team)
     }
 
     override fun findOne(id: Long) = repository.findById(id)
@@ -94,7 +89,6 @@ class TeamServiceImpl(private val repository: TeamRepository,
     @Transactional
     override fun leave(team: Team, participant: Participant) {
         team.leave(participant)
-        eventPublisher.publishEvent(TeamChangedEvent(team))
     }
 
     @Transactional
@@ -102,13 +96,13 @@ class TeamServiceImpl(private val repository: TeamRepository,
 
         val members = team.join(participant)
 
-        eventPublisher.publishEvent(TeamChangedEvent(team))
         if (team.isFull()) {
             mailService.sendTeamIsCompleteEmail(team.members.toList())
         }
     }
 
     override fun getDistance(teamId: Long): Double {
+
         return this.findOne(teamId)?.getCurrentDistance() ?: 0.0
     }
 
@@ -202,6 +196,3 @@ class TeamServiceImpl(private val repository: TeamRepository,
         return teams.size
     }
 }
-
-class TeamCreatedEvent(val team: Team)
-class TeamChangedEvent(val team: Team)

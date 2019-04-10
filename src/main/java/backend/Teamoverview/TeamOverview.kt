@@ -1,179 +1,100 @@
-package backend.Teamoverview
+package backend.teamoverview
 
-import backend.model.BasicEntity
-import backend.model.event.Event
-import backend.model.event.Team
-import backend.model.location.Location
-import com.fasterxml.jackson.core.JsonGenerator
-import com.fasterxml.jackson.databind.SerializerProvider
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.fasterxml.jackson.databind.ser.std.StdSerializer
+import backend.model.misc.Coord
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.ZoneId
-import javax.persistence.*
 
-@Entity
-class TeamOverview : BasicEntity {
+interface TeamOverview {
 
-    private constructor() : super()
+    interface Event {
+        val id: Long
 
-    constructor(team: Team, event: Event) {
-        setOrUpdateValues(event, team)
+        @Value("#{target.title}")
+        fun getName(): String
     }
 
-    fun setOrUpdateValues(event: Event, team: Team) {
-        this.teamId = team.id!!
-        this.teamName = team.name
-        this.event = Event(event.id, event.title)
-        this.members = team.members.map {
-            TeamMember(it.id, it.firstname, it.lastname, it.emergencynumber, it.phonenumber)
+    interface Participant {
+        val id: Long
+        val firstname: String?
+        val lastname: String?
+
+        @Value("#{target.emergencynumber}")
+        fun getEmergencyPhone(): String
+
+        @Value("#{target.phonenumber}")
+        fun getContactPhone(): String
+    }
+
+    interface Location {
+        val id: Long
+        val coord: Coord
+        val locationData: Map<String, String>
+
+        @Value("#{@teamOverviewBean.formatDateTime(target.date)}")
+        fun getTimestamp(): Long
+    }
+
+    interface Posting {
+        val id: Long
+
+        @Value("#{@teamOverviewBean.formatDateTime(target.date)}")
+        fun getTimestamp(): Long
+    }
+
+    interface Contact {
+
+        interface Admin {
+            val id: Long
+            val firstname: String?
+            val lastname: String?
         }
+
+        val id: Long
+        val admin: Admin
+        val comment: String?
+
+        @Value("#{@teamOverviewBean.formatReason(target.reason)}")
+        fun getReason(): Int
+
+        @Value("#{@teamOverviewBean.formatDateTime(target.createdAt)}")
+        fun getTimestamp(): Long
     }
 
-    var teamId: Long = -1
+    val event: Event
+    
+    @Value("#{target.id}")
+    fun getTeamId(): Long
 
-    lateinit var teamName: String
+    @Value("#{target.name}")
+    fun getTeamName(): String
 
-    @Embedded
-    var event: backend.Teamoverview.Event? = null
+    @Value("#{target.asleep}")
+    fun getAsleep(): Boolean
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    var members: List<TeamMember> = listOf()
+    @Value("#{target.members}")
+    fun getMembers(): List<Participant>
 
-    @Embedded
-    @AttributeOverrides(
-            AttributeOverride(name = "latitude", column = Column(nullable = true)),
-            AttributeOverride(name = "longitude", column = Column(nullable = true))
-    )
-    var lastLocation: LastLocation? = null
+    @Value("#{@locationRepository.findLastLocationByTeamId(target.id)}")
+    fun getLastLocation(): Location?
 
-    @Embedded
-    var lastPosting: LastPosting? = null
+    @Value("#{@postingRepository.findLastPostingByTeamId(target.id)}")
+    fun getLastPosting(): Posting?
 
-    @Embedded
-    var lastContactWithHeadquarters: LastContactWithHeadquarters? = null
-
-    fun setLastContactWithHeadquarters(comment: String, timestamp: LocalDateTime) {
-        val lastContact = LastContactWithHeadquarters(timestamp, comment)
-        this.lastContactWithHeadquarters = lastContact
-    }
-
+    @Value("#{@contactWithHeadquartersRepository.findLastContactByTeamId(target.id)}")
+    fun getLastContactWithHeadquarters(): Contact?
 }
 
-@Embeddable
-class Event() {
+@Component
+class TeamOverviewBean {
 
-    @Column(name = "event_id")
-    var id: Long? = null
-    var name: String? = null
-
-    constructor(id: Long?, name: String?) : this() {
-        this.id = id
-        this.name = name
+    fun formatReason(reason: ContactWithHeadquarters.Reason): Int {
+        return reason.ordinal
     }
-}
 
-@Embeddable
-class TeamMember {
-
-    constructor()
-
-    var id: Long? = null
-    var firstname: String? = null
-    var lastname: String? = null
-    var emergencyPhone: String? = null
-    var contactPhone: String? = null
-
-    constructor(id: Long?, firstname: String?, lastname: String?, emergencyPhone: String?, contactPhone: String?) {
-        this.id = id
-        this.firstname = firstname
-        this.lastname = lastname
-        this.emergencyPhone = emergencyPhone
-        this.contactPhone = contactPhone
-    }
-}
-
-@Embeddable
-class LastLocation() {
-
-    @Embedded
-    var coord: Coord? = null
-
-    @Column(name = "location_id")
-    var id: Long? = null
-
-    @Column(name = "location_timestamp")
-    @JsonSerialize(using = TimestampSerializer::class)
-    var timestamp: LocalDateTime? = null
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @MapKeyColumn(name = "last_location_data_key")
-    @Column(name = "last_location_data_value")
-    var locationData: MutableMap<String, String> = mutableMapOf()
-
-    constructor(location: Location) : this() {
-        this.coord = Coord(location.coord.latitude, location.coord.longitude)
-        this.id = location.id
-        this.locationData = location.locationData.toMutableMap()
-        this.timestamp = location.date
-
-    }
-}
-
-@Embeddable
-class Coord() {
-
-    var latitude: Double? = null
-    var longitude: Double? = null
-
-    constructor(latitude: Double, longitude: Double) : this() {
-        this.latitude = latitude
-        this.longitude = longitude
-    }
-}
-
-
-@Embeddable
-class LastPosting() {
-    @Column(name = "posting_id")
-    var id: Long? = null
-
-    @Column(name = "posting_timestamp")
-    @JsonSerialize(using = TimestampSerializer::class)
-    var timestamp: LocalDateTime? = null
-
-    constructor(id: Long?, timestamp: LocalDateTime) : this() {
-        this.id = id
-        this.timestamp = timestamp
-    }
-}
-
-@Embeddable
-class LastContactWithHeadquarters() {
-
-    @JsonSerialize(using = TimestampSerializer::class)
-    var timestamp: LocalDateTime? = null
-
-    @Column(columnDefinition = "TEXT")
-    var comment: String? = null
-
-    constructor(timestamp: LocalDateTime, comment: String) : this() {
-        this.timestamp = timestamp
-        this.comment = comment
-    }
-}
-
-
-class TimestampSerializer : StdSerializer<LocalDateTime> {
-
-    constructor() : super(LocalDateTime::class.java)
-
-    constructor(clazz: Class<LocalDateTime>) : super(clazz)
-
-    override fun serialize(value: LocalDateTime, gen: JsonGenerator, provider: SerializerProvider?) {
+    fun formatDateTime(date: LocalDateTime): Long {
         val zoneId = ZoneId.systemDefault()
-        val epoch = value.atZone(zoneId).toInstant().toEpochMilli()
-        gen.writeNumber(epoch)
+        return date.atZone(zoneId).toInstant().toEpochMilli()
     }
-
 }
