@@ -133,6 +133,7 @@ class Sponsoring : BasicEntity, Billable {
                 PROPOSED to WITHDRAWN,
                 REJECTED to WITHDRAWN,
                 ACCEPTED to WITHDRAWN,
+                ACCEPTED to REJECTED,
                 ACCEPTED to PAYED)
 
         if (!transitions.contains(from to to)) {
