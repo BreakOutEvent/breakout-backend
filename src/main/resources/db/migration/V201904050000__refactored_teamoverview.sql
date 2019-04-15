@@ -13,7 +13,7 @@ CREATE TABLE `contact_with_headquarters` (
   `reason` int(11) NOT NULL,
   `comment` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
-)
+);
 
 -- Add going to sleep column
 alter table team add column `asleep` BIT DEFAULT 0;
