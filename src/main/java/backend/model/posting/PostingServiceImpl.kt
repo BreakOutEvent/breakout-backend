@@ -10,7 +10,7 @@ import backend.model.misc.Coord
 import backend.model.user.Participant
 import backend.model.user.User
 import backend.model.user.UserAccount
-import org.springframework.context.ApplicationEventPublisher
+import backend.services.NotificationService
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -18,9 +18,9 @@ import java.time.LocalDateTime
 
 @Service
 class PostingServiceImpl(private val repository: PostingRepository,
+                         private val notificationService: NotificationService,
                          private val locationService: LocationService,
-                         private val mediaService: MediaService,
-                         private val applicationEventPublisher: ApplicationEventPublisher) : PostingService {
+                         private val mediaService: MediaService) : PostingService {
 
     override fun removeComment(posting: Posting, commentId: Long) {
         posting.removeComment(commentId)
@@ -31,6 +31,10 @@ class PostingServiceImpl(private val repository: PostingRepository,
     override fun addComment(posting: Posting, from: UserAccount, at: LocalDateTime, withText: String): Comment {
         val comment = posting.addComment(from, at, withText)
         this.save(posting)
+
+        val users = posting.team!!.members.map { it.account }.filter { it.id != from.id && !it.isBlocking(from) }
+        notificationService.notifyNewComment(comment, posting, users)
+
         return comment
     }
 
@@ -38,6 +42,10 @@ class PostingServiceImpl(private val repository: PostingRepository,
     override fun like(posting: Posting, account: UserAccount, timeCreated: LocalDateTime): Like {
         val like = posting.like(timeCreated, account)
         this.save(posting)
+
+        val users = posting.team!!.members.map { it.account }.filter { it.id != account.id && !it.isBlocking(account) }
+        notificationService.notifyNewLike(like, posting, users)
+
         return like // TODO: Transactional?
     }
 
@@ -74,7 +82,6 @@ class PostingServiceImpl(private val repository: PostingRepository,
             savedMedia = mediaService.save(media)
         }
 
-        //applicationEventPublisher.publishEvent(PostingCreatedEvent(posting))
         return repository.save(Posting(text, date, location, user, savedMedia))
     }
 
@@ -135,5 +142,3 @@ class PostingServiceImpl(private val repository: PostingRepository,
         repository.delete(posting)
     }
 }
-
-class PostingCreatedEvent(val posting: Posting)

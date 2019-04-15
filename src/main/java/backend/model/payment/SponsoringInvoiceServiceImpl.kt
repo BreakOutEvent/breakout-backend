@@ -52,6 +52,10 @@ class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: Spon
         return sponsoringInvoiceRepository.findOne(id)
     }
 
+    override fun findBySponsorId(sponsorId: Long): Iterable<SponsoringInvoice> {
+        return sponsoringInvoiceRepository.findBySponsorId(sponsorId)
+    }
+
     override fun findAll(): Iterable<SponsoringInvoice> {
         return sponsoringInvoiceRepository.findAll()
     }

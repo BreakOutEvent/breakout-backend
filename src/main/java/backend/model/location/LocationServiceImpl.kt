@@ -10,7 +10,6 @@ import backend.model.user.Participant
 import backend.services.FeatureFlagService
 import backend.services.GeoCodingService
 import backend.util.speedToLocation
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import javax.transaction.Transactional
@@ -19,8 +18,7 @@ import javax.transaction.Transactional
 class LocationServiceImpl(private val locationRepository: LocationRepository,
                           private val geoCodingService: GeoCodingService,
                           private val featureFlagService: FeatureFlagService,
-                          private val eventService: EventService,
-                          private val eventPublisher: ApplicationEventPublisher) : LocationService {
+                          private val eventService: EventService) : LocationService {
 
     override fun findAll(): Iterable<Location> {
         return locationRepository.findAll()
@@ -47,7 +45,6 @@ class LocationServiceImpl(private val locationRepository: LocationRepository,
 
         val savedLocation = locationRepository.save(location)
         val team = location.team ?: throw Exception("Location has no team")
-        //eventPublisher.publishEvent(LocationUploadedEvent(location, team))
         return savedLocation
     }
 
@@ -123,5 +120,3 @@ class LocationServiceImpl(private val locationRepository: LocationRepository,
             locationRepository.findByTeamIdAndPriorOrderByDateDesc(location.team?.id, location.id, location.date).firstOrNull()
 
 }
-
-class LocationUploadedEvent(val location: Location, val team: Team)

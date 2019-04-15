@@ -17,4 +17,13 @@ interface LocationRepository : CrudRepository<Location, Long> {
 
     @Query("Select l from Location l WHERE l.team.id = :id AND l.date <= :date AND l.id != :locationId order by l.date desc")
     fun findByTeamIdAndPriorOrderByDateDesc(@Param("id") id: Long?, @Param("locationId") locationId: Long?, @Param("date") date: LocalDateTime): List<Location>
+
+    @Query("""
+        select *
+        from location
+        where team_id = :id
+        order by id desc
+        limit 1
+    """, nativeQuery = true)
+    fun findLastLocationByTeamId(@Param("id") id: Long): Location?
 }

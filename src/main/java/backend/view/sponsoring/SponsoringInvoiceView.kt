@@ -2,6 +2,7 @@ package backend.view.sponsoring
 
 import backend.model.payment.SponsoringInvoice
 import backend.model.sponsoring.ISponsor
+import backend.view.EventView
 import backend.view.challenge.ChallengeView
 import backend.view.user.UserView
 
@@ -30,6 +31,7 @@ class DetailedSponsoringInvoiceView : SponsoringInvoiceView {
     var sponsorings: List<SponsoringView>? = null
     var type: String? = null
     var contactEmails: List<String> = listOf()
+    var event: EventView? = null
 
     constructor() : super()
 
@@ -38,6 +40,7 @@ class DetailedSponsoringInvoiceView : SponsoringInvoiceView {
         this.sponsorings = invoice.sponsorings.map { SponsoringView(it) }
         this.type = invoice.sponsor.supporterType.toString()
         this.contactEmails = invoice.getContactEmails().map { email -> email.toString() }
+        this.event = invoice.event?.let(::EventView)
     }
 }
 
