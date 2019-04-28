@@ -31,7 +31,7 @@ class GroupMessageServiceImpl(val repository: GroupMessageRepository,
 
         val email = Email(
                 to = listOf(EmailAddress(user.email)),
-                subject = "BreakOut 2016 - Du wurdest einer Gruppennachricht hinzugefügt!",
+                subject = "BreakOut - Du wurdest einer Gruppennachricht hinzugefügt!",
                 body = "Hallo ${user.firstname ?: ""},<br><br>" +
                         "Du wurdest einer neuen Gruppennachricht hinzugefügt. Sieh nach was man Dir mitteilen mag!<br><br>" +
                         "Liebe Grüße<br>" +
@@ -42,6 +42,8 @@ class GroupMessageServiceImpl(val repository: GroupMessageRepository,
         )
 
         mailService.send(email)
+        notificationServer.notifyAddedToMessage(groupMessage.id, user)
+
 
         return repository.save(groupMessage)
     }
