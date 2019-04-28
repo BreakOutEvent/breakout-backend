@@ -35,11 +35,21 @@ class NotificationServiceImpl(private val restTemplate: RestOperations,
 
     private data class Translations(val german: String, val english: String = german)
 
+    override fun notifyAddedToMessage(groupId: Long?, user: UserAccount) {
+        val tokens = listOf(user).mapNotNull { it.notificationToken }
+        send(
+                mapOf("id" to groupId, "type" to "ADDED_TO_MESSAGE"),
+                Translations("Dir wurde eine neue Nachricht geschickt", "You were sent a new message"),
+                null,
+                tokens
+        )
+    }
+
     override fun notifyNewMessage(message: Message, groupId: Long?, users: List<UserAccount>) {
         val senderName = message.creator.fullName()
         val tokens = users.mapNotNull { it.notificationToken }
         send(
-                mapOf("id" to groupId),
+                mapOf("id" to groupId, "type" to "NEW_MESSAGE"),
                 Translations("$senderName hat dir eine Nachricht geschickt", "$senderName sent you a message"),
                 Translations(message.text),
                 tokens
@@ -51,7 +61,7 @@ class NotificationServiceImpl(private val restTemplate: RestOperations,
         val challengeText = "${challenge.description} (${challenge.amount})"
         val tokens = users.mapNotNull { it.notificationToken }
         send(
-                mapOf("challengeId" to challenge.id),
+                mapOf("challengeId" to challenge.id, "type" to "NEW_CHALLENGE"),
                 Translations("Neue Challenge von $sponsorName", "New Challenge from $sponsorName"),
                 Translations(challengeText),
                 tokens
@@ -61,7 +71,7 @@ class NotificationServiceImpl(private val restTemplate: RestOperations,
     override fun notifyChallengeCompleted(challenge: Challenge, posting: Posting) {
         val tokens = arrayOf(challenge.sponsor.registeredSponsor?.account).mapNotNull { it?.notificationToken }
         send(
-                mapOf("postingId" to posting.id),
+                mapOf("postingId" to posting.id, "type" to "CHALLENGE_COMPLETED"),
                 Translations("Team ${challenge.team?.name} hat deine Challenge erfüllt", "Team ${challenge.team?.name} completed your challenge"),
                 Translations(challenge.description),
                 tokens
@@ -72,8 +82,8 @@ class NotificationServiceImpl(private val restTemplate: RestOperations,
         val commenterName = comment.user?.fullName()
         val tokens = users.mapNotNull { it.notificationToken }
         send(
-                mapOf("postingId" to posting.id),
-                Translations("$commenterName hat auf dein Post kommentiert", "$commenterName commented on your Post"),
+                mapOf("postingId" to posting.id, "type" to "COMMENTED_POSTING"),
+                Translations("$commenterName hat deinen Post kommentiert", "$commenterName commented on your Post"),
                 Translations(comment.text),
                 tokens
         )
@@ -83,8 +93,8 @@ class NotificationServiceImpl(private val restTemplate: RestOperations,
         val likerName = like.user?.fullName()
         val tokens = users.mapNotNull { it.notificationToken }
         send(
-                mapOf("postingId" to posting.id),
-                Translations("$likerName hat dein Post geliked", "$likerName liked your Post"),
+                mapOf("postingId" to posting.id, "type" to "LIKED_POSTING"),
+                Translations("$likerName hat deinen Post geliked", "$likerName liked your Post"),
                 null,
                 tokens
         )
