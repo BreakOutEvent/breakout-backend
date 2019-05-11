@@ -2,6 +2,7 @@ package backend.controller.exceptions
 
 import backend.model.event.EventService
 import backend.model.payment.SponsoringInvoiceService
+import backend.util.euroOf
 import backend.view.sponsoring.DetailedSponsoringInvoiceView
 import backend.view.sponsoring.SponsoringInvoiceView
 import org.slf4j.LoggerFactory
@@ -90,5 +91,22 @@ class SponsoringInvoiceController(private val sponsoringInvoiceService: Sponsori
         } else {
             sponsoringInvoiceService.findByEventId(eventId).map(::SponsoringInvoiceView)
         }
+    }
+
+    @GetMapping("/search/")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    fun searchInvoices(@RequestParam(required = false) purposeOfTransferCode: String?,
+                       @RequestParam(required = false) teamId: Long?,
+                       @RequestParam(required = false) eventId: Long?,
+                       @RequestParam(required = false) firstname: String?,
+                       @RequestParam(required = false) lastname: String?,
+                       @RequestParam(required = false) company: String?,
+                       @RequestParam(required = false) minDonation: Number?,
+                       @RequestParam(required = false) maxDonation: Number?,
+                       @RequestParam(required = false) donorType: String?): Iterable<SponsoringInvoiceView> {
+
+        return sponsoringInvoiceService
+                .findByFilters(purposeOfTransferCode, teamId, eventId, firstname, lastname, company, minDonation?.let(::euroOf), maxDonation?.let(::euroOf), donorType)
+                .map(::SponsoringInvoiceView)
     }
 }
