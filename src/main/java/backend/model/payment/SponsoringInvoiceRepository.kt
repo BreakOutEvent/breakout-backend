@@ -6,6 +6,12 @@ import org.springframework.data.repository.query.Param
 
 interface SponsoringInvoiceRepository : CrudRepository<SponsoringInvoice, Long> {
 
+    @Query("""
+        from SponsoringInvoice
+        where (registeredSponsor is not null and registeredSponsor.supporterType is not null) or unregisteredSponsor is not null
+    """)
+    override fun findAll(): Iterable<SponsoringInvoice>
+
     @Query("from SponsoringInvoice where registeredSponsor.id = :registeredSponsorId")
     fun findBySponsorId(@Param("registeredSponsorId") registeredSponsorId: Long): Iterable<SponsoringInvoice>
 
