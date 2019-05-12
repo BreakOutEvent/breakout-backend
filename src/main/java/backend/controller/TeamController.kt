@@ -22,6 +22,7 @@ import backend.util.CacheNames.POSTINGS
 import backend.util.CacheNames.TEAMS
 import backend.util.data.DonateSums
 import backend.view.InvitationView
+import backend.view.TeamAndTeamEntryFeeInvoiceView
 import backend.view.TeamView
 import backend.view.posting.PostingView
 import org.slf4j.Logger
@@ -275,5 +276,12 @@ class TeamController(private val teamService: TeamService,
     @GetMapping("/{id}/donatesum/")
     fun getTeamDonateSum(@PathVariable("id") teamId: Long): DonateSums {
         return teamService.getDonateSum(teamId)
+    }
+
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/teamfee/")
+    fun getTeamFees(@PathVariable eventId: Long): Iterable<TeamAndTeamEntryFeeInvoiceView> {
+        return teamService.findByEventId(eventId).map(::TeamAndTeamEntryFeeInvoiceView)
     }
 }
