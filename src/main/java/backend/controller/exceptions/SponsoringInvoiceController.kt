@@ -107,6 +107,6 @@ class SponsoringInvoiceController(private val sponsoringInvoiceService: Sponsori
 
         return sponsoringInvoiceService
                 .findByFilters(purposeOfTransferCode, teamId, eventId, firstname, lastname, company, minDonation?.let(::euroOf), maxDonation?.let(::euroOf), donorType)
-                .map(::SponsoringInvoiceView)
+                .map(::DetailedSponsoringInvoiceView)
     }
 }
