@@ -20,6 +20,9 @@ class FakeNotificationService : NotificationService {
 
     val logger: Logger = LoggerFactory.getLogger(FakeNotificationService::class.java)
 
+    override fun notifyAddedToMessage(groupId: Long?, user: UserAccount) {
+        logger.info("""Fakely added user to message group $groupId""")
+    }
     override fun notifyNewMessage(message: Message, groupId: Long?, users: List<UserAccount>) {
         logger.info("""Fakely sending "$message.text" in group $groupId""")
     }
