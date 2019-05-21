@@ -66,10 +66,8 @@ class TeamEntryFeeInvoiceTest {
 
         PowerMockito.`when`(team.isFull()).thenReturn(true)
 
-        assertFails {
-            invoice.addPayment(firstPayment)
-            invoice.addPayment(secondPayment)
-        }
+        invoice.addPayment(firstPayment)
+        invoice.addPayment(secondPayment)
     }
 
     @Test
@@ -96,21 +94,21 @@ class TeamEntryFeeInvoiceTest {
     }
 
     @Test
-    fun testFailToAddPaymentIfAmountIsWrong() {
+    fun testAddPaymentUnderAmount() {
         val invoice = TeamEntryFeeInvoice(team, euroOf(10))
         val payment = AdminPayment(euroOf(4), admin)
 
-        assertFails { invoice.addPayment(payment) }
+        invoice.addPayment(payment)
     }
 
     @Test
-    fun testFailToAddPaymentIfTeamHasOnlyOneMember() {
+    fun testAddPaymentWhenTeamHasOnlyOneMember() {
         val invoice = TeamEntryFeeInvoice(team, euroOf(10))
         val payment = AdminPayment(euroOf(5), admin)
 
         PowerMockito.`when`(team.isFull()).thenReturn(false)
 
-        assertFails { invoice.addPayment(payment) }
+        invoice.addPayment(payment)
     }
 
     @Test
