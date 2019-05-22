@@ -11,11 +11,13 @@ import backend.model.user.Admin
 import backend.model.user.Participant
 import backend.model.user.Sponsor
 import backend.model.user.UserService
+import backend.util.Profiles.DEVELOPMENT
 import backend.util.Profiles.HEROKU
 import backend.util.euroOf
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -24,7 +26,7 @@ import java.time.LocalDateTime
 import javax.annotation.PostConstruct
 
 @Service
-@Profile(HEROKU)
+@Profile(HEROKU, DEVELOPMENT)
 class TestDataInitializer {
 
     // Services
@@ -35,15 +37,26 @@ class TestDataInitializer {
     @Autowired lateinit private var sponsoringService: SponsoringService
     @Autowired lateinit private var challengeService: ChallengeService
     @Autowired lateinit private var userDetailsService: UserDetailsService
+    @Autowired lateinit private var template: JdbcTemplate
 
     @PostConstruct
     fun initialize() {
 
-        val date = LocalDateTime.of(2016, 6, 3, 0, 0)
+        // Don't perform population if an event exists already
+        if (eventService.exists(1)) {
+            return
+        }
+
+        val date = LocalDateTime.now().minusHours(1)
 
         // ---- Events ----
-        val eventMunich = eventService.createEvent("Breakout München 2016", date, "München", Coord(48.1374300, 11.5754900), 36)
-        val eventBerlin = eventService.createEvent("Breakout Berlin 2016", date, "Berlin", Coord(52.5243700, 13.4105300), 36)
+        val eventMunich = eventService.createEvent("Breakout München", date, "München", Coord(48.1374300, 11.5754900), 36)
+        val eventBerlin = eventService.createEvent("Breakout Berlin", date, "Berlin", Coord(52.5243700, 13.4105300), 36)
+
+        arrayOf(eventMunich, eventBerlin).forEach {
+            eventService.markAsCurrent(it.id!!)
+            eventService.allowNewSponsoring(it.id!!)
+        }
 
         // --- iOS Devs Test Accounts ---
         val leo = userService.create("leokaessner@me.com", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
@@ -101,6 +114,50 @@ class TestDataInitializer {
         // ---- Locations for team2 ----
         locationService.create(Coord(53.5753200, 10.0153400), participant3, date.plusHours(2))
         locationService.create(Coord(52.3740300, 4.8896900), participant3, date.plusHours(2))
+
+        template.execute("""
+            INSERT INTO `oauth_client_details` (
+                `client_id`,
+                `resource_ids`,
+                `client_secret`,
+                `scope`,
+                `authorized_grant_types`,
+                `web_server_redirect_uri`,
+                `authorities`,
+                `access_token_validity`,
+                `refresh_token_validity`,
+                `additional_information`,
+                `autoapprove`
+            )
+
+            VALUES
+                (
+                    'test_breakout_app',
+                    'BREAKOUT_BACKEND',
+                    '123456789',
+                    'read,write',
+                    'password,refresh_token',
+                    '',
+                    'USER',
+                    NULL,
+                    NULL,
+                    '{}',
+                    ''
+                ),
+                (
+                    'test_client_app',
+                    'BREAKOUT_BACKEND',
+                    '123456789',
+                    'read,write',
+                    'password,refresh_token',
+                    '',
+                    'USER',
+                    NULL,
+                    NULL,
+                    '{}',
+                    ''
+                );
+        """.trimIndent())
 
     }
 

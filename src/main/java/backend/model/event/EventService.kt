@@ -39,4 +39,8 @@ interface EventService {
     fun getDonateSum(id: Long): DonateSums
 
     fun regenerateCache(eventId: Long?)
+
+    fun markAsCurrent(eventId: Long): Event
+
+    fun allowNewSponsoring(eventId: Long): Event
 }
