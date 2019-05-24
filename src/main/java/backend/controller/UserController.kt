@@ -282,11 +282,10 @@ class UserController(private val userService: UserService,
         sponsor.address = sponsorView.address?.toAddress() ?: sponsor.address
         sponsor.isHidden = sponsorView.isHidden ?: sponsor.isHidden
         sponsor.company = sponsorView.company ?: sponsor.company
-        sponsor.logo = sponsorView.logo?.let(::Media) ?: null
+        sponsor.logo = sponsorView.logo?.let(::Media) ?: sponsor.logo
 
         val urlString = sponsorView.url
         if (urlString != null) sponsor.url = Url(urlString)
-        else sponsor.url = null
 
         return this
     }
@@ -305,6 +304,46 @@ class UserController(private val userService: UserService,
     @GetMapping("/exists")
     fun exists(@RequestParam email: String): Boolean {
         return userService.exists(email)
+    }
+
+    /**
+     * DELETE /user/{id}/logo
+     * Deletes company logo of given sponsor
+     */
+    @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(TEAMS, allEntries = true))])
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/{id}/logo")
+    fun deleteLogo(@PathVariable id: Long,
+                    @AuthenticationPrincipal customUserDetails: CustomUserDetails): BasicUserView {
+
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
+        if (user.account.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")
+
+        val sponsor: Sponsor = user.getRole(Sponsor::class) ?: user.addRole(Sponsor::class)
+        sponsor.logo = null
+        userService.save(user)
+
+        return BasicUserView(user)
+    }
+
+    /**
+     * DELETE /user/{id}/url
+     * Deletes company url of given sponsor
+     */
+    @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(TEAMS, allEntries = true))])
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/{id}/url")
+    fun deleteUrl(@PathVariable id: Long,
+                   @AuthenticationPrincipal customUserDetails: CustomUserDetails): BasicUserView {
+
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
+        if (user.account.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")
+
+        val sponsor: Sponsor = user.getRole(Sponsor::class) ?: user.addRole(Sponsor::class)
+        sponsor.url = null
+        userService.save(user)
+
+        return BasicUserView(user)
     }
 
 }
