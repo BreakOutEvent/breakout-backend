@@ -42,7 +42,7 @@ class Sponsor : UserRole, ISponsor {
     override var url: Url? = null
 
     @Embedded
-    override lateinit var address: Address
+    override var address: Address? = null
 
     override var isHidden: Boolean = false
 

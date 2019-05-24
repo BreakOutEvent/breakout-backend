@@ -82,13 +82,14 @@ class ChallengeController(private var challengeService: ChallengeService,
     }
 
     private fun challengeWithRegisteredSponsor(user: User, team: Team, amount: Money, description: String, maximumCount: Int?): ChallengeView {
-        val sponsor = user.getRole(Sponsor::class) ?: throw UnauthorizedException("User is no sponsor")
+        val sponsor = user.getRole(Sponsor::class) ?: user.addRole(Sponsor::class)
         val challenge = challengeService.proposeChallenge(sponsor, team, amount, description, maximumCount)
         return ChallengeView(challenge)
     }
 
     private fun challengeUnregisteredSponsor(body: ChallengeView, team: Team, amount: Money, description: String): ChallengeView {
-        val unregisteredSponsor = body.unregisteredSponsor ?: throw BadRequestException("Missing data for unregistered sponsor")
+        val unregisteredSponsor = body.unregisteredSponsor
+                ?: throw BadRequestException("Missing data for unregistered sponsor")
 
         val sponsor = UnregisteredSponsor(
                 firstname = unregisteredSponsor.firstname!!,
@@ -112,12 +113,14 @@ class ChallengeController(private var challengeService: ChallengeService,
     fun changeStatus(@PathVariable challengeId: Long,
                      @Valid @RequestBody body: ChallengeStatusView): ChallengeView {
 
-        val challenge = challengeService.findOne(challengeId) ?: throw NotFoundException("No challenge with id $challengeId found")
+        val challenge = challengeService.findOne(challengeId)
+                ?: throw NotFoundException("No challenge with id $challengeId found")
         return when (body.status!!.toLowerCase()) {
             "rejected" -> challengeService.reject(challenge)
             "withdrawn" -> challengeService.withdraw(challenge)
             "with_proof" -> {
-                val proof = postingService.getByID(body.postingId!!) ?: throw NotFoundException("No posting with id ${body.postingId} found")
+                val proof = postingService.getByID(body.postingId!!)
+                        ?: throw NotFoundException("No posting with id ${body.postingId} found")
                 challengeService.addProof(challenge, proof)
             }
             else -> throw BadRequestException("Unknown status for challenge ${body.status}")
@@ -180,6 +183,7 @@ class ChallengeController(private var challengeService: ChallengeService,
 
             val sponsor = when (it.sponsor.isHidden) {
                 true -> SponsorTeamProfileView(
+                        sponsorId = null,
                         firstname = "",
                         lastname = "",
                         company = null,
@@ -187,6 +191,7 @@ class ChallengeController(private var challengeService: ChallengeService,
                         url = null,
                         logoUrl = null)
                 false -> SponsorTeamProfileView(
+                        sponsorId = it.sponsor.registeredSponsor?.id,
                         firstname = it.sponsor.firstname ?: "",
                         lastname = it.sponsor.lastname ?: "",
                         company = it.sponsor.company,

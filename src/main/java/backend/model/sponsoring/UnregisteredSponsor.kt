@@ -33,7 +33,7 @@ class UnregisteredSponsor : BasicEntity, ISponsor {
     override var url: Url? = null
 
     @Embedded
-    override lateinit var address: Address
+    override var address: Address? = null
 
     @OneToMany(mappedBy = "unregisteredSponsor")
     override var sponsorings: MutableList<Sponsoring> = mutableListOf()

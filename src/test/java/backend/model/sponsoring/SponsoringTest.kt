@@ -63,7 +63,7 @@ class SponsoringTest {
         val sponsor = PowerMockito.mock(Sponsor::class.java)
         val sponsoring = Sponsoring(sponsor, team, amountPerKm, limit)
 
-        assertEquals(PROPOSED, sponsoring.status)
+        assertEquals(ACCEPTED, sponsoring.status)
         sponsoring.accept()
         assertEquals(ACCEPTED, sponsoring.status)
     }
@@ -76,7 +76,7 @@ class SponsoringTest {
         val sponsor = PowerMockito.mock(Sponsor::class.java)
         val sponsoring = Sponsoring(sponsor, team, amountPerKm, limit)
 
-        assertEquals(PROPOSED, sponsoring.status)
+        assertEquals(ACCEPTED, sponsoring.status)
         sponsoring.accept()
         assertEquals(ACCEPTED, sponsoring.status)
     }
@@ -89,7 +89,7 @@ class SponsoringTest {
         val sponsor = PowerMockito.mock(Sponsor::class.java)
         val sponsoring = Sponsoring(sponsor, team, amountPerKm, limit)
 
-        assertEquals(PROPOSED, sponsoring.status)
+        assertEquals(ACCEPTED, sponsoring.status)
         sponsoring.reject()
         assertEquals(REJECTED, sponsoring.status)
     }

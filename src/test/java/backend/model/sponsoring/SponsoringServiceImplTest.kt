@@ -67,7 +67,7 @@ class SponsoringServiceImplTest : IntegrationTest() {
         assertFails { sponsoringService.acceptSponsoring(sponsoring) }
 
         val found = sponsoringRepository.findOne(sponsoring.id)
-        assertEquals(PROPOSED, found.status)
+        assertEquals(ACCEPTED, found.status)
 
     }
 
@@ -100,7 +100,7 @@ class SponsoringServiceImplTest : IntegrationTest() {
         assertFails { sponsoringService.rejectSponsoring(sponsoring) }
 
         val found = sponsoringRepository.findOne(sponsoring.id)
-        assertEquals(PROPOSED, found.status)
+        assertEquals(ACCEPTED, found.status)
     }
 
     @Test
@@ -175,7 +175,7 @@ class SponsoringServiceImplTest : IntegrationTest() {
         assertFails { sponsoringService.withdrawSponsoring(sponsoring) }
 
         val found = sponsoringRepository.findOne(sponsoring.id)
-        assertEquals(PROPOSED, found.status)
+        assertEquals(ACCEPTED, found.status)
     }
 
 }
