@@ -1,9 +1,11 @@
 package backend.controller
 
 import backend.configuration.CustomUserDetails
+import backend.model.event.EventService
 import backend.model.event.TeamService
 import backend.model.removeBlocking
 import backend.model.user.UserService
+import backend.view.EventView
 import backend.view.InvitationView
 import backend.view.user.BasicUserView
 import backend.view.user.UserView
@@ -15,8 +17,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/me")
-class AuthenticatedUserController(private val userService: UserService, private val teamService: TeamService) {
-
+class AuthenticatedUserController(
+        private val userService: UserService,
+        private val teamService: TeamService,
+        private val eventService: EventService
+) {
 
     /**
      * GET /me/
@@ -51,5 +56,15 @@ class AuthenticatedUserController(private val userService: UserService, private 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val invitations = teamService.findInvitationsForUser(user)
         return invitations.map(::InvitationView)
+    }
+
+    /**
+     * GET /me/event/open/
+     * Show events where the user is allowed to register
+     */
+    @GetMapping("/event/open/")
+    fun getEventsOpenForRegistration(@AuthenticationPrincipal customUserDetails: CustomUserDetails?): Iterable<EventView> {
+        val user = customUserDetails?.let { userService.getUserFromCustomUserDetails(it) }
+        return eventService.findEvensOpenForRegistration(user).map(::EventView)
     }
 }
