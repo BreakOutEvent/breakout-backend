@@ -4,8 +4,10 @@ import backend.controller.exceptions.NotFoundException
 import backend.model.cache.CacheService
 import backend.model.location.Location
 import backend.model.misc.Coord
+import backend.model.user.User
 import backend.services.FeatureFlagService
 import backend.util.data.DonateSums
+import org.joda.time.DateTime
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -98,5 +100,16 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository,
                     accSums.challengeSum + donateSums.challengeSum,
                     accSums.fullSum + donateSums.fullSum)
         }.orElseGet { DonateSums(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO) }
+    }
+
+    override fun findEvensOpenForRegistration(user: User?): List<Event> {
+        val openEvents = findAll().filter { it.isOpenForRegistration }
+        val invited = user?.let { teamService.findInvitationsForUser(it) }?.mapNotNull { it.team?.event } ?: emptyList()
+        val whitelisted = user?.let { repository.findWhitelistEntriesWithEmail(it.email) }?.map { it.event } ?: emptyList()
+        val all = openEvents + invited + whitelisted
+
+        return all
+                .distinctBy { it.id }
+                .filter { it.isCurrent && it.date > LocalDateTime.now() }
     }
 }
