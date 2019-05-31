@@ -166,6 +166,7 @@ class SponsoringController(private var sponsoringService: SponsoringService,
         return sponsoringService.findByTeamId(teamId).map {
             val sponsor = when (it.sponsor.isHidden) {
                 true -> SponsorTeamProfileView(
+                        sponsorId = null,
                         firstname = "",
                         lastname = "",
                         company = null,
@@ -173,6 +174,7 @@ class SponsoringController(private var sponsoringService: SponsoringService,
                         url = null,
                         logoUrl = null)
                 false -> SponsorTeamProfileView(
+                        sponsorId = it.sponsor.registeredSponsor?.id,
                         firstname = it.sponsor.firstname ?: "",
                         lastname = it.sponsor.lastname ?: "",
                         company = it.sponsor.company,

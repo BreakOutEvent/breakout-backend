@@ -2,6 +2,7 @@ package backend.model.event
 
 import backend.model.location.Location
 import backend.model.misc.Coord
+import backend.model.user.User
 import backend.util.data.DonateSums
 import java.time.LocalDateTime
 
@@ -39,4 +40,6 @@ interface EventService {
     fun getDonateSum(id: Long): DonateSums
 
     fun regenerateCache(eventId: Long?)
+
+    fun findEvensOpenForRegistration(user: User?): List<Event>
 }

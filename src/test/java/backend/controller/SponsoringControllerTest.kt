@@ -196,7 +196,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.team").exists())
                 .andExpect(jsonPath("$.sponsorId").exists())
                 .andExpect(jsonPath("$.userId").exists())
-                .andExpect(jsonPath("$.status").value("PROPOSED"))
+                .andExpect(jsonPath("$.status").value("ACCEPTED"))
                 .andExpect(jsonPath("$.unregisteredSponsor").doesNotExist())
     }
 
@@ -222,7 +222,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.team").exists())
                 .andExpect(jsonPath("$.sponsorId").exists())
                 .andExpect(jsonPath("$.userId").exists())
-                .andExpect(jsonPath("$.status").value("PROPOSED"))
+                .andExpect(jsonPath("$.status").value("ACCEPTED"))
                 .andExpect(jsonPath("$.unregisteredSponsor").doesNotExist())
     }
 

@@ -61,7 +61,7 @@ class UserView() {
         this.id = user.account.id
         this.isBlocked = user.isBlocked
         this.participant = if (user.hasRole(Participant::class)) ParticipantViewModel(user) else null
-        this.sponsor = if (user.hasRole(Sponsor::class)) SponsorView(user) else null
+        this.sponsor = SponsorView(user)
         this.profilePic = user.profilePic?.let(::MediaView)
         this.roles = user.account.getAuthorities().map { it.authority }
 
@@ -154,9 +154,9 @@ class UserView() {
                 else -> null
             }
             this.company = sponsor?.company
-            this.url = sponsor?.url.toString()
-            this.address = AddressView(sponsor?.address)
+            this.url = sponsor?.url?.toString()
             this.logo = sponsor?.logo?.let(::MediaView)
+            this.address = sponsor?.address?.let(::AddressView)
             this.isHidden = sponsor?.isHidden
         }
     }
