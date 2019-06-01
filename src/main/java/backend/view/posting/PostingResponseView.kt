@@ -41,6 +41,9 @@ class PostingResponseView() {
 
     var proves: PostingChallengeView? = null
 
+    var teamId: Long? = null
+
+    var teamName: String? = null
 
     constructor(posting: Posting, challenge: ChallengeProofProjection?, userId: Long?) : this() {
         this.id = posting.id
@@ -54,5 +57,7 @@ class PostingResponseView() {
         this.likes = posting.likes.count()
         this.hasLiked = posting.hasLiked
         this.proves = challenge?.let(::PostingChallengeView)
+        this.teamName = posting.team?.name
+        this.teamId = posting.team?.id
     }
 }
