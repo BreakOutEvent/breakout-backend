@@ -141,4 +141,8 @@ class PostingServiceImpl(private val repository: PostingRepository,
     override fun delete(posting: Posting) {
         repository.delete(posting)
     }
+
+    override fun findAllByChallenge(challengeId: Long): List<Posting> {
+        return repository.findAllByChallengeId(challengeId)
+    }
 }

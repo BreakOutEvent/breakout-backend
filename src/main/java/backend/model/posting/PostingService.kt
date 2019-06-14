@@ -4,6 +4,7 @@ import backend.model.media.Media
 import backend.model.misc.Coord
 import backend.model.user.User
 import backend.model.user.UserAccount
+import com.squareup.okhttp.Challenge
 import java.time.LocalDateTime
 
 interface PostingService {
@@ -37,4 +38,7 @@ interface PostingService {
     fun removeComment(from: Posting, id: Long)
 
     fun addComment(to: Posting, from: UserAccount, at: LocalDateTime, withText: String): Comment
+
+    fun findAllByChallenge(challengeId: Long): List<Posting>
+
 }

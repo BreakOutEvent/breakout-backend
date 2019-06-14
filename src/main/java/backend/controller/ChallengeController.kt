@@ -8,6 +8,8 @@ import backend.model.challenges.ChallengeService
 import backend.model.event.Team
 import backend.model.event.TeamService
 import backend.model.posting.PostingService
+import backend.model.removeBlockedBy
+import backend.model.removeReported
 import backend.model.sponsoring.UnregisteredSponsor
 import backend.model.user.Sponsor
 import backend.model.user.Participant
@@ -20,6 +22,7 @@ import backend.view.SponsorTeamProfileView
 import backend.view.challenge.ChallengeStatusView
 import backend.view.challenge.ChallengeTeamProfileView
 import backend.view.challenge.ChallengeView
+import backend.view.posting.PostingResponseView
 import org.javamoney.moneta.Money
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.http.HttpStatus.CREATED
@@ -202,6 +205,19 @@ class ChallengeController(private var challengeService: ChallengeService,
 
             ChallengeTeamProfileView(it.id, it.amount, it.description, it.status.toString(), it.fulfilledCount, it.maximumCount, sponsor)
         }
+    }
+
+    @GetMapping("/challenge/{challengeId}/posting/")
+    fun getPostingsFulfullingChallenges(@PathVariable challengeId: Long, @AuthenticationPrincipal customUserDetails: CustomUserDetails?): Iterable<PostingResponseView> {
+        return postingService
+                .findAllByChallenge(challengeId)
+                .removeReported()
+                .removeBlockedBy(customUserDetails?.id)
+                .map {
+                    PostingResponseView(it.hasLikesBy(customUserDetails?.id), it.challenge?.let {
+                        challengeService.findChallengeProveProjectionById(it)
+                    }, customUserDetails?.id)
+                }
     }
 
 }

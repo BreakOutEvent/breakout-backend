@@ -19,6 +19,9 @@ interface PostingRepository : CrudRepository<Posting, Long> {
     fun findReported(): List<Posting>
 
 
+    @Query("select p from Posting p where p.challenge = :challengeId")
+    fun findAllByChallengeId(@Param("challengeId") challengeId: Long): List<Posting>
+
     @Query("""
         select *
         from posting
