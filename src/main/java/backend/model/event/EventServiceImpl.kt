@@ -110,6 +110,6 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository,
 
         return all
                 .distinctBy { it.id }
-                .filter { it.isCurrent && it.date > LocalDateTime.now() }
+                .filter { it.isCurrent && it.date.plusHours(it.duration.toLong()) > LocalDateTime.now() }
     }
 }
