@@ -14,7 +14,7 @@ class TeamOverviewServiceImpl(
     override fun findAll(): Iterable<TeamOverview> =
             teamRepository.findAllByEventIsCurrentTrueAndHasStartedTrue()
 
-    override fun allCalls(teamId: Long): Iterable<ContactWithHeadquarters> =
+    override fun allCalls(teamId: Long): Iterable<TeamOverview.Contact> =
             contactWithHeadquartersRepository.findAllByTeamId(teamId)
 
     @Transactional

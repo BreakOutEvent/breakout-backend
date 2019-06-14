@@ -6,7 +6,7 @@ import org.springframework.data.repository.query.Param
 
 interface ContactWithHeadquartersRepository : CrudRepository<ContactWithHeadquarters, Long> {
 
-    fun findAllByTeamId(teamId: Long): Iterable<ContactWithHeadquarters>
+    fun findAllByTeamId(teamId: Long): Iterable<TeamOverview.Contact>
 
     @Query("""
         select *

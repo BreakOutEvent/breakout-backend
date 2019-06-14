@@ -23,7 +23,7 @@ class TeamOverviewController(val teamOverviewService: TeamOverviewService,
 
     @GetMapping("{teamId}/calls/")
     @PreAuthorize("hasAuthority('ADMIN')")
-    fun getCallsForTeam(@PathVariable teamId: Long): Iterable<ContactWithHeadquarters> {
+    fun getCallsForTeam(@PathVariable teamId: Long): Iterable<TeamOverview.Contact> {
         return teamOverviewService.allCalls(teamId)
     }
 
