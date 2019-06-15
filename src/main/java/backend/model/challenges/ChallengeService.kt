@@ -22,6 +22,9 @@ interface ChallengeService {
     @PreAuthorize("#challenge.team.isMember(authentication.name)")
     fun reject(challenge: Challenge): Challenge
 
+    @PreAuthorize("hasAuthority('ADMIN')")
+    fun addProofAsAdmin(challenge: Challenge, proof: Posting): Challenge
+
     @PreAuthorize("#challenge.team.isMember(authentication.name)")
     fun addProof(challenge: Challenge, proof: Posting): Challenge
 

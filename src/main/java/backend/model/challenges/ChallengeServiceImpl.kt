@@ -35,6 +35,14 @@ class ChallengeServiceImpl @Autowired constructor(
     }
 
     @Transactional
+    override fun addProofAsAdmin(challenge: Challenge, proof: Posting): Challenge {
+        proof.challenge = challenge.id
+        challenge.addProof()
+        notificationService.notifyChallengeCompleted(challenge, proof)
+        return challengeRepository.save(challenge)
+    }
+
+    @Transactional
     override fun addProof(challenge: Challenge, proof: Posting): Challenge {
         if (featureFlagService.isEnabled("challenge.addProof")) {
             proof.challenge = challenge.id

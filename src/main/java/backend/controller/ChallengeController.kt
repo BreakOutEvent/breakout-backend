@@ -124,7 +124,7 @@ class ChallengeController(private var challengeService: ChallengeService,
             "with_proof" -> {
                 val proof = postingService.getByID(body.postingId!!)
                         ?: throw NotFoundException("No posting with id ${body.postingId} found")
-                challengeService.addProof(challenge, proof)
+                challengeService.addProofAsAdmin(challenge, proof)
             }
             else -> throw BadRequestException("Unknown status for challenge ${body.status}")
         }.let(::ChallengeView)

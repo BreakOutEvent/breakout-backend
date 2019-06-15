@@ -1,12 +1,16 @@
 package backend.controller
 
+import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
+import backend.model.challenges.ChallengeService
 import backend.model.event.TeamService
 import backend.model.location.LocationService
 import backend.model.misc.Coord
 import backend.model.posting.PostingService
 import backend.model.sponsoring.SponsoringService
 import backend.services.mail.MailService
+import backend.view.challenge.ChallengeStatusView
+import backend.view.challenge.ChallengeView
 import backend.view.posting.PostingView
 import backend.view.user.AdminTeamLocationView
 import org.slf4j.Logger
@@ -22,7 +26,8 @@ class AdminController(private val mailService: MailService,
                       private val teamService: TeamService,
                       private val sponsoringService: SponsoringService,
                       private val locationService: LocationService,
-                      private val postingService: PostingService) {
+                      private val postingService: PostingService,
+                      private val challengeService: ChallengeService) {
 
 
     private val logger: Logger = LoggerFactory.getLogger(AdminController::class.java)
@@ -82,5 +87,27 @@ class AdminController(private val mailService: MailService,
                 LocalDateTime.now())
 
         return PostingView(posting, null, null)
+    }
+
+    /**
+     * POST /challenge/{challengeId}/proof/
+     * Add proof to a posting
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/challenge/{challengeId}/proof/")
+    fun addProofToChallenge(@PathVariable challengeId: Long,
+                            @Valid @RequestBody body: ChallengeStatusView): ChallengeView {
+
+        val challenge = challengeService.findOne(challengeId)
+                ?: throw NotFoundException("No challenge with id $challengeId found")
+
+        return when (body.status!!.toLowerCase()) {
+            "with_proof" -> {
+                val proof = postingService.getByID(body.postingId!!)
+                        ?: throw NotFoundException("No posting with id ${body.postingId} found")
+                challengeService.addProofAsAdmin(challenge, proof)
+            }
+            else -> throw BadRequestException("Unknown status for challenge ${body.status}")
+        }.let(::ChallengeView)
     }
 }
