@@ -1,6 +1,7 @@
 package backend.model.challenges
 
 import backend.exceptions.DomainException
+import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.posting.Posting
 import backend.model.sponsoring.UnregisteredSponsor
@@ -27,6 +28,11 @@ class ChallengeServiceImpl @Autowired constructor(
     override fun findAllUnregisteredSponsorsWithChallengesAtEvent(eventId: Long): Iterable<UnregisteredSponsor> {
         return this.challengeRepository.findAllUnregisteredSponsorsWithChallengesAtEvent(eventId)
     }
+
+    override fun findAllChallengesForEvents(currentEvents: List<Event>): Iterable<Challenge> {
+        return this.challengeRepository.findAllChallengesForEvents(currentEvents.map { it.id!! })
+    }
+
 
     @Transactional
     override fun reject(challenge: Challenge): Challenge {

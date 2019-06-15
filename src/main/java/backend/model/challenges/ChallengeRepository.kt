@@ -20,4 +20,7 @@ interface ChallengeRepository : CrudRepository<Challenge, Long> {
 
     @Query("select s from Challenge c join c.unregisteredSponsor as s where c.team.event.id = :eventId")
     fun findAllUnregisteredSponsorsWithChallengesAtEvent(@Param("eventId") eventId: Long): Iterable<UnregisteredSponsor>
+
+    @Query("select c from Challenge c where c.team.event.id in :eventIds")
+    fun findAllChallengesForEvents(@Param("eventIds") eventIds: Iterable<Long>): Iterable<Challenge>
 }

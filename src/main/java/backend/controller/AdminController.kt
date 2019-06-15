@@ -3,6 +3,7 @@ package backend.controller
 import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.model.challenges.ChallengeService
+import backend.model.event.EventService
 import backend.model.event.TeamService
 import backend.model.location.LocationService
 import backend.model.misc.Coord
@@ -24,10 +25,11 @@ import javax.validation.Valid
 @RequestMapping("/admin")
 class AdminController(private val mailService: MailService,
                       private val teamService: TeamService,
+                      private val eventService: EventService,
+                      private val challengeService: ChallengeService,
                       private val sponsoringService: SponsoringService,
                       private val locationService: LocationService,
-                      private val postingService: PostingService,
-                      private val challengeService: ChallengeService) {
+                      private val postingService: PostingService) {
 
 
     private val logger: Logger = LoggerFactory.getLogger(AdminController::class.java)
@@ -83,10 +85,21 @@ class AdminController(private val mailService: MailService,
                 team.members.elementAt(0),
                 "Current Location: ${body.city}",
                 null,
-                Coord(body.latitude, body.longitude), 
+                Coord(body.latitude, body.longitude),
                 LocalDateTime.now())
 
         return PostingView(posting, null, null)
+    }
+
+    /**
+     * GET /admin/allchallenges/
+     * Allows Admin to get all challenges for current events
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/allchallenges/")
+    fun getAllChallenges(): Iterable<ChallengeView> {
+        val currentEvents = eventService.findAll().filter { it.isCurrent }
+        return challengeService.findAllChallengesForEvents(currentEvents).map(::ChallengeView)
     }
 
     /**

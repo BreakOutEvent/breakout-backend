@@ -1,5 +1,6 @@
 package backend.model.challenges
 
+import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.posting.Posting
 import backend.model.sponsoring.UnregisteredSponsor
@@ -41,5 +42,7 @@ interface ChallengeService {
     fun findAllRegisteredSponsorsWithChallengesAtEvent(eventId: Long): Iterable<Sponsor>
 
     fun findAllUnregisteredSponsorsWithChallengesAtEvent(eventId: Long): Iterable<UnregisteredSponsor>
+
+    fun findAllChallengesForEvents(currentEvents: List<Event>) : Iterable<Challenge>
 }
 
