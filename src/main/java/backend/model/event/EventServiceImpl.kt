@@ -26,7 +26,7 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository,
 
     val logger: Logger = LoggerFactory.getLogger(EventServiceImpl::class.java)
 
-    @Scheduled(cron = "0 */2 * * * ?")
+    @Scheduled(cron = "*/30 * * * * ?")
     @Transactional(propagation = Propagation.REQUIRED)
     fun scheduleRegenerateScores() {
         if (featureFlagService.isEnabled("event.scheduleRegenerateScores"))
