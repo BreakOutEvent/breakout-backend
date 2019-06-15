@@ -1,5 +1,6 @@
 package backend.controller
 
+import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.model.challenges.ChallengeService
@@ -9,21 +10,26 @@ import backend.model.location.LocationService
 import backend.model.misc.Coord
 import backend.model.posting.PostingService
 import backend.model.sponsoring.SponsoringService
+import backend.model.user.Admin
+import backend.model.user.UserService
 import backend.services.mail.MailService
 import backend.view.challenge.ChallengeStatusView
 import backend.view.challenge.ChallengeView
 import backend.view.posting.PostingView
 import backend.view.user.AdminTeamLocationView
+import backend.view.user.UserView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/admin")
-class AdminController(private val mailService: MailService,
+class AdminController(private val userService: UserService,
+                      private val mailService: MailService,
                       private val teamService: TeamService,
                       private val eventService: EventService,
                       private val challengeService: ChallengeService,
@@ -122,5 +128,48 @@ class AdminController(private val mailService: MailService,
             }
             else -> throw BadRequestException("Unknown status for challenge ${body.status}")
         }.let(::ChallengeView)
+    }
+
+    /**
+     * POST /admin/{id}/makeadmin
+     * Turn a user into an Admin
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("user/{id}/admin/")
+    fun addAdminRights(@PathVariable id: Long): UserView {
+        val user = userService.getUserById(id) ?: throw NotFoundException("User with ID $id not found")
+        user.addRole(Admin::class)
+        userService.save(user)
+        return UserView(user)
+    }
+
+    /**
+     * POST /admin/{id}/makeadmin
+     * Turn a user into an Admin
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @DeleteMapping("user/{id}/admin/")
+    fun removeAdminRights(@PathVariable id: Long): UserView {
+        val user = userService.getUserById(id) ?: throw NotFoundException("User with ID $id not found")
+        user.removeRole(Admin::class)
+        userService.save(user)
+        return UserView(user)
+    }
+
+    /**
+     * POST /admin/{id}/swappasswords
+     * Swaps your password with another user
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("user/{id}/swappasswords/")
+    fun swapPasswords(@PathVariable id: Long,
+                      @AuthenticationPrincipal customUserDetails: CustomUserDetails): Map<String, String> {
+
+        val first = userService.getUserFromCustomUserDetails(customUserDetails)
+        val second = userService.getUserById(id) ?: throw NotFoundException("User with ID $id not found")
+
+        userService.swapPasswords(first.account, second.account)
+
+        return mapOf("message" to "success")
     }
 }

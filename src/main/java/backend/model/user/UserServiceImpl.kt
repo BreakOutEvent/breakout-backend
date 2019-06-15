@@ -98,5 +98,14 @@ class UserServiceImpl @Autowired constructor(private val userRepository: UserRep
     override fun findAllSponsors(): Iterable<Sponsor> {
         return userRepository.findAllSponsors()
     }
+
+    override fun swapPasswords(first: UserAccount, second: UserAccount) {
+        val tmp = first.passwordHash
+        first.passwordHash = second.passwordHash
+        second.passwordHash = tmp
+
+        save(first)
+        save(second)
+    }
 }
 
