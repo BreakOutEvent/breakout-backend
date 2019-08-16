@@ -31,4 +31,6 @@ interface UserService {
     fun searchByString(search: String): List<UserAccount>
 
     fun findAllSponsors(): Iterable<Sponsor>
+
+    fun swapPasswords(first: UserAccount, second: UserAccount)
 }

@@ -25,5 +25,4 @@ interface UserRepository : CrudRepository<UserAccount, Long> {
 
     @Query("select u from UserAccount u join u.userRoles r where KEY(r) = :role")
     fun findAllUsersByRole(@Param("role") role: Class<out UserRole>): List<UserAccount>
-
 }

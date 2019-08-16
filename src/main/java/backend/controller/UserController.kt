@@ -13,16 +13,15 @@ import backend.model.sponsoring.SupporterType
 import backend.model.removeBlockedBy
 import backend.model.removeBlocking
 import backend.services.ConfigurationService
-import backend.util.CacheNames
 import backend.util.CacheNames.POSTINGS
 import backend.util.CacheNames.TEAMS
 import backend.view.DetailedInvitationView
 import backend.view.NotificationTokenView
+import backend.view.user.AdminSimpleUserView
 import backend.view.user.BasicUserView
 import backend.view.user.SimpleUserView
 import backend.view.user.UserView
 import io.swagger.annotations.Api
-import org.hibernate.annotations.Cache
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CacheEvict
@@ -119,7 +118,11 @@ class UserController(private val userService: UserService,
         val user = customUserDetails?.id?.let { userService.getUserById(it) }
         val users = userService.searchByString(search).take(6).toMutableList()
         users.addAll(teamService.searchByString(search).take(3).flatMap { it.members.map { it.account } })
-        return users.removeBlockedBy(customUserDetails?.id).removeBlocking(user).map(::SimpleUserView)
+
+        return when (user?.hasRole(Admin::class)) {
+            true -> users.map(::AdminSimpleUserView)
+            else -> users.removeBlockedBy(customUserDetails?.id).removeBlocking(user).map(::SimpleUserView)
+        }
     }
 
     /**
