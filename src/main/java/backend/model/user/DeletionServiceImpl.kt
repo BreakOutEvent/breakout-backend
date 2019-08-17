@@ -31,8 +31,7 @@ class DeletionServiceImpl @Autowired constructor(private val userRepository: Use
                                                  private val teamRepository: TeamRepository,
                                                  private val messageRepository: GroupMessageRepository,
                                                  private val challengeRepository: ChallengeRepository,
-                                                 private val emailRepository: EmailRepository,
-                                                 private val template: JdbcTemplate) : DeletionService {
+                                                 private val emailRepository: EmailRepository) : DeletionService {
 
     fun delete(email: Email) {
         emailRepository.delete(email)

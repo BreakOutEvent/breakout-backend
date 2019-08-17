@@ -30,7 +30,7 @@ class ChallengeTest {
         val challenge = Challenge(sponsor, team, euroOf(50), "description")
 
         assertEquals(sponsor, challenge.sponsor)
-        assertNull(challenge.sponsor.unregisteredSponsor)
+        assertNull(challenge.sponsor?.unregisteredSponsor)
     }
 
     @Test
@@ -41,7 +41,7 @@ class ChallengeTest {
         val challenge = Challenge(unregistered, team, euroOf(50), "description")
 
         assertTrue(challenge.sponsor is UnregisteredSponsor)
-        assertNull(challenge.sponsor.registeredSponsor)
+        assertNull(challenge.sponsor?.registeredSponsor)
     }
 
     @Test
