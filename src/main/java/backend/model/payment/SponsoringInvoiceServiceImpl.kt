@@ -90,12 +90,12 @@ class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: Spon
         return invoices
                 .filterBy(purposeOfTransferCode) { purposeOfTransferCode, invoice -> purposeOfTransferCode == invoice.purposeOfTransferCode }
                 .filterBy(eventId) { eventId, invoice -> eventId == invoice.event?.id }
-                .filterBy(firstname) { firstname, invoice -> invoice.sponsor.firstname?.contains(firstname, ignoreCase = true) ?: false }
-                .filterBy(lastname) { lastname, invoice -> invoice.sponsor.lastname?.contains(lastname, ignoreCase = true) ?: false }
-                .filterBy(company) { company, invoice -> invoice.sponsor.company?.contains(company, ignoreCase = true) ?: false }
+                .filterBy(firstname) { firstname, invoice -> invoice.sponsor?.firstname?.contains(firstname, ignoreCase = true) ?: false }
+                .filterBy(lastname) { lastname, invoice -> invoice.sponsor?.lastname?.contains(lastname, ignoreCase = true) ?: false }
+                .filterBy(company) { company, invoice -> invoice.sponsor?.company?.contains(company, ignoreCase = true) ?: false }
                 .filterBy(minDonation) { minDonation, invoice -> minDonation <= invoice.amount }
                 .filterBy(maxDonation) { maxDonation, invoice -> maxDonation >= invoice.amount }
-                .filterBy(donorType) { donorType, invoice -> donorType == invoice.sponsor.supporterType.name }
+                .filterBy(donorType) { donorType, invoice -> donorType == invoice.sponsor?.supporterType?.name }
 
     }
 

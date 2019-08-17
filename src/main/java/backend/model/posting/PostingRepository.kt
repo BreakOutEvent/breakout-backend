@@ -18,6 +18,13 @@ interface PostingRepository : CrudRepository<Posting, Long> {
     @Query("select p from Posting p where p.reported = true")
     fun findReported(): List<Posting>
 
+    fun findAllByUserId(userId: Long): List<Posting>
+
+    @Query("select distinct p from Posting p inner join p.comments c where c.user.id = :userId")
+    fun findAllCommentedByUser(@Param("userId") userId: Long): List<Posting>
+
+    @Query("select p from Posting p inner join p.likes l where l.user.id = :userId")
+    fun findAllLikedByUser(@Param("userId") userId: Long): List<Posting>
 
     @Query("select p from Posting p where p.challenge = :challengeId")
     fun findAllByChallengeId(@Param("challengeId") challengeId: Long): List<Posting>

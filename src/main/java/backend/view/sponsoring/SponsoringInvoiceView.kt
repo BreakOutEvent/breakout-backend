@@ -20,7 +20,7 @@ open class SponsoringInvoiceView {
         this.id = invoice.id
         this.amount = invoice.amount.numberStripped.toDouble()
         this.payed = invoice.amountOfCurrentPayments().numberStripped.toDouble()
-        this.sponsor = SponsorView(invoice.sponsor)
+        this.sponsor = invoice.sponsor?.let(::SponsorView)
         this.purposeOfTransfer = invoice.purposeOfTransfer
     }
 }
@@ -38,7 +38,7 @@ class DetailedSponsoringInvoiceView : SponsoringInvoiceView {
     constructor(invoice: SponsoringInvoice) : super(invoice) {
         this.challenges = invoice.challenges.map { ChallengeView(it) }
         this.sponsorings = invoice.sponsorings.map { SponsoringView(it) }
-        this.type = invoice.sponsor.supporterType.toString()
+        this.type = invoice.sponsor?.supporterType.toString()
         this.contactEmails = invoice.getContactEmails().map { email -> email.toString() }
         this.event = invoice.event?.let(::EventView)
     }

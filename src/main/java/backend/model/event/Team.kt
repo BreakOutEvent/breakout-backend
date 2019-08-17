@@ -193,7 +193,7 @@ class Team : BasicEntity, Blockable {
     }
 
     private fun Sponsoring.toEmailListing(): String {
-        return "<b>Name</b> ${this.sponsor.firstname} ${this.sponsor.lastname} <b>Status</b> ${this.status} <b>Betrag pro km</b> ${this.amountPerKm.display()} <b>Limit</b> ${this.limit.display()} <b>Gereiste KM</b> ${this.team?.getCurrentDistance()} <b>Spendenversprechen</b> ${this.billableAmount().display()}"
+        return "<b>Name</b> ${this.sponsor?.firstname} ${this.sponsor?.lastname} <b>Status</b> ${this.status} <b>Betrag pro km</b> ${this.amountPerKm.display()} <b>Limit</b> ${this.limit.display()} <b>Gereiste KM</b> ${this.team?.getCurrentDistance()} <b>Spendenversprechen</b> ${this.billableAmount().display()}"
     }
 
     @JvmName("challengeToEmailListing")
@@ -203,7 +203,7 @@ class Team : BasicEntity, Blockable {
 
     private fun Challenge.toEmailListing(): String {
         println()
-        return "<b>Name</b> ${this.sponsor.firstname} ${this.sponsor.lastname} <b>Beschreibung</b> ${this.description.take(50)}... <b>Challengebetrag</b> ${this.amount.display()} <b>Spendenversprechen</b> ${this.billableAmount().display()}"
+        return "<b>Name</b> ${this.sponsor?.firstname} ${this.sponsor?.lastname} <b>Beschreibung</b> ${this.description.take(50)}... <b>Challengebetrag</b> ${this.amount.display()} <b>Spendenversprechen</b> ${this.billableAmount().display()}"
     }
 
     override fun isBlockedBy(userId: Long?): Boolean {

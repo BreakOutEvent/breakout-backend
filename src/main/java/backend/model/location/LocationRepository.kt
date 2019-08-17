@@ -26,4 +26,6 @@ interface LocationRepository : CrudRepository<Location, Long> {
         limit 1
     """, nativeQuery = true)
     fun findLastLocationByTeamId(@Param("id") id: Long): Location?
+
+    fun findAllByUploaderId(uploaderId: Long): List<Location>
 }

@@ -46,9 +46,8 @@ class Sponsoring : BasicEntity, Billable {
     @ManyToOne
     private var registeredSponsor: Sponsor? = null
 
-    var sponsor: ISponsor
+    var sponsor: ISponsor?
         get() = this.unregisteredSponsor as? ISponsor ?: this.registeredSponsor
-                ?: throw NullPointerException("Neither unregisteredSponsor nor registeredSponsor are set")
         private set(value) {}
 
     /**
@@ -62,7 +61,7 @@ class Sponsoring : BasicEntity, Billable {
         this.amountPerKm = amountPerKm
         this.limit = limit
         this.contract = null
-        this.sponsor.sponsorings.add(this)
+        this.sponsor?.sponsorings?.add(this)
     }
 
     constructor(unregisteredSponsor: UnregisteredSponsor, team: Team, amountPerKm: Money, limit: Money) : this() {
@@ -72,7 +71,7 @@ class Sponsoring : BasicEntity, Billable {
         this.limit = limit
         this.status = ACCEPTED
         this.contract = null
-        this.sponsor.sponsorings.add(this)
+        this.sponsor?.sponsorings?.add(this)
     }
 
     fun accept() {
@@ -163,5 +162,10 @@ class Sponsoring : BasicEntity, Billable {
 
     fun belongsToEvent(eventId: Long): Boolean {
         return this.team?.event?.id == eventId
+    }
+
+    fun removeSponsor() {
+        unregisteredSponsor = null
+        registeredSponsor = null
     }
 }

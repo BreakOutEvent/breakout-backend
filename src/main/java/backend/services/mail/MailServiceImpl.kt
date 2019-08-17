@@ -615,7 +615,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
         |
         |Bitte beachtet, dass eure Sponsoren auch mehrere Teams unterstützt haben könnten. Sponsoren, die hier gelistet sind, können auch noch offene Spendenversprechen bei anderen Teams haben und daher hier auftauchen.
         |
-        |${invoice.foldRight("") { a, b -> b + "${a.sponsor.firstname} ${a.sponsor.lastname} ${buildSponsorCompanyText(a.sponsor)}\n" }}
+        |${invoice.foldRight("") { a, b -> b + "${a.sponsor?.firstname} ${a.sponsor?.lastname} ${buildSponsorCompanyText(a.sponsor)}\n" }}
         |
         |Die offenen Spenden sollten bitte wie folgt überwiesen werden:
         |
@@ -643,7 +643,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
         |
         |Beware that your sponsors might have supported other teams as well. The sponsors being listed below might also be a result of unpaid donation promises for other teams.
         |
-        |${invoice.foldRight("") { a, b -> b + "${a.sponsor.firstname} ${a.sponsor.lastname} ${buildSponsorCompanyText(a.sponsor)}\n" }}
+        |${invoice.foldRight("") { a, b -> b + "${a.sponsor?.firstname} ${a.sponsor?.lastname} ${buildSponsorCompanyText(a.sponsor)}\n" }}
         |
         |The open donations should be transferred to following bank account:
         |
@@ -670,8 +670,8 @@ class MailServiceImpl(configurationService: ConfigurationService,
         mailSenderService.send(email)
     }
 
-    private fun buildSponsorCompanyText(sponsor: ISponsor): String {
-        sponsor.company?.let {
+    private fun buildSponsorCompanyText(sponsor: ISponsor?): String {
+        sponsor?.company?.let {
             return "- $it"
         }
         return ""
@@ -683,7 +683,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
         val germanText = """
             |Sollten Sie bereits eine Email mit Ihrem Spendenversprechen erhalten haben, können Sie diese ignorieren
             |
-            |Liebe(r) ${invoice.sponsor.firstname} ${invoice.sponsor.lastname},
+            |Liebe(r) ${invoice.sponsor?.firstname} ${invoice.sponsor?.lastname},
             |
             |vielen herzlichen Dank, dass Sie beim BreakOut $year ein Team unterstützen! Ihre Spende wird von BreakOut e. V. an $partner weitergeleitet. Wir bitten Sie herzlich, Ihre Spende bis zum $ceremonyDay. $ceremonyMonthGerman an das unten angegebene Konto zu überweisen, damit wir das Geld rechtzeitig zur Siegerehrung des diesjährigen BreakOuts erhalten.
             |Bei Challenges, für die Ihr Spendenversprechen 0€ beträgt, wurde die Challenge vom Team leider während des BreakOuts $year nicht erfüllt.
@@ -718,7 +718,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
         val englishText = """
             |Should you have received an email stating your donation promise before, please ignore this email
             |
-            |Dear ${invoice.sponsor.firstname} ${invoice.sponsor.lastname},
+            |Dear ${invoice.sponsor?.firstname} ${invoice.sponsor?.lastname},
             |
             |Many, many thanks for supporting a team during BreakOut $year! We would kindly ask you to transfer your donation by $ceremonyMonthEnglish ${ceremonyDay}th so that we will receive the payment in time for our awards party.
             |If your donation promise for a given challenge is 0€, the team has unfortunately not mastered the challenge during BreakOut $year.
@@ -759,7 +759,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
 
         val germanText = """
-            |Liebe(r) ${invoice.sponsor.firstname} ${invoice.sponsor.lastname},
+            |Liebe(r) ${invoice.sponsor?.firstname} ${invoice.sponsor?.lastname},
             |
             |vielen herzlichen Dank, dass Sie beim BreakOut $year ein Team unterstützen! Ihre Spende wird von BreakOut e. V. an $partner weitergeleitet. Daher möchten wir Sie gern daran erinnern, Ihr Spendenversprechen baldmöglichst einzulösen.
             |Sollten Sie Ihre Überweisung bereits veranlasst haben, können Sie diese Email einfach ignorieren.
@@ -795,7 +795,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
         val englishText = """
             |
-            |Dear ${invoice.sponsor.firstname} ${invoice.sponsor.lastname},
+            |Dear ${invoice.sponsor?.firstname} ${invoice.sponsor?.lastname},
             |
             |Many, many thanks for supporting a team during BreakOut $year! We would like to kindly remind you to fulfill your donation promise as soon as possible. If you have already transferred your donation, you can simply ignore this email.
             |If your donation promise for a given challenge is 0€, the team has unfortunately not mastered the challenge during BreakOut $year.
