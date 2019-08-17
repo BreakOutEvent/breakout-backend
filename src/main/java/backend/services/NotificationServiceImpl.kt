@@ -46,7 +46,7 @@ class NotificationServiceImpl(private val restTemplate: RestOperations,
     }
 
     override fun notifyNewMessage(message: Message, groupId: Long?, users: List<UserAccount>) {
-        val senderName = message.creator.fullName()
+        val senderName = message.creator?.fullName()
         val tokens = users.mapNotNull { it.notificationToken }
         send(
                 mapOf("id" to groupId, "type" to "NEW_MESSAGE"),
@@ -57,7 +57,7 @@ class NotificationServiceImpl(private val restTemplate: RestOperations,
     }
 
     override fun notifyNewChallenge(challenge: Challenge, users: List<UserAccount>) {
-        val sponsorName = "${challenge.sponsor.firstname} ${challenge.sponsor.lastname}"
+        val sponsorName = "${challenge.sponsor?.firstname} ${challenge.sponsor?.lastname}"
         val challengeText = "${challenge.description} (${challenge.amount})"
         val tokens = users.mapNotNull { it.notificationToken }
         send(
@@ -69,7 +69,7 @@ class NotificationServiceImpl(private val restTemplate: RestOperations,
     }
 
     override fun notifyChallengeCompleted(challenge: Challenge, posting: Posting) {
-        val tokens = arrayOf(challenge.sponsor.registeredSponsor?.account).mapNotNull { it?.notificationToken }
+        val tokens = arrayOf(challenge.sponsor?.registeredSponsor?.account).mapNotNull { it?.notificationToken }
         send(
                 mapOf("postingId" to posting.id, "type" to "CHALLENGE_COMPLETED"),
                 Translations("Team ${challenge.team?.name} hat deine Challenge erfüllt", "Team ${challenge.team?.name} completed your challenge"),

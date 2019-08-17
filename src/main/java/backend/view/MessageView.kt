@@ -11,7 +11,7 @@ class MessageView() {
 
     var id: Long? = null
 
-    lateinit var creator: BasicUserView
+    var creator: BasicUserView? = null
 
     @NotNull
     @SafeHtml(whitelistType = NONE)
@@ -24,6 +24,6 @@ class MessageView() {
         this.id = message.id
         this.date = message.date.toEpochSecond(ZoneOffset.UTC)
         this.text = message.text
-        this.creator = BasicUserView(message.creator)
+        this.creator = message.creator?.let(::BasicUserView)
     }
 }

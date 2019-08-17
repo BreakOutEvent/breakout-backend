@@ -37,18 +37,18 @@ class SponsoringInvoice : Invoice {
 
     var initialVersionSent: Boolean = false
 
-    var sponsor: ISponsor
+    var sponsor: ISponsor?
         private set(value) {
             when (value) {
                 is UnregisteredSponsor -> this.unregisteredSponsor = value
                 is Sponsor -> this.registeredSponsor = value
-                else -> throw Exception("Unsupported implementation of ISponsor found: ${value::class}")
+                else -> throw Exception("Unsupported implementation of ISponsor found: $value")
             }
         }
         get() {
             this.unregisteredSponsor?.let { return it }
             this.registeredSponsor?.let { return it }
-            throw Exception("Neither registered nor unregistered sponsor are found in invoice $id")
+            return null
         }
 
     /*
@@ -95,7 +95,7 @@ class SponsoringInvoice : Invoice {
 
     override fun generatePurposeOfTransfer(): String {
         this.purposeOfTransferCode = generateRandomPurposeOfTransferCode()
-        this.purposeOfTransfer = "Spende $purposeOfTransferCode-BREAKOUT-${sponsor.lastname}"
+        this.purposeOfTransfer = "Spende $purposeOfTransferCode-BREAKOUT-${sponsor?.lastname}"
 
         return this.purposeOfTransfer!!
     }
@@ -156,8 +156,13 @@ class SponsoringInvoice : Invoice {
                 return total
             }
             is Sponsor -> listOf(EmailAddress(registeredSponsor!!.email))
-            else -> throw Exception("No sponsor email found for invoice $id")
+            else -> listOf()
         }
+    }
+
+    fun removeSponsor() {
+        unregisteredSponsor = null
+        registeredSponsor = null
     }
 }
 

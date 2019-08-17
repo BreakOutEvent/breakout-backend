@@ -15,7 +15,7 @@ class Message : BasicEntity, UserGenerated {
     private constructor() : super()
 
     @ManyToOne
-    lateinit var creator: UserAccount
+    var creator: UserAccount? = null
 
     @Column(columnDefinition = "TEXT")
     lateinit var text: String

@@ -160,7 +160,7 @@ class ChallengeController(private var challengeService: ChallengeService,
         return challengeService.findByTeamId(team.id!!).map { challenge ->
             val view = ChallengeView(challenge)
 
-            challenge.sponsor.unregisteredSponsor?.let {
+            challenge.sponsor?.unregisteredSponsor?.let {
                 if (it.isHidden) {
                     view.unregisteredSponsor = null
                     view.sponsorIsHidden = true
@@ -169,7 +169,7 @@ class ChallengeController(private var challengeService: ChallengeService,
                 view.unregisteredSponsor?.email = null
             }
 
-            challenge.sponsor.let {
+            challenge.sponsor?.let {
                 if (it.isHidden) {
                     view.sponsorId = null
                     view.sponsorIsHidden = true
@@ -184,23 +184,23 @@ class ChallengeController(private var challengeService: ChallengeService,
     fun getAllChallengesForTeamProfile(@PathVariable teamId: Long): Iterable<ChallengeTeamProfileView> {
         return challengeService.findByTeamId(teamId).map {
 
-            val sponsor = when (it.sponsor.isHidden) {
+            val sponsor = when (it.sponsor?.isHidden ?: true) {
                 true -> SponsorTeamProfileView(
                         sponsorId = null,
                         firstname = "",
                         lastname = "",
                         company = null,
-                        sponsorIsHidden = it.sponsor.isHidden,
+                        sponsorIsHidden = it.sponsor?.isHidden ?: true,
                         url = null,
                         logoUrl = null)
                 false -> SponsorTeamProfileView(
-                        sponsorId = it.sponsor.registeredSponsor?.id,
-                        firstname = it.sponsor.firstname ?: "",
-                        lastname = it.sponsor.lastname ?: "",
-                        company = it.sponsor.company,
-                        sponsorIsHidden = it.sponsor.isHidden,
-                        url = it.sponsor.url,
-                        logoUrl = it.sponsor.logo?.url)
+                        sponsorId = it.sponsor?.registeredSponsor?.id,
+                        firstname = it.sponsor?.firstname ?: "",
+                        lastname = it.sponsor?.lastname ?: "",
+                        company = it.sponsor?.company,
+                        sponsorIsHidden = it.sponsor?.isHidden ?: true,
+                        url = it.sponsor?.url,
+                        logoUrl = it.sponsor?.logo?.url)
             }
 
             ChallengeTeamProfileView(it.id, it.amount, it.description, it.status.toString(), it.fulfilledCount, it.maximumCount, sponsor)

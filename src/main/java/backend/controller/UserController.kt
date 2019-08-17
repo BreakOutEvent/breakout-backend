@@ -39,6 +39,7 @@ import javax.validation.Valid
 @RequestMapping("/user")
 class UserController(private val userService: UserService,
                      private val teamService: TeamService,
+                     private val deletionService: DeletionService,
                      configurationService: ConfigurationService) {
 
     private val JWT_SECRET: String = configurationService.getRequired("org.breakout.api.jwt_secret")
@@ -141,6 +142,26 @@ class UserController(private val userService: UserService,
 
         user.setValuesFrom(body)
         userService.save(user)
+
+        return UserView(user)
+    }
+
+    /**
+     * DELETE /user/{id}/
+     * Edits user with given id
+     */
+    @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(TEAMS, allEntries = true))])
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/{id}/")
+    fun deleteUser(@PathVariable id: Long,
+                   @AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
+
+        val deleter = userService.getUserFromCustomUserDetails(customUserDetails)
+        if (deleter.account.id != id && !deleter.hasRole(Admin::class))
+            throw UnauthorizedException("authenticated user and requested resource mismatch")
+
+        val user = userService.getUserById(id) ?: throw NotFoundException("user with id $id does not exist")
+        deletionService.delete(user)
 
         return UserView(user)
     }

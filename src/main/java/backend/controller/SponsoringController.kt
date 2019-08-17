@@ -61,7 +61,7 @@ class SponsoringController(private var sponsoringService: SponsoringService,
         return sponsoringService.findByTeamId(team.id!!).map { sponsoring ->
             val view = SponsoringView(sponsoring)
 
-            sponsoring.sponsor.unregisteredSponsor?.let {
+            sponsoring.sponsor?.unregisteredSponsor?.let {
                 if (it.isHidden) {
                     view.unregisteredSponsor = null
                     view.sponsorIsHidden = true
@@ -70,7 +70,7 @@ class SponsoringController(private var sponsoringService: SponsoringService,
                 view.unregisteredSponsor?.email = null
             }
 
-            sponsoring.sponsor.let {
+            sponsoring.sponsor?.let {
                 if (it.isHidden) {
                     view.sponsorId = null
                     view.sponsorIsHidden = true
@@ -164,23 +164,23 @@ class SponsoringController(private var sponsoringService: SponsoringService,
     @GetMapping("/team/{teamId}/sponsoring/")
     fun getAllSponsoringsForTeamOverview(@PathVariable teamId: Long): Iterable<SponsoringTeamProfileView> {
         return sponsoringService.findByTeamId(teamId).map {
-            val sponsor = when (it.sponsor.isHidden) {
+            val sponsor = when (it.sponsor?.isHidden ?: true) {
                 true -> SponsorTeamProfileView(
                         sponsorId = null,
                         firstname = "",
                         lastname = "",
                         company = null,
-                        sponsorIsHidden = it.sponsor.isHidden,
+                        sponsorIsHidden = it.sponsor?.isHidden ?: true,
                         url = null,
                         logoUrl = null)
                 false -> SponsorTeamProfileView(
-                        sponsorId = it.sponsor.registeredSponsor?.id,
-                        firstname = it.sponsor.firstname ?: "",
-                        lastname = it.sponsor.lastname ?: "",
-                        company = it.sponsor.company,
-                        sponsorIsHidden = it.sponsor.isHidden,
-                        url = it.sponsor.url,
-                        logoUrl = it.sponsor.logo?.url)
+                        sponsorId = it.sponsor?.registeredSponsor?.id,
+                        firstname = it.sponsor?.firstname ?: "",
+                        lastname = it.sponsor?.lastname ?: "",
+                        company = it.sponsor?.company,
+                        sponsorIsHidden = it.sponsor?.isHidden ?: true,
+                        url = it.sponsor?.url,
+                        logoUrl = it.sponsor?.logo?.url)
             }
 
             SponsoringTeamProfileView(sponsor, it.status.toString())

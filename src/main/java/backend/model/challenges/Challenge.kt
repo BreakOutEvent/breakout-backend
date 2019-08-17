@@ -77,16 +77,13 @@ class Challenge : BasicEntity, Billable {
     lateinit var amount: Money
         private set
 
-    // TODO: Remove after using Join Table
-    @Deprecated("Used for PreRemove on Sponsor. A Challenge should never exist without a sponsor")
     fun removeSponsor() {
         this.registeredSponsor = null
         this.unregisteredSponsor = null
     }
 
-    var sponsor: ISponsor
+    var sponsor: ISponsor?
         get() = this.unregisteredSponsor as? ISponsor ?: this.registeredSponsor
-                ?: throw NullPointerException("Neither unregisteredSponsor nor registeredSponsor are set")
         private set(value) {}
 
     @ManyToOne(fetch = FetchType.LAZY)
