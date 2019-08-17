@@ -3,13 +3,11 @@ package backend.model.user
 import backend.model.challenges.Challenge
 import backend.model.challenges.ChallengeRepository
 import backend.model.event.TeamRepository
-import backend.model.media.Media
 import backend.model.event.Team
 import backend.model.posting.Posting
 import backend.model.sponsoring.Sponsoring
 import backend.model.location.Location
 import backend.model.location.LocationRepository
-import backend.model.media.MediaRepository
 import backend.model.messaging.GroupMessage
 import backend.model.messaging.GroupMessageRepository
 import backend.model.misc.Email
@@ -18,7 +16,6 @@ import backend.model.payment.*
 import backend.model.posting.PostingRepository
 import backend.model.sponsoring.SponsoringRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -37,17 +34,17 @@ class DeletionServiceImpl @Autowired constructor(private val userRepository: Use
         emailRepository.delete(email)
     }
 
-    fun delete(invoice: SponsoringInvoice) {
+    fun anonymize(invoice: SponsoringInvoice) {
         invoice.removeSponsor()
         sponsoringInvoiceRepository.save(invoice)
     }
 
-    fun delete(location: Location) {
+    fun anonymize(location: Location) {
         location.uploader = null
         locationRepository.save(location)
     }
 
-    fun delete(groupMessage: GroupMessage, user: User) {
+    fun anonymize(groupMessage: GroupMessage, user: User) {
         groupMessage.messages
                 .filter { it.creator?.id == user.account.id }
                 .forEach {
@@ -59,23 +56,23 @@ class DeletionServiceImpl @Autowired constructor(private val userRepository: Use
         messageRepository.save(groupMessage)
     }
 
-    fun delete(sponsoring: Sponsoring) {
+    fun anonymize(sponsoring: Sponsoring) {
         sponsoring.removeSponsor()
         sponsoringRepository.save(sponsoring)
     }
 
-    fun delete(team: Team, user: User) {
+    fun anonymize(team: Team, user: User) {
         team.members.removeIf { it.account.id == user.account.id }
         teamRepository.save(team)
     }
 
-    fun delete(challenge: Challenge) {
+    fun anonymize(challenge: Challenge) {
         challenge.removeSponsor()
         challenge.description = ""
         challengeRepository.save(challenge)
     }
 
-    fun deleteComments(posting: Posting, user: User) {
+    fun anonymizeComments(posting: Posting, user: User) {
         posting.comments
                 .filter { it.user?.account?.id == user.account.id }
                 .forEach {
@@ -86,7 +83,7 @@ class DeletionServiceImpl @Autowired constructor(private val userRepository: Use
         postingRepository.save(posting)
     }
 
-    fun delete(posting: Posting) {
+    fun deleteOrAnonymizeIfNotPossible(posting: Posting) {
         if (posting.challenge == null && posting.comments.isEmpty()) {
             postingRepository.delete(posting)
         } else {
@@ -100,26 +97,26 @@ class DeletionServiceImpl @Autowired constructor(private val userRepository: Use
     @Transactional
     fun deleteUserGeneratedData(user: User) {
         user.account.getRole(Sponsor::class)?.let {
-            sponsoringInvoiceRepository.findBySponsorId(it.id!!).forEach(::delete)
+            sponsoringInvoiceRepository.findBySponsorId(it.id!!).forEach(::anonymize)
         }
 
-        sponsoringRepository.findBySponsorAccountId(user.account.id!!).forEach(::delete)
-        challengeRepository.findBySponsorAccountId(user.account.id!!).forEach(::delete)
+        sponsoringRepository.findBySponsorAccountId(user.account.id!!).forEach(::anonymize)
+        challengeRepository.findBySponsorAccountId(user.account.id!!).forEach(::anonymize)
 
         messageRepository
                 .findWhereUserHasSentMessages(user.account.id!!)
-                .forEach { delete(it, user) }
+                .forEach { anonymize(it, user) }
 
-        user.account.groupMessages.forEach { delete(it, user) }
+        user.account.groupMessages.forEach { anonymize(it, user) }
 
         user.account
                 .getRole(Participant::class)
                 ?.getAllTeams()
-                ?.forEach { delete(it, user) }
+                ?.forEach { anonymize(it, user) }
 
         postingRepository
                 .findAllByUserId(user.account.id!!)
-                .forEach(::delete)
+                .forEach(::deleteOrAnonymizeIfNotPossible)
 
         postingRepository
                 .findAllLikedByUser(user.account.id!!)
@@ -130,11 +127,11 @@ class DeletionServiceImpl @Autowired constructor(private val userRepository: Use
 
         postingRepository
                 .findAllCommentedByUser(user.account.id!!)
-                .forEach { deleteComments(it, user) }
+                .forEach { anonymizeComments(it, user) }
 
         locationRepository
                 .findAllByUploaderId(user.account.id!!)
-                .forEach(::delete)
+                .forEach(::anonymize)
 
         emailRepository
                 .findByReceipient(user.account.email)
