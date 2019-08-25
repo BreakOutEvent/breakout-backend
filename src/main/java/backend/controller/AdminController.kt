@@ -40,14 +40,6 @@ class AdminController(private val userService: UserService,
 
     private val logger: Logger = LoggerFactory.getLogger(AdminController::class.java)
 
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("/generatespeedtolocations/")
-    fun generateSpeedToLocations(): String {
-        logger.info("Regenerating speed to locations where missing from admin request")
-        locationService.generateSpeed()
-        return "done"
-    }
-
     /**
      * GET /admin/resendmail/
      * Allows Admin to resend failed mails
@@ -82,7 +74,7 @@ class AdminController(private val userService: UserService,
      * POST /admin/postteamlocation/
      * Generate a team-posting to set a team-location
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('EVENT_MANAGER')")
     @PostMapping("/postteamlocation/")
     fun postTeamLocation(@Valid @RequestBody body: AdminTeamLocationView): PostingView {
         val team = teamService.findOne(body.teamId) ?: throw NotFoundException("Team with ID ${body.teamId} not found")
@@ -101,7 +93,7 @@ class AdminController(private val userService: UserService,
      * GET /admin/allchallenges/
      * Allows Admin to get all challenges for current events
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('EVENT_MANAGER')")
     @GetMapping("/allchallenges/")
     fun getAllChallenges(): Iterable<ChallengeView> {
         val currentEvents = eventService.findAll().filter { it.isCurrent }
@@ -112,7 +104,7 @@ class AdminController(private val userService: UserService,
      * POST /challenge/{challengeId}/proof/
      * Add proof to a posting
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('EVENT_MANAGER')")
     @PostMapping("/challenge/{challengeId}/proof/")
     fun addProofToChallenge(@PathVariable challengeId: Long,
                             @Valid @RequestBody body: ChallengeStatusView): ChallengeView {
@@ -144,7 +136,7 @@ class AdminController(private val userService: UserService,
     }
 
     /**
-     * POST /admin/{id}/makeadmin
+     * DELETE /admin/{id}/makeadmin
      * Turn a user into an Admin
      */
     @PreAuthorize("hasAuthority('ADMIN')")

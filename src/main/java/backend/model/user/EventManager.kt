@@ -4,8 +4,8 @@ import javax.persistence.DiscriminatorValue
 import javax.persistence.Entity
 
 @Entity
-@DiscriminatorValue("ADMIN")
-class Admin : UserRole {
+@DiscriminatorValue("EVENT_MANAGER")
+class EventManager : UserRole {
 
     /**
      * Private constructor for JPA
@@ -14,6 +14,5 @@ class Admin : UserRole {
 
     constructor(account: UserAccount) : super(account)
 
-    override fun getAuthority(): String = "ADMIN"
-    override fun getSubRoles(): Iterable<UserRole> = listOf(EventOwner(account), FinanceManager(account))
+    override fun getAuthority(): String = "EVENT_MANAGER"
 }

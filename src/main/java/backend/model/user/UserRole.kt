@@ -94,12 +94,16 @@ abstract class UserRole : BasicEntity, User, GrantedAuthority {
     override fun <T : UserRole> getRole(clazz: KClass<T>): T? = this.account.getRole(clazz)
     override fun <T : UserRole> hasRole(clazz: KClass<T>): Boolean = this.account.hasRole(clazz)
     override fun <T : UserRole> removeRole(clazz: KClass<T>): T? = this.account.removeRole(clazz)
+    override fun <T : UserRole> hasAuthority(clazz: KClass<T>): Boolean = this.account.hasAuthority(clazz)
 
     override fun activate(token: String) = this.account.activate(token)
     override fun isActivationTokenCorrect(token: String): Boolean = this.account.isActivationTokenCorrect(token)
     override fun createActivationToken(): String = this.account.createActivationToken()
     override fun isActivated(): Boolean = this.account.isActivated()
     override fun setNewPassword(password: String, token: String) = this.account.setNewPassword(password, token)
+
+    open fun getSubRoles(): Iterable<UserRole> = emptyList()
+    fun getAuthorities(): Iterable<UserRole> = listOf(this) + getSubRoles().flatMap { it.getAuthorities() }
 
     companion object {
 

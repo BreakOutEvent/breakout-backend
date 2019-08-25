@@ -16,19 +16,19 @@ class TeamOverviewController(val teamOverviewService: TeamOverviewService,
                              val userService: UserService) {
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('EVENT_MANAGER')")
     fun getTeamOverview(): Iterable<TeamOverview> {
         return teamOverviewService.findAll()
     }
 
     @GetMapping("{teamId}/calls/")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('EVENT_MANAGER')")
     fun getCallsForTeam(@PathVariable teamId: Long): Iterable<TeamOverview.Contact> {
         return teamOverviewService.allCalls(teamId)
     }
 
     @PostMapping("{teamId}/lastContactWithHeadquarters/")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('EVENT_MANAGER')")
     @ResponseStatus(CREATED)
     fun addContactCommentForTeam(@PathVariable teamId: Long,
                                  @Valid @RequestBody body: ContactCommentBody,

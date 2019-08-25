@@ -35,7 +35,6 @@ class GeneralConfiguration {
 
 
 class CustomLoggingFilter : AbstractRequestLoggingFilter() {
-
     override fun shouldLog(request: HttpServletRequest?): Boolean {
         return logger.isDebugEnabled
     }

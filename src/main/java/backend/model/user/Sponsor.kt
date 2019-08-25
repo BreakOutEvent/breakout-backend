@@ -66,8 +66,6 @@ class Sponsor : UserRole, ISponsor {
         this.account = account
     }
 
-    override fun getAuthority(): String = "SPONSOR"
-
     @PreRemove
     fun preRemove() {
         this.sponsorings.forEach(Sponsoring::removeSponsors)
@@ -76,4 +74,6 @@ class Sponsor : UserRole, ISponsor {
         this.challenges.forEach(Challenge::removeSponsor)
         this.sponsorings.clear()
     }
+
+    override fun getAuthority(): String = "SPONSOR"
 }

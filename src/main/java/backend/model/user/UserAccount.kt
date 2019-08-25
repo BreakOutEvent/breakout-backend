@@ -67,8 +67,13 @@ class UserAccount : BasicEntity, User {
 
     private var activationToken: String? = null
 
+    private fun getAllRoles(): Collection<UserRole> {
+        return this.userRoles.values
+                .flatMap { it.getAuthorities() }
+    }
+
     fun getAuthorities(): Collection<GrantedAuthority> {
-        return this.userRoles.values.map(::BasicGrantedAuthority)
+        return getAllRoles().map(::BasicGrantedAuthority)
     }
 
     override fun activate(token: String) {
@@ -119,6 +124,10 @@ class UserAccount : BasicEntity, User {
         val role: UserRole = UserRole.createFor(clazz.java, this)
         userRoles[clazz.java] = role
         return role as T
+    }
+
+    override fun <T : UserRole> hasAuthority(clazz: KClass<T>): Boolean {
+        return getAllRoles().any { it.javaClass == clazz.java }
     }
 
     override val account: UserAccount

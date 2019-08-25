@@ -10,12 +10,9 @@ import backend.model.event.Team
 import backend.model.event.TeamService
 import backend.model.media.Media
 import backend.model.misc.EmailAddress
-import backend.model.user.Admin
-import backend.model.user.Participant
-import backend.model.user.User
-import backend.model.user.UserService
 import backend.model.removeBlockedBy
 import backend.model.removeReported
+import backend.model.user.*
 import backend.services.ConfigurationService
 import backend.util.CacheNames.LOCATIONS
 import backend.util.CacheNames.POSTINGS
@@ -130,7 +127,7 @@ class TeamController(private val teamService: TeamService,
         checkAuthenticationForEditTeam(team, user)
 
         body.hasStarted?.let {
-            if (user.hasRole(Admin::class)) team.hasStarted = it
+            if (user.hasAuthority(EventManager::class)) team.hasStarted = it
             else throw UnauthorizedException("Only an admin can change the hasStarted property of a team")
         }
 
@@ -279,7 +276,7 @@ class TeamController(private val teamService: TeamService,
     }
 
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('FINANCE_MANAGER')")
     @GetMapping("/teamfee/")
     fun getTeamFees(@PathVariable eventId: Long): Iterable<TeamAndTeamEntryFeeInvoiceView> {
         return teamService.findByEventId(eventId).map(::TeamAndTeamEntryFeeInvoiceView)
