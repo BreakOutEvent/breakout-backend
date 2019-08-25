@@ -12,6 +12,7 @@ import backend.model.user.UserService
 import backend.model.removeBlockedBy
 import backend.model.removeReported
 import backend.model.user.Admin
+import backend.model.user.EventManager
 import backend.services.ConfigurationService
 import backend.services.mail.MailSenderService
 import backend.util.CacheNames.LOCATIONS
@@ -83,7 +84,7 @@ class PostingController(private val postingService: PostingService,
 
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
         val user = customUserDetails?.let { userService.getUserFromCustomUserDetails(it) }
-        val canSeeReportedPosts = user?.hasAuthority("EVENT_MANAGER") ?: false
+        val canSeeReportedPosts = user?.hasAuthority(EventManager::class) ?: false
 
         if (posting.isBlockedBy(customUserDetails?.id))
             throw NotFoundException("posting with id $id was posted by blocked user ${posting.user!!.id}")
@@ -144,7 +145,7 @@ class PostingController(private val postingService: PostingService,
     ): Map<String, String> {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
-        if (!(user.hasAuthority("EVENT_MANAGER")) && posting.user?.id != customUserDetails.id) {
+        if (!user.hasAuthority(EventManager::class) && posting.user?.id != customUserDetails.id) {
             throw UnauthorizedException("A user can only delete postings submitted by itself")
         }
 

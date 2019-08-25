@@ -6,10 +6,7 @@ import backend.controller.exceptions.UnauthorizedException
 import backend.model.event.TeamService
 import backend.model.payment.SponsoringInvoiceService
 import backend.model.payment.TeamEntryFeeService
-import backend.model.user.Admin
-import backend.model.user.Participant
-import backend.model.user.Sponsor
-import backend.model.user.UserService
+import backend.model.user.*
 import backend.services.ConfigurationService
 import backend.view.PaymentView
 import backend.view.TeamEntryFeeInvoiceView
@@ -144,7 +141,7 @@ class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
     fun getAllSponsorInvoicesForTeam(@PathVariable teamId: Long,
                                      @AuthenticationPrincipal cud: CustomUserDetails): Iterable<SponsoringInvoiceView> {
         val user = userService.getUserFromCustomUserDetails(cud)
-        if (user.hasAuthority("FINANCE_MANAGER")) {
+        if (user.hasAuthority(FinanceManager::class)) {
             val invoices = sponsoringInvoiceService.findByTeamId(teamId)
             return invoices.map(::SponsoringInvoiceView)
         }

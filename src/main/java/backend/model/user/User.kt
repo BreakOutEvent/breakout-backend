@@ -25,8 +25,7 @@ interface User : Blockable, Blocker {
     fun <T : UserRole> getRole(clazz: KClass<T>): T?
     fun <T : UserRole> hasRole(clazz: KClass<T>): Boolean
     fun <T : UserRole> removeRole(clazz: KClass<T>): T?
-
-    fun hasAuthority(authority: String): Boolean
+    fun <T : UserRole> hasAuthority(clazz: KClass<T>): Boolean
 
     companion object {
         fun create(email: String, password: String): User {
