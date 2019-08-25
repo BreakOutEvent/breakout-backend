@@ -50,7 +50,7 @@ class EventController(open var eventService: EventService,
      * POST /event/{id}/whitelistMail/
      * Allows admin to create new event
      */
-    //@PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('EVENT_OWNER')")
     @ResponseStatus(CREATED)
     @PostMapping("/{id}/whitelistMail/")
     fun addEmailWhitelist(@PathVariable("id") id: Long, @Valid @RequestBody body: WhitelistEmailView): WhitelistEmailView? {
@@ -64,7 +64,7 @@ class EventController(open var eventService: EventService,
      * POST /event/{id}/whitelistDomain/
      * Allows admin to create new event
      */
-    //@PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('EVENT_OWNER')")
     @ResponseStatus(CREATED)
     @PostMapping("/{id}/whitelistDomain/")
     fun addDomainWhitelist(@PathVariable("id") id: Long, @Valid @RequestBody body: WhitelistDomainView): WhitelistDomainView? {
