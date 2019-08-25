@@ -7,6 +7,8 @@ import backend.model.event.EventService
 import backend.model.misc.Coord
 import backend.util.CacheNames.LOCATIONS
 import backend.view.EventView
+import backend.view.WhitelistDomainView
+import backend.view.WhitelistEmailView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CacheEvict
@@ -42,6 +44,33 @@ class EventController(open var eventService: EventService,
                 startingLocation = Coord(body.startingLocation.latitude!!, body.startingLocation.longitude!!))
 
         return EventView(event)
+    }
+
+    /**
+     * POST /event/{id}/whitelistMail/
+     * Allows admin to create new event
+     */
+    //@PreAuthorize("hasAuthority('ADMIN')")
+    @ResponseStatus(CREATED)
+    @PostMapping("/{id}/whitelistMail/")
+    fun addEmailWhitelist(@PathVariable("id") id: Long, @Valid @RequestBody body: WhitelistEmailView): WhitelistEmailView? {
+        val event = eventService.findById(id) ?: throw NotFoundException("event with id $id does not exist")
+        val whitelistEntry = eventService.addEmailToWhitelist(event, body.email)
+        return whitelistEntry?.let { WhitelistEmailView(it) }
+
+    }
+
+    /**
+     * POST /event/{id}/whitelistDomain/
+     * Allows admin to create new event
+     */
+    //@PreAuthorize("hasAuthority('ADMIN')")
+    @ResponseStatus(CREATED)
+    @PostMapping("/{id}/whitelistDomain/")
+    fun addDomainWhitelist(@PathVariable("id") id: Long, @Valid @RequestBody body: WhitelistDomainView): WhitelistDomainView? {
+        val event = eventService.findById(id) ?: throw NotFoundException("event with id $id does not exist")
+        val whitelistEntry = eventService.addDomainToWhitelist(event, body.domain)
+        return whitelistEntry?.let { WhitelistDomainView(it) }
     }
 
     /**

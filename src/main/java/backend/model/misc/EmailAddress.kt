@@ -9,7 +9,7 @@ import javax.persistence.Embeddable
 class EmailAddress() {
 
     @Email
-    private lateinit var value: String
+    lateinit var value: String
 
     constructor(email: String) : this() {
         val validator = EmailValidator.getInstance()
