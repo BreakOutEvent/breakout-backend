@@ -3,6 +3,7 @@ package backend.model.user
 import backend.model.Blockable
 import backend.model.Blocker
 import backend.model.media.Media
+import com.sun.org.apache.xpath.internal.operations.Bool
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import kotlin.reflect.KClass
 
@@ -24,6 +25,8 @@ interface User : Blockable, Blocker {
     fun <T : UserRole> getRole(clazz: KClass<T>): T?
     fun <T : UserRole> hasRole(clazz: KClass<T>): Boolean
     fun <T : UserRole> removeRole(clazz: KClass<T>): T?
+
+    fun hasAuthority(authority: String): Boolean
 
     companion object {
         fun create(email: String, password: String): User {

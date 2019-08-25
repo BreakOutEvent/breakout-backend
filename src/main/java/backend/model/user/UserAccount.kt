@@ -68,7 +68,9 @@ class UserAccount : BasicEntity, User {
     private var activationToken: String? = null
 
     fun getAuthorities(): Collection<GrantedAuthority> {
-        return this.userRoles.values.map(::BasicGrantedAuthority)
+        return this.userRoles.values
+                .flatMap { it.getAuthorities() }
+                .map(::BasicGrantedAuthority)
     }
 
     override fun activate(token: String) {
@@ -120,6 +122,9 @@ class UserAccount : BasicEntity, User {
         userRoles[clazz.java] = role
         return role as T
     }
+
+    override fun hasAuthority(authority: String): Boolean =
+            getAuthorities().map { it.authority }.contains(authority)
 
     override val account: UserAccount
         @JsonIgnore

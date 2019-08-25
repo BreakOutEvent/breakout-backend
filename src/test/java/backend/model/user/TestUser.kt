@@ -16,9 +16,9 @@ class TestUser : IntegrationTest() {
     @Test
     fun createUserWithoutRole() {
         val user = UserAccount()
-        assertFalse(user.hasRole(Employee::class))
-        assertNull(user.getRole(Employee::class))
-        assertNull(user.removeRole(Employee::class))
+        assertFalse(user.hasRole(Admin::class))
+        assertNull(user.getRole(Admin::class))
+        assertNull(user.removeRole(Admin::class))
     }
 
     /**
@@ -31,15 +31,15 @@ class TestUser : IntegrationTest() {
     fun createUserWithRoleEmployee() {
 
         val user = UserAccount()
-        user.addRole(Employee::class)
+        user.addRole(Admin::class)
 
-        assertTrue(user.hasRole(Employee::class))
+        assertTrue(user.hasRole(Admin::class))
 
-        val emp = user.getRole(Employee::class)
+        val emp = user.getRole(Admin::class)
 
         assertNotNull(emp)
-        assertEquals(emp, user.removeRole(Employee::class))
-        assertNull(user.removeRole(Employee::class))
+        assertEquals(emp, user.removeRole(Admin::class))
+        assertNull(user.removeRole(Admin::class))
     }
 
     /**
@@ -59,7 +59,7 @@ class TestUser : IntegrationTest() {
         user.passwordHash = "Lorem ipsum"
         user.gender = "Male"
 
-        val emp = user.addRole(Employee::class)
+        val emp = user.addRole(Admin::class)
 
         // Check user
         assertEquals("Florian", user.firstname)
@@ -98,7 +98,7 @@ class TestUser : IntegrationTest() {
     fun createAndSaveUser() {
 
         // Create user with role and save it
-        val user = UserAccount().addRole(Employee::class).apply {
+        val user = UserAccount().addRole(Admin::class).apply {
             firstname = "Florian"
             lastname = "Schmidt"
             email = "florian.schmidt.1995@icloud.com"
@@ -113,18 +113,18 @@ class TestUser : IntegrationTest() {
         val user1 = userRepository.findByEmail("florian.schmidt.1995@icloud.com")
         assertNotNull(user.account)
         assertEquals(user.account.id, user1.account.id)
-        assertTrue(user.hasRole(Employee::class))
+        assertTrue(user.hasRole(Admin::class))
 
         // Add and remove roles from user and save
         user1.addRole(Participant::class)
-        user1.removeRole(Employee::class)
+        user1.removeRole(Admin::class)
         userRepository.save(user1.account)
 
         // Check if found user has correct roles
         val user2 = userRepository.findByEmail("florian.schmidt.1995@icloud.com")
         assertEquals(user.account.id, user2.account.id)
         assertTrue(user2.hasRole(Participant::class))
-        assertFalse(user2.hasRole(Employee::class))
+        assertFalse(user2.hasRole(Admin::class))
 
     }
 }

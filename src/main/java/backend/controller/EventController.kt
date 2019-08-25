@@ -30,7 +30,7 @@ class EventController(open var eventService: EventService,
      * POST /event/
      * Allows admin to create new event
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('EVENT_OWNER')")
     @ResponseStatus(CREATED)
     @PostMapping("/")
     @CacheEvict(LOCATIONS, allEntries = true)

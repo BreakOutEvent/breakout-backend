@@ -80,7 +80,7 @@ class SponsoringInvoiceController(private val sponsoringInvoiceService: Sponsori
     }
 
     @GetMapping("/{eventId}/")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('FINANCE_MANAGER')")
     fun getInvoicesByEvent(@PathVariable("eventId") eventId: Long,
                            @RequestParam(required = false) detailed: Boolean?): Iterable<SponsoringInvoiceView> {
 
@@ -94,7 +94,7 @@ class SponsoringInvoiceController(private val sponsoringInvoiceService: Sponsori
     }
 
     @GetMapping("/search/")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('FINANCE_MANAGER')")
     fun searchInvoices(@RequestParam(required = false) purposeOfTransferCode: String?,
                        @RequestParam(required = false) teamId: Long?,
                        @RequestParam(required = false) eventId: Long?,

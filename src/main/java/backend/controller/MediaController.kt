@@ -28,7 +28,7 @@ class MediaController(private val mediaService: MediaService,
      * Allows Admin to delete all mediaSizes for media
      */
     @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(TEAMS, allEntries = true))])
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('EVENT_MANAGER')")
     @RequestMapping("/{id}/", method = [(RequestMethod.DELETE)])
     fun adminDeletePosting(@PathVariable("id") id: Long): Map<String, String> {
         val media = mediaService.getByID(id) ?: throw NotFoundException("media with id $id does not exist")

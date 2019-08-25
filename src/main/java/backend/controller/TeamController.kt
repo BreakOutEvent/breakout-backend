@@ -130,7 +130,7 @@ class TeamController(private val teamService: TeamService,
         checkAuthenticationForEditTeam(team, user)
 
         body.hasStarted?.let {
-            if (user.hasRole(Admin::class)) team.hasStarted = it
+            if (user.hasAuthority("EVENT_MANAGER")) team.hasStarted = it
             else throw UnauthorizedException("Only an admin can change the hasStarted property of a team")
         }
 
@@ -279,7 +279,7 @@ class TeamController(private val teamService: TeamService,
     }
 
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('FINANCE_MANAGER')")
     @GetMapping("/teamfee/")
     fun getTeamFees(@PathVariable eventId: Long): Iterable<TeamAndTeamEntryFeeInvoiceView> {
         return teamService.findByEventId(eventId).map(::TeamAndTeamEntryFeeInvoiceView)

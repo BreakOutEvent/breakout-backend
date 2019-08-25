@@ -60,10 +60,6 @@ class Participant : UserRole {
         this.currentTeam = team
     }
 
-    override fun getAuthority(): String {
-        return "PARTICIPANT"
-    }
-
     @PreRemove
     fun preRemove() {
         this.locations.forEach { it.uploader = null }
@@ -84,4 +80,6 @@ class Participant : UserRole {
     fun participatedAtEvent(event: Event): Boolean {
         return this.getAllTeams().any { it.event == event }
     }
+
+    override fun getAuthority(): String = "PARTICIPANT"
 }

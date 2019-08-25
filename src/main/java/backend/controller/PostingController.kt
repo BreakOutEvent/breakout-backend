@@ -83,12 +83,12 @@ class PostingController(private val postingService: PostingService,
 
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
         val user = customUserDetails?.let { userService.getUserFromCustomUserDetails(it) }
-        val isAdmin = user?.hasRole(Admin::class) ?: false
+        val canSeeReportedPosts = user?.hasAuthority("EVENT_MANAGER") ?: false
 
         if (posting.isBlockedBy(customUserDetails?.id))
             throw NotFoundException("posting with id $id was posted by blocked user ${posting.user!!.id}")
 
-        if (posting.reported && !isAdmin)
+        if (posting.reported && !canSeeReportedPosts)
             throw NotFoundException("posting with id $id was reported.")
 
         val challengeProveProjection = posting.challenge?.let {
@@ -103,7 +103,7 @@ class PostingController(private val postingService: PostingService,
      * GET /posting/report/
      * Gets posting by id
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('EVENT_MANAGER')")
     @GetMapping("/report/")
     fun getReported(@AuthenticationPrincipal customUserDetails: CustomUserDetails?): Iterable<PostingResponseView> {
         return postingService.findReported().map {
@@ -118,7 +118,7 @@ class PostingController(private val postingService: PostingService,
      * Allows Admin to delete report about a Posting
      */
     @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(LOCATIONS, allEntries = true))])
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('EVENT_MANAGER')")
     @DeleteMapping("/{id}/report/")
     fun dismissReport(@PathVariable("id") id: Long): PostingResponseView {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
@@ -144,7 +144,7 @@ class PostingController(private val postingService: PostingService,
     ): Map<String, String> {
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
-        if (!(user.hasRole(Admin::class)) && posting.user?.id != customUserDetails.id) {
+        if (!(user.hasAuthority("EVENT_MANAGER")) && posting.user?.id != customUserDetails.id) {
             throw UnauthorizedException("A user can only delete postings submitted by itself")
         }
 
@@ -160,7 +160,7 @@ class PostingController(private val postingService: PostingService,
      * Allows Admin to delete Comment
      */
     @CacheEvict(value = POSTINGS, allEntries = true)
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('EVENT_MANAGER')")
     @RequestMapping("/{id}/comment/{commentId}/", method = [DELETE])
     fun adminDeleteComment(@PathVariable("id") postingId: Long,
                            @PathVariable("commentId") commentId: Long): Map<String, String> {

@@ -42,7 +42,7 @@ class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
      * POST /invoice/{id}/payment/
      * Allows admin to add payment to given invoice
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('FINANCE_MANAGER')")
     @PostMapping("/{invoiceId}/payment/")
     fun createAdminPayment(@PathVariable invoiceId: Long,
                            @Valid @RequestBody paymentView: PaymentView,
@@ -125,7 +125,7 @@ class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
      * GET /invoice/teamfee/{id}/
      * Allows admin to get given invoice
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('FINANCE_MANAGER')")
     @GetMapping("/teamfee/{invoiceId}/")
     fun getTeamFeeInvoice(@PathVariable invoiceId: Long): TeamEntryFeeInvoiceView {
 
@@ -144,7 +144,7 @@ class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
     fun getAllSponsorInvoicesForTeam(@PathVariable teamId: Long,
                                      @AuthenticationPrincipal cud: CustomUserDetails): Iterable<SponsoringInvoiceView> {
         val user = userService.getUserFromCustomUserDetails(cud)
-        if (user.hasRole(Admin::class)) {
+        if (user.hasAuthority("FINANCE_MANAGER")) {
             val invoices = sponsoringInvoiceService.findByTeamId(teamId)
             return invoices.map(::SponsoringInvoiceView)
         }
@@ -183,7 +183,7 @@ class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
      * GET /invoice/sponsoring/
      * Allows admin to get all sponsoring invoices
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('FINANCE_MANAGER')")
     @GetMapping("/sponsoring/admin/")
     fun getAllSponsorInvoices(): List<SponsoringInvoiceView> {
         val invoices = sponsoringInvoiceService.findAll()
