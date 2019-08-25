@@ -1,28 +1,25 @@
 package backend.model.event
 
 import backend.model.BasicEntity
-import backend.model.misc.EmailAddress
-import javax.persistence.Embedded
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.ManyToOne
 
 @Entity
-class WhitelistEntry : BasicEntity {
+class WhitelistDomainEntry : BasicEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     lateinit var event: Event
 
-    @Embedded
-    lateinit var invitee: EmailAddress
+    lateinit var domain: String
 
     /**
      * Private constructor for JPA
      */
     private constructor() : super()
 
-    constructor(email: EmailAddress, event: Event) : this() {
-        this.invitee = email
+    constructor(domain: String, event: Event) : this() {
+        this.domain = domain
         this.event = event
     }
 }

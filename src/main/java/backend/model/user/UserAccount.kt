@@ -143,6 +143,11 @@ class UserAccount : BasicEntity, User {
     override fun hashCode(): Int {
         return email.hashCode()
     }
+
+
+    override fun emailDomain(): String {
+        return email.split("@").last()
+    }
 }
 
 class BasicGrantedAuthority(userRole: UserRole) : GrantedAuthority {

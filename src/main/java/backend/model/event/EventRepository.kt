@@ -19,6 +19,9 @@ interface EventRepository : CrudRepository<Event, Long> {
     @Query("SELECT loc FROM Location loc WHERE (loc.distance, loc.team.id) IN (Select max(l.distance), l.team.id from Location l inner join l.team t where t.event.id = :id group by l.team.id)")
     fun getLocationMaxDistanceByIdEachTeam(@Param("id") id: Long): List<Location>
 
-    @Query("Select e from WhitelistEntry e where e.invitee.value = :email")
-    fun findWhitelistEntriesWithEmail(@Param("email") email: String): List<WhitelistEntry>
+    @Query("Select e from WhitelistEmailEntry e where e.invitee.value = :email")
+    fun findWhitelistEmailEntriesByEmail(@Param("email") email: String): List<WhitelistEmailEntry>
+
+    @Query("Select e from WhitelistDomainEntry e where e.domain = :domain")
+    fun findWhitelistDomainsEntriesByDomain(@Param("domain") domain: String): List<WhitelistDomainEntry>
 }
