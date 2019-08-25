@@ -7,7 +7,6 @@ import backend.model.misc.Coord
 import backend.model.user.User
 import backend.services.FeatureFlagService
 import backend.util.data.DonateSums
-import org.joda.time.DateTime
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -105,8 +104,9 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository,
     override fun findEvensOpenForRegistration(user: User?): List<Event> {
         val openEvents = findAll().filter { it.isOpenForRegistration }
         val invited = user?.let { teamService.findInvitationsForUser(it) }?.mapNotNull { it.team?.event } ?: emptyList()
-        val whitelisted = user?.let { repository.findWhitelistEntriesWithEmail(it.email) }?.map { it.event } ?: emptyList()
-        val all = openEvents + invited + whitelisted
+        val whitelistedByEmail = user?.let { repository.findWhitelistEmailEntriesByEmail(it.email) }?.map { it.event } ?: emptyList()
+        val whitelistedByDomain = user?.let { repository.findWhitelistDomainsEntriesByDomain(it.emailDomain()) }?.map { it.event } ?: emptyList()
+        val all = openEvents + invited + whitelistedByEmail + whitelistedByDomain
 
         return all
                 .distinctBy { it.id }

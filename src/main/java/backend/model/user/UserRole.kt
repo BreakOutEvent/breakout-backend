@@ -85,6 +85,11 @@ abstract class UserRole : BasicEntity, User, GrantedAuthority {
             this.account.preferredLanguage = value
         }
 
+
+    override fun emailDomain(): String {
+        return email.split("@").last()
+    }
+
     override fun <T : UserRole> addRole(clazz: KClass<T>): T = this.account.addRole(clazz)
     override fun <T : UserRole> getRole(clazz: KClass<T>): T? = this.account.getRole(clazz)
     override fun <T : UserRole> hasRole(clazz: KClass<T>): Boolean = this.account.hasRole(clazz)
