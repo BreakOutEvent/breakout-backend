@@ -21,8 +21,8 @@ class WhitelistEmailEntry : BasicEntity {
      */
     private constructor() : super()
 
-    constructor(email: EmailAddress, event: Event) : this() {
-        this.invitee = email
+    constructor(email: String, event: Event) : this() {
+        this.invitee = EmailAddress(email)
         this.event = event
     }
 }

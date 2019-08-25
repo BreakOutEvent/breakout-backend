@@ -42,4 +42,8 @@ interface EventService {
     fun regenerateCache(eventId: Long?)
 
     fun findEvensOpenForRegistration(user: User?): List<Event>
+
+    fun addEmailToWhitelist(event: Event, email: String): WhitelistEmailEntry?
+
+    fun addDomainToWhitelist(event: Event, domain: String): WhitelistDomainEntry?
 }

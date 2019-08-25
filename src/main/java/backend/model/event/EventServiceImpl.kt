@@ -19,6 +19,8 @@ import java.time.LocalDateTime
 
 @Service
 class EventServiceImpl @Autowired constructor(val repository: EventRepository,
+                                              val whitelistEmailRepository: WhitelistEmailRepository,
+                                              val whitelistDomainRepository: WhitelistDomainRepository,
                                               val teamService: TeamService,
                                               val cacheService: CacheService,
                                               val featureFlagService: FeatureFlagService) : EventService {
@@ -104,12 +106,20 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository,
     override fun findEvensOpenForRegistration(user: User?): List<Event> {
         val openEvents = findAll().filter { it.isOpenForRegistration }
         val invited = user?.let { teamService.findInvitationsForUser(it) }?.mapNotNull { it.team?.event } ?: emptyList()
-        val whitelistedByEmail = user?.let { repository.findWhitelistEmailEntriesByEmail(it.email) }?.map { it.event } ?: emptyList()
-        val whitelistedByDomain = user?.let { repository.findWhitelistDomainsEntriesByDomain(it.emailDomain()) }?.map { it.event } ?: emptyList()
+        val whitelistedByEmail = user?.let { whitelistEmailRepository.findWhitelistEmailEntriesByEmail(it.email) }?.map { it.event } ?: emptyList()
+        val whitelistedByDomain = user?.let { whitelistDomainRepository.findWhitelistDomainsEntriesByDomain(it.emailDomain()) }?.map { it.event } ?: emptyList()
         val all = openEvents + invited + whitelistedByEmail + whitelistedByDomain
 
         return all
                 .distinctBy { it.id }
                 .filter { it.isCurrent && it.date.plusHours(it.duration.toLong()) > LocalDateTime.now() }
+    }
+
+    override fun addEmailToWhitelist(event: Event, email: String): WhitelistEmailEntry? {
+        return whitelistEmailRepository.save(WhitelistEmailEntry(email, event))
+    }
+
+    override fun addDomainToWhitelist(event: Event, domain: String): WhitelistDomainEntry? {
+        return whitelistDomainRepository.save(WhitelistDomainEntry(domain, event))
     }
 }
