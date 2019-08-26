@@ -7,6 +7,7 @@ import backend.model.event.Team
 import backend.model.sponsoring.ISponsor
 import backend.model.sponsoring.SponsoringService
 import backend.model.user.Admin
+import backend.model.user.User
 import backend.services.mail.MailService
 import backend.util.euroOf
 import org.javamoney.moneta.Money
@@ -25,14 +26,14 @@ class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: Spon
     private val logger = LoggerFactory.getLogger(SponsoringInvoiceServiceImpl::class.java)
 
     @Transactional
-    override fun addAdminPaymentToInvoice(admin: Admin, amount: Money, invoice: SponsoringInvoice, date: LocalDateTime?, fidorId: Long?): SponsoringInvoice {
+    override fun addAdminPaymentToInvoice(admin: User, amount: Money, invoice: SponsoringInvoice, date: LocalDateTime?, fidorId: Long?): SponsoringInvoice {
         val payment = AdminPayment(amount, admin, fidorId, date)
         invoice.addPayment(payment)
         return invoice
     }
 
     @Transactional
-    override fun addSepaPaymentToInvoice(admin: Admin, fidorId: Long, amount: Money, date: LocalDateTime?, invoice: SponsoringInvoice): SponsoringInvoice {
+    override fun addSepaPaymentToInvoice(admin: User, fidorId: Long, amount: Money, date: LocalDateTime?, invoice: SponsoringInvoice): SponsoringInvoice {
         val payment = SepaPayment(amount, admin, fidorId, date)
         invoice.addPayment(payment)
         return invoice

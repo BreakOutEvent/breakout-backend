@@ -48,17 +48,17 @@ class InvoiceController(private val teamEntryFeeService: TeamEntryFeeService,
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val teamFeeInvoice = teamEntryFeeService.findById(invoiceId)
         val sponsoringInvoice = sponsoringInvoiceService.findById(invoiceId)
-        val admin = user.getRole(Admin::class) ?: throw UnauthorizedException("User is no admin")
+
         val amount = Money.of(BigDecimal.valueOf(paymentView.amount!!), "EUR")
         val date: LocalDateTime? = paymentView.date?.let { LocalDateTime.ofInstant(Instant.ofEpochSecond(it), ZoneOffset.UTC) }
 
         if (teamFeeInvoice != null) {
-            val savedInvoice = teamEntryFeeService.addAdminPaymentToInvoice(admin, amount, teamFeeInvoice, date, paymentView.fidorId)
+            val savedInvoice = teamEntryFeeService.addAdminPaymentToInvoice(user, amount, teamFeeInvoice, date, paymentView.fidorId)
             return TeamEntryFeeInvoiceView(savedInvoice)
         }
 
         if (sponsoringInvoice != null) {
-            val savedInvoice = sponsoringInvoiceService.addAdminPaymentToInvoice(admin, amount, sponsoringInvoice, date, paymentView.fidorId)
+            val savedInvoice = sponsoringInvoiceService.addAdminPaymentToInvoice(user, amount, sponsoringInvoice, date, paymentView.fidorId)
             return SponsoringInvoiceView(savedInvoice)
         }
 

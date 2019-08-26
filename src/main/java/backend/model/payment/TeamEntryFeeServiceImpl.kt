@@ -1,6 +1,7 @@
 package backend.model.payment
 
 import backend.model.user.Admin
+import backend.model.user.User
 import backend.services.mail.MailService
 import org.javamoney.moneta.Money
 import org.slf4j.Logger
@@ -16,7 +17,7 @@ class TeamEntryFeeServiceImpl(private val teamEntryFeeInvoiceRepository: TeamEnt
     private val logger: Logger = LoggerFactory.getLogger(TeamEntryFeeServiceImpl::class.java)
 
     @Transactional
-    override fun addAdminPaymentToInvoice(admin: Admin, amount: Money, invoice: TeamEntryFeeInvoice, date: LocalDateTime?, fidorId: Long?): TeamEntryFeeInvoice {
+    override fun addAdminPaymentToInvoice(admin: User, amount: Money, invoice: TeamEntryFeeInvoice, date: LocalDateTime?, fidorId: Long?): TeamEntryFeeInvoice {
         val payment = AdminPayment(amount, admin, fidorId, date)
         invoice.addPayment(payment)
 
@@ -43,7 +44,7 @@ class TeamEntryFeeServiceImpl(private val teamEntryFeeInvoiceRepository: TeamEnt
     }
 
     @Transactional
-    override fun addSepaPaymentToInvoice(admin: Admin, fidorId: Long, amount: Money, date: LocalDateTime?, invoice: TeamEntryFeeInvoice): TeamEntryFeeInvoice {
+    override fun addSepaPaymentToInvoice(admin: User, fidorId: Long, amount: Money, date: LocalDateTime?, invoice: TeamEntryFeeInvoice): TeamEntryFeeInvoice {
         val payment = SepaPayment(amount, admin, fidorId, date)
         invoice.addPayment(payment)
 
