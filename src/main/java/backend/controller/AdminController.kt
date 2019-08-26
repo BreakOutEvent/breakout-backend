@@ -10,8 +10,7 @@ import backend.model.location.LocationService
 import backend.model.misc.Coord
 import backend.model.posting.PostingService
 import backend.model.sponsoring.SponsoringService
-import backend.model.user.Admin
-import backend.model.user.UserService
+import backend.model.user.*
 import backend.services.mail.MailService
 import backend.view.challenge.ChallengeStatusView
 import backend.view.challenge.ChallengeView
@@ -24,7 +23,10 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
+import javax.persistence.DiscriminatorValue
 import javax.validation.Valid
+import kotlin.reflect.KClass
+import kotlin.reflect.full.findAnnotation
 
 @RestController
 @RequestMapping("/admin")
@@ -128,9 +130,23 @@ class AdminController(private val userService: UserService,
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("user/{id}/admin/")
-    fun addAdminRights(@PathVariable id: Long): UserView {
+    fun addAdminRights(@PathVariable id: Long,
+                       @RequestParam authority: String): UserView {
+
         val user = userService.getUserById(id) ?: throw NotFoundException("User with ID $id not found")
-        user.addRole(Admin::class)
+
+        fun <T : UserRole> authority(clazz: KClass<T>): String {
+            return clazz.findAnnotation<DiscriminatorValue>()?.value ?: throw NotFoundException("Role corresponding to right was not found")
+        }
+
+        when (authority) {
+            authority(Admin::class) -> user.addRole(Admin::class)
+            authority(EventManager::class) -> user.addRole(EventManager::class)
+            authority(EventOwner::class) -> user.addRole(EventOwner::class)
+            authority(FinanceManager::class) -> user.addRole(FinanceManager::class)
+            else -> throw NotFoundException("Role corresponding to right was not found")
+        }
+
         userService.save(user)
         return UserView(user)
     }
@@ -141,9 +157,24 @@ class AdminController(private val userService: UserService,
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("user/{id}/admin/")
-    fun removeAdminRights(@PathVariable id: Long): UserView {
+    fun removeAdminRights(@PathVariable id: Long,
+                          @RequestParam authority: String): UserView {
+
         val user = userService.getUserById(id) ?: throw NotFoundException("User with ID $id not found")
-        user.removeRole(Admin::class)
+
+
+        fun <T : UserRole> authority(clazz: KClass<T>): String {
+            return clazz.findAnnotation<DiscriminatorValue>()?.value ?: throw NotFoundException("Role corresponding to right was not found")
+        }
+
+        when (authority) {
+            authority(Admin::class) -> user.removeRole(Admin::class)
+            authority(EventManager::class) -> user.removeRole(EventManager::class)
+            authority(EventOwner::class) -> user.removeRole(EventOwner::class)
+            authority(FinanceManager::class) -> user.removeRole(FinanceManager::class)
+            else -> throw NotFoundException("Role corresponding to right was not found")
+        }
+
         userService.save(user)
         return UserView(user)
     }
