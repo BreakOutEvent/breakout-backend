@@ -144,7 +144,7 @@ class TeamController(private val teamService: TeamService,
     private fun checkAuthenticationForEditTeam(team: Team, user: User) {
 
 
-        val userIsAdmin = user.getRole(Admin::class) != null
+        val userIsAdmin = user.hasAuthority(EventManager::class) != null
         val userIsTeamMember = user
                 .getRole(Participant::class)
                 ?.let { team.members.contains(it) }
