@@ -17,7 +17,6 @@ import backend.view.challenge.ChallengeView
 import backend.view.posting.PostingView
 import backend.view.user.AdminTeamLocationView
 import backend.view.user.UserView
-import com.sun.javaws.exceptions.InvalidArgumentException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.security.access.prepost.PreAuthorize
