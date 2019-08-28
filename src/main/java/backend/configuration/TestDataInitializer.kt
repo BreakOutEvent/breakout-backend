@@ -42,8 +42,10 @@ class TestDataInitializer {
         val date = LocalDateTime.of(2016, 6, 3, 0, 0)
 
         // ---- Events ----
-        val eventMunich = eventService.createEvent("Breakout München 2016", date, "München", Coord(48.1374300, 11.5754900), 36)
-        val eventBerlin = eventService.createEvent("Breakout Berlin 2016", date, "Berlin", Coord(52.5243700, 13.4105300), 36)
+
+        val fee = Money.of(60.0, "EUR")
+        val eventMunich = eventService.createEvent("Breakout München 2016", date, "München", Coord(48.1374300, 11.5754900), 36, fee)
+        val eventBerlin = eventService.createEvent("Breakout Berlin 2016", date, "Berlin", Coord(52.5243700, 13.4105300), 36, fee)
 
         // --- iOS Devs Test Accounts ---
         val leo = userService.create("leokaessner@me.com", "password", { addRole(Participant::class) }).getRole(Participant::class)!!

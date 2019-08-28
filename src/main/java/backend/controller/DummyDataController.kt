@@ -5,6 +5,7 @@ import backend.model.misc.Coord
 import backend.model.posting.PostingService
 import backend.model.user.UserService
 import backend.util.Profiles
+import org.javamoney.moneta.Money
 import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -36,8 +37,9 @@ class DummyDataController(val userService: UserService,
     }
 
     fun createEvent(count: Int): Iterable<Long> {
+        val fee = Money.of(60.0, "EUR")
         return (0..count).map {
-            eventService.createEvent("Eventtitle$it", LocalDateTime.now(), "City$count", Coord(0.0, 0.0), 36).id!!
+            eventService.createEvent("Eventtitle$it", LocalDateTime.now(), "City$count", Coord(0.0, 0.0), 36, fee).id!!
         }
     }
 
