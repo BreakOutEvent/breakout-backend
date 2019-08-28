@@ -32,6 +32,8 @@ class EventView() {
     var isOpenForRegistration: Boolean = false
     var allowNewSponsoring: Boolean = false
 
+    var teamFee: Double? = null
+
     @NotNull
     var duration: Int = 36
 
