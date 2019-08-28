@@ -101,6 +101,8 @@ class UserView() {
         @SafeHtml(whitelistType = NONE)
         var hometown: String? = null
 
+        var gender: String? = null
+
         var eventId: Long? = null
 
         var eventCity: String? = null
@@ -109,10 +111,13 @@ class UserView() {
 
         var teamName: String? = null
 
+        var isCurrent: Boolean? = null
+
         constructor(user: User) : this() {
             this.participant = user.getRole(Participant::class)
             this.emergencynumber = participant?.emergencynumber
             this.hometown = participant?.hometown
+            this.gender = participant?.gender
             this.birthdate = participant?.birthdate.toString()
             this.phonenumber = participant?.phonenumber
             this.tshirtsize = participant?.tshirtsize
@@ -120,6 +125,7 @@ class UserView() {
             this.eventCity = participant?.getCurrentTeam()?.event?.city
             this.teamId = participant?.getCurrentTeam()?.id
             this.teamName = participant?.getCurrentTeam()?.name
+            this.isCurrent = participant?.getCurrentTeam()?.event?.isCurrent
         }
     }
 
