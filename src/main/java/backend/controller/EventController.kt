@@ -9,6 +9,7 @@ import backend.util.CacheNames.LOCATIONS
 import backend.view.EventView
 import backend.view.WhitelistDomainView
 import backend.view.WhitelistEmailView
+import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CacheEvict
@@ -36,12 +37,42 @@ class EventController(open var eventService: EventService,
     @CacheEvict(LOCATIONS, allEntries = true)
     fun createEvent(@Valid @RequestBody body: EventView): EventView {
 
+        val teamFee = body.teamFee ?: 60.0
+
         val event = eventService.createEvent(
                 title = body.title,
                 date = LocalDateTime.ofEpochSecond(body.date!!, 0, ZoneOffset.UTC),
                 city = body.city,
                 duration = body.duration,
-                startingLocation = Coord(body.startingLocation.latitude!!, body.startingLocation.longitude!!))
+                startingLocation = Coord(body.startingLocation.latitude!!, body.startingLocation.longitude!!),
+                teamFee = Money.of(teamFee, "EUR"))
+
+        return EventView(event)
+    }
+
+    /**
+     * PUT /event/{id}/
+     * Allows admin to update event details
+     */
+    @PreAuthorize("hasAuthority('EVENT_OWNER')")
+    @ResponseStatus(CREATED)
+    @PutMapping("/{id}/")
+    @CacheEvict(LOCATIONS, allEntries = true)
+    fun updateEvent(@PathVariable("id") id: Long, @Valid @RequestBody body: EventView): EventView {
+        val event = eventService.findById(id) ?: throw NotFoundException("event with id $id does not exist")
+
+        event.title = body.title
+        event.date = body.date?.let { LocalDateTime.ofEpochSecond(it, 0, ZoneOffset.UTC) } ?: event.date
+        event.city = body.city
+        event.duration = body.duration
+        event.startingLocation = Coord(body.startingLocation.latitude!!, body.startingLocation.longitude!!)
+        event.teamFee = body.teamFee?.let { Money.of(it, "EUR") } ?: event.teamFee
+
+        event.isCurrent = body.isCurrent
+        event.isOpenForRegistration = body.isOpenForRegistration
+        event.allowNewSponsoring = body.allowNewSponsoring
+
+        eventService.save(event)
 
         return EventView(event)
     }

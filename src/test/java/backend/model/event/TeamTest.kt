@@ -6,6 +6,7 @@ import backend.model.misc.Coord
 import backend.model.misc.EmailAddress
 import backend.model.user.Participant
 import backend.model.user.User
+import org.javamoney.moneta.Money
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -29,7 +30,7 @@ class TeamTest {
     @Before
     fun setUp() {
         creator = User.create("creator@mail.de", "password").addRole(Participant::class)
-        event = Event("Awesome Event", LocalDateTime.now(), "Munich", Coord(0.0, 0.0), duration = 36)
+        event = Event("Awesome Event", LocalDateTime.now(), "Munich", Coord(0.0, 0.0), duration = 36, teamFee = Money.of(60, "EUR"))
         team = Team(creator, "Team awesome", "our team is awesome", event, null)
     }
 

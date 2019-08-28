@@ -5,6 +5,7 @@ import backend.model.misc.Coord
 import backend.model.posting.PostingService
 import backend.model.user.UserService
 import backend.util.Profiles
+import org.javamoney.moneta.Money
 import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping

@@ -56,7 +56,7 @@ class TeamView() {
         this.profilePic = team.profilePic?.let(::MediaView)
         this.invoiceId = team.invoice?.id
         this.hasStarted = team.hasStarted
-        this.hasFullyPaid = team.invoice?.isFullyPaid()
+        this.hasFullyPaid = team.invoice?.isFullyPaid() ?: true
         this.isFull = team.isFull()
         this.asleep = team.asleep
     }
@@ -73,7 +73,7 @@ class TeamView() {
         this.profilePic = team.profilePic?.let(::MediaView)
         this.invoiceId = team.invoice?.id
         this.hasStarted = team.hasStarted
-        this.hasFullyPaid = team.invoice?.isFullyPaid()
+        this.hasFullyPaid = team.invoice?.isFullyPaid() ?: true
         this.isFull = team.isFull()
         this.distance = distance
         this.donateSum = donateSum
