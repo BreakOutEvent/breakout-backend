@@ -11,6 +11,8 @@ interface EventService {
 
     fun createEvent(title: String, date: LocalDateTime, city: String, startingLocation: Coord, duration: Int): Event
 
+    fun save(event: Event)
+
     fun findAll(): Iterable<Event>
 
     fun exists(id: Long): Boolean

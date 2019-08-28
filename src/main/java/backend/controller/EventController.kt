@@ -47,6 +47,32 @@ class EventController(open var eventService: EventService,
     }
 
     /**
+     * PUT /event/{id}/
+     * Allows admin to update event details
+     */
+    @PreAuthorize("hasAuthority('EVENT_OWNER')")
+    @ResponseStatus(CREATED)
+    @PutMapping("/{id}/")
+    @CacheEvict(LOCATIONS, allEntries = true)
+    fun updateEvent(@PathVariable("id") id: Long, @Valid @RequestBody body: EventView): EventView {
+        val event = eventService.findById(id) ?: throw NotFoundException("event with id $id does not exist")
+
+        event.title = body.title
+        event.date = body.date?.let { LocalDateTime.ofEpochSecond(it, 0, ZoneOffset.UTC) } ?: event.date
+        event.city = body.city
+        event.duration = body.duration
+        event.startingLocation = Coord(body.startingLocation.latitude!!, body.startingLocation.longitude!!)
+
+        event.isCurrent = body.isCurrent
+        event.isOpenForRegistration = body.isOpenForRegistration
+        event.allowNewSponsoring = body.allowNewSponsoring
+
+        eventService.save(event)
+
+        return EventView(event)
+    }
+
+    /**
      * POST /event/{id}/whitelistMail/
      * Allows admin to create new event
      */

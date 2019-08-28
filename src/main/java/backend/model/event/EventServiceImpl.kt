@@ -74,6 +74,8 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository,
         return repository.save(event)
     }
 
+    override fun save(event: Event) { repository.save(event) }
+
     override fun findPostingsById(id: Long) = repository.findPostingsById(id)
 
     override fun findLocationPostingsById(id: Long) = repository.findLocationPostingsById(id)
