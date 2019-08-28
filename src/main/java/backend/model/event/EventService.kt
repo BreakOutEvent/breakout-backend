@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 interface EventService {
     fun findById(id: Long): Event?
 
-    fun createEvent(title: String, date: LocalDateTime, city: String, startingLocation: Coord, duration: Int, teamFee: Money): Event
+    fun createEvent(title: String, date: LocalDateTime, city: String, startingLocation: Coord, duration: Int, teamFee: Money = Money.of(60, "EUR")): Event
 
     fun save(event: Event)
 
