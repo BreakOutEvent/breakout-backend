@@ -27,7 +27,7 @@ class Event : BasicEntity {
 
     var duration: Int = 36
 
-    var teamFee: Money = Money.of(60, "EUR")
+    var teamFee: Money? = Money.of(60, "EUR")
 
     /**
      * Private constructor for JPA

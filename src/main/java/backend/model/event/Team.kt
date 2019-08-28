@@ -36,9 +36,12 @@ class Team : BasicEntity, Blockable {
         this.name = name
         this.description = description
         this.profilePic = profilePic
-
-        if (event.teamFee.isPositive) {
-            this.invoice = TeamEntryFeeInvoice(this, event.teamFee)
+        this.invoice = event.teamFee?.let { fee ->
+            if (fee.isPositive) {
+                TeamEntryFeeInvoice(this, fee)
+            } else {
+                null
+            }
         }
     }
 
