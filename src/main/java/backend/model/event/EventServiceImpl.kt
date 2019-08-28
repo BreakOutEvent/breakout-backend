@@ -7,6 +7,7 @@ import backend.model.misc.Coord
 import backend.model.user.User
 import backend.services.FeatureFlagService
 import backend.util.data.DonateSums
+import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -69,8 +70,8 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository,
     override fun findAll(): Iterable<Event> = repository.findAll()
 
     @Transactional
-    override fun createEvent(title: String, date: LocalDateTime, city: String, startingLocation: Coord, duration: Int): Event {
-        val event = Event(title, date, city, startingLocation, duration)
+    override fun createEvent(title: String, date: LocalDateTime, city: String, startingLocation: Coord, duration: Int, teamFee: Money): Event {
+        val event = Event(title, date, city, startingLocation, duration, teamFee)
         return repository.save(event)
     }
 

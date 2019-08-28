@@ -4,12 +4,13 @@ import backend.model.location.Location
 import backend.model.misc.Coord
 import backend.model.user.User
 import backend.util.data.DonateSums
+import org.javamoney.moneta.Money
 import java.time.LocalDateTime
 
 interface EventService {
     fun findById(id: Long): Event?
 
-    fun createEvent(title: String, date: LocalDateTime, city: String, startingLocation: Coord, duration: Int): Event
+    fun createEvent(title: String, date: LocalDateTime, city: String, startingLocation: Coord, duration: Int, teamFee: Money): Event
 
     fun save(event: Event)
 

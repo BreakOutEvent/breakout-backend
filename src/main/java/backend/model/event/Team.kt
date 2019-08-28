@@ -13,10 +13,8 @@ import backend.model.payment.billableAmount
 import backend.model.payment.display
 import backend.model.sponsoring.Sponsoring
 import backend.model.user.Participant
-import backend.model.user.User
 import org.hibernate.annotations.Formula
 import org.javamoney.moneta.Money
-import java.math.BigDecimal
 import java.util.*
 import javax.persistence.*
 import javax.persistence.CascadeType.ALL
@@ -38,7 +36,10 @@ class Team : BasicEntity, Blockable {
         this.name = name
         this.description = description
         this.profilePic = profilePic
-        this.invoice = TeamEntryFeeInvoice(this, Money.of(BigDecimal.valueOf(60), "EUR"))
+
+        if (event.teamFee.isPositive) {
+            this.invoice = TeamEntryFeeInvoice(this, event.teamFee)
+        }
     }
 
     var hasStarted: Boolean = false
