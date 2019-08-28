@@ -127,7 +127,7 @@ class TeamController(private val teamService: TeamService,
         checkAuthenticationForEditTeam(team, user)
 
         body.hasStarted?.let {
-            if (user.hasAuthority(EventManager::class)) team.hasStarted = it
+            if (user.hasAuthority(EventManager::class   )) team.hasStarted = it
             else throw UnauthorizedException("Only an admin can change the hasStarted property of a team")
         }
 
@@ -144,7 +144,7 @@ class TeamController(private val teamService: TeamService,
     private fun checkAuthenticationForEditTeam(team: Team, user: User) {
 
 
-        val userIsAdmin = user.hasAuthority(EventManager::class) != null
+        val userIsAdmin = user.hasAuthority(EventManager::class)
         val userIsTeamMember = user
                 .getRole(Participant::class)
                 ?.let { team.members.contains(it) }
