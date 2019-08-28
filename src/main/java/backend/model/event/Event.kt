@@ -29,18 +29,21 @@ class Event : BasicEntity {
 
     var teamFee: Money? = Money.of(60, "EUR")
 
+    var brand: String? = null
+
     /**
      * Private constructor for JPA
      */
     private constructor() : super()
 
-    constructor(title: String, date: LocalDateTime, city: String, startingLocation: Coord, duration: Int, teamFee: Money) : this() {
+    constructor(title: String, date: LocalDateTime, city: String, startingLocation: Coord, duration: Int, teamFee: Money, brand: String) : this() {
         this.title = title
         this.date = date
         this.city = city
         this.startingLocation = startingLocation
         this.duration = duration
         this.teamFee = teamFee
+        this.brand = brand
     }
 
 }

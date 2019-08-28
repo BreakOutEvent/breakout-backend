@@ -70,8 +70,8 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository,
     override fun findAll(): Iterable<Event> = repository.findAll()
 
     @Transactional
-    override fun createEvent(title: String, date: LocalDateTime, city: String, startingLocation: Coord, duration: Int, teamFee: Money): Event {
-        val event = Event(title, date, city, startingLocation, duration, teamFee)
+    override fun createEvent(title: String, date: LocalDateTime, city: String, startingLocation: Coord, duration: Int, teamFee: Money, brand: String): Event {
+        val event = Event(title, date, city, startingLocation, duration, teamFee, brand)
         return repository.save(event)
     }
 

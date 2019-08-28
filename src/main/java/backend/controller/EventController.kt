@@ -18,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import java.util.*
 import javax.validation.Valid
 
 @RestController
@@ -38,6 +39,7 @@ class EventController(open var eventService: EventService,
     fun createEvent(@Valid @RequestBody body: EventView): EventView {
 
         val teamFee = body.teamFee ?: 60.0
+        val brand = body.brand ?: "BreakOut ${Date().year}"
 
         val event = eventService.createEvent(
                 title = body.title,
@@ -45,7 +47,9 @@ class EventController(open var eventService: EventService,
                 city = body.city,
                 duration = body.duration,
                 startingLocation = Coord(body.startingLocation.latitude!!, body.startingLocation.longitude!!),
-                teamFee = Money.of(teamFee, "EUR"))
+                teamFee = Money.of(teamFee, "EUR"),
+                brand = brand
+        )
 
         return EventView(event)
     }
@@ -67,6 +71,7 @@ class EventController(open var eventService: EventService,
         event.duration = body.duration
         event.startingLocation = Coord(body.startingLocation.latitude!!, body.startingLocation.longitude!!)
         event.teamFee = body.teamFee?.let { Money.of(it, "EUR") } ?: event.teamFee
+        event.brand = body.brand ?: event.brand
 
         event.isCurrent = body.isCurrent
         event.isOpenForRegistration = body.isOpenForRegistration

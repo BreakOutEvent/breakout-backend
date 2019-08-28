@@ -34,6 +34,8 @@ class EventView() {
 
     var teamFee: Double? = null
 
+    var brand: String? = null
+
     @NotNull
     var duration: Int = 36
 
@@ -47,5 +49,6 @@ class EventView() {
         this.isCurrent = event.isCurrent
         this.isOpenForRegistration = event.isOpenForRegistration
         this.allowNewSponsoring = event.allowNewSponsoring
+        this.brand = event.brand
     }
 }
