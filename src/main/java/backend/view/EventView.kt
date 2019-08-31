@@ -50,6 +50,6 @@ class EventView() {
         this.isOpenForRegistration = event.isOpenForRegistration
         this.allowNewSponsoring = event.allowNewSponsoring
         this.brand = event.brand
-        this.teamFee = event.teamFee.numberStripped.toDouble()
+        this.teamFee = event.teamFee?.numberStripped.toDouble()
     }
 }
