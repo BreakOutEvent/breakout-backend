@@ -9,6 +9,7 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
+    - uses: MrRamych/gradle-actions/openjdk-8@2.1
     - name: Clean Database
       run: mysql -u root --password=root -e "DROP DATABASE IF EXISTS test; CREATE DATABASE test;"
     - name: Run Tests
