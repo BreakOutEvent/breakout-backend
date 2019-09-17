@@ -10,6 +10,6 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Clean Database
-      run: mysql -h 127.0.0.1 -u root -e "DROP DATABASE IF EXISTS test; CREATE DATABASE test;"
+      run: mysql -h 127.0.0.1 -u root -p root -e "DROP DATABASE IF EXISTS test; CREATE DATABASE test;"
     - name: Run Tests
       run: gradle test
