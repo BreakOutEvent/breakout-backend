@@ -28,9 +28,7 @@ jobs:
   include:
     - stage: build and test
       script:
-        - |
-          printenv
-          gradle test
+        - gradle test
     - stage: build docker image
       script:
         - |
