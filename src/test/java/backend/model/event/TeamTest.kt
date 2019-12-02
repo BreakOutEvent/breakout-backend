@@ -30,7 +30,7 @@ class TeamTest {
     @Before
     fun setUp() {
         creator = User.create("creator@mail.de", "password").addRole(Participant::class)
-        event = Event("Awesome Event", LocalDateTime.now(), "Munich", Coord(0.0, 0.0), duration = 36, teamFee = Money.of(60, "EUR"), brand = "BreakOut")
+        event = Event("Awesome Event", LocalDateTime.now(), "Munich", Coord(0.0, 0.0), duration = 36, teamFee = Money.of(60, "EUR"), brand = "BreakOut", bank = "Bank", iban = "IBAN", bic = "BIC")
         team = Team(creator, "Team awesome", "our team is awesome", event, null)
     }
 
