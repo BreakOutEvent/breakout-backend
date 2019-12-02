@@ -35,6 +35,9 @@ class EventView() {
     var teamFee: Double? = null
 
     var brand: String? = null
+    var bank: String? = null
+    var iban: String? = null
+    var bic: String? = null
 
     @NotNull
     var duration: Int = 36
@@ -51,5 +54,8 @@ class EventView() {
         this.allowNewSponsoring = event.allowNewSponsoring
         this.brand = event.brand
         this.teamFee = event.teamFee?.numberStripped?.toDouble()
+        this.bank = event.bank
+        this.iban = event.iban
+        this.bic = event.bic
     }
 }

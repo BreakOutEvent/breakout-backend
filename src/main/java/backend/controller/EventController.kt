@@ -40,6 +40,9 @@ class EventController(open var eventService: EventService,
 
         val teamFee = body.teamFee ?: 60.0
         val brand = body.brand ?: "BreakOut ${Date().year}"
+        val bank = body.bank ?: "Fidor Bank"
+        val iban = body.iban ?: "DE85 7002 2200 0020 2418 37"
+        val bic = body.bic ?: "FDDODEMMXXX"
 
         val event = eventService.createEvent(
                 title = body.title,
@@ -48,7 +51,10 @@ class EventController(open var eventService: EventService,
                 duration = body.duration,
                 startingLocation = Coord(body.startingLocation.latitude!!, body.startingLocation.longitude!!),
                 teamFee = Money.of(teamFee, "EUR"),
-                brand = brand
+                brand = brand,
+                bank = bank,
+                iban = iban,
+                bic = bic
         )
 
         return EventView(event)
@@ -72,6 +78,9 @@ class EventController(open var eventService: EventService,
         event.startingLocation = Coord(body.startingLocation.latitude!!, body.startingLocation.longitude!!)
         event.teamFee = body.teamFee?.let { Money.of(it, "EUR") } ?: event.teamFee
         event.brand = body.brand ?: event.brand
+        event.bank = body.bank ?: event.bank
+        event.iban = body.iban ?: event.iban
+        event.bic = body.bic ?: event.bic
 
         event.isCurrent = body.isCurrent
         event.isOpenForRegistration = body.isOpenForRegistration
