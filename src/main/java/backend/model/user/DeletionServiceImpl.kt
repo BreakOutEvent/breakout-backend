@@ -84,13 +84,13 @@ class DeletionServiceImpl @Autowired constructor(private val userRepository: Use
     }
 
     fun deleteOrAnonymizeIfNotPossible(posting: Posting) {
+        posting.media = null
+        posting.user = null
+        posting.text = ""
+        postingRepository.save(posting)
+      
         if (posting.challenge == null && posting.comments.isEmpty()) {
             postingRepository.delete(posting)
-        } else {
-            posting.media = null
-            posting.user = null
-            posting.text = ""
-            postingRepository.save(posting)
         }
     }
 
