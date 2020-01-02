@@ -8,6 +8,7 @@ import backend.model.posting.Posting
 import backend.model.sponsoring.Sponsoring
 import backend.model.location.Location
 import backend.model.location.LocationRepository
+import backend.model.media.MediaRepository
 import backend.model.messaging.GroupMessage
 import backend.model.messaging.GroupMessageRepository
 import backend.model.misc.Email
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class DeletionServiceImpl @Autowired constructor(private val userRepository: UserRepository,
                                                  private val postingRepository: PostingRepository,
+                                                 private val mediaRepository: MediaRepository,
                                                  private val locationRepository: LocationRepository,
                                                  private val sponsoringRepository: SponsoringRepository,
                                                  private val sponsoringInvoiceRepository: SponsoringInvoiceRepository,
@@ -84,12 +86,14 @@ class DeletionServiceImpl @Autowired constructor(private val userRepository: Use
     }
 
     fun deleteOrAnonymizeIfNotPossible(posting: Posting) {
+        val media = posting.media
         posting.media = null
         posting.user = null
         posting.text = ""
         postingRepository.save(posting)
       
         if (posting.challenge == null && posting.comments.isEmpty()) {
+            media?.let { mediaRepository.delete(it) }
             postingRepository.delete(posting)
         }
     }
