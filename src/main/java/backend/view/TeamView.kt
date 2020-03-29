@@ -4,7 +4,6 @@ import backend.model.event.Team
 import backend.model.removeBlockedBy
 import backend.util.data.DonateSums
 import backend.view.user.BasicUserView
-import com.sun.org.apache.xpath.internal.operations.Bool
 import org.hibernate.validator.constraints.SafeHtml
 import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import java.util.*

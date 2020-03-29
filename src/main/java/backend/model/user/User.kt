@@ -3,7 +3,6 @@ package backend.model.user
 import backend.model.Blockable
 import backend.model.Blocker
 import backend.model.media.Media
-import com.sun.org.apache.xpath.internal.operations.Bool
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import kotlin.reflect.KClass
 
