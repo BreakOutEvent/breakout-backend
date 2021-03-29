@@ -8,7 +8,6 @@ import backend.model.posting.Posting
 import backend.model.user.Participant
 import backend.util.distanceCoordsKM
 import backend.util.distanceCoordsListKM
-import backend.model.location.LocationRepository.getAllLatLonByTeamId
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -50,9 +49,8 @@ class Location : BasicEntity {
         this.uploader = uploader
         this.date = date
         this.distance = distanceCoordsKM(from = team!!.event.startingLocation, to = coord)
-        if (team!!.event.id == 14) {
-            this.distance = distanceCoordsListKM(
-                getAllLatLonByTeamId(team!!.id).map(Coord(it.latitude, it.longitude)))
+        if (team!!.event.id!!.equals(20)) {
+            this.distance = distanceCoordsListKM(this.team!!.locations.map{Coord(it.coord.latitude, it.coord.longitude)} + coord)
         }
         this.locationData = locationData
     }
