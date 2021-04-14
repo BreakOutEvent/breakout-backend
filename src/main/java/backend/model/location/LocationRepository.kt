@@ -27,13 +27,5 @@ interface LocationRepository : CrudRepository<Location, Long> {
     """, nativeQuery = true)
     fun findLastLocationByTeamId(@Param("id") id: Long): Location?
 
-    @Query("""
-        select longitude, latitude
-        from location
-        where team_id = :id
-        order by id desc
-    """, nativeQuery = true)
-    fun getAllLatLonByTeamId(@Param("id") id: Long): List<Location>
-
     fun findAllByUploaderId(uploaderId: Long): List<Location>
 }
