@@ -13,6 +13,7 @@ interface UserService {
     fun getAllAdmins(): Iterable<UserAccount>
 
     fun create(email: String, password: String): User
+    fun create(email: String, password: String, newsletter: Boolean): User
     fun create(email: String, password: String, f: User.() -> Unit): User
 
     fun save(user: User): User

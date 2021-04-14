@@ -1,0 +1,1 @@
+ALTER TABLE user_account ADD newsletter BOOLEAN NOT NULL DEFAULT false

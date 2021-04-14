@@ -43,7 +43,17 @@ class UserServiceImpl @Autowired constructor(private val userRepository: UserRep
 
     override fun create(email: String, password: String): User {
         if (this.exists(email)) throw ConflictException("user with email $email already exists")
-        val user = User.create(email, password)
+        val user = User.create(email, password, false)
+        val token = user.createActivationToken()
+
+        sendActivationEmail(token, user)
+
+        return userRepository.save(user.account)
+    }
+
+    override fun create(email: String, password: String, newsletter: Boolean): User {
+        if (this.exists(email)) throw ConflictException("user with email $email already exists")
+        val user = User.create(email, password, newsletter)
         val token = user.createActivationToken()
 
         sendActivationEmail(token, user)

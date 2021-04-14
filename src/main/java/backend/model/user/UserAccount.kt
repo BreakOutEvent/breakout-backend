@@ -41,6 +41,8 @@ class UserAccount : BasicEntity, User {
 
     override var notificationToken: String? = null
 
+    override var newsletter: Boolean = false
+
     @Enumerated(EnumType.STRING)
     override var preferredLanguage: Language = Language.DE
 
