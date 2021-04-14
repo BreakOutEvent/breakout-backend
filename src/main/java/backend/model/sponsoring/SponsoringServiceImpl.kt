@@ -58,7 +58,7 @@ class SponsoringServiceImpl(private val sponsoringRepository: SponsoringReposito
         val title = when (sponsor.gender) {
             "male" -> "Sehr geehrter Herr"
             "female" -> "Sehr geehrte Frau"
-            else -> "Sehr geehrte Frau / Herr"
+            else -> "Sehr geehrte*r"
         }
 
         return "$title ${sponsor.firstname} ${sponsor.lastname},<br><br>" +
