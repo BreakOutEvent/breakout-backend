@@ -10,13 +10,15 @@ import backend.services.ConfigurationService
 import backend.services.mail.MailService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 @Service
 class UserServiceImpl @Autowired constructor(private val userRepository: UserRepository,
                                              private val mailService: MailService,
                                              private val mediaService: MediaService,
                                              configurationService: ConfigurationService) : UserService {
-
+    private val logger: Logger = LoggerFactory.getLogger(UserServiceImpl::class.java)
     private val host: String = configurationService.getRequired("org.breakout.api.host")
 
     override fun getUserFromCustomUserDetails(customUserDetails: CustomUserDetails): User {
@@ -51,11 +53,14 @@ class UserServiceImpl @Autowired constructor(private val userRepository: UserRep
         return userRepository.save(user.account)
     }
 
-    override fun create(email: String, password: String, newsletter: Boolean): User {
+    override fun createN(email: String, password: String, newsletter: Boolean): User {
         if (this.exists(email)) throw ConflictException("user with email $email already exists")
         val user = User.create(email, password, newsletter)
+        user.account.newsletter = newsletter
+        logger.info(user.account.newsletter.toString())
+        
         val token = user.createActivationToken()
-
+        
         sendActivationEmail(token, user)
 
         return userRepository.save(user.account)

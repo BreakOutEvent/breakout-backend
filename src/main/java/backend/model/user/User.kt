@@ -28,7 +28,7 @@ interface User : Blockable, Blocker {
     fun <T : UserRole> hasAuthority(clazz: KClass<T>): Boolean
 
     companion object {
-        fun create(email: String, password: String, newsletter: Boolean): User {
+        fun create(email: String, password: String, newsletter: Boolean = true): User {
             val user = UserAccount()
             user.email = email
             user.passwordHash = BCryptPasswordEncoder().encode(password)

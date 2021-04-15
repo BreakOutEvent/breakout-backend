@@ -11,6 +11,7 @@ import org.hibernate.validator.constraints.SafeHtml
 import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
+import com.fasterxml.jackson.annotation.JsonProperty
 
 class UserView() {
 
@@ -52,7 +53,9 @@ class UserView() {
 
     var groupMessageIds: List<Long> = arrayListOf()
 
-    var newsletter: Boolean = true
+    @Valid
+    @JsonProperty("newsletter")
+    var newsletter: Boolean = false
 
     constructor(user: User) : this() {
         this.user = user

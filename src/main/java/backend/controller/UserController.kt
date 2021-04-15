@@ -60,8 +60,9 @@ class UserController(private val userService: UserService,
         val newsletter = body.newsletter
 
         if (userService.exists(email)) throw ConflictException("email ${body.email!!} already exists")
-
-        val user = userService.create(email, password, newsletter)
+        logger.info("createUser Newsletter")
+        logger.info(newsletter.toString())
+        val user = userService.createN(email, password, newsletter)
         user.setValuesFrom(body)
         userService.save(user)
 
@@ -265,6 +266,8 @@ class UserController(private val userService: UserService,
         this.gender = userView.gender ?: this.gender
         this.profilePic = userView.profilePic?.let(::Media) ?: this.profilePic
         this.newsletter = userView.newsletter ?: this.newsletter
+        logger.info("setValuesFrom Newsletter")
+        logger.info(this.newsletter.toString())
 
         userView.preferredLanguage?.let {
             when (it) {
