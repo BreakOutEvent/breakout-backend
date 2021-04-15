@@ -57,10 +57,11 @@ class UserController(private val userService: UserService,
         // because UserView has those as optional because of PUT requests
         val email = body.email ?: throw BadRequestException("missing email")
         val password = body.password ?: throw BadRequestException("missing password")
+        val newsletter = body.newsletter
 
         if (userService.exists(email)) throw ConflictException("email ${body.email!!} already exists")
 
-        val user = userService.create(email, password)
+        val user = userService.create(email, password, newsletter)
         user.setValuesFrom(body)
         userService.save(user)
 
@@ -263,6 +264,7 @@ class UserController(private val userService: UserService,
         this.lastname = userView.lastname ?: this.lastname
         this.gender = userView.gender ?: this.gender
         this.profilePic = userView.profilePic?.let(::Media) ?: this.profilePic
+        this.newsletter = userView.newsletter ?: this.newsletter
 
         userView.preferredLanguage?.let {
             when (it) {

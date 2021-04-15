@@ -52,6 +52,8 @@ class UserView() {
 
     var groupMessageIds: List<Long> = arrayListOf()
 
+    var newsletter: Boolean = true
+
     constructor(user: User) : this() {
         this.user = user
         this.firstname = user.firstname
@@ -60,6 +62,7 @@ class UserView() {
         this.gender = user.gender
         this.id = user.account.id
         this.isBlocked = user.isBlocked
+        this.newsletter = user.newsletter
         this.participant = if (user.hasRole(Participant::class)) ParticipantViewModel(user) else null
         this.sponsor = SponsorView(user)
         this.profilePic = user.profilePic?.let(::MediaView)
