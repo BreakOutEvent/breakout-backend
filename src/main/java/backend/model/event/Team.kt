@@ -29,7 +29,7 @@ class Team : BasicEntity, Blockable {
      */
     private constructor() : super()
 
-    constructor(creator: Participant, name: String, description: String, event: Event, profilePic: Media?, postaddress: String?) : this() {
+    constructor(creator: Participant, name: String, description: String, event: Event, profilePic: Media?, postaddress: String? = null) : this() {
         this.event = event
         this.event.teams.add(this)
         this.addMember(creator)

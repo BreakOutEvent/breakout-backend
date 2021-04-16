@@ -103,8 +103,7 @@ class TeamController(private val teamService: TeamService,
         val description = body.description ?: ""
         val name = body.name ?: throw BadRequestException("Team must have a name. Missing in body")
         if (name.isEmpty()) throw BadRequestException("Team name cannot be empty")
-        val postaddress = body.postaddress ?: throw BadRequestException("Team must have a postaddress. Missing in body")
-        if (postaddress.isEmpty()) throw BadRequestException("Postaddress cannot be empty")
+        val postaddress = body.postaddress
         val team = teamService.create(creator, name, description, event, body.profilePic?.let(::Media), postaddress)
 
 
