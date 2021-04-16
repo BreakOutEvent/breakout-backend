@@ -1,0 +1,1 @@
+ALTER TABLE team ADD postaddress VARCHAR(255)

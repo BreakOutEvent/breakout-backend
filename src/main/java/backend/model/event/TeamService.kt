@@ -22,7 +22,7 @@ interface TeamService {
      * @return The newly created Team
      */
     @Throws
-    fun create(creator: Participant, name: String, description: String, event: Event, profilePic: Media?): Team
+    fun create(creator: Participant, name: String, description: String, event: Event, profilePic: Media?, postaddress: String?): Team
 
     /**
      * Invite a participant to a team

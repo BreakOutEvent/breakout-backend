@@ -43,6 +43,8 @@ class TeamView() {
 
     var asleep: Boolean? = null
 
+    var postaddress: String? = null
+
     constructor(team: Team, userId: Long?) : this() {
         this.id = team.id
         this.name = team.name
@@ -58,6 +60,7 @@ class TeamView() {
         this.hasFullyPaid = team.invoice?.isFullyPaid() ?: true
         this.isFull = team.isFull()
         this.asleep = team.asleep
+        this.postaddress = team.postaddress
     }
 
     constructor(team: Team, distance: Double, donateSum: DonateSums, score: Double, userId: Long?) : this() {
@@ -78,5 +81,6 @@ class TeamView() {
         this.donateSum = donateSum
         this.score = score
         this.asleep = team.asleep
+        this.postaddress = team.postaddress
     }
 }
