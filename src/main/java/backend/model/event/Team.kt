@@ -29,7 +29,7 @@ class Team : BasicEntity, Blockable {
      */
     private constructor() : super()
 
-    constructor(creator: Participant, name: String, description: String, event: Event, profilePic: Media?) : this() {
+    constructor(creator: Participant, name: String, description: String, event: Event, profilePic: Media?, postaddress: String? = null) : this() {
         this.event = event
         this.event.teams.add(this)
         this.addMember(creator)
@@ -43,6 +43,7 @@ class Team : BasicEntity, Blockable {
                 null
             }
         }
+        this.postaddress = postaddress
     }
 
     var hasStarted: Boolean = false
@@ -56,6 +57,8 @@ class Team : BasicEntity, Blockable {
 
     @Column(columnDefinition = "TEXT")
     lateinit var description: String
+
+    var postaddress: String? = null
 
     @OneToMany(cascade = [ALL], mappedBy = "team", orphanRemoval = true)
     private var invitations: MutableList<Invitation> = ArrayList()

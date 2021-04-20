@@ -55,6 +55,12 @@ abstract class UserRole : BasicEntity, User, GrantedAuthority {
             this.account.isBlocked = isBlocked
         }
 
+    override var newsletter: Boolean
+        get() = this.account.newsletter
+        set(newsletter) {
+            this.account.newsletter = newsletter
+        }
+
     override var passwordHash: String
         get() = this.account.passwordHash
         set(password) {

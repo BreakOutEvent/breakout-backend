@@ -29,8 +29,8 @@ class TeamServiceImpl(private val repository: TeamRepository,
     private val logger: Logger = LoggerFactory.getLogger(TeamServiceImpl::class.java)
 
     @Transactional
-    override fun create(creator: Participant, name: String, description: String, event: Event, profilePic: Media?): Team {
-        val team = Team(creator, name, description, event, profilePic)
+    override fun create(creator: Participant, name: String, description: String, event: Event, profilePic: Media?, postaddress: String?): Team {
+        val team = Team(creator, name, description, event, profilePic, postaddress)
         // TODO: Maybe use sensible cascading?
 
         if (team.profilePic != null) {
