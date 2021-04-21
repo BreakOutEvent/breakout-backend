@@ -134,7 +134,13 @@ class TeamServiceImpl(private val repository: TeamRepository,
     override fun getScore(team: Team): Double {
         val donateSum = getDonateSum(team)
         val distance = getDistance(team.id!!)
-        return sqrt(donateSum.fullSum.toDouble() * distance)
+        var totalScore = 0.0
+        if (team.event.city == "Anywhere") {
+            totalScore = donateSum.fullSum.toDouble() + distance
+        }else{
+            totalScore = sqrt(donateSum.fullSum.toDouble() * distance)
+        }
+        return totalScore
     }
 
     @Transactional
