@@ -136,7 +136,7 @@ class TeamServiceImpl(private val repository: TeamRepository,
         val distance = getDistance(team.id!!)
         var totalScore = 0.0
         if (team.event.city == "Anywhere") {
-            totalScore = sqrt(donateSum.fullSum.toDouble() + distance)
+            totalScore = donateSum.fullSum.toDouble() + distance
         }else{
             totalScore = sqrt(donateSum.fullSum.toDouble() * distance)
         }
