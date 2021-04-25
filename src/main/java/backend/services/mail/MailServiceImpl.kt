@@ -23,17 +23,17 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
     private val paymentDeadlineMonthGerman = "Mai"
     private val paymentDeadlineMonthEnglish = "May"
-    private val paymentDeadlineDay = 22
+    private val paymentDeadlineDay = 24
 
     private val eventMonthGerman = "Juni"
     private val eventMonthEnglish= "June"
-    private val eventDay = 14
+    private val eventDay = 19
 
     private val ceremonyMonthGerman = "Juni"
     private val ceremonyMonthEnglish= "June"
-    private val ceremonyDay = 14
+    private val ceremonyDay = 19
 
-    private val partner = "Zeltschule e.V."
+    private val partner = "Viva con Agua de Sankt Pauli e.V."
 
     override fun send(email: Email, saveToDb: Boolean) {
         this.mailSenderService.send(email, saveToDb)
@@ -55,8 +55,9 @@ class MailServiceImpl(configurationService: ConfigurationService,
             BreakOut ist ein Spendenmarathon, bei dem Geld für das Projekt $partner gesammelt wird.<br><br>
 
             In Zweierteams versucht Ihr, euch ab Startschuss binnen 36 Stunden so weit wie möglich von Eurem Startpunkt
-            (München, Berlin oder Barcelona) zu entfernen. Dabei gilt es, für das Reisen kein Geld auszugeben – vielmehr
+            zu entfernen. Dabei gilt es, für das Reisen kein Geld auszugeben – vielmehr
             sammelt Ihr pro zurückgelegtem Kilometer Geld für $partner.<br>
+            Achtung! In diesem Jahr gibt es neue, der aktuellen Situation angepassten Regeln. Bitte befolgt auch unseren Gesundheitscode of Honour.<br>
             Das Konzept folgt damit der Idee eines Spendenmarathons: Im Vorfeld akquiriert Ihr eigene Sponsoren, die dann
             pro gereistem Kilometer einen vorab festgelegten Betrag spenden.<br><br>
 
@@ -292,7 +293,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
         val germanText = """Liebes Team ${team.name},<br><br>
 
             vielen Dank, dass Ihr Euch für den ${event.brand} angemeldet habt. Um Eure
-            Anmeldung abzuschließen, müsst Ihr noch 60€ Teilnahmegebühr überweisen.
+            Anmeldung abzuschließen, müsst Ihr noch 50€ Teilnahmegebühr überweisen.
             Solange Ihr keine Teilnahmegebühr überwiesen habt, können wir Euer Team nicht
             freischalten. Bitte überweist das Geld bis spätestens $paymentDeadlineDay. $paymentDeadlineMonthGerman, damit wir euch
             mit einem T-Shirt und Starterkit für Eure Reise ausstatten können.<br><br>
@@ -304,7 +305,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
             Überweisungszweck: ${team.invoice!!.purposeOfTransfer}<br>
             Betrag: ${team.event.teamFee?.display()}<br><br>
 
-            Wenn ihr lieber Paypal nutzt, sendet bitte 60€ unter Angabe eurer
+            Wenn ihr lieber Paypal nutzt, sendet bitte 50€ unter Angabe eurer
             Teamnummer an finanzen@break-out.org.<br><br>
 
             Ihr möchtet doch nicht mehr teilnehmen? Schade! Bitte gebt uns kurz unter
@@ -327,7 +328,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
             Purpose of transfer: ${team.invoice!!.purposeOfTransfer}<br>
             Amount: ${team.event.teamFee?.display()}<br><br>
 
-            If you prefer Paypal, please send 60.00€ to finanzen@break-out.org,
+            If you prefer Paypal, please send 50.00€ to finanzen@break-out.org,
             indicating your team number.<br><br>
 
             You have decided not to participate in ${event.brand}? Please let us know by
