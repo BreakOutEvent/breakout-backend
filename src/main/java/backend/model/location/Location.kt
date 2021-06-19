@@ -50,6 +50,7 @@ class Location : BasicEntity {
         this.date = date
         this.distance = distanceCoordsKM(from = team!!.event.startingLocation, to = coord)
         if (team!!.event.city == "Anywhere") {
+            // filter locations
             var locations = this.team!!.locations.filter{ it.isDuringEvent }
             this.distance = distanceCoordsListKM(locations.map{Coord(it.coord.latitude, it.coord.longitude)} + coord)
         }
