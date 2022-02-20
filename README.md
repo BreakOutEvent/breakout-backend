@@ -12,6 +12,35 @@ This is the backend application for BreakOut.
 With BreakOut we challenge you to travel as far away as possible in 36 hours without spending any money, starting from Munich. During this time each team collects money for the DAFI-program to give refugees the opportunity of higher education.
 More information at http://www.break-out.org
 
+# Local Setup
+
+- Make sure to use Java JDK 8
+
+- Create Mariadb with docker 
+```
+docker run --name mariadb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=mySecretPw -e MYSQL_DATABASE=breakout -d mariadb
+```
+
+ - Add client credentials
+```
+mysql -h 127.0.0.1 -u root -pmySecretPw breakout -e "INSERT INTO breakout.oauth_client_details (client_id, resource_ids, client_secret, scope, authorized_grant_types, web_server_redirect_uri, authorities, access_token_validity, refresh_token_validity, additional_information, autoapprove) VALUES ('breakout_app', 'BREAKOUT_BACKEND', '123456789', 'read,write', 'password,refresh_token', '', 'USER', null, null, '{}', ''); INSERT INTO breakout.oauth_client_details (client_id, resource_ids, client_secret, scope, authorized_grant_types, web_server_redirect_uri, authorities, access_token_validity, refresh_token_validity, additional_information, autoapprove) VALUES ('client_app', 'BREAKOUT_BACKEND', '123456789', 'read,write', 'password,refresh_token', '', 'USER', null, null, '{}', '');"
+```
+
+ - Run Backend
+```
+SPRING_PROFILES_ACTIVE=localdev ./gradlew bootRun
+```
+
+- Register User in Frontend
+- (Emails will not be sent in default configuration, content will be logged in console)
+- Make User Admin
+```
+mysql -h 127.0.0.1 -u root -pmySecretPw breakout -e "INSERT INTO breakout.user_role (role_name, id, account_id) VALUES ('ADMIN', 1, 1); INSERT INTO breakout.user_account_user_roles (user_account_id, user_roles_id, user_roles_key) VALUES (1, 1, 'backend.model.user.Admin');"
+```
+
+- Logout then Login again in Frontend
+
+
 # Test the backend
 The newest dev build of this application is always deployed to http://breakout-development.herokuapp.com
 
