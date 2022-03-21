@@ -21,14 +21,14 @@ More information at http://www.break-out.org
 docker run --name mariadb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=mySecretPw -e MYSQL_DATABASE=breakout -d mariadb
 ```
 
- - Add client credentials
-```
-mysql -h 127.0.0.1 -u root -pmySecretPw breakout -e "INSERT INTO breakout.oauth_client_details (client_id, resource_ids, client_secret, scope, authorized_grant_types, web_server_redirect_uri, authorities, access_token_validity, refresh_token_validity, additional_information, autoapprove) VALUES ('breakout_app', 'BREAKOUT_BACKEND', '123456789', 'read,write', 'password,refresh_token', '', 'USER', null, null, '{}', ''); INSERT INTO breakout.oauth_client_details (client_id, resource_ids, client_secret, scope, authorized_grant_types, web_server_redirect_uri, authorities, access_token_validity, refresh_token_validity, additional_information, autoapprove) VALUES ('client_app', 'BREAKOUT_BACKEND', '123456789', 'read,write', 'password,refresh_token', '', 'USER', null, null, '{}', '');"
-```
-
  - Run Backend
 ```
 SPRING_PROFILES_ACTIVE=localdev ./gradlew bootRun
+```
+
+- Add client credentials
+```
+mysql -h 127.0.0.1 -u root -pmySecretPw breakout -e "INSERT INTO breakout.oauth_client_details (client_id, resource_ids, client_secret, scope, authorized_grant_types, web_server_redirect_uri, authorities, access_token_validity, refresh_token_validity, additional_information, autoapprove) VALUES ('breakout_app', 'BREAKOUT_BACKEND', '123456789', 'read,write', 'password,refresh_token', '', 'USER', null, null, '{}', ''); INSERT INTO breakout.oauth_client_details (client_id, resource_ids, client_secret, scope, authorized_grant_types, web_server_redirect_uri, authorities, access_token_validity, refresh_token_validity, additional_information, autoapprove) VALUES ('client_app', 'BREAKOUT_BACKEND', '123456789', 'read,write', 'password,refresh_token', '', 'USER', null, null, '{}', '');"
 ```
 
 - Register User in Frontend
