@@ -15,6 +15,7 @@ More information at http://www.break-out.org
 # Local Setup
 
 - Make sure to use Java JDK 8
+- Make sure to have installed mysql client
 
 - Create Mariadb with docker 
 ```
