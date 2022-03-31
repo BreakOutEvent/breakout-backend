@@ -91,6 +91,12 @@ abstract class UserRole : BasicEntity, User, GrantedAuthority {
             this.account.preferredLanguage = value
         }
 
+     override var newEmailToValidate: String?
+        get() = this.account.newEmailToValidate
+        set(newEmailToValidate) {
+            this.account.newEmailToValidate = newEmailToValidate
+        }
+
 
     override fun emailDomain(): String {
         return email.split("@").last()

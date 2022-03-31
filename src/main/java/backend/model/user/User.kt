@@ -20,6 +20,7 @@ interface User : Blockable, Blocker {
     var profilePic: Media?
     var notificationToken: String?
     var newsletter: Boolean
+    var newEmailToValidate: String?
 
     fun <T : UserRole> addRole(clazz: KClass<T>): T
     fun <T : UserRole> getRole(clazz: KClass<T>): T?

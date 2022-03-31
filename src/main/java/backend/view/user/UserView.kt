@@ -53,6 +53,9 @@ class UserView() {
     var groupMessageIds: List<Long> = arrayListOf()
 
     var newsletter: Boolean = true
+    
+    @Email
+    var newEmailToValidate: String? = null
 
     constructor(user: User) : this() {
         this.user = user
@@ -67,6 +70,7 @@ class UserView() {
         this.sponsor = SponsorView(user)
         this.profilePic = user.profilePic?.let(::MediaView)
         this.roles = user.account.getAuthorities().map { it.authority }
+        this.newEmailToValidate = user.newEmailToValidate
 
         this.groupMessageIds = user.account.groupMessages
                                            .removeBlockedBy(user.account.id)

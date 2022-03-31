@@ -265,6 +265,7 @@ class UserController(private val userService: UserService,
         this.gender = userView.gender ?: this.gender
         this.profilePic = userView.profilePic?.let(::Media) ?: this.profilePic
         this.newsletter = userView.newsletter ?: this.newsletter
+        this.newEmailToValidate = userView.newEmailToValidate ?: this.newEmailToValidate
 
         userView.preferredLanguage?.let {
             when (it) {
