@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
-class UserView() {
+open class UserView() {
 
     @JsonIgnore
     var user: User? = null

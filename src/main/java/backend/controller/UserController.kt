@@ -17,10 +17,7 @@ import backend.util.CacheNames.POSTINGS
 import backend.util.CacheNames.TEAMS
 import backend.view.DetailedInvitationView
 import backend.view.NotificationTokenView
-import backend.view.user.AdminSimpleUserView
-import backend.view.user.BasicUserView
-import backend.view.user.SimpleUserView
-import backend.view.user.UserView
+import backend.view.user.*
 import io.swagger.annotations.Api
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -29,18 +26,18 @@ import org.springframework.cache.annotation.Caching
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 import javax.validation.Valid
 
-
 @Api
 @RestController
 @RequestMapping("/user")
-class UserController(private val userService: UserService,
-                     private val teamService: TeamService,
-                     private val deletionService: DeletionService,
-                     configurationService: ConfigurationService) {
+open class UserController(private val userService: UserService,
+                          private val teamService: TeamService,
+                          private val deletionService: DeletionService,
+                          configurationService: ConfigurationService) {
 
     private val JWT_SECRET: String = configurationService.getRequired("org.breakout.api.jwt_secret")
     private val logger: Logger = LoggerFactory.getLogger(UserController::class.java)
@@ -130,21 +127,46 @@ class UserController(private val userService: UserService,
     /**
      * PUT /user/{id}/
      * Edits user with given id
+     * Changes the user password
      */
     @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(TEAMS, allEntries = true))])
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}/")
-    fun updateUser(@PathVariable id: Long,
-                   @Valid @RequestBody body: UserView,
-                   @AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
+     fun updateUser(@PathVariable id: Long,
+                        @Valid @RequestBody body: UpdateUserView,
+                        @AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (user.account.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")
 
         user.setValuesFrom(body)
-        userService.save(user)
 
+        userService.getUserByEmail(user.email)
+        if(!body.password.isNullOrEmpty() && !body.newPassword.isNullOrEmpty()){
+            if(!user.hasPassword(body.password)) {
+                throw  BadRequestException("Old password is wrong")
+            }
+            user.setPassword(body.newPassword)
+        }
+        userService.save(user)
         return UserView(user)
+    }
+
+    /**
+     * Checks if the current password given from the user at the account setting is equal with the users password
+     */
+    private fun User.hasPassword(value: String?): Boolean {
+        if (BCryptPasswordEncoder().matches(value, this.passwordHash)){
+            return true
+        }
+        return false
+    }
+
+    /**
+     * Sets the newPassword
+     */
+    private fun User.setPassword(value: String?){
+        this.passwordHash = BCryptPasswordEncoder().encode(value)
     }
 
     /**
@@ -266,6 +288,7 @@ class UserController(private val userService: UserService,
         this.profilePic = userView.profilePic?.let(::Media) ?: this.profilePic
         this.newsletter = userView.newsletter ?: this.newsletter
         this.newEmailToValidate = userView.newEmailToValidate ?: this.newEmailToValidate
+       // this.newPassword = userView.newPassword ?: this.newPassword
 
         userView.preferredLanguage?.let {
             when (it) {
@@ -374,3 +397,9 @@ class UserController(private val userService: UserService,
     }
 
 }
+/* fun passwordsHash(password: String?): Boolean {
+     if (UserAccount().passwordHash == BCryptPasswordEncoder().encode(password)) {
+         run {return true}
+     }
+            else  return false
+ }*/
