@@ -288,7 +288,6 @@ open class UserController(private val userService: UserService,
         this.profilePic = userView.profilePic?.let(::Media) ?: this.profilePic
         this.newsletter = userView.newsletter ?: this.newsletter
         this.newEmailToValidate = userView.newEmailToValidate ?: this.newEmailToValidate
-       // this.newPassword = userView.newPassword ?: this.newPassword
 
         userView.preferredLanguage?.let {
             when (it) {
@@ -397,9 +396,3 @@ open class UserController(private val userService: UserService,
     }
 
 }
-/* fun passwordsHash(password: String?): Boolean {
-     if (UserAccount().passwordHash == BCryptPasswordEncoder().encode(password)) {
-         run {return true}
-     }
-            else  return false
- }*/
