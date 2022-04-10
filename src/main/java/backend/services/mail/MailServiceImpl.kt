@@ -436,6 +436,56 @@ class MailServiceImpl(configurationService: ConfigurationService,
         this.send(mail)
     }
 
+
+    override fun sendConfirmNewUserEmail(token: String, user: User) {
+
+        val germanText = """Neue BreakOut-E-Mail-Adresse bestätigen<br><br>
+
+        Zum Schutz Deiner Daten müssen wir sicherstellen, dass diese E-Mail-Adresse Dir gehört. Bitte klicke dazu auf
+        den Button am Ende der E-Mail.<br><br>
+
+        Du hast Dich nicht für BreakOut angemeldet oder keine Änderung der E-Mail-Adresse angefordert? Dann ignoriere diese E-Mail einfach.<br><br>
+
+        Du hast Fragen oder benötigst Unterstützung? Schreib uns eine E-Mail an
+        <a href='mailto:event@break-out.org'>event@break-out.org</a>.<br><br>
+
+        Liebe Grüße<br>
+        Dein BreakOut-Team""".trimIndent()
+
+
+        val englishText = """Confirm your new BreakOut e-mail address<br><br>
+
+         To protect your data we need to make sure this e-mail address belongs to you. Please click on the button on
+         the bottom of this message to confirm your e-mail address.<br><br>
+
+         You did not sign up for BreakOut or didn't change your e-mail address? Please just ignore this e-mail.<br><br>
+
+         You have questions or need support with your registration? Drop us a message at
+         <a href='mailto:event@break-out.org'>event@break-out.org</a>.<br><br>
+
+         Your BreakOut Team""".trimIndent()
+
+        val germanSubject = "Neue BreakOut E-Mail-Adresse bestätigen"
+        val englishSubject = "Confirm your new BreakOut e-mail address"
+
+        val subject = mergeEmailSubject(germanSubject, englishSubject)
+        val body = mergeEmailBody(germanText, englishText)
+
+        val buttonText = "Email-Adresse bestätigen / Confirm email address"
+        val buttonUrl = "$host/confirmEmailChange/$token?utm_source=backend&utm_medium=email&utm_campaign=confirmEmailChange"
+        val campaignCode = "confirmEmailChange"
+
+        val mail = Email(
+                to = listOf(EmailAddress(user.email)),
+                subject = subject,
+                body = body,
+                buttonText = buttonText,
+                buttonUrl = buttonUrl,
+                campaignCode = campaignCode)
+
+        this.send(mail)
+    }
+
     override fun sendTeamIsCompleteEmail(participants: List<Participant>) {
         val first = participants.first()
         val second = participants.last()

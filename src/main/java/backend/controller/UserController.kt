@@ -132,41 +132,28 @@ open class UserController(private val userService: UserService,
     @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(TEAMS, allEntries = true))])
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}/")
-     fun updateUser(@PathVariable id: Long,
-                        @Valid @RequestBody body: UpdateUserView,
-                        @AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
+    fun updateUser(@PathVariable id: Long,
+                   @Valid @RequestBody body: UpdateUserView,
+                   @AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (user.account.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")
 
         user.setValuesFrom(body)
 
-        userService.getUserByEmail(user.email)
-        if(!body.password.isNullOrEmpty() && !body.newPassword.isNullOrEmpty()){
-            if(!user.hasPassword(body.password)) {
-                throw  BadRequestException("Old password is wrong")
+        if (!body.password.isNullOrBlank() && !body.newPassword.isNullOrBlank()) {
+            if (!user.isCurrentPassword(body.password)) {
+                throw BadRequestException("Current password is wrong")
             }
             user.setPassword(body.newPassword)
         }
+
+        if (!body.email.isNullOrBlank()) {
+            userService.requestEmailChange(user, body.email!!)
+        }
+
         userService.save(user)
         return UserView(user)
-    }
-
-    /**
-     * Checks if the current password given from the user at the account setting is equal with the users password
-     */
-    private fun User.hasPassword(value: String?): Boolean {
-        if (BCryptPasswordEncoder().matches(value, this.passwordHash)){
-            return true
-        }
-        return false
-    }
-
-    /**
-     * Sets the newPassword
-     */
-    private fun User.setPassword(value: String?){
-        this.passwordHash = BCryptPasswordEncoder().encode(value)
     }
 
     /**
@@ -287,7 +274,6 @@ open class UserController(private val userService: UserService,
         this.gender = userView.gender ?: this.gender
         this.profilePic = userView.profilePic?.let(::Media) ?: this.profilePic
         this.newsletter = userView.newsletter ?: this.newsletter
-        this.newEmailToValidate = userView.newEmailToValidate ?: this.newEmailToValidate
 
         userView.preferredLanguage?.let {
             when (it) {
@@ -320,7 +306,7 @@ open class UserController(private val userService: UserService,
     private fun User.becomeOrModifySponsor(sponsorView: UserView.SponsorView): User {
         val sponsor: Sponsor = this.getRole(Sponsor::class) ?: this.addRole(Sponsor::class)
 
-         sponsorView.supporterType?.let {
+        sponsorView.supporterType?.let {
             when (it) {
                 "DONOR" -> sponsor.supporterType = SupporterType.DONOR
                 "ACTIVE" -> sponsor.supporterType = SupporterType.ACTIVE
@@ -346,7 +332,8 @@ open class UserController(private val userService: UserService,
      */
     @GetMapping("/invitation")
     fun showInvitation(@RequestParam token: String): DetailedInvitationView {
-        val invitation = teamService.findInvitationsByInviteCode(token) ?: throw NotFoundException("No invitation for code $token")
+        val invitation = teamService.findInvitationsByInviteCode(token)
+                ?: throw NotFoundException("No invitation for code $token")
         return DetailedInvitationView(invitation)
     }
 
@@ -363,7 +350,7 @@ open class UserController(private val userService: UserService,
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}/logo")
     fun deleteLogo(@PathVariable id: Long,
-                    @AuthenticationPrincipal customUserDetails: CustomUserDetails): BasicUserView {
+                   @AuthenticationPrincipal customUserDetails: CustomUserDetails): BasicUserView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (user.account.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")
@@ -383,7 +370,7 @@ open class UserController(private val userService: UserService,
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}/url")
     fun deleteUrl(@PathVariable id: Long,
-                   @AuthenticationPrincipal customUserDetails: CustomUserDetails): BasicUserView {
+                  @AuthenticationPrincipal customUserDetails: CustomUserDetails): BasicUserView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (user.account.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")

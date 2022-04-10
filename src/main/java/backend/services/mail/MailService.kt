@@ -23,6 +23,8 @@ interface MailService {
 
     fun sendUserHasRegisteredEmail(token: String, user: User)
 
+    fun sendConfirmNewUserEmail(token: String, user: User)
+
     fun sendInvitationEmail(emailAddress: EmailAddress, team: Team)
 
     fun sendTeamIsCompleteEmail(participants: List<Participant>)

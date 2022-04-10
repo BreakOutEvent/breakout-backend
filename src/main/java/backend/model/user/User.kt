@@ -3,7 +3,6 @@ package backend.model.user
 import backend.model.Blockable
 import backend.model.Blocker
 import backend.model.media.Media
-import backend.view.user.UserView
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import kotlin.reflect.KClass
 
@@ -33,7 +32,7 @@ interface User : Blockable, Blocker {
         fun create(email: String, password: String, newsletter: Boolean = false): User {
             val user = UserAccount()
             user.email = email
-            user.passwordHash = BCryptPasswordEncoder().encode(password)
+            user.setPassword(password)
             user.newsletter = newsletter
             return user
         }
@@ -44,7 +43,11 @@ interface User : Blockable, Blocker {
     fun createActivationToken(): String
     fun isActivated(): Boolean
 
-    fun setNewPassword(password: String, token: String)
+    fun confirmEmailChange(token: String)
+    fun isChangeEmailTokenCorrect(token: String): Boolean
+    fun createChangeEmailToken(): String
+
+    fun setPasswordViaReset(password: String, token: String)
 
     override fun isBlockedBy(userId: Long?): Boolean {
         return userId.let {
@@ -59,6 +62,20 @@ interface User : Blockable, Blocker {
 
     fun emailDomain(): String
 
+
+    /**
+     * Checks if the passed [password] matches the current password hash of this user
+     */
+    fun isCurrentPassword(password: String?): Boolean {
+        return BCryptPasswordEncoder().matches(password, this.passwordHash)
+    }
+
+    /**
+     * Sets the password of the user to the hash of the passed [password]
+     */
+    fun setPassword(password: String?) {
+        this.passwordHash = BCryptPasswordEncoder().encode(password)
+    }
 }
 
 enum class Language {

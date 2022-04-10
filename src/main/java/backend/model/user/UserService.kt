@@ -23,7 +23,11 @@ interface UserService {
 
     fun activate(user: User, token: String)
 
+    fun confirmChangeEmail(user: User, token: String)
+
     fun getUserByActivationToken(token: String): User?
+
+    fun getUserByChangeEmailToken(token: String): User?
 
     fun requestReset(emailString: String)
 
@@ -34,4 +38,6 @@ interface UserService {
     fun findAllSponsors(): Iterable<Sponsor>
 
     fun swapPasswords(first: UserAccount, second: UserAccount)
+
+    fun requestEmailChange(user: User, newEmailToValidate: String)
 }
