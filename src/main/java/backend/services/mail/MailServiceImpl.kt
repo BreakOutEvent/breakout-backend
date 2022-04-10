@@ -476,7 +476,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
         val campaignCode = "confirmEmailChange"
 
         val mail = Email(
-                to = listOf(EmailAddress(user.email)),
+                to = listOf(EmailAddress(user.newEmailToValidate)),
                 subject = subject,
                 body = body,
                 buttonText = buttonText,
