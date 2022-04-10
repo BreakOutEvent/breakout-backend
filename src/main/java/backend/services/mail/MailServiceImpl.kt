@@ -438,6 +438,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
 
     override fun sendConfirmNewUserEmail(token: String, user: User) {
+        if(user?.newEmailToValidate == null) return
 
         val germanText = """Neue BreakOut-E-Mail-Adresse bestätigen<br><br>
 
