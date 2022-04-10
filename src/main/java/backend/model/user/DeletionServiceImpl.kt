@@ -36,6 +36,10 @@ class DeletionServiceImpl @Autowired constructor(private val userRepository: Use
         emailRepository.delete(email)
     }
 
+ override   fun delete(team: Team) {
+        teamRepository.delete(team)
+    }
+
     fun anonymize(invoice: SponsoringInvoice) {
         invoice.removeSponsor()
         sponsoringInvoiceRepository.save(invoice)
