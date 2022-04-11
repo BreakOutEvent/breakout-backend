@@ -86,6 +86,10 @@ class TeamServiceImpl(private val repository: TeamRepository,
         return repository.findInvitationsByInviteCode(code)
     }
 
+    override fun findInvitationsByTeamId(teamId: Long): List<Invitation> {
+        return repository.findInvitationsByTeamId(teamId)
+    }
+
     @Transactional
     override fun leave(team: Team, participant: Participant) {
         team.leave(participant)

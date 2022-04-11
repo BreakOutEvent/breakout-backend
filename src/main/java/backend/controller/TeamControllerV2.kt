@@ -13,6 +13,7 @@ import io.swagger.annotations.Api
 import backend.model.user.*
 import backend.view.TeamView
 import backend.model.event.Team
+import backend.view.InvitationView
 import org.springframework.web.bind.annotation.*
 import backend.view.TeamEntryFeeInvoiceView
 import org.springframework.security.access.prepost.PreAuthorize
@@ -73,5 +74,23 @@ class TeamControllerV2(val userService: UserService, val teamService: TeamServic
         deletionService.delete(team)
 
         return TeamView(team, customUserDetails.id)
+    }
+
+    /**
+     * GET /team/{id}/invitations
+     * Show all outstanding invitations for the team with the given id
+     */
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{id}/invitations/")
+    fun showInvitationsForTeamMembers(@PathVariable id: Long,
+                                      @AuthenticationPrincipal customUserDetails: CustomUserDetails): Iterable<InvitationView> {
+        val team = teamService.findOne(id) ?: throw NotFoundException("Team with id $id not found")
+
+        if (!team.isMember(customUserDetails.username)) {
+            throw org.springframework.security.access.AccessDeniedException("Not allowed to see invitations of team with id $id")
+        }
+
+        val invitations = teamService.findInvitationsByTeamId(id)
+        return invitations.map(::InvitationView)
     }
 }
