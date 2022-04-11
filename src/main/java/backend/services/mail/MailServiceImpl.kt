@@ -21,19 +21,16 @@ class MailServiceImpl(configurationService: ConfigurationService,
 
     private val host: String = configurationService.getRequired("org.breakout.api.host")
 
-    private val paymentDeadlineMonthGerman = "Mai"
-    private val paymentDeadlineMonthEnglish = "May"
-    private val paymentDeadlineDay = 24
+    private val paymentDeadlineDe = "1. Juni"
+    private val paymentDeadlineEn = "June 1st"
 
-    private val eventMonthGerman = "Juni"
-    private val eventMonthEnglish= "June"
-    private val eventDay = 19
+    private val eventDateDe = "24./25. Juni"
+    private val eventDateEn = "June 24/25th"
 
-    private val ceremonyMonthGerman = "Juni"
-    private val ceremonyMonthEnglish= "June"
-    private val ceremonyDay = 19
+    private val ceremonyDateDe = "8. Juli"
+    private val ceremonyDateEn = "July 8th"
 
-    private val partner = "Viva con Agua de Sankt Pauli e.V."
+    private val partner = "Zeltschule e.V."
 
     override fun send(email: Email, saveToDb: Boolean) {
         this.mailSenderService.send(email, saveToDb)
@@ -295,7 +292,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
             vielen Dank, dass Ihr Euch für den ${event.brand} angemeldet habt. Um Eure
             Anmeldung abzuschließen, müsst Ihr noch 50€ Teilnahmegebühr überweisen.
             Solange Ihr keine Teilnahmegebühr überwiesen habt, können wir Euer Team nicht
-            freischalten. Bitte überweist das Geld bis spätestens $paymentDeadlineDay. $paymentDeadlineMonthGerman, damit wir euch
+            freischalten. Bitte überweist das Geld bis spätestens $paymentDeadlineDe, damit wir euch
             mit einem T-Shirt und Starterkit für Eure Reise ausstatten können.<br><br>
 
             Bitte überweist eure Teamgebühr an folgendes Konto:<br>
@@ -319,7 +316,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
             Thank you for signing up for ${event.brand}. To complete your registration,
             please transfer your registration fee as soon as possible. We can only activate
             your team once we've received the registration fee. Please transfer the fee by
-            latest $paymentDeadlineMonthEnglish ${paymentDeadlineDay}th so that we can equip you with a t-shirt and your starter kit.<br><br>
+            latest $paymentDeadlineEn so that we can equip you with a t-shirt and your starter kit.<br><br>
 
             Please transfer the registration fee to the following account:<br>
             Account owner: BreakOut e.V.<br>
@@ -456,7 +453,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
         vollständig.<br>
 
         Um Eure Anmeldung abzuschließen, müsst Ihr nur noch die Teilnahmegebühr von ${event?.teamFee?.display()} pro Team bis spätestens
-        $paymentDeadlineDay. $paymentDeadlineMonthGerman überweisen. In der Gebühr ist ein Deposit von 20€ enthalten. Wenn ihr 100€ Spenden gesammelt habt
+        $paymentDeadlineDe überweisen. In der Gebühr ist ein Deposit von 20€ enthalten. Wenn ihr 100€ Spenden gesammelt habt
         (keine Sorge, das schafft ihr locker!), wird euch das Deposit nach dem Event zurücküberwiesen.<br><br>
 
         Bitte überweist eure Teamgebühr an folgendes Konto:<br><br>
@@ -476,7 +473,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
         val englishText = """Hello ${first.firstname},<br><br>
 
         Congratulations! ${second.firstname} will join you for ${event?.brand} - your team is now complete.<br>
-        To complete your registration, please transfer the registration fee of ${event?.teamFee} per team by $paymentDeadlineMonthEnglish ${paymentDeadlineDay}th. This fee
+        To complete your registration, please transfer the registration fee of ${event?.teamFee} per team by $paymentDeadlineEn. This fee
         includes a deposit of 20€. When your team has raised 100€ of donations
         (no worries, you'll definitely raise more than 100€ :) ! ), we will transfer the deposit back to your
         account.<br><br>
@@ -521,7 +518,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
         Über alles weitere halten wir Euch per E-Mail auf dem Laufenden! Schaut außerdem regelmäßig auf unserer
         Facebookseite vorbei für großartige Gewinnspiele und die neuesten Neuigkeiten rund um ${event?.brand}:
         https://www.facebook.com/breakout.ev/ <br>
-        Bis zum $eventDay. $eventMonthGerman - wir freuen uns auf Euch!<br><br>
+        Bis zum $eventDateDe - wir freuen uns auf Euch!<br><br>
 
         Liebe Grüße<br>
         Euer BreakOut-Team"""
@@ -533,7 +530,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
         <a href="https://break-out.org/next-steps">https://break-out.org/next-steps</a> <br>
         We'll send you more information about the event via e-mail. Check out our Facebook page at https://www.facebook.com/breakout.ev/
         for the latest news and fun competitions.<br>
-        We're excited to see you at ${event?.brand} on $eventMonthEnglish ${eventDay}th!<br><br>
+        We're excited to see you at ${event?.brand} on $eventDateEn!<br><br>
 
         Your BreakOut Team"""
 
@@ -571,7 +568,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
             |Wenn eure Kilometerspenden auf "ACCEPTED" stehen, habt ihr sie akzeptiert und sie werden eurem Spendenversprechen angerechnet.
             |Wenn eure Kilometerspenden auf "WITHDRAWN" stehen, dann hat euer Sponsor dieses Spendenversprechen zurückgezogen.
             |
-            |Bitte erinnert eure Sponsoren an die Bezahlung des Spendenversprechens bis $ceremonyDay. $ceremonyMonthGerman, damit euer Geld bis zur Siegerehrung da ist.
+            |Bitte erinnert eure Sponsoren an die Bezahlung des Spendenversprechens bis $ceremonyDateDe, damit euer Geld bis zur Siegerehrung da ist.
             |
             |Haben wir schon erwähnt, wie großartig Ihr seid ;-)
             |
@@ -588,7 +585,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
             |
             |${team.toEmailOverview()}
             |
-            |Please remind your sponsors to pay their donations by $ceremonyMonthEnglish ${ceremonyDay}th so that we'll receive the payment by the victory party.
+            |Please remind your sponsors to pay their donations by $ceremonyDateEn so that we'll receive the payment by the victory party.
             |
             |Have we already mentioned how awesome you are? ;-)
             |
@@ -691,7 +688,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
             |
             |Liebe(r) ${invoice.sponsor?.firstname} ${invoice.sponsor?.lastname},
             |
-            |vielen herzlichen Dank, dass Sie beim ${event?.brand} ein Team unterstützen! Ihre Spende wird von BreakOut e. V. an $partner weitergeleitet. Wir bitten Sie herzlich, Ihre Spende bis zum $ceremonyDay. $ceremonyMonthGerman an das unten angegebene Konto zu überweisen, damit wir das Geld rechtzeitig zur Siegerehrung des diesjährigen BreakOuts erhalten.
+            |vielen herzlichen Dank, dass Sie beim ${event?.brand} ein Team unterstützen! Ihre Spende wird von BreakOut e. V. an $partner weitergeleitet. Wir bitten Sie herzlich, Ihre Spende bis zum $ceremonyDateDe an das unten angegebene Konto zu überweisen, damit wir das Geld rechtzeitig zur Siegerehrung des diesjährigen BreakOuts erhalten.
             |Bei Challenges, für die Ihr Spendenversprechen 0€ beträgt, wurde die Challenge vom Team leider während des ${event?.brand} nicht erfüllt.
             |Bitte beachten Sie: wenn Sie Teams in mehreren Städten unterstützt haben, erhalten Sie pro Stadt eine Email mit der Auflistung Ihres Spendenversprechens für diese Stadt.
             |
@@ -726,7 +723,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
             |
             |Dear ${invoice.sponsor?.firstname} ${invoice.sponsor?.lastname},
             |
-            |Many, many thanks for supporting a team during ${event?.brand}! We would kindly ask you to transfer your donation by $ceremonyMonthEnglish ${ceremonyDay}th so that we will receive the payment in time for our awards party.
+            |Many, many thanks for supporting a team during ${event?.brand}! We would kindly ask you to transfer your donation by $ceremonyDateEn so that we will receive the payment in time for our awards party.
             |If your donation promise for a given challenge is 0€, the team has unfortunately not mastered the challenge during ${event?.brand}.
             |If you supported teams in different cities, you will receive on email per city showing your donation promise for the given city.
             |
