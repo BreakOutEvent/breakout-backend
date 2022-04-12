@@ -115,6 +115,7 @@ class Team : BasicEntity, Blockable {
     fun invite(email: EmailAddress): Invitation {
         if (isInvited(email)) throw DomainException("User $email already is invited to this team")
         val invitation = Invitation(email, this)
+        if(this.isFull()) throw DomainException("Team is already full")
         this.invitations.add(invitation)
         return invitation
     }

@@ -79,6 +79,8 @@ interface TeamService {
 
     fun findInvitationsByInviteCode(code: String): Invitation?
 
+    fun findInvitationsByTeamId(teamId: Long): List<Invitation>
+
     fun getDistanceForTeam(teamId: Long): Double
 
     fun getDistance(teamId: Long): Double
