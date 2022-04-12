@@ -64,12 +64,12 @@ class TeamControllerV2(val userService: UserService, val teamService: TeamServic
                    @AuthenticationPrincipal customUserDetails: CustomUserDetails): TeamView {
 
         val deleter = userService.getUserFromCustomUserDetails(customUserDetails)
-
-        // TODO: Hier check, ob user im jeweiligen Team! und wegen weiteren Bedinungen bei Josi nachfragen
-       // if (deleter.account.id != id ) // && !deleter.hasRole(Admin::class)
-      //      throw UnauthorizedException("authenticated user and requested resource mismatch")
-
         val team = teamService.findOne(id) ?: throw NotFoundException("Team with id $id not found")
+
+        if(!deleter.hasRole(Admin::class) && !team.isMember(customUserDetails.username)) {
+            throw UnauthorizedException("Participant is not a member of team $id nor an admin.")
+        }
+
         deletionService.delete(team)
 
         return TeamView(team, customUserDetails.id)
