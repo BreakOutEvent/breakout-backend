@@ -11,6 +11,8 @@ interface UserRepository : CrudRepository<UserAccount, Long> {
 
     fun findByActivationToken(token: String): User
 
+    fun findByChangeEmailToken(token: String): User
+
     @Query("select case when count(e) > 0 then true else false end from UserAccount e where e.email = ?1")
     fun existsByEmail(email: String): Boolean
 

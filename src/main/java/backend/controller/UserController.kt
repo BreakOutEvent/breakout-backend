@@ -17,10 +17,7 @@ import backend.util.CacheNames.POSTINGS
 import backend.util.CacheNames.TEAMS
 import backend.view.DetailedInvitationView
 import backend.view.NotificationTokenView
-import backend.view.user.AdminSimpleUserView
-import backend.view.user.BasicUserView
-import backend.view.user.SimpleUserView
-import backend.view.user.UserView
+import backend.view.user.*
 import io.swagger.annotations.Api
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -29,18 +26,18 @@ import org.springframework.cache.annotation.Caching
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 import javax.validation.Valid
 
-
 @Api
 @RestController
 @RequestMapping("/user")
-class UserController(private val userService: UserService,
-                     private val teamService: TeamService,
-                     private val deletionService: DeletionService,
-                     configurationService: ConfigurationService) {
+open class UserController(private val userService: UserService,
+                          private val teamService: TeamService,
+                          private val deletionService: DeletionService,
+                          configurationService: ConfigurationService) {
 
     private val JWT_SECRET: String = configurationService.getRequired("org.breakout.api.jwt_secret")
     private val logger: Logger = LoggerFactory.getLogger(UserController::class.java)
@@ -130,20 +127,32 @@ class UserController(private val userService: UserService,
     /**
      * PUT /user/{id}/
      * Edits user with given id
+     * Changes the user password
      */
     @Caching(evict = [(CacheEvict(POSTINGS, allEntries = true)), (CacheEvict(TEAMS, allEntries = true))])
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}/")
     fun updateUser(@PathVariable id: Long,
-                   @Valid @RequestBody body: UserView,
+                   @Valid @RequestBody body: UpdateUserView,
                    @AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (user.account.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")
 
         user.setValuesFrom(body)
-        userService.save(user)
 
+        if (!body.password.isNullOrBlank() && !body.newPassword.isNullOrBlank()) {
+            if (!user.isCurrentPassword(body.password)) {
+                throw BadRequestException("Current password is wrong")
+            }
+            user.setPassword(body.newPassword)
+        }
+
+        if (!body.email.isNullOrBlank()) {
+            userService.requestEmailChange(user, body.email!!)
+        }
+
+        userService.save(user)
         return UserView(user)
     }
 
@@ -297,7 +306,7 @@ class UserController(private val userService: UserService,
     private fun User.becomeOrModifySponsor(sponsorView: UserView.SponsorView): User {
         val sponsor: Sponsor = this.getRole(Sponsor::class) ?: this.addRole(Sponsor::class)
 
-         sponsorView.supporterType?.let {
+        sponsorView.supporterType?.let {
             when (it) {
                 "DONOR" -> sponsor.supporterType = SupporterType.DONOR
                 "ACTIVE" -> sponsor.supporterType = SupporterType.ACTIVE
@@ -323,7 +332,8 @@ class UserController(private val userService: UserService,
      */
     @GetMapping("/invitation")
     fun showInvitation(@RequestParam token: String): DetailedInvitationView {
-        val invitation = teamService.findInvitationsByInviteCode(token) ?: throw NotFoundException("No invitation for code $token")
+        val invitation = teamService.findInvitationsByInviteCode(token)
+                ?: throw NotFoundException("No invitation for code $token")
         return DetailedInvitationView(invitation)
     }
 
@@ -340,7 +350,7 @@ class UserController(private val userService: UserService,
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}/logo")
     fun deleteLogo(@PathVariable id: Long,
-                    @AuthenticationPrincipal customUserDetails: CustomUserDetails): BasicUserView {
+                   @AuthenticationPrincipal customUserDetails: CustomUserDetails): BasicUserView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (user.account.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")
@@ -360,7 +370,7 @@ class UserController(private val userService: UserService,
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}/url")
     fun deleteUrl(@PathVariable id: Long,
-                   @AuthenticationPrincipal customUserDetails: CustomUserDetails): BasicUserView {
+                  @AuthenticationPrincipal customUserDetails: CustomUserDetails): BasicUserView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (user.account.id != id) throw UnauthorizedException("authenticated user and requested resource mismatch")

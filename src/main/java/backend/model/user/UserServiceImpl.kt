@@ -20,12 +20,15 @@ class UserServiceImpl @Autowired constructor(private val userRepository: UserRep
     private val host: String = configurationService.getRequired("org.breakout.api.host")
 
     override fun getUserFromCustomUserDetails(customUserDetails: CustomUserDetails): User {
-        return userRepository.findOne(customUserDetails.id) ?: throw Exception("User could be authenticated but data was not found")
+        return userRepository.findOne(customUserDetails.id)
+                ?: throw Exception("User could be authenticated but data was not found")
     }
 
     override fun getUserById(id: Long): User? = userRepository.findOne(id)
 
     override fun getUserByActivationToken(token: String): User? = userRepository.findByActivationToken(token)
+
+    override fun getUserByChangeEmailToken(token: String): User? = userRepository.findByChangeEmailToken(token)
 
     override fun getUserByEmail(email: String): User? = userRepository.findByEmail(email)
 
@@ -97,7 +100,23 @@ class UserServiceImpl @Autowired constructor(private val userRepository: UserRep
 
     override fun resetPassword(emailString: String, password: String, token: String) {
         val user = this.getUserByEmail(emailString) ?: throw NotFoundException("No user found with email")
-        user.setNewPassword(password, token)
+        user.setPasswordViaReset(password, token)
+        this.save(user)
+    }
+
+    override fun requestEmailChange(user: User, newEmailToValidate: String) {
+        if (newEmailToValidate == null ||
+                newEmailToValidate.equals(user.email, ignoreCase = true) ||
+                newEmailToValidate.equals(user.newEmailToValidate, ignoreCase = true)) return
+
+        val token = user.createChangeEmailToken()
+        user.newEmailToValidate = newEmailToValidate
+        mailService.sendConfirmNewUserEmail(token, user)
+    }
+
+    override fun confirmChangeEmail(user: User, token: String) {
+        if (!user.isChangeEmailTokenCorrect(token)) throw DomainException("Incorrect email change token")
+        else user.confirmEmailChange(token)
         this.save(user)
     }
 

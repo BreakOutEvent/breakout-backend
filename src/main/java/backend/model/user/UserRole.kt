@@ -91,6 +91,12 @@ abstract class UserRole : BasicEntity, User, GrantedAuthority {
             this.account.preferredLanguage = value
         }
 
+     override var newEmailToValidate: String?
+        get() = this.account.newEmailToValidate
+        set(newEmailToValidate) {
+            this.account.newEmailToValidate = newEmailToValidate
+        }
+
 
     override fun emailDomain(): String {
         return email.split("@").last()
@@ -106,7 +112,10 @@ abstract class UserRole : BasicEntity, User, GrantedAuthority {
     override fun isActivationTokenCorrect(token: String): Boolean = this.account.isActivationTokenCorrect(token)
     override fun createActivationToken(): String = this.account.createActivationToken()
     override fun isActivated(): Boolean = this.account.isActivated()
-    override fun setNewPassword(password: String, token: String) = this.account.setNewPassword(password, token)
+    override fun setPasswordViaReset(password: String, token: String) = this.account.setPasswordViaReset(password, token)
+    override fun confirmEmailChange(token: String) = this.account.confirmEmailChange(token)
+    override fun isChangeEmailTokenCorrect(token: String): Boolean = this.account.isChangeEmailTokenCorrect(token)
+    override fun createChangeEmailToken(): String = this.account.createChangeEmailToken()
 
     open fun getSubRoles(): Iterable<UserRole> = emptyList()
     fun getAuthorities(): Iterable<UserRole> = listOf(this) + getSubRoles().flatMap { it.getAuthorities() }

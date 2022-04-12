@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.validator.constraints.Email
 import org.hibernate.validator.constraints.NotEmpty
 import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import java.util.*
 import javax.persistence.*
 import kotlin.collections.ArrayList
@@ -43,6 +42,9 @@ class UserAccount : BasicEntity, User {
 
     override var newsletter: Boolean = false
 
+    @Email
+    override var newEmailToValidate: String? = null
+
     @Enumerated(EnumType.STRING)
     override var preferredLanguage: Language = Language.DE
 
@@ -69,6 +71,8 @@ class UserAccount : BasicEntity, User {
 
     private var activationToken: String? = null
 
+    private var changeEmailToken: String? = null
+
     private fun getAllRoles(): Collection<UserRole> {
         return this.userRoles.values
                 .flatMap { it.getAuthorities() }
@@ -87,6 +91,21 @@ class UserAccount : BasicEntity, User {
         }
     }
 
+    override fun confirmEmailChange(token: String) {
+        if (isChangeEmailTokenCorrect(token)) {
+            if(this.newEmailToValidate.isNullOrBlank()) {
+                throw DomainException("No new email to confirm")
+            }
+            this.isBlocked = false // also unblock user
+            this.activationToken = null // also reset user activation
+            this.email = this.newEmailToValidate!!
+            this.newEmailToValidate = null
+            this.changeEmailToken = null
+        } else {
+            throw DomainException("Provided token $token does not match the change email token")
+        }
+    }
+
     override fun isActivationTokenCorrect(token: String): Boolean {
         return this.activationToken == token
     }
@@ -96,15 +115,23 @@ class UserAccount : BasicEntity, User {
         return this.activationToken!!
     }
 
+    override fun isChangeEmailTokenCorrect(token: String): Boolean {
+        return this.changeEmailToken == token
+    }
+
+    override fun createChangeEmailToken(): String {
+        this.changeEmailToken = UUID.randomUUID().toString()
+        return this.changeEmailToken!!
+    }
+
     override fun isActivated(): Boolean {
         return !isBlocked
     }
 
-    override fun setNewPassword(password: String, token: String) {
-
+    override fun setPasswordViaReset(password: String, token: String) {
         //successful password reset is also email validation
         this.activate(token)
-        this.passwordHash = BCryptPasswordEncoder().encode(password)
+        this.setPassword(password)
     }
 
     // This cast will always succeed because the specific type of the value / object
