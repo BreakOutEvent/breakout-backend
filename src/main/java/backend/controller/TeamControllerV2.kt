@@ -8,17 +8,25 @@ import backend.model.event.TeamService
 import backend.model.event.TeamSummaryProjection
 import backend.model.user.Participant
 import backend.model.user.UserService
+import backend.view.user.UserView
+import io.swagger.annotations.Api
+import backend.model.user.*
+import backend.view.TeamView
+import backend.model.event.Team
+import org.springframework.web.bind.annotation.*
 import backend.view.TeamEntryFeeInvoiceView
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+@Api
 @RestController
 @RequestMapping("/team")
-class TeamControllerV2(val userService: UserService, val teamService: TeamService) {
+class TeamControllerV2(val userService: UserService, val teamService: TeamService, val deletionService: DeletionService) {
 
 
     @PreAuthorize("isAuthenticated()")
@@ -44,5 +52,26 @@ class TeamControllerV2(val userService: UserService, val teamService: TeamServic
     @GetMapping("/")
     fun getAllTeamsOverview(): Iterable<TeamSummaryProjection> {
         return teamService.findAllTeamSummaryProjections()
+    }
+
+      /**
+     * DELETE /team/{id}/
+     * Deletes team with given id
+     */
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/{id}/")
+    fun deleteTeam(@PathVariable id: Long,
+                   @AuthenticationPrincipal customUserDetails: CustomUserDetails): TeamView {
+
+        val deleter = userService.getUserFromCustomUserDetails(customUserDetails)
+        val team = teamService.findOne(id) ?: throw NotFoundException("Team with id $id not found")
+
+        if(!deleter.hasRole(Admin::class) && !team.isMember(customUserDetails.username)) {
+            throw UnauthorizedException("Participant is not a member of team $id nor an admin.")
+        }
+
+        deletionService.delete(team)
+
+        return TeamView(team, customUserDetails.id)
     }
 }
