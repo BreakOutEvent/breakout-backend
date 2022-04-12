@@ -109,6 +109,8 @@ class UserServiceImpl @Autowired constructor(private val userRepository: UserRep
                 newEmailToValidate.equals(user.email, ignoreCase = true) ||
                 newEmailToValidate.equals(user.newEmailToValidate, ignoreCase = true)) return
 
+        if (this.exists(newEmailToValidate)) throw ConflictException("user with new email $newEmailToValidate already exists")
+
         val token = user.createChangeEmailToken()
         user.newEmailToValidate = newEmailToValidate
         mailService.sendConfirmNewUserEmail(token, user)
@@ -116,6 +118,8 @@ class UserServiceImpl @Autowired constructor(private val userRepository: UserRep
 
     override fun confirmChangeEmail(user: User, token: String) {
         if (!user.isChangeEmailTokenCorrect(token)) throw DomainException("Incorrect email change token")
+        else if (user.newEmailToValidate.isNullOrBlank()) throw DomainException("Missing new email to set")
+        else if (this.exists(user.newEmailToValidate!!)) throw ConflictException("user with new email ${user.newEmailToValidate} already exists")
         else user.confirmEmailChange(token)
         this.save(user)
     }
