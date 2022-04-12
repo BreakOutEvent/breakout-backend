@@ -25,10 +25,6 @@ class BasicUserView() {
     @SafeHtml(whitelistType = NONE)
     var gender: String? = null
 
-    @Valid
-    @SafeHtml(whitelistType = NONE)
-    var email: String? = null
-
     var id: Long? = null
 
     var isBlocked: Boolean? = null
@@ -44,7 +40,6 @@ class BasicUserView() {
         this.user = user
         this.firstname = user.firstname
         this.lastname = user.lastname
-        this.email = user.email
         this.id = user.account.id
         this.gender = user.gender
         this.isBlocked = user.isBlocked
