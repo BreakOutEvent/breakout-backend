@@ -40,9 +40,9 @@ class EventController(open var eventService: EventService,
 
         val teamFee = body.teamFee ?: 60.0
         val brand = body.brand ?: "BreakOut ${Date().year}"
-        val bank = body.bank ?: "Fidor Bank"
-        val iban = body.iban ?: "DE85 7002 2200 0020 2418 37"
-        val bic = body.bic ?: "FDDODEMMXXX"
+        val bank = body.bank ?: "Holvi Payment Services Oy"
+        val iban = body.iban ?: "DE78 1001 7997 1735 6121 29"
+        val bic = body.bic ?: "HOLVDEB1"
 
         val event = eventService.createEvent(
                 title = body.title,
