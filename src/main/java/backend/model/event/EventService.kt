@@ -18,9 +18,9 @@ interface EventService {
             duration: Int,
             teamFee: Money = Money.of(60, "EUR"),
             brand: String = "BreakOut",
-            bank: String = "Fidor Bank",
-            iban: String = "DE85 7002 2200 0020 2418 37",
-            bic: String = "FDDODEMMXXX"
+            bank: String = "Holvi Payment Services Oy",
+            iban: String = "DE78 1001 7997 1735 6121 29",
+            bic: String = "HOLVDEB1"
     ): Event
 
     fun save(event: Event)
