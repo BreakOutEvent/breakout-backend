@@ -1,15 +1,15 @@
 USE `${BREAKOUT}`;
 
 -- create new table for Sponsoring <-> Team ManyToMany
-CREATE TABLE `sponsoring_team` (
+CREATE TABLE `sponsoring_teams` (
    `sponsoring_id` bigint(20) NOT NULL,
    `team_id` bigint(20) NOT NULL,
-   CONSTRAINT FOREIGN KEY fk_sponsoring_team_sponsoring_id (`sponsoring_id`) REFERENCES `sponsoring` (`id`),
-   CONSTRAINT FOREIGN KEY fk_sponsoring_team_team_id (`team_id`) REFERENCES `team` (`id`)
+   CONSTRAINT FOREIGN KEY fk_sponsoring_teams_sponsoring_id (`sponsoring_id`) REFERENCES `sponsoring` (`id`),
+   CONSTRAINT FOREIGN KEY fk_sponsoring_teams_team_id (`team_id`) REFERENCES `team` (`id`)
 );
 
 -- copy existing sponsoring -> team relations into new sponsoring_team table
-INSERT INTO `sponsoring_team` (`sponsoring_id`, `team_id`) SELECT `id`, `team_id` FROM `sponsoring`;
+INSERT INTO `sponsoring_teams` (`sponsoring_id`, `team_id`) SELECT `id`, `team_id` FROM `sponsoring`;
 
 -- add new event id
 ALTER TABLE `sponsoring` ADD COLUMN `event_id` bigint(20) DEFAULT NULL;
