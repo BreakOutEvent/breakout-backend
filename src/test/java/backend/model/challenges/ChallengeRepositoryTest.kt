@@ -132,12 +132,12 @@ class ChallengeRepositoryTest : IntegrationTest() {
     fun testFindAllRegisteredSponsorsWithSponsoringsAtEvent() {
 
         setAuthenticatedUser(firstRegisteredSponsor.email)
-        sponsoringService.createSponsoring(firstRegisteredSponsor, firstTeamAtFirstEvent, euroOf(1.0), euroOf(10.0))
-        sponsoringService.createSponsoring(firstRegisteredSponsor, firstTeamAtSecondEvent, euroOf(1.0), euroOf(10.0))
+        sponsoringService.createSponsoring(firstEvent, firstRegisteredSponsor, mutableSetOf(firstTeamAtFirstEvent), euroOf(1.0), euroOf(10.0))
+        sponsoringService.createSponsoring(secondEvent, firstRegisteredSponsor, mutableSetOf(firstTeamAtSecondEvent), euroOf(1.0), euroOf(10.0))
 
 
         setAuthenticatedUser(secondRegisteredSponsor.email)
-        sponsoringService.createSponsoring(secondRegisteredSponsor, secondTeamAtSecondEvent, euroOf(1.0), euroOf(10.0))
+        sponsoringService.createSponsoring(secondEvent, secondRegisteredSponsor, mutableSetOf(secondTeamAtSecondEvent), euroOf(1.0), euroOf(10.0))
 
         val fromFirst = sponsoringRepository.findAllRegisteredSponsorsWithSponsoringsAtEvent(firstEvent.id!!)
         val fromSecond = sponsoringRepository.findAllRegisteredSponsorsWithSponsoringsAtEvent(secondEvent.id!!)
@@ -150,8 +150,8 @@ class ChallengeRepositoryTest : IntegrationTest() {
     fun testFindAllRegisteredSponsorsWhenOneSponsorSponsorsMultipleTeamsAtTheSameEvent() {
         setAuthenticatedUser(firstRegisteredSponsor.email)
 
-        sponsoringService.createSponsoring(firstRegisteredSponsor, firstTeamAtFirstEvent, euroOf(0.0), euroOf(10.0))
-        sponsoringService.createSponsoring(firstRegisteredSponsor, secondTeamAtFirstEvent, euroOf(0.0), euroOf(10.0))
+        sponsoringService.createSponsoring(firstEvent, firstRegisteredSponsor, mutableSetOf(firstTeamAtFirstEvent), euroOf(0.0), euroOf(10.0))
+        sponsoringService.createSponsoring(firstEvent, firstRegisteredSponsor, mutableSetOf(secondTeamAtFirstEvent), euroOf(0.0), euroOf(10.0))
 
         val fromFirst = sponsoringRepository.findAllRegisteredSponsorsWithSponsoringsAtEvent(firstEvent.id!!)
 
@@ -162,8 +162,8 @@ class ChallengeRepositoryTest : IntegrationTest() {
     fun testFindAllRegisteredSponsorsWhenOneSponsorSponsorsMultipleTeamsAtDifferentEvents() {
         setAuthenticatedUser(firstRegisteredSponsor.email)
 
-        sponsoringService.createSponsoring(firstRegisteredSponsor, firstTeamAtFirstEvent, euroOf(0.0), euroOf(1.0))
-        sponsoringService.createSponsoring(firstRegisteredSponsor, firstTeamAtSecondEvent, euroOf(0.0), euroOf(1.0))
+        sponsoringService.createSponsoring(firstEvent, firstRegisteredSponsor, mutableSetOf(firstTeamAtFirstEvent), euroOf(0.0), euroOf(1.0))
+        sponsoringService.createSponsoring(secondEvent, firstRegisteredSponsor, mutableSetOf(firstTeamAtSecondEvent), euroOf(0.0), euroOf(1.0))
 
         val fromFirst = sponsoringRepository.findAllRegisteredSponsorsWithSponsoringsAtEvent(firstEvent.id!!)
         val fromSecond = sponsoringRepository.findAllRegisteredSponsorsWithSponsoringsAtEvent(secondEvent.id!!)
@@ -181,7 +181,8 @@ class ChallengeRepositoryTest : IntegrationTest() {
                 url = "",
                 gender = "",
                 address = Address("", "", "", "", ""),
-                email = "spon@example.com"
+                email = "spon@example.com",
+                team = firstTeamAtFirstEvent
         )
 
         val secondUnregistered = UnregisteredSponsor(
@@ -191,24 +192,15 @@ class ChallengeRepositoryTest : IntegrationTest() {
                 url = "",
                 gender = "",
                 address = Address("", "", "", "", ""),
-                email = "spon@example.com"
-        )
-
-        val thirdUnregistered = UnregisteredSponsor(
-                firstname = "Firstname",
-                lastname = "",
-                company = "",
-                url = "",
-                gender = "",
-                address = Address("", "", "", "", ""),
-                email = "spon@example.com"
+                email = "spon@example.com",
+                team = secondTeamAtFirstEvent
         )
 
         setAuthenticatedUser(firstTeamAtFirstEvent.members.first().email)
-        sponsoringService.createSponsoringWithOfflineSponsor(firstTeamAtFirstEvent, euroOf(10), euroOf(10), firstUnregistered)
+        sponsoringService.createSponsoringWithOfflineSponsor(firstEvent, euroOf(10), euroOf(10), firstUnregistered)
 
         setAuthenticatedUser(secondTeamAtFirstEvent.members.first().email)
-        sponsoringService.createSponsoringWithOfflineSponsor(secondTeamAtFirstEvent, euroOf(10), euroOf(10), secondUnregistered)
+        sponsoringService.createSponsoringWithOfflineSponsor(firstEvent, euroOf(10), euroOf(10), secondUnregistered)
 
     }
 }

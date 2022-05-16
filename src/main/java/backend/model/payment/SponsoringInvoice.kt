@@ -118,7 +118,9 @@ class SponsoringInvoice : Invoice {
     }
 
     private fun Sponsoring.toEmailListing(): String {
-        return "<b>Team-ID</b> ${this.team?.id} <b>Teamname</b> ${this.team?.name} <b>Status</b> ${this.status} <b>Betrag pro km</b> ${this.amountPerKm.display()} <b>Limit</b> ${this.limit.display()} <b>Gereiste KM</b> ${this.team?.getCurrentDistance()} <b>Spendenversprechen</b> ${this.billableAmount().display()}"
+        // TODO: implement with teams
+        return ""
+        //return "<b>Team-ID</b> ${this.team?.id} <b>Teamname</b> ${this.team?.name} <b>Status</b> ${this.status} <b>Betrag pro km</b> ${this.amountPerKm.display()} <b>Limit</b> ${this.limit.display()} <b>Gereiste KM</b> ${this.team?.getCurrentDistance()} <b>Spendenversprechen</b> ${this.billableAmount().display()}"
     }
 
     @JvmName("challengeToEmailListing")
@@ -135,7 +137,7 @@ class SponsoringInvoice : Invoice {
         return when (sponsor) {
             is UnregisteredSponsor -> {
                 val fromChallenges = this.challenges.flatMap { it.team?.members?.map { EmailAddress(it.email) } ?: listOf() }
-                val fromSponsorings = this.sponsorings.flatMap { it.team?.members?.map { EmailAddress(it.email) } ?: listOf() }
+                val fromSponsorings = this.sponsorings.flatMap { it.teams?.flatMap {  t -> t.members?.map { m -> EmailAddress(m.email) } ?: listOf() } }
                 val fromUnregistered: Iterable<EmailAddress> = if (this.unregisteredSponsor?.email != null) {
                     try {
                         listOf(EmailAddress(this.unregisteredSponsor!!.email!!))

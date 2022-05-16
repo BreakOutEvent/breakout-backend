@@ -212,8 +212,9 @@ class MailServiceImpl(configurationService: ConfigurationService,
     }
 
     override fun sendSponsoringWasWithdrawnEmail(sponsoring: Sponsoring) {
-        val event = sponsoring.team?.event
-        val germanText = """Hallo Team ${sponsoring.team!!.name}, <br><br>
+        val event = sponsoring.event
+        for(team in sponsoring.teams) {
+            val germanText = """Hallo Team ${team.name}, <br><br>
 
             ein Sponsoring wurde zurückgezogen, vielleicht wollt ihr mit dem Sponsor noch einmal darüber reden.<br>
             Du hast Fragen oder benötigst Unterstützung? Schreib uns eine E-Mail an
@@ -222,7 +223,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
             Liebe Grüße<br>
             Euer BreakOut-Team""".trimIndent()
 
-        val englishText = """Dear Team ${sponsoring.team!!.name} <br><br>
+            val englishText = """Dear Team ${team!!.name} <br><br>
 
             unfortunately a sponsor withdrew their sponsorship for your journey.
             Perhaps you might want to contact him or her to find out what's going on. <br>
@@ -232,21 +233,23 @@ class MailServiceImpl(configurationService: ConfigurationService,
             Best regards<br>
             Your BreakOut-Team""".trimIndent()
 
-        val germanSubject = "${event?.brand} - Rückzug eines Sponsorings!"
-        val englishSubject = "${event?.brand} - Sponsorship Withdrawal!"
+            val germanSubject = "${event?.brand} - Rückzug eines Sponsorings!"
+            val englishSubject = "${event?.brand} - Sponsorship Withdrawal!"
 
-        val email = Email(
-                to = sponsoring.team!!.members.map { EmailAddress(it.email) },
-                subject = mergeEmailSubject(germanSubject, englishSubject),
-                body = mergeEmailBody(germanText, englishText),
-                campaignCode = "sponsoring_withdrawn")
+            val email = Email(
+                    to = team!!.members.map { EmailAddress(it.email) },
+                    subject = mergeEmailSubject(germanSubject, englishSubject),
+                    body = mergeEmailBody(germanText, englishText),
+                    campaignCode = "sponsoring_withdrawn")
 
-        this.send(email)
+            this.send(email)
+        }
     }
 
     override fun sendSponsoringWasAddedEmail(sponsoring: Sponsoring) {
-        val event = sponsoring.team?.event
-        val germanText = """Hallo Team ${sponsoring.team!!.name}, <br><br>
+        val event = sponsoring.event
+        for(team in sponsoring.teams) {
+            val germanText = """Hallo Team ${team.name}, <br><br>
 
             Euch wurde ein Sponsoring hinzugefügt!<br><br>
 
@@ -260,7 +263,7 @@ class MailServiceImpl(configurationService: ConfigurationService,
             Liebe Grüße<br>
             Euer BreakOut-Team""".trimIndent()
 
-        val englishText = """Dear team ${sponsoring.team!!.name}, <br><br>
+            val englishText = """Dear team ${team.name}, <br><br>
 
             There is a new sponsorship for your journey!<br><br>
 
@@ -273,16 +276,17 @@ class MailServiceImpl(configurationService: ConfigurationService,
             Best regards<br>
             Your BreakOut-Team""".trimIndent()
 
-        val germanSubject = "${event?.brand} - New Sponsorship!"
-        val englishSubject = "${event?.brand} - Neues Sponsoring hinzugefügt!"
+            val germanSubject = "${event?.brand} - New Sponsorship!"
+            val englishSubject = "${event?.brand} - Neues Sponsoring hinzugefügt!"
 
-        val email = Email(
-                to = sponsoring.team!!.members.map { EmailAddress(it.email) },
-                subject = mergeEmailSubject(germanSubject, englishSubject),
-                body = mergeEmailBody(germanText, englishText),
-                campaignCode = "sponsoring_added")
+            val email = Email(
+                    to = team.members.map { EmailAddress(it.email) },
+                    subject = mergeEmailSubject(germanSubject, englishSubject),
+                    body = mergeEmailBody(germanText, englishText),
+                    campaignCode = "sponsoring_added")
 
-        this.send(email)
+            this.send(email)
+        }
     }
 
     override fun sendTeamEntryFeePaymentReminderEmail(team: Team) {

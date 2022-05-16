@@ -192,7 +192,7 @@ class SponsoringInvoiceServiceImpl(private val sponsoringInvoiceRepository: Spon
 
     private fun invoiceToTeamSponsorPairs(invoice: SponsoringInvoice): List<Pair<Team, SponsoringInvoice>> {
         val teamsFromChallenges = invoice.challenges.map { it.team }
-        val teamsFromSponsorings = invoice.sponsorings.map { it.team }
+        val teamsFromSponsorings = invoice.sponsorings.flatMap { it.teams }
         val teamsFromBoth = teamsFromChallenges.union(teamsFromSponsorings).distinct()
         return teamsFromBoth.filterNotNull().map { it to invoice }
     }

@@ -2,6 +2,7 @@ package backend.model.sponsoring
 
 import backend.model.BasicEntity
 import backend.model.challenges.Challenge
+import backend.model.event.Team
 import backend.model.misc.Url
 import backend.model.user.Address
 import backend.model.user.Sponsor
@@ -41,6 +42,9 @@ class UnregisteredSponsor : BasicEntity, ISponsor {
     @OneToMany(mappedBy = "unregisteredSponsor")
     override var challenges: MutableList<Challenge> = mutableListOf()
 
+    @OneToOne
+    var team: Team? = null
+
     @Column(nullable = true) // TODO: Why nullable?
     override
     var isHidden: Boolean = false
@@ -58,6 +62,7 @@ class UnregisteredSponsor : BasicEntity, ISponsor {
     constructor(firstname: String,
                 lastname: String,
                 company: String,
+                team: Team? = null,
                 gender: String? = null,
                 url: String? = null,
                 address: Address,
@@ -67,6 +72,7 @@ class UnregisteredSponsor : BasicEntity, ISponsor {
         this.firstname = firstname
         this.lastname = lastname
         this.company = company
+        this.team = team
         this.address = address
         this.isHidden = isHidden
         this.email = email

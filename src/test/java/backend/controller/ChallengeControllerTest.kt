@@ -367,7 +367,7 @@ class ChallengeControllerTest : IntegrationTest() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val team = teamService.create(participant, "name", "description", event, null)
-        val sponsor = UnregisteredSponsor("", "", "", "", "", address = Address("", "", "", "", ""))
+        val sponsor = UnregisteredSponsor("", "", "", team, "", "", address = Address("", "", "", "", ""))
         setAuthenticatedUser(participant.email)
         val challenge = challengeService.proposeChallenge(sponsor, team, euroOf(200), "desc")
 

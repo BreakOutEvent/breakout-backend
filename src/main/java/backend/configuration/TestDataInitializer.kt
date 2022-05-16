@@ -58,7 +58,7 @@ class TestDataInitializer {
         teamService.join(david, teamiOS)
 
         setAuthenticatedUser(keno.email)
-        sponsoringService.createSponsoring(keno, teamiOS, euroOf(5), euroOf(10000000))
+        sponsoringService.createSponsoring(eventMunich, keno, mutableSetOf(teamiOS), euroOf(5), euroOf(10000000))
         locationService.create(Coord(51.0505, 13.7372), leo, date.plusHours(1))
         locationService.create(Coord(48.8534100, 2.3488000), leo, date.plusHours(2))
 
@@ -88,11 +88,11 @@ class TestDataInitializer {
 
         // ---- Sponsor1 ----
         val sponsor1 = userService.create("sponsor1@break-out.org", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
-        sponsoringService.createSponsoring(sponsor1, team1, Money.parse("EUR 0.1"), Money.parse("EUR 100"))
+        sponsoringService.createSponsoring(eventMunich, sponsor1, mutableSetOf(team1), Money.parse("EUR 0.1"), Money.parse("EUR 100"))
 
         // ---- Sponsor2 ----
         val sponsor2 = userService.create("sponsor2@break-out.org", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
-        sponsoringService.createSponsoring(sponsor2, team2, Money.parse("EUR 0.2"), Money.parse("EUR 200"))
+        sponsoringService.createSponsoring(eventMunich, sponsor2, mutableSetOf(team2), Money.parse("EUR 0.2"), Money.parse("EUR 200"))
 
         // ---- Locations for team1 ----
         locationService.create(Coord(51.0505, 13.7372), participant1, date.plusHours(1))

@@ -2,6 +2,7 @@ package backend.model.sponsoring
 
 import backend.exceptions.DomainException
 import backend.model.BasicEntity
+import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.media.Media
 import backend.model.misc.EmailAddress
@@ -12,6 +13,7 @@ import backend.util.euroOf
 import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.HashSet
 import javax.persistence.*
 import javax.persistence.CascadeType.PERSIST
 
@@ -25,7 +27,7 @@ class Sponsoring : BasicEntity, Billable {
     var contract: Media? = null
 
     var status: SponsoringStatus = ACCEPTED
-        private set (value) {
+        private set(value) {
             checkTransition(from = field, to = value)
             field = value
         }
@@ -37,14 +39,17 @@ class Sponsoring : BasicEntity, Billable {
     lateinit var limit: Money
         private set
 
-    @ManyToOne
-    var team: Team? = null
+    @ManyToMany
+    var teams: MutableSet<Team> = HashSet()
 
     @ManyToOne(cascade = [PERSIST])
     private var unregisteredSponsor: UnregisteredSponsor? = null
 
     @ManyToOne
     private var registeredSponsor: Sponsor? = null
+
+    @ManyToOne
+    var event: Event? = null
 
     var sponsor: ISponsor?
         get() = this.unregisteredSponsor as? ISponsor ?: this.registeredSponsor
@@ -55,18 +60,20 @@ class Sponsoring : BasicEntity, Billable {
      */
     private constructor() : super()
 
-    constructor(sponsor: Sponsor, team: Team, amountPerKm: Money, limit: Money) : this() {
+    constructor(event: Event, sponsor: Sponsor, teams: MutableSet<Team>, amountPerKm: Money, limit: Money) : this() {
+        this.event = event
         this.registeredSponsor = sponsor
-        this.team = team
+        this.teams = teams
         this.amountPerKm = amountPerKm
         this.limit = limit
         this.contract = null
         this.sponsor?.sponsorings?.add(this)
     }
 
-    constructor(unregisteredSponsor: UnregisteredSponsor, team: Team, amountPerKm: Money, limit: Money) : this() {
+    constructor(event: Event, unregisteredSponsor: UnregisteredSponsor, teams: MutableSet<Team>, amountPerKm: Money, limit: Money) : this() {
+        this.event = event
         this.unregisteredSponsor = unregisteredSponsor
-        this.team = team
+        this.teams = teams
         this.amountPerKm = amountPerKm
         this.limit = limit
         this.status = ACCEPTED
@@ -98,9 +105,14 @@ class Sponsoring : BasicEntity, Billable {
     }
 
     @Suppress("UNUSED") //Used by Spring @PreAuthorize
+    fun isTeamMember(username: String): Boolean {
+        return this.teams?.any { it.isMember(username) }
+    }
+
+    @Suppress("UNUSED") //Used by Spring @PreAuthorize
     fun checkWithdrawPermissions(username: String): Boolean {
         return when {
-            this.unregisteredSponsor != null -> this.team!!.isMember(username)
+            this.unregisteredSponsor != null -> this.unregisteredSponsor!!.team?.isMember(username) == true
             this.registeredSponsor != null -> EmailAddress(this.registeredSponsor!!.email) == EmailAddress(username)
             else -> throw Exception("Error checking withdrawal permissions")
         }
@@ -141,8 +153,9 @@ class Sponsoring : BasicEntity, Billable {
     }
 
     override fun billableAmount(): Money {
-
-        val distance: Double = team?.getCurrentDistance() ?: run {
+        val distance: Double = if (teams.isNotEmpty())
+            teams?.sumByDouble { it.getCurrentDistance() }
+        else run {
             logger.warn("No team for sponsoring $id found. Using 0.0 for currentDistance")
             return@run 0.0
         }
@@ -161,7 +174,7 @@ class Sponsoring : BasicEntity, Billable {
     }
 
     fun belongsToEvent(eventId: Long): Boolean {
-        return this.team?.event?.id == eventId
+        return this.event?.id == eventId
     }
 
     fun removeSponsor() {

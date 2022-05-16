@@ -1,5 +1,6 @@
 package backend.model.sponsoring
 
+import backend.model.event.Event
 import backend.model.event.Team
 import backend.model.event.TeamService
 import backend.model.misc.Email
@@ -17,7 +18,6 @@ import javax.transaction.Transactional
 @Service
 class SponsoringServiceImpl(private val sponsoringRepository: SponsoringRepository,
                             private val mailService: MailService,
-                            private val teamService: TeamService,
                             private val userService: UserService) : SponsoringService {
 
     override fun findAllRegisteredSponsorsWithSponsoringAtEvent(eventId: Long): Iterable<Sponsor> {
@@ -31,8 +31,8 @@ class SponsoringServiceImpl(private val sponsoringRepository: SponsoringReposito
     private val logger: Logger = LoggerFactory.getLogger(SponsoringServiceImpl::class.java)
 
     @Transactional
-    override fun createSponsoring(sponsor: Sponsor, team: Team, amountPerKm: Money, limit: Money): Sponsoring {
-        val sponsoring = Sponsoring(sponsor, team, amountPerKm, limit)
+    override fun createSponsoring(event: Event, sponsor: Sponsor, teams: MutableSet<Team>, amountPerKm: Money, limit: Money): Sponsoring {
+        val sponsoring = Sponsoring(event, sponsor, teams, amountPerKm, limit)
         mailService.sendSponsoringWasAddedEmail(sponsoring)
         return sponsoringRepository.save(sponsoring)
     }
@@ -108,11 +108,11 @@ class SponsoringServiceImpl(private val sponsoringRepository: SponsoringReposito
     }
 
     @Transactional
-    override fun createSponsoringWithOfflineSponsor(team: Team,
+    override fun createSponsoringWithOfflineSponsor(event: Event,
                                                     amountPerKm: Money,
                                                     limit: Money,
                                                     unregisteredSponsor: UnregisteredSponsor): Sponsoring {
-        val sponsoring = Sponsoring(unregisteredSponsor, team, amountPerKm, limit)
+        val sponsoring = Sponsoring(event, unregisteredSponsor, mutableSetOf(unregisteredSponsor.team!!), amountPerKm, limit)
         return sponsoringRepository.save(sponsoring)
     }
 
@@ -154,7 +154,8 @@ class SponsoringServiceImpl(private val sponsoringRepository: SponsoringReposito
     }
 
     fun calculateAmount(sponsoring: Sponsoring): Money {
-        val kilometers = teamService.getDistanceForTeam(sponsoring.team!!.id!!)
+        // TODO: fix calculation
+        val kilometers = sponsoring.teams.sumByDouble { it.getCurrentDistance() }
         val amountPerKmAsBigDecimal = sponsoring.amountPerKm.numberStripped
         val total = amountPerKmAsBigDecimal.multiply(BigDecimal.valueOf(kilometers))
 

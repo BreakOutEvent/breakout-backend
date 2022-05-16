@@ -25,7 +25,7 @@ class SponsoringControllerTest : IntegrationTest() {
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val sponsor = userService.create("sponsor@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
         val team = teamService.create(participant, "name", "description", event, null)
-        val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(1), euroOf(200))
+        val sponsoring = sponsoringService.createSponsoring(event, sponsor, mutableSetOf(team), euroOf(1), euroOf(200))
 
         val request = get("/event/${event.id}/team/${team.id}/sponsoring/")
                 .asUser(mockMvc, participant.email, "password")
@@ -36,8 +36,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[0]").exists())
                 .andExpect(jsonPath("$.[0].amountPerKm").exists())
                 .andExpect(jsonPath("$.[0].limit").exists())
-                .andExpect(jsonPath("$.[0].teamId").exists())
-                .andExpect(jsonPath("$.[0].team").exists())
+                .andExpect(jsonPath("$.[0].teams").exists()) // TODO: assert map content
                 .andExpect(jsonPath("$.[0].sponsorId").exists())
                 .andExpect(jsonPath("$.[0].userId").exists())
                 .andExpect(jsonPath("$.[0].id").value(sponsoring.id!!.toInt()))
@@ -51,7 +50,7 @@ class SponsoringControllerTest : IntegrationTest() {
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val sponsor = userService.create("sponsor@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
         val team = teamService.create(participant, "name", "description", event, null)
-        val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(1), euroOf(200))
+        val sponsoring = sponsoringService.createSponsoring(event, sponsor, mutableSetOf(team), euroOf(1), euroOf(200))
 
         val request = get("/event/${event.id}/team/${team.id}/sponsoring/")
 
@@ -61,8 +60,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[0]").exists())
                 .andExpect(jsonPath("$.[0].amountPerKm").exists())
                 .andExpect(jsonPath("$.[0].limit").exists())
-                .andExpect(jsonPath("$.[0].teamId").exists())
-                .andExpect(jsonPath("$.[0].team").exists())
+                .andExpect(jsonPath("$.[0].teams").exists()) // TODO: assert map content
                 .andExpect(jsonPath("$.[0].sponsorId").exists())
                 .andExpect(jsonPath("$.[0].userId").exists())
                 .andExpect(jsonPath("$.[0].id").value(sponsoring.id!!.toInt()))
@@ -73,6 +71,7 @@ class SponsoringControllerTest : IntegrationTest() {
     fun testGetAllSponsoringsUnauthenticatedUnregisteredSponsor() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val team = teamService.create(participant, "name", "description", event, null)
         val sponsor = UnregisteredSponsor(
                 firstname = "Hans",
                 lastname = "Wurst",
@@ -86,12 +85,12 @@ class SponsoringControllerTest : IntegrationTest() {
                         city = "City",
                         zipcode = "01111",
                         country = "Germany"
-                )
+                ),
+                team = team
         )
-        val team = teamService.create(participant, "name", "description", event, null)
 
         setAuthenticatedUser(participant.email)
-        val sponsoring = sponsoringService.createSponsoringWithOfflineSponsor(team, euroOf(1), euroOf(200), sponsor)
+        val sponsoring = sponsoringService.createSponsoringWithOfflineSponsor(event, euroOf(1), euroOf(200), sponsor)
 
         val request = get("/event/${event.id}/team/${team.id}/sponsoring/")
 
@@ -101,8 +100,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[0]").exists())
                 .andExpect(jsonPath("$.[0].amountPerKm").exists())
                 .andExpect(jsonPath("$.[0].limit").exists())
-                .andExpect(jsonPath("$.[0].teamId").exists())
-                .andExpect(jsonPath("$.[0].team").exists())
+                .andExpect(jsonPath("$.[0].teams").exists()) // TODO: assert map content
                 .andExpect(jsonPath("$.[0].sponsorId").doesNotExist())
                 .andExpect(jsonPath("$.[0].userId").doesNotExist())
                 .andExpect(jsonPath("$.[0].id").value(sponsoring.id!!.toInt()))
@@ -117,6 +115,7 @@ class SponsoringControllerTest : IntegrationTest() {
         //Set-Up
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
+        val team = teamService.create(participant, "name", "description", event, null)
         val unregisteredSponsor = UnregisteredSponsor(
                 firstname = "Hans",
                 lastname = "Wurst",
@@ -130,7 +129,8 @@ class SponsoringControllerTest : IntegrationTest() {
                         city = "City",
                         zipcode = "01111",
                         country = "Germany"
-                )
+                ),
+                team = team
         )
 
         val registeredSponsor = userService.create("sponsor@mail.de", "password", {
@@ -138,11 +138,10 @@ class SponsoringControllerTest : IntegrationTest() {
         }).getRole(Sponsor::class)!!
 
         setAuthenticatedUser(registeredSponsor.email)
-        val team = teamService.create(participant, "name", "description", event, null)
 
-        val sponsoring1 = sponsoringService.createSponsoring(registeredSponsor, team, euroOf(1), euroOf(200))
+        val sponsoring1 = sponsoringService.createSponsoring(event, registeredSponsor, mutableSetOf(team), euroOf(1), euroOf(200))
         setAuthenticatedUser(participant.email)
-        val sponsoring2 = sponsoringService.createSponsoringWithOfflineSponsor(team, euroOf(1), euroOf(200), unregisteredSponsor)
+        val sponsoring2 = sponsoringService.createSponsoringWithOfflineSponsor(event, euroOf(1), euroOf(200), unregisteredSponsor)
 
         // Test & Assertions
         val request = get("/event/${event.id}/team/${team.id}/sponsoring/")
@@ -154,8 +153,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[0].sponsorIsHidden").value(true))
                 .andExpect(jsonPath("$.[0].amountPerKm").exists())
                 .andExpect(jsonPath("$.[0].limit").exists())
-                .andExpect(jsonPath("$.[0].teamId").exists())
-                .andExpect(jsonPath("$.[0].team").exists())
+                .andExpect(jsonPath("$.[0].teams").exists()) // TODO: assert map content
                 .andExpect(jsonPath("$.[0].sponsoring").doesNotExist())
                 .andExpect(jsonPath("$.[0].id").value(sponsoring1.id!!.toInt()))
                 .andExpect(jsonPath("$.[0].eventId").value(event.id!!.toInt()))
@@ -164,8 +162,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[1].amountPerKm").exists())
                 .andExpect(jsonPath("$.[1].sponsorIsHidden").value(true))
                 .andExpect(jsonPath("$.[1].limit").exists())
-                .andExpect(jsonPath("$.[1].teamId").exists())
-                .andExpect(jsonPath("$.[1].team").exists())
+                .andExpect(jsonPath("$.[1].teams").exists())// TODO: assert map content
                 .andExpect(jsonPath("$.[1].sponsorId").doesNotExist())
                 .andExpect(jsonPath("$.[1].userId").doesNotExist())
                 .andExpect(jsonPath("$.[1].id").value(sponsoring2.id!!.toInt()))
@@ -192,8 +189,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$").exists())
                 .andExpect(jsonPath("$.amountPerKm").exists())
                 .andExpect(jsonPath("$.limit").exists())
-                .andExpect(jsonPath("$.teamId").exists())
-                .andExpect(jsonPath("$.team").exists())
+                .andExpect(jsonPath("$.teams").exists()) // TODO: assert map content
                 .andExpect(jsonPath("$.sponsorId").exists())
                 .andExpect(jsonPath("$.userId").exists())
                 .andExpect(jsonPath("$.status").value("ACCEPTED"))
@@ -218,8 +214,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$").exists())
                 .andExpect(jsonPath("$.amountPerKm").exists())
                 .andExpect(jsonPath("$.limit").exists())
-                .andExpect(jsonPath("$.teamId").exists())
-                .andExpect(jsonPath("$.team").exists())
+                .andExpect(jsonPath("$.teams").exists()) // TODO: assert map content
                 .andExpect(jsonPath("$.sponsorId").exists())
                 .andExpect(jsonPath("$.userId").exists())
                 .andExpect(jsonPath("$.status").value("ACCEPTED"))
@@ -262,8 +257,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$").exists())
                 .andExpect(jsonPath("$.amountPerKm").exists())
                 .andExpect(jsonPath("$.limit").exists())
-                .andExpect(jsonPath("$.teamId").exists())
-                .andExpect(jsonPath("$.team").exists())
+                .andExpect(jsonPath("$.teams").exists()) // TODO: assert map content
                 .andExpect(jsonPath("$.status").value("ACCEPTED"))
                 .andExpect(jsonPath("$.sponsorId").doesNotExist())
                 .andExpect(jsonPath("$.userId").doesNotExist())
@@ -336,10 +330,10 @@ class SponsoringControllerTest : IntegrationTest() {
         val team = teamService.create(participant, "name", "description", event, null)
 
         val sponsor1 = userService.create("sponsor1@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
-        sponsoringService.createSponsoring(sponsor1, team, euroOf(1), euroOf(200))
+        sponsoringService.createSponsoring(event, sponsor1, mutableSetOf(team), euroOf(1), euroOf(200))
 
         val sponsor2 = userService.create("sponsor2@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
-        sponsoringService.createSponsoring(sponsor2, team, euroOf(1), euroOf(200))
+        sponsoringService.createSponsoring(event, sponsor2, mutableSetOf(team), euroOf(1), euroOf(200))
 
         val request = get("/user/${sponsor1.account.id}/sponsor/sponsoring/")
                 .asUser(mockMvc, sponsor1.email, "password")
@@ -350,8 +344,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$.[0]").exists())
                 .andExpect(jsonPath("$.[0].amountPerKm").exists())
                 .andExpect(jsonPath("$.[0].limit").exists())
-                .andExpect(jsonPath("$.[0].teamId").exists())
-                .andExpect(jsonPath("$.[0].team").exists())
+                .andExpect(jsonPath("$.[0].teams").exists()) // TODO: assert map content
                 .andExpect(jsonPath("$.[0].sponsorId").exists())
                 .andExpect(jsonPath("$.[0].userId").exists())
                 .andExpect(jsonPath("$.[1]").doesNotExist())
@@ -363,7 +356,7 @@ class SponsoringControllerTest : IntegrationTest() {
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val sponsor = userService.create("sponsor@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
         val team = teamService.create(participant, "name", "description", event, null)
-        val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(1), euroOf(200))
+        val sponsoring = sponsoringService.createSponsoring(event, sponsor, mutableSetOf(team), euroOf(1), euroOf(200))
 
         val body = mapOf("status" to "ACCEPTED")
 
@@ -376,8 +369,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$").exists())
                 .andExpect(jsonPath("$.amountPerKm").exists())
                 .andExpect(jsonPath("$.limit").exists())
-                .andExpect(jsonPath("$.teamId").exists())
-                .andExpect(jsonPath("$.team").exists())
+                .andExpect(jsonPath("$.teams").exists()) // TODO: assert map content
                 .andExpect(jsonPath("$.sponsorId").exists())
                 .andExpect(jsonPath("$.userId").exists())
                 .andExpect(jsonPath("$.status").value("ACCEPTED"))
@@ -389,7 +381,7 @@ class SponsoringControllerTest : IntegrationTest() {
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val sponsor = userService.create("sponsor@mail.de", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
         val team = teamService.create(participant, "name", "description", event, null)
-        val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(1), euroOf(200))
+        val sponsoring = sponsoringService.createSponsoring(event, sponsor, mutableSetOf(team), euroOf(1), euroOf(200))
 
         val body = mapOf("status" to "rejected")
 
@@ -402,8 +394,7 @@ class SponsoringControllerTest : IntegrationTest() {
                 .andExpect(jsonPath("$").exists())
                 .andExpect(jsonPath("$.amountPerKm").exists())
                 .andExpect(jsonPath("$.limit").exists())
-                .andExpect(jsonPath("$.teamId").exists())
-                .andExpect(jsonPath("$.team").exists())
+                .andExpect(jsonPath("$.teams").exists()) // TODO: assert map content
                 .andExpect(jsonPath("$.sponsorId").exists())
                 .andExpect(jsonPath("$.userId").exists())
                 .andExpect(jsonPath("$.status").value("REJECTED"))
@@ -414,9 +405,9 @@ class SponsoringControllerTest : IntegrationTest() {
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 0.0), 36)
         val participant = userService.create("participant@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val team = teamService.create(participant, "name", "description", event, null)
-        val sponsor = UnregisteredSponsor("", "", "", "", "", address = Address("", "", "", "", ""))
+        val sponsor = UnregisteredSponsor("", "", "", team, "", "", address = Address("", "", "", "", ""))
         setAuthenticatedUser(participant.email)
-        val sponsoring = sponsoringService.createSponsoringWithOfflineSponsor(team, euroOf(1), euroOf(200), sponsor)
+        val sponsoring = sponsoringService.createSponsoringWithOfflineSponsor(event, euroOf(1), euroOf(200), sponsor)
 
         val body = mapOf("status" to "withdrawn")
 
@@ -445,7 +436,7 @@ class SponsoringControllerTest : IntegrationTest() {
         val sponsor = userService.create("sponsor@break-out.org", "password", { addRole(Sponsor::class) }).getRole(Sponsor::class)!!
 
         setAuthenticatedUser(sponsor.email)
-        val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(1), euroOf(200))
+        val sponsoring = sponsoringService.createSponsoring(event, sponsor, mutableSetOf(team), euroOf(1), euroOf(200))
 
         val body = mapOf("status" to "withdrawn")
 

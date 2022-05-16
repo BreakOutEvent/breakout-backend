@@ -76,8 +76,8 @@ class Team : BasicEntity, Blockable {
     @OneToOne(cascade = [ALL], orphanRemoval = true, mappedBy = "team", fetch = LAZY)
     var invoice: TeamEntryFeeInvoice? = null
 
-    @OneToMany(cascade = [ALL], orphanRemoval = true, mappedBy = "team")
-    var sponsoring: MutableList<Sponsoring> = ArrayList()
+    @ManyToMany(cascade = [ALL], mappedBy = "teams")
+    var sponsorings: MutableList<Sponsoring> = ArrayList()
 
     @OneToMany(cascade = [ALL], orphanRemoval = true, mappedBy = "team")
     var challenges: MutableList<Challenge> = ArrayList()
@@ -115,7 +115,7 @@ class Team : BasicEntity, Blockable {
     fun invite(email: EmailAddress): Invitation {
         if (isInvited(email)) throw DomainException("User $email already is invited to this team")
         val invitation = Invitation(email, this)
-        if(this.isFull()) throw DomainException("Team is already full")
+        if (this.isFull()) throw DomainException("Team is already full")
         this.invitations.add(invitation)
         return invitation
     }
@@ -165,8 +165,8 @@ class Team : BasicEntity, Blockable {
         this.invitations.forEach { it.team = null }
         this.invitations.clear()
 
-        this.sponsoring.forEach { it.team = null }
-        this.sponsoring.clear()
+        this.sponsorings.forEach {it.teams.clear() }
+        this.sponsorings.clear()
 
         this.challenges.forEach { it.team = null }
         this.challenges.clear()
@@ -177,7 +177,7 @@ class Team : BasicEntity, Blockable {
     }
 
     fun raisedAmountFromSponsorings(): Money {
-        return this.sponsoring.billableAmount()
+        return this.sponsorings.billableAmount()
     }
 
     @Deprecated("The naming on this is bad as the current distance is actually the farthest distance during the event. This will be renamed")
@@ -191,7 +191,7 @@ class Team : BasicEntity, Blockable {
         |<b>Challenges</b>
         |${challenges.toEmailListing()}
         |<b>Kilometerspenden / Donations per km</b>
-        |${this.sponsoring.toEmailListing()}
+        |${this.sponsorings.toEmailListing()}
         """.trimMargin("|")
     }
 
@@ -201,7 +201,12 @@ class Team : BasicEntity, Blockable {
     }
 
     private fun Sponsoring.toEmailListing(): String {
-        return "<b>Name</b> ${this.sponsor?.firstname} ${this.sponsor?.lastname} <b>Status</b> ${this.status} <b>Betrag pro km</b> ${this.amountPerKm.display()} <b>Limit</b> ${this.limit.display()} <b>Gereiste KM</b> ${this.team?.getCurrentDistance()} <b>Spendenversprechen</b> ${this.billableAmount().display()}"
+        var result = "<b>Name</b> ${this.sponsor?.firstname} ${this.sponsor?.lastname} <b>Status</b> ${this.status} <b>Betrag pro km</b> ${this.amountPerKm.display()} <b>Limit</b> ${this.limit.display()} <b>Spendenversprechen</b> ${this.billableAmount().display()}"
+        for(team in teams) {
+            // TODO: HTML encode team name
+            result += "<br/><b>Team ${team.name} <b>Gereiste KM</b> ${team.getCurrentDistance()} "
+        }
+        return result
     }
 
     @JvmName("challengeToEmailListing")
