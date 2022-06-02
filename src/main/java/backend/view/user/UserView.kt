@@ -57,25 +57,25 @@ open class UserView() {
     @Email
     var newEmailToValidate: String? = null
 
-    constructor(user: User) : this() {
-        this.user = user
-        this.firstname = user.firstname
-        this.lastname = user.lastname
-        this.email = user.email
-        this.gender = user.gender
-        this.id = user.account.id
-        this.isBlocked = user.isBlocked
-        this.newsletter = user.newsletter
-        this.participant = if (user.hasRole(Participant::class)) ParticipantViewModel(user) else null
-        this.sponsor = SponsorView(user)
-        this.profilePic = user.profilePic?.let(::MediaView)
-        this.roles = user.account.getAuthorities().map { it.authority }
-        this.newEmailToValidate = user.newEmailToValidate
+   constructor(user: User) : this() {
+            this.user = user
+            this.firstname = user.firstname
+            this.lastname = user.lastname
+            this.email = user.email
+            this.gender = user.gender
+            this.id = user.account.id
+            this.isBlocked = user.isBlocked
+            this.newsletter = user.newsletter
+            this.participant = if (user.hasRole(Participant::class)) ParticipantViewModel(user) else null
+            this.sponsor = SponsorView(user)
+            this.profilePic = user.profilePic?.let(::MediaView)
+            this.roles = user.account.getAuthorities().map { it.authority }
+            this.newEmailToValidate = user.newEmailToValidate
 
-        this.groupMessageIds = user.account.groupMessages
-                                           .removeBlockedBy(user.account.id)
-                                           .removeBlocking(user)
-                                           .map { it.id!! }
+            this.groupMessageIds = user.account.groupMessages
+                    .removeBlockedBy(user.account.id)
+                    .removeBlocking(user)
+                    .map { it.id!! }
 
         this.preferredLanguage = when (user.preferredLanguage) {
             Language.EN -> "en"

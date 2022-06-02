@@ -4,11 +4,13 @@ import backend.controller.exceptions.NotFoundException
 import backend.exceptions.CacheNonExistentException
 import backend.model.cache.CacheService
 import backend.model.event.EventService
+import backend.model.event.ExtendedParticipantViewModel
 import backend.model.misc.Coord
 import backend.util.CacheNames.LOCATIONS
 import backend.view.EventView
 import backend.view.WhitelistDomainView
 import backend.view.WhitelistEmailView
+import backend.view.user.UsersListView
 import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -186,5 +188,15 @@ class EventController(open var eventService: EventService,
             eventService.regenerateCache(id)
             throw e
         }
+    }
+
+    /**
+     * GET /event/{id}/participants/
+     * Gets all participants for given event
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/{id}/participants/")
+    fun getEventParticipants(@PathVariable("id") id: Long): List<UsersListView> {
+        return eventService.listParticipantsOfEvent(id) ?: throw NotFoundException("event with id $id does not exist")
     }
 }
