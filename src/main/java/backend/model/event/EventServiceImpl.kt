@@ -127,8 +127,7 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository,
         return whitelistDomainRepository.save(WhitelistDomainEntry(domain, event))
     }
 
-    override fun listParticipantsOfEvent(id: Long): List<UsersListView> {
-        val ParticipantsList = repository.findListParticipantsOfEvent(id)
-        return
+    override fun listParticipantsOfEvent(eventId: Long): List<UsersListView> {
+        return repository.findListParticipantsOfEvent(eventId)
     }
 }

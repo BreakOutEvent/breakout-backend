@@ -3,7 +3,6 @@ package backend.model.event
 import backend.model.location.Location
 import backend.model.misc.Coord
 import backend.model.user.User
-import backend.model.user.UserRepository
 import backend.util.data.DonateSums
 import backend.view.user.UsersListView
 import org.javamoney.moneta.Money

@@ -4,7 +4,6 @@ import backend.controller.exceptions.NotFoundException
 import backend.exceptions.CacheNonExistentException
 import backend.model.cache.CacheService
 import backend.model.event.EventService
-import backend.model.event.ExtendedParticipantViewModel
 import backend.model.misc.Coord
 import backend.util.CacheNames.LOCATIONS
 import backend.view.EventView
@@ -195,8 +194,8 @@ class EventController(open var eventService: EventService,
      * Gets all participants for given event
      */
     @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("/{id}/participants/")
-    fun getEventParticipants(@PathVariable("id") id: Long): List<UsersListView> {
-        return eventService.listParticipantsOfEvent(id) ?: throw NotFoundException("event with id $id does not exist")
+    @GetMapping("/{eventId}/participants/")
+    fun getEventParticipants(@PathVariable("eventId") eventId: Long): List<UsersListView> {
+        return eventService.listParticipantsOfEvent(eventId) ?: throw NotFoundException("event with id $eventId does not exist")
     }
 }
