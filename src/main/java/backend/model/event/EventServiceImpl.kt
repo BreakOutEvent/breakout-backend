@@ -7,7 +7,7 @@ import backend.model.misc.Coord
 import backend.model.user.User
 import backend.services.FeatureFlagService
 import backend.util.data.DonateSums
-import backend.view.user.UsersListView
+import backend.view.user.ParticipantViewModel
 import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -127,7 +127,7 @@ class EventServiceImpl @Autowired constructor(val repository: EventRepository,
         return whitelistDomainRepository.save(WhitelistDomainEntry(domain, event))
     }
 
-    override fun listParticipantsOfEvent(eventId: Long): List<UsersListView> {
-        return repository.findListParticipantsOfEvent(eventId)
+    override fun listParticipantsOfEvent(eventId: Long): List<ParticipantViewModel> {
+        return repository.listTeamMembersOfEvent(eventId).map { ParticipantViewModel(it) }
     }
 }

@@ -9,7 +9,7 @@ import backend.util.CacheNames.LOCATIONS
 import backend.view.EventView
 import backend.view.WhitelistDomainView
 import backend.view.WhitelistEmailView
-import backend.view.user.UsersListView
+import backend.view.user.ParticipantViewModel
 import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -195,7 +195,7 @@ class EventController(open var eventService: EventService,
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/{eventId}/participants/")
-    fun getEventParticipants(@PathVariable("eventId") eventId: Long): List<UsersListView> {
-        return eventService.listParticipantsOfEvent(eventId) ?: throw NotFoundException("event with id $eventId does not exist")
+    fun getEventParticipants(@PathVariable("eventId") eventId: Long): List<ParticipantViewModel> {
+        return eventService.listParticipantsOfEvent(eventId)
     }
 }

@@ -1,8 +1,7 @@
 package backend.model.event
 
 import backend.model.location.Location
-import backend.model.user.UserAccount
-import backend.view.user.UsersListView
+import backend.model.user.Participant
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
@@ -22,7 +21,7 @@ interface EventRepository : CrudRepository<Event, Long> {
     fun getLocationMaxDistanceByIdEachTeam(@Param("id") id: Long): List<Location>
     
     @Query("select t.members from Team t where t.event.id = :eventId ")
-    fun findListParticipantsOfEvent(@Param("eventId") EventId: Long): List<UsersListView>
+    fun listTeamMembersOfEvent(@Param("eventId") EventId: Long): List<Participant>
 }
 
 interface WhitelistEmailRepository : CrudRepository<WhitelistEmailEntry, Long> {
