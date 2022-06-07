@@ -17,7 +17,7 @@ jobs:
       DB_DATABASE: test
       DB_USER: root
       DB_PASSWORD: root
-      GRADLE_OPTS: "-Xmx4g"
+      GRADLE_OPTS: "-Xmx4096m -XX:MaxPermSize=4096m -XX:+HeapDumpOnOutOfMemoryError -XX:-UseGCOverheadLimit"
     steps:
       - name: Mysql Setup
         run : |
