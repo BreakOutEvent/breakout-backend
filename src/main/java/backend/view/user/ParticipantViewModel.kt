@@ -15,9 +15,11 @@ class ParticipantViewModel {
     var lastname: String? = null
     var emergencynumber: String? = null
     var tshirtsize: String? = null
-    var hometown: String? = null
+    var postaddress: String? = null
     var phonenumber: String? = null
     var birthdate: String? = null
+    var email: String? = null
+    var eventCity: String? = null
 
     constructor(participant: Participant) {
         this.id = participant?.id
@@ -29,8 +31,10 @@ class ParticipantViewModel {
         this.lastname = participant?.account?.lastname
         this.emergencynumber = participant?.emergencynumber
         this.tshirtsize = participant?.tshirtsize
-        this.hometown = participant?.hometown
+        this.postaddress = participant?.getCurrentTeam()?.postaddress
         this.phonenumber = participant?.phonenumber
         this.birthdate = participant?.birthdate?.toString()
+        this.email = participant?.account?.email
+        this.eventCity = participant?.getCurrentTeam()?.event?.city
     }
 }
