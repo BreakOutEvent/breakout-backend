@@ -17,6 +17,7 @@ jobs:
       DB_DATABASE: test
       DB_USER: root
       DB_PASSWORD: root
+      GRADLE_OPTS: "-Xmx4g"
     steps:
       - name: Mysql Setup
         run : |
