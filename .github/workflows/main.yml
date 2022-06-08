@@ -13,7 +13,7 @@ jobs:
     permissions:
       security-events: write
     env:
-      SPRING_PROFILES_ACTIVE: test
+      SPRING_PROFILES_ACTIVE: githubaction
       DB_DATABASE: test
       DB_USER: root
       DB_PASSWORD: root
