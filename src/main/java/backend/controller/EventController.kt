@@ -9,6 +9,7 @@ import backend.util.CacheNames.LOCATIONS
 import backend.view.EventView
 import backend.view.WhitelistDomainView
 import backend.view.WhitelistEmailView
+import backend.view.user.ParticipantViewModel
 import org.javamoney.moneta.Money
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -186,5 +187,15 @@ class EventController(open var eventService: EventService,
             eventService.regenerateCache(id)
             throw e
         }
+    }
+
+    /**
+     * GET /event/{id}/participants/
+     * Gets all participants for given event
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/{eventId}/participants/")
+    fun getEventParticipants(@PathVariable("eventId") eventId: Long): List<ParticipantViewModel> {
+        return eventService.listParticipantsOfEvent(eventId)
     }
 }

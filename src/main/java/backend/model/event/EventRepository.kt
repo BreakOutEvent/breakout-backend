@@ -1,6 +1,7 @@
 package backend.model.event
 
 import backend.model.location.Location
+import backend.model.user.Participant
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
@@ -18,6 +19,9 @@ interface EventRepository : CrudRepository<Event, Long> {
 
     @Query("SELECT loc FROM Location loc WHERE (loc.distance, loc.team.id) IN (Select max(l.distance), l.team.id from Location l inner join l.team t where t.event.id = :id group by l.team.id)")
     fun getLocationMaxDistanceByIdEachTeam(@Param("id") id: Long): List<Location>
+    
+    @Query("select t.members from Team t where t.event.id = :eventId ")
+    fun listTeamMembersOfEvent(@Param("eventId") EventId: Long): List<Participant>
 }
 
 interface WhitelistEmailRepository : CrudRepository<WhitelistEmailEntry, Long> {
