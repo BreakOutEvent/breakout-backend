@@ -2,7 +2,7 @@
 ![BreakOut-Logo](https://static.break-out.org/breakout-logo.png "BreakOut")
 
 
-[![Build Status](https://travis-ci.org/BreakOutEvent/breakout-backend.svg?branch=develop)](https://travis-ci.org/BreakOutEvent/breakout-backend)
+![main workflow](https://github.com/BreakOutEvent/breakout-backend/actions/workflows/main.yml/badge.svg)
 
 # breakout-backend
 
