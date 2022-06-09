@@ -4,6 +4,8 @@ import backend.configuration.CustomUserDetails
 import backend.controller.exceptions.BadRequestException
 import backend.controller.exceptions.NotFoundException
 import backend.controller.exceptions.UnauthorizedException
+import backend.model.event.Event
+import backend.model.event.EventService
 import backend.model.event.Team
 import backend.model.event.TeamService
 import backend.model.sponsoring.Sponsoring
@@ -28,6 +30,7 @@ import javax.validation.Valid
 class SponsoringController(private var sponsoringService: SponsoringService,
                            private var userService: UserService,
                            private var teamService: TeamService,
+                           private var eventService: EventService,
                            private var configurationService: ConfigurationService) {
 
     private val jwtSecret: String = configurationService.getRequired("org.breakout.api.jwt_secret")
@@ -89,31 +92,38 @@ class SponsoringController(private var sponsoringService: SponsoringService,
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/event/{eventId}/team/{teamId}/sponsoring/")
     @ResponseStatus(CREATED)
-    fun createSponsoring(@PathVariable teamId: Long,
+    fun createSponsoring(@PathVariable eventId: Long,
+                         @PathVariable teamId: Long,
                          @Valid @RequestBody body: SponsoringView,
                          @AuthenticationPrincipal customUserDetails: CustomUserDetails): SponsoringView {
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
+        val event = eventService.findById(eventId) ?: throw NotFoundException("Event with id $eventId not found")
         val team = teamService.findOne(teamId) ?: throw NotFoundException("Team with id $teamId not found")
+        if (team.event.id != event.id) {
+            throw BadRequestException("Team not part of event")
+        }
         val amountPerKm = Money.of(body.amountPerKm, "EUR")
         val limit = Money.of(body.limit, "EUR")
 
         val sponsoring = if (body.unregisteredSponsor != null) {
-            user.getRole(Participant::class) ?: throw UnauthorizedException("Cannot add unregistered sponsor if user is no participant")
-            createSponsoringWithUnregisteredSponsor(team, amountPerKm, limit, body.unregisteredSponsor!!)
+            user.getRole(Participant::class)
+                    ?: throw UnauthorizedException("Cannot add unregistered sponsor if user is no participant")
+            createSponsoringWithUnregisteredSponsor(event, team, amountPerKm, limit, body.unregisteredSponsor!!)
         } else {
-            val sponsor = user.getRole(Sponsor::class) ?: throw UnauthorizedException("Cannot add user as sponsor. Missing role sponsor")
-            createSponsoringWithAuthenticatedSponsor(team, amountPerKm, limit, sponsor)
+            val sponsor = user.getRole(Sponsor::class)
+                    ?: throw UnauthorizedException("Cannot add user as sponsor. Missing role sponsor")
+            createSponsoringWithAuthenticatedSponsor(event, mutableSetOf(team), amountPerKm, limit, sponsor)
         }
 
         return SponsoringView(sponsoring)
     }
 
-    private fun createSponsoringWithAuthenticatedSponsor(team: Team, amount: Money, limit: Money, sponsor: Sponsor): Sponsoring {
-        return sponsoringService.createSponsoring(sponsor, team, amount, limit)
+    private fun createSponsoringWithAuthenticatedSponsor(event: Event, teams: MutableSet<Team>, amount: Money, limit: Money, sponsor: Sponsor): Sponsoring {
+        return sponsoringService.createSponsoring(event, sponsor, teams, amount, limit)
     }
 
-    private fun createSponsoringWithUnregisteredSponsor(team: Team, amount: Money, limit: Money, sponsor: UnregisteredSponsorView): Sponsoring {
+    private fun createSponsoringWithUnregisteredSponsor(event: Event, team: Team, amount: Money, limit: Money, sponsor: UnregisteredSponsorView): Sponsoring {
 
         val unregisteredSponsor = UnregisteredSponsor(
                 firstname = sponsor.firstname!!,
@@ -121,9 +131,10 @@ class SponsoringController(private var sponsoringService: SponsoringService,
                 company = sponsor.company!!,
                 address = sponsor.address!!.toAddress()!!,
                 email = sponsor.email,
-                isHidden = sponsor.isHidden)
+                isHidden = sponsor.isHidden,
+                team = team)
 
-        return sponsoringService.createSponsoringWithOfflineSponsor(team, amount, limit, unregisteredSponsor)
+        return sponsoringService.createSponsoringWithOfflineSponsor(event, amount, limit, unregisteredSponsor)
     }
 
 
@@ -150,7 +161,8 @@ class SponsoringController(private var sponsoringService: SponsoringService,
                                  @PathVariable sponsoringId: Long,
                                  @RequestBody body: Map<String, String>): SponsoringView {
 
-        val sponsoring = sponsoringService.findOne(sponsoringId) ?: throw NotFoundException("No sponsoring with id $sponsoringId found")
+        val sponsoring = sponsoringService.findOne(sponsoringId)
+                ?: throw NotFoundException("No sponsoring with id $sponsoringId found")
         val status = body["status"] ?: throw BadRequestException("Missing status in body")
 
         return when (status.toLowerCase()) {

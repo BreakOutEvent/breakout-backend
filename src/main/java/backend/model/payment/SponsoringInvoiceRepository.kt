@@ -18,9 +18,10 @@ interface SponsoringInvoiceRepository : CrudRepository<SponsoringInvoice, Long> 
     @Query("""
         select distinct i
         from SponsoringInvoice i
-        left join i.sponsorings s on s.team.id = :teamId
         left join i.challenges c on c.team.id = :teamId
-        where s.id is not null or c.id is not null
+        left join i.sponsorings s
+        where c.id is not null
+        and exists (SELECT 1 FROM Sponsoring sp JOIN sp.teams t WHERE sp.id = s.id AND t.id = :teamId)
     """)
     fun findByTeamId(@Param("teamId") teamId: Long): Iterable<SponsoringInvoice>
 

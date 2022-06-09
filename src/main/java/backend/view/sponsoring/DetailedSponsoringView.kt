@@ -12,9 +12,7 @@ class DetailedSponsoringView() {
 
     var eventId: Long? = null
 
-    var teamId: Long? = null
-
-    var team: String? = null
+    var teams: Map<Long, String>? = null
 
     @NotNull
     var amountPerKm: Double? = null
@@ -43,9 +41,8 @@ class DetailedSponsoringView() {
 
     constructor(sponsoring: Sponsoring) : this() {
         this.id = sponsoring.id
-        this.eventId = sponsoring.team?.event?.id
-        this.teamId = sponsoring.team?.id
-        this.team = sponsoring.team?.name
+        this.eventId = sponsoring.event?.id
+        this.teams = sponsoring.teams.associate { it.id!! to it.name }
         this.amountPerKm = sponsoring.amountPerKm.numberStripped.toDouble()
         this.limit = sponsoring.limit.numberStripped.toDouble()
         this.status = sponsoring.status.toString().toUpperCase()

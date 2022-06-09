@@ -36,7 +36,6 @@ class AdminController(private val userService: UserService,
                       private val eventService: EventService,
                       private val challengeService: ChallengeService,
                       private val sponsoringService: SponsoringService,
-                      private val locationService: LocationService,
                       private val postingService: PostingService) {
 
 

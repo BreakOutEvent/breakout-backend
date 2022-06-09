@@ -31,7 +31,7 @@ class SponsoringServiceImplTest : IntegrationTest() {
         val creator = userService.create("creator@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
         val team = teamService.create(creator, "name", "description", event, null)
-        val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(10), euroOf(20))
+        val sponsoring = sponsoringService.createSponsoring(event, sponsor, mutableSetOf(team), euroOf(10), euroOf(20))
 
         val found = sponsoringRepository.findOne(sponsoring.id)
 
@@ -44,7 +44,7 @@ class SponsoringServiceImplTest : IntegrationTest() {
         val creator = userService.create("creator@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
         val team = teamService.create(creator, "name", "description", event, null)
-        val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(10), euroOf(20))
+        val sponsoring = sponsoringService.createSponsoring(event, sponsor, mutableSetOf(team), euroOf(10), euroOf(20))
 
         setAuthenticatedUser(creator.email)
 
@@ -60,7 +60,7 @@ class SponsoringServiceImplTest : IntegrationTest() {
         val creator = userService.create("creator@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
         val team = teamService.create(creator, "name", "description", event, null)
-        val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(10), euroOf(20))
+        val sponsoring = sponsoringService.createSponsoring(event, sponsor, mutableSetOf(team), euroOf(10), euroOf(20))
 
         setAuthenticatedUser(sponsor.email)
 
@@ -77,7 +77,7 @@ class SponsoringServiceImplTest : IntegrationTest() {
         val creator = userService.create("creator@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
         val team = teamService.create(creator, "name", "description", event, null)
-        val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(10), euroOf(20))
+        val sponsoring = sponsoringService.createSponsoring(event, sponsor, mutableSetOf(team), euroOf(10), euroOf(20))
 
         setAuthenticatedUser(creator.email)
 
@@ -93,7 +93,7 @@ class SponsoringServiceImplTest : IntegrationTest() {
         val creator = userService.create("creator@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
         val team = teamService.create(creator, "name", "description", event, null)
-        val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(10), euroOf(20))
+        val sponsoring = sponsoringService.createSponsoring(event, sponsor, mutableSetOf(team), euroOf(10), euroOf(20))
 
         setAuthenticatedUser(sponsor.email)
 
@@ -115,11 +115,12 @@ class SponsoringServiceImplTest : IntegrationTest() {
                 url = "www.url.de",
                 company = "company",
                 gender = "gender",
-                address = Address(street = "street", housenumber = "5", zipcode = "10", city = "city", country = "country")
+                address = Address(street = "street", housenumber = "5", zipcode = "10", city = "city", country = "country"),
+                team = team
         )
 
         setAuthenticatedUser(creator.email)
-        val sponsoring = sponsoringService.createSponsoringWithOfflineSponsor(team, euroOf(10), euroOf(100), unregisteredSponsor)
+        val sponsoring = sponsoringService.createSponsoringWithOfflineSponsor(event, euroOf(10), euroOf(100), unregisteredSponsor)
         sponsoringService.withdrawSponsoring(sponsoring)
     }
 
@@ -136,11 +137,12 @@ class SponsoringServiceImplTest : IntegrationTest() {
                 url = "www.url.de",
                 company = "company",
                 gender = "gender",
-                address = Address(street = "street", housenumber = "5", zipcode = "10", city = "city", country = "country")
+                address = Address(street = "street", housenumber = "5", zipcode = "10", city = "city", country = "country"),
+                team = team
         )
 
         setAuthenticatedUser(creator.email)
-        val sponsoring = sponsoringService.createSponsoringWithOfflineSponsor(team, euroOf(10), euroOf(100), unregisteredSponsor)
+        val sponsoring = sponsoringService.createSponsoringWithOfflineSponsor(event, euroOf(10), euroOf(100), unregisteredSponsor)
 
         setAuthenticatedUser(sponsor.email)
         assertFails { sponsoringService.withdrawSponsoring(sponsoring) }
@@ -152,7 +154,7 @@ class SponsoringServiceImplTest : IntegrationTest() {
         val creator = userService.create("creator@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
         val team = teamService.create(creator, "name", "description", event, null)
-        val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(10), euroOf(20))
+        val sponsoring = sponsoringService.createSponsoring(event, sponsor, mutableSetOf(team), euroOf(10), euroOf(20))
 
         setAuthenticatedUser(sponsor.email)
 
@@ -168,7 +170,7 @@ class SponsoringServiceImplTest : IntegrationTest() {
         val creator = userService.create("creator@mail.de", "password", { addRole(Participant::class) }).getRole(Participant::class)!!
         val event = eventService.createEvent("title", LocalDateTime.now(), "city", Coord(0.0, 1.1), 36)
         val team = teamService.create(creator, "name", "description", event, null)
-        val sponsoring = sponsoringService.createSponsoring(sponsor, team, euroOf(10), euroOf(20))
+        val sponsoring = sponsoringService.createSponsoring(event, sponsor, mutableSetOf(team), euroOf(10), euroOf(20))
 
         setAuthenticatedUser(creator.email)
 
