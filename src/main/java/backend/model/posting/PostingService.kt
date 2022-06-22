@@ -37,6 +37,8 @@ interface PostingService {
 
     fun removeComment(from: Posting, id: Long)
 
+    fun getCommentsById(id:Long): Comment?
+
     fun addComment(to: Posting, from: UserAccount, at: LocalDateTime, withText: String): Comment
 
     fun findAllByChallenge(challengeId: Long): List<Posting>

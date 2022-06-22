@@ -7,6 +7,7 @@ import backend.model.media.Media
 import backend.model.misc.Coord
 import backend.model.misc.Email
 import backend.model.misc.EmailAddress
+import backend.model.posting.Posting
 import backend.model.posting.PostingService
 import backend.model.user.UserService
 import backend.model.removeBlockedBy
@@ -161,17 +162,22 @@ class PostingController(private val postingService: PostingService,
      * Allows Admin to delete Comment
      */
     @CacheEvict(value = POSTINGS, allEntries = true)
-    @PreAuthorize("hasAuthority('EVENT_MANAGER')")
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping("/{id}/comment/{commentId}/", method = [DELETE])
     fun adminDeleteComment(@PathVariable("id") postingId: Long,
-                           @PathVariable("commentId") commentId: Long): Map<String, String> {
+                           @PathVariable("commentId") commentId: Long,
+                           @AuthenticationPrincipal customUserDetails: CustomUserDetails): Map<String, String> {
 
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
         val posting = postingService.getByID(postingId) ?: throw NotFoundException("Posting with id $postingId not found")
+        val comment = postingService.getCommentsById(commentId) ?: throw NotFoundException("Comment with id $commentId not found")
+        if (!user.hasAuthority(EventManager::class) || comment.user?.id != customUserDetails.id) {
+            throw UnauthorizedException("A user can only delete postings submitted by itself")
+        }
         postingService.removeComment(from = posting, id = commentId)
 
         return mapOf("message" to "success")
     }
-
 
     /**
      * GET /posting/

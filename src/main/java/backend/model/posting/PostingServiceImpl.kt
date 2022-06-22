@@ -27,6 +27,8 @@ class PostingServiceImpl(private val repository: PostingRepository,
         this.save(posting)
     }
 
+    override fun getCommentsById(id: Long): Comment? = repository.findCommentsById(id)
+
     // TODO: This should return Posting (will break API)
     override fun addComment(posting: Posting, from: UserAccount, at: LocalDateTime, withText: String): Comment {
         val comment = posting.addComment(from, at, withText)
