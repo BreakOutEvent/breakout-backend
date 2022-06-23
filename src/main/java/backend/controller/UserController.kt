@@ -382,4 +382,23 @@ open class UserController(private val userService: UserService,
         return BasicUserView(user)
     }
 
+    /**
+     * DELETE /user/{id}/
+     * Deletes user with the given id (user deletes its own account, not admin role related)
+     */
+
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/{id}/user/")
+    fun deleteOwnAccount(@PathVariable id: Long,
+                          @AuthenticationPrincipal customUserDetails: CustomUserDetails): UserView {
+
+        val deleter = userService.getUserFromCustomUserDetails(customUserDetails)
+        if (deleter.account.id != id )
+            throw UnauthorizedException("authenticated user and requested resource mismatch")
+
+        val user = userService.getUserById(id) ?: throw NotFoundException("user with id $id does not exist")
+        deletionService.deleteUserAccount(user)
+
+        return UserView(user)
+    }
 }

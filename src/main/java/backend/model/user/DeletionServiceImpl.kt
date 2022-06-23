@@ -150,4 +150,9 @@ class DeletionServiceImpl @Autowired constructor(private val userRepository: Use
         deleteUserGeneratedData(user)
         userRepository.delete(user.account)
     }
+
+    override fun deleteUserAccount(user: User) {
+        deleteUserGeneratedData(user)
+        userRepository.delete(user.account)
+    }
 }
