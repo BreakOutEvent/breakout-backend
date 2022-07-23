@@ -32,6 +32,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     private lateinit var configurationService: ConfigurationService
     private lateinit var JWT_SECRET: String
     private lateinit var user: User
+    private lateinit var user2: User
     private lateinit var admin: User
     private lateinit var event: Event
     private lateinit var team: Team
@@ -45,6 +46,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         event = eventService.createEvent("Breakout München", LocalDateTime.now(), "Munich", Coord(1.0, 1.0), 36)
         admin = userService.create("test_admin@break-out.org", "password", { addRole(Admin::class); isBlocked = false })
         user = userService.create("test@mail.com", "password", { addRole(Participant::class) })
+        user2 = userService.create("test2@mail.com", "password", { addRole(Participant::class) })
         team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event, null)
     }
 
@@ -228,9 +230,9 @@ open class TestPostingEndpoint : IntegrationTest() {
     @Test
     open fun deleteCommentFailNotAdminOrPoster() {
 
-        val posting = postingService.savePostingWithLocationAndMedia("Test", null, admin.account, null, LocalDateTime.now())
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.account, null, LocalDateTime.now())
         //val comment = commentService.createComment("TestComment", LocalDateTime.now(), posting, user.account)
-        val comment = postingService.addComment(posting, admin.account, LocalDateTime.now(), "Hello!")
+        val comment = postingService.addComment(posting, user.account, LocalDateTime.now(), "Hello!")
         val requestPosting = get("/posting/${posting.id}/")
 
         mockMvc.perform(requestPosting)
@@ -258,7 +260,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val requestDelete = MockMvcRequestBuilders
                 .delete("/posting/${posting.id}/comment/$commentId/")
-                .asUser(mockMvc, user.email, "password")
+                .asUser(mockMvc, user2.email, "password")
 
         mockMvc.perform(requestDelete)
                 .andExpect(status().isForbidden)
