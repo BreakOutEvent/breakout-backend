@@ -173,7 +173,7 @@ class PostingController(private val postingService: PostingService,
 
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (!user.hasAuthority(EventManager::class) && comment.user?.id != customUserDetails.id) {
-            throw UnauthorizedException("Users can only delete comments submitted by themselves")
+            throw ForbiddenException("Users can only delete comments submitted by themselves")
         }
 
         postingService.removeComment(from = posting, id = commentId)

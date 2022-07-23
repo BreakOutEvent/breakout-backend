@@ -10,6 +10,9 @@ class NotFoundException(message: String) : RuntimeException(message)
 @ResponseStatus(HttpStatus.UNAUTHORIZED)
 class UnauthorizedException(message: String) : RuntimeException(message)
 
+@ResponseStatus(HttpStatus.FORBIDDEN)
+class ForbiddenException(message: String) : RuntimeException(message)
+
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 class BadRequestException(message: String) : RuntimeException(message)
 
