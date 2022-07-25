@@ -32,6 +32,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     private lateinit var configurationService: ConfigurationService
     private lateinit var JWT_SECRET: String
     private lateinit var user: User
+    private lateinit var user2: User
     private lateinit var admin: User
     private lateinit var event: Event
     private lateinit var team: Team
@@ -45,6 +46,7 @@ open class TestPostingEndpoint : IntegrationTest() {
         event = eventService.createEvent("Breakout München", LocalDateTime.now(), "Munich", Coord(1.0, 1.0), 36)
         admin = userService.create("test_admin@break-out.org", "password", { addRole(Admin::class); isBlocked = false })
         user = userService.create("test@mail.com", "password", { addRole(Participant::class) })
+        user2 = userService.create("test2@mail.com", "password", { addRole(Participant::class) })
         team = teamService.create(user.getRole(Participant::class)!!, "name", "description", event, null)
     }
 
@@ -118,7 +120,7 @@ open class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
-    open fun adminDeleteComment() {
+    open fun deleteCommentAsAdmin() {
 
         val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.account, null, LocalDateTime.now())
 //        val comment = commentService.createComment("TestComment", LocalDateTime.now(), posting, user.account)
@@ -172,7 +174,61 @@ open class TestPostingEndpoint : IntegrationTest() {
     }
 
     @Test
-    open fun adminDeleteCommentFailNotAdmin() {
+    open fun deleteCommentAsUser() {
+
+        val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.account, null, LocalDateTime.now())
+//        val comment = commentService.createComment("TestComment", LocalDateTime.now(), posting, user.account)
+        postingService.addComment(posting, user.account, LocalDateTime.now(), "TestComment")
+        val requestPosting = get("/posting/${posting.id}/")
+
+        mockMvc.perform(requestPosting)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.text").exists())
+                .andExpect(jsonPath("$.date").exists())
+                .andExpect(jsonPath("$.user").exists())
+                .andExpect(jsonPath("$.comments").isArray)
+                .andExpect(jsonPath("$.comments[0].text").value("TestComment"))
+
+        fun MockHttpServletResponse.asMap(): Map<String, Any> {
+            val mapper = ObjectMapper()
+            val body = this.contentAsString
+
+            return mapper.readValue(body, Map::class.java) as Map<String, Any>
+        }
+
+        val comments: List<Map<String, Any>> = mockMvc.perform(get("/posting/${posting.id}/"))
+                .andReturn().response.asMap()["comments"]!! as List<Map<String, Any>>
+
+        val commentId = comments.first()["id"]!!
+
+        val requestDelete = MockMvcRequestBuilders
+                .delete("/posting/${posting.id}/comment/$commentId/")
+                .asUser(mockMvc, user.email, "password")
+
+        mockMvc.perform(requestDelete)
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.message").value("success"))
+
+
+        val requestPosting2 = get("/posting/${posting.id}/")
+
+        mockMvc.perform(requestPosting2)
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_UTF_8))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.text").exists())
+                .andExpect(jsonPath("$.date").exists())
+                .andExpect(jsonPath("$.user").exists())
+                .andExpect(jsonPath("$.comments").isArray)
+                .andExpect(jsonPath("$.comments[0]").doesNotExist())
+
+    }
+
+    @Test
+    open fun deleteCommentFailNotAdminOrPoster() {
 
         val posting = postingService.savePostingWithLocationAndMedia("Test", null, user.account, null, LocalDateTime.now())
         //val comment = commentService.createComment("TestComment", LocalDateTime.now(), posting, user.account)
@@ -204,7 +260,7 @@ open class TestPostingEndpoint : IntegrationTest() {
 
         val requestDelete = MockMvcRequestBuilders
                 .delete("/posting/${posting.id}/comment/$commentId/")
-                .asUser(mockMvc, user.email, "password")
+                .asUser(mockMvc, user2.email, "password")
 
         mockMvc.perform(requestDelete)
                 .andExpect(status().isForbidden)

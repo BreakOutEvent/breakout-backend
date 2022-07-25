@@ -139,7 +139,7 @@ class Posting : BasicEntity, UserGenerated, Reportable {
         return this
     }
 
-    private fun findCommentById(commentId: Long): Comment? {
+    public fun findCommentById(commentId: Long): Comment? {
         return this.comments.firstOrNull { it.id == commentId }
     }
 

@@ -146,7 +146,7 @@ class PostingController(private val postingService: PostingService,
         val posting = postingService.getByID(id) ?: throw NotFoundException("posting with id $id does not exist")
         val user = userService.getUserFromCustomUserDetails(customUserDetails)
         if (!user.hasAuthority(EventManager::class) && posting.user?.id != customUserDetails.id) {
-            throw UnauthorizedException("A user can only delete postings submitted by itself")
+            throw UnauthorizedException("Users can only delete postings submitted by themselves")
         }
 
         posting.challenge?.let {
@@ -156,17 +156,26 @@ class PostingController(private val postingService: PostingService,
         return mapOf("message" to "success")
     }
 
+
     /**
      * DELETE /posting/{id}/comment/{commentId}/
-     * Allows Admin to delete Comment
+     * Allows Admin or author to delete Comment
      */
     @CacheEvict(value = POSTINGS, allEntries = true)
-    @PreAuthorize("hasAuthority('EVENT_MANAGER')")
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping("/{id}/comment/{commentId}/", method = [DELETE])
-    fun adminDeleteComment(@PathVariable("id") postingId: Long,
-                           @PathVariable("commentId") commentId: Long): Map<String, String> {
+    fun deleteComment(@PathVariable("id") postingId: Long,
+                      @PathVariable("commentId") commentId: Long,
+                      @AuthenticationPrincipal customUserDetails: CustomUserDetails): Map<String, String> {
 
         val posting = postingService.getByID(postingId) ?: throw NotFoundException("Posting with id $postingId not found")
+        val comment = posting.findCommentById(commentId) ?: throw NotFoundException("Comment with id $commentId not found for posting with id $postingId")
+
+        val user = userService.getUserFromCustomUserDetails(customUserDetails)
+        if (!user.hasAuthority(EventManager::class) && comment.user?.id != customUserDetails.id) {
+            throw ForbiddenException("Users can only delete comments submitted by themselves")
+        }
+
         postingService.removeComment(from = posting, id = commentId)
 
         return mapOf("message" to "success")
